@@ -1,0 +1,324 @@
+<app-card
+  viewTitle="Configuración contabilidad"
+  [notWithCardStyle]="true"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="UrlFiltersService.activeFilters"
+>
+  <app-table
+    class="text-nowrap"
+    [loading]="loading"
+    [arrayData]="items"
+    [pagination]="pagination"
+    (pageChange)="onPagination($event)"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Cuenta Ingreso</th>
+      <th>Cuenta Inventario</th>
+      <th>Cuenta Gasto</th>
+      <th>Cuenta Costo</th>
+      <th>Cuenta Entrada</th>
+      <th>Cuenta Iva Venta</th>
+      <th>Cuenta Iva Compra</th>
+      <th>Cuenta Retefuente Compra</th>
+      <th>Cuenta ReteICA Compra</th>
+      @if (configurable_entity_type !== 'product') {
+        <th>Cuenta Descuento Venta</th>
+        <th>Cuenta Descuento Compra</th>
+        <th>Cuenta Retefuente Venta</th>
+        <th>Retefuente %</th>
+        <th>Cuenta ReteICA Venta</th>
+        <th>ReteICA %</th>
+        <th>Cuenta ReteIVA Venta</th>
+        <th>Cuenta ReteIVA Compra</th>
+        <th>ReteIVA %</th>
+      }
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @if (items.length && !loading) {
+        @for (item of items; track item) {
+          <tr class="text-center">
+            <td>{{ item?.configurable?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.income_account?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.inventory_account?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.expense_account?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.cost_account?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.entry_account?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.sale_iva_account?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.purchase_iva_account?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.retefuente_purchase_account?.Nombre || 'N/A' }}</td>
+            <td>{{ item?.reteica_purchase_account?.Nombre || 'N/A' }}</td>
+            @if (configurable_entity_type !== 'product') {
+              <td>{{ item?.sale_discount_account?.Nombre || 'N/A' }}</td>
+              <td>{{ item?.purchase_discount_account?.Nombre || 'N/A' }}</td>
+              <td>{{ item?.retefuente_sale_account?.Nombre || 'N/A' }}</td>
+              <td>
+                {{ item?.retefuente_percentage ? item?.retefuente_percentage + '%' : 'N/A' }}
+              </td>
+              <td>{{ item?.reteica_sale_account?.Nombre || 'N/A' }}</td>
+              <td>{{ item?.reteica_percentage ? item?.reteica_percentage + '%' : 'N/A' }}</td>
+              <td>{{ item?.reteiva_sale_account?.Nombre || 'N/A' }}</td>
+              <td>{{ item?.reteiva_purchase_account?.Nombre || 'N/A' }}</td>
+              <td>{{ item?.reteiva_percentage ? item?.reteiva_percentage + '%' : 'N/A' }}</td>
+            }
+            <td>
+              <app-dropdown-actions>
+                <app-action-edit (action)="editItem(item)" />
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      } @else {
+        <tr>
+          <td colspan="100%">
+            <app-not-data-sa [loading]="loading"></app-not-data-sa>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<app-modal-basic #itemModal [dialogClass]="'modal-xl'">
+  <div class="app-modal-header w-100">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center w-100">
+          <h4 class="modal-title text-primary">Editar {{ translateConfigurableEntityType() }}</h4>
+          <button
+            type="button"
+            class="close btn-close"
+            aria-label="Close"
+            (click)="closeModal()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-body">
+    @if (viewModal) {
+      <form [formGroup]="configurable_entity_type === 'product' ? formProducts : form">
+        @if (formsValuesChanged === false && !loadingItem) {
+          <h6 class="mt-0 mb-3">Nombre: {{ itemName || 'N/A' }}</h6>
+          <div class="row">
+            @if (configurable_entity_type !== 'product') {
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Tipo de retención"
+                placeholder="Ingresar tipo de retención"
+                [control]="form.controls['retention_type_id']"
+                [list]="retentionTypes"
+              />
+            }
+            <app-autocomplete-fc
+              class="col col-md-3"
+              label="Cuenta ingreso"
+              placeholder="Ingresar cuenta ingreso"
+              [control]="
+                configurable_entity_type === 'product'
+                  ? formProducts.controls['income_account']
+                  : form.controls['income_account']
+              "
+              [list]="accounts"
+            />
+            <app-autocomplete-fc
+              class="col col-md-3"
+              label="Cuenta inventario"
+              placeholder="Ingresar cuenta inventario"
+              [control]="
+                configurable_entity_type === 'product'
+                  ? formProducts.controls['inventory_account']
+                  : form.controls['inventory_account']
+              "
+              [list]="accounts"
+            />
+            <app-autocomplete-fc
+              class="col col-md-3"
+              label="Cuenta gasto"
+              placeholder="Ingresar cuenta gasto"
+              [control]="
+                configurable_entity_type === 'product'
+                  ? formProducts.controls['expense_account']
+                  : form.controls['expense_account']
+              "
+              [list]="accounts"
+            />
+            <app-autocomplete-fc
+              class="col col-md-3"
+              label="Cuenta costo"
+              placeholder="Ingresar cuenta costo"
+              [control]="
+                configurable_entity_type === 'product'
+                  ? formProducts.controls['cost_account']
+                  : form.controls['cost_account']
+              "
+              [list]="accounts"
+            />
+            <app-autocomplete-fc
+              class="col col-md-3"
+              label="Cuenta entrada"
+              placeholder="Ingresar cuenta entrada"
+              [control]="
+                configurable_entity_type === 'product'
+                  ? formProducts.controls['entry_account']
+                  : form.controls['entry_account']
+              "
+              [list]="accounts"
+            />
+            <app-autocomplete-fc
+              class="col col-md-3"
+              label="Cuenta IVA venta"
+              placeholder="Ingresar cuenta iva venta"
+              [control]="
+                configurable_entity_type === 'product'
+                  ? formProducts.controls['sale_iva_account']
+                  : form.controls['sale_iva_account']
+              "
+              [list]="accounts"
+            />
+            <app-autocomplete-fc
+              class="col col-md-3"
+              label="Cuenta IVA compra"
+              placeholder="Ingresar cuenta iva compra"
+              [control]="
+                configurable_entity_type === 'product'
+                  ? formProducts.controls['purchase_iva_account']
+                  : form.controls['purchase_iva_account']
+              "
+              [list]="accounts"
+            />
+            @if (configurable_entity_type === 'product') {
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta retefuente compra"
+                placeholder="Ingresar cuenta retefuente compra"
+                [control]="formProducts.controls['retefuente_purchase_account']"
+                [list]="accounts"
+              />
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta reteICA compra"
+                placeholder="Ingresar cuenta reteICA compra"
+                [control]="formProducts.controls['reteica_purchase_account']"
+                [list]="accounts"
+              />
+            }
+            @if (configurable_entity_type !== 'product') {
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta descuento venta"
+                placeholder="Ingresar cuenta descuento venta"
+                [control]="form.controls['sale_discount_account']"
+                [list]="accounts"
+              />
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta descuento compra"
+                placeholder="Ingresar cuenta descuento compra"
+                [control]="form.controls['purchase_discount_account']"
+                [list]="accounts"
+              />
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta retefuente venta"
+                placeholder="Ingresar cuenta retefuente venta"
+                [control]="form.controls['retefuente_sale_account']"
+                [list]="accounts"
+              />
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta retefuente compra"
+                placeholder="Ingresar cuenta retefuente compra"
+                [control]="form.controls['retefuente_purchase_account']"
+                [list]="accounts"
+              />
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Porcentaje retefuente</mat-label>
+                <input
+                  matInput
+                  currencyMask
+                  [options]="masks.maskPorcentaje"
+                  appInputPositionInitial
+                  placeholder="Ingresa el porcentaje retefuente"
+                  formControlName="retefuente_percentage"
+                  autocomplete="off"
+                />
+              </mat-form-field>
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta reteICA venta"
+                placeholder="Ingresar cuenta reteICA venta"
+                [control]="form.controls['reteica_sale_account']"
+                [list]="accounts"
+              />
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta reteICA compra"
+                placeholder="Ingresar cuenta reteICA compra"
+                [control]="form.controls['reteica_purchase_account']"
+                [list]="accounts"
+              />
+              <mat-form-field class="col col-md-3" appearance="outline">
+                <mat-label>Porcentaje reteICA</mat-label>
+                <input
+                  matInput
+                  currencyMask
+                  [options]="masks.maskPorcentaje"
+                  appInputPositionInitial
+                  placeholder="Ingresa el porcentaje reteICA"
+                  formControlName="reteica_percentage"
+                  autocomplete="off"
+                />
+              </mat-form-field>
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta reteIVA venta"
+                placeholder="Ingresar cuenta reteIVA venta"
+                [control]="form.controls['reteiva_sale_account']"
+                [list]="accounts"
+              />
+              <app-autocomplete-fc
+                class="col col-md-3"
+                label="Cuenta reteIVA compra"
+                placeholder="Ingresar cuenta reteIVA compra"
+                [control]="form.controls['reteiva_purchase_account']"
+                [list]="accounts"
+              />
+              <mat-form-field class="col col-md-3" appearance="outline">
+                <mat-label>Porcentaje reteIVA</mat-label>
+                <input
+                  matInput
+                  currencyMask
+                  [options]="masks.maskPorcentaje"
+                  appInputPositionInitial
+                  placeholder="Ingresa el porcentaje reteIVA"
+                  formControlName="reteiva_percentage"
+                  autocomplete="off"
+                />
+              </mat-form-field>
+            }
+          </div>
+        } @else {
+          <app-not-data-sa [loading]="loadingItem"></app-not-data-sa>
+        }
+      </form>
+    }
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-end">
+      <button type="button" class="btn btn-danger me-2" (click)="closeModal()">Cancelar</button>
+      <button type="button" class="btn btn-primary" (click)="editEntityTypeInDB()">Guardar</button>
+    </div>
+  </div>
+</app-modal-basic>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filters.name"
+    (searching)="filters.name = $event; getItems()"
+  ></app-automatic-search>
+</ng-template>

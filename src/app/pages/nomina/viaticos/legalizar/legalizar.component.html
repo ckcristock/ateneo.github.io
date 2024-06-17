@@ -1,0 +1,30 @@
+@if (data && !loading) {
+  <app-card viewTitle="Legalizar viático">
+    <div *ngIf="!loading">
+      <app-viaticos-viaje *ngIf="data" [data]="data"></app-viaticos-viaje>
+      <app-hospedaje [legal]="true" *ngIf="data.hotels.length"></app-hospedaje>
+      {{ validHotel }}
+      <br />
+      <app-transporte-terrestre
+        *ngIf="data.transports.length"
+        [legal]="true"
+      ></app-transporte-terrestre>
+      {{ validTransport }}
+
+      <app-viaticos-taxis
+        *ngIf="data.expense_taxi_cities.length"
+        [legal]="true"
+      ></app-viaticos-taxis>
+      {{ validTaxi }}
+
+      <app-viaticos-alimentacion
+        *ngIf="data.feedings.length"
+        [feedings]="data.feedings"
+      ></app-viaticos-alimentacion>
+      <app-viaticos-totales [data]="data"></app-viaticos-totales>
+    </div>
+    <button [disabled]="!validHotel" class="btn btn-primary btn-block">Legalizar</button>
+  </app-card>
+} @else {
+  <app-placeholder-form></app-placeholder-form>
+}

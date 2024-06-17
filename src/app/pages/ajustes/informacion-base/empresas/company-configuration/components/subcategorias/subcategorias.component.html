@@ -1,0 +1,184 @@
+<app-card viewTitle="Subcategorías" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="openModal(add, 'Agregar')" />
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Sucategories"
+    [pagination]="pagination"
+    (pageChange)="getSubcategories()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Categoría</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of Sucategories; track $index) {
+        <tr class="text-center">
+          <td>
+            {{ item.Nombre }}
+            @if (item.Fijo == 1) {
+              <span class="badge rounded-pill bg-info"><i class="fas fa-lock"></i></span>
+            }
+          </td>
+          <td>{{ item.category?.Nombre }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="openModal(add, 'Editar', item)" />
+              @if (item.Activo == 1 && item.Fijo == 0 && !restriccionDesdeCatalogo) {
+                <app-action-deactivate (action)="activateSubcategory(item.Id_Subcategoria, 0)" />
+              }
+              @if (item.Activo == 0 && item.Fijo == 0 && !restriccionDesdeCatalogo) {
+                <app-action-activate (action)="activateSubcategory(item.Id_Subcategoria, 1)" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Categoría</mat-label>
+    <mat-select [(ngModel)]="filters.Id_Categoria_Nueva" (selectionChange)="getSubcategories()">
+      <mat-option value="">Todos</mat-option>
+      @for (categoria of categorias_filtro; track categoria) {
+        <mat-option [value]="categoria.value">{{ categoria.text }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Nombre</mat-label>
+    <input
+      type="text"
+      [(ngModel)]="filters.nombre"
+      (input)="getSubcategories()"
+      matInput
+      autocomplete="off"
+      placeholder="Busca por nombre"
+    />
+  </mat-form-field>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>
+
+<ng-template #add let-modalSubategoria>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modalSubategoria.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="form">
+      @if (!Subcategory?.category?.Fijo) {
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Ingresa el nombre"
+              formControlName="Nombre"
+              required
+            />
+          </mat-form-field>
+          <app-autocomplete-fc
+            class="col"
+            label="Categoría asociada"
+            placeholder="Categoría asociada"
+            [control]="form.controls['Id_Categoria_Nueva']"
+            [list]="categorias_filtro"
+          ></app-autocomplete-fc>
+        </div>
+        <hr class="border border-secondary border-1 opacity-50" />
+      }
+      <div class="row d-flex justify-content-between">
+        <div class="col-md-6 text-info">Campos adicionales</div>
+        <div class="col-md-6 text-end">
+          <div class="btn-group rounded w-sm-100 mat-form-field-wrapper">
+            <button type="button" class="btn btn-primary btn-sm" (click)="newField()">
+              <i class="fa fa-plus"></i> Agregar
+            </button>
+          </div>
+        </div>
+      </div>
+      <div formArrayName="dynamic">
+        @if (fieldDinamic.controls.length) {
+          @for (item of fieldDinamic.controls; track item; let i = $index) {
+            <div [formGroupName]="i">
+              <div class="row">
+                <mat-form-field class="col-md-3" appearance="outline">
+                  <mat-label>Nombre</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    placeholder="Ingresa el nombre"
+                    formControlName="label"
+                    autocomplete="off"
+                    required
+                  />
+                </mat-form-field>
+                <mat-form-field class="col-md-2" appearance="outline">
+                  <mat-label>Tipo</mat-label>
+                  <mat-select formControlName="type" required>
+                    <mat-option value="number">Numérico</mat-option>
+                    <mat-option value="text">Texto</mat-option>
+                    <mat-option value="date">Fecha</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field class="col-md-2" appearance="outline">
+                  <mat-label>Requerido</mat-label>
+                  <mat-select formControlName="required" required>
+                    <mat-option value="Si">Sí</mat-option>
+                    <mat-option value="No">No</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <div class="col-md-2 mt-2">
+                  <mat-checkbox
+                    matTooltip="Marca esta casilla si el campo es requerido solo cuando el producto se reciba en un acta de recepción"
+                    color="primary"
+                    formControlName="reception"
+                    >Recepcion</mat-checkbox
+                  >
+                </div>
+                <!-- <mat-checkbox class="col col-md-2 mt-2" color="primary" formControlName="lists"> -->
+                <!--   Listar -->
+                <!-- </mat-checkbox> -->
+                <div class="col-1 mt-2">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="deleteField(i, item)"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="alert alert-warning text-center" role="alert">Sin datos agregados</div>
+        }
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modalSubategoria.close()">
+      Cancelar
+    </button>
+    <button type="button" (click)="SaveSubcategory()" class="btn btn-primary">Guardar</button>
+  </div>
+</ng-template>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>

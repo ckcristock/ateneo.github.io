@@ -1,0 +1,73 @@
+<app-modal-basic #modal [dialogClass]="'modal-xl modal-full'">
+  <div class="app-modal-header">
+    <div class="row">
+      <h4 class="text text-center justify-content-center modal-title px-3">Historial de Nómina</h4>
+      <button type="button" class="close basic-close" (click)="modal.hide()"></button>
+    </div>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-12">
+        <table class="table table-sm table-striped">
+          <thead>
+            <tr>
+              <th>Fecha Reporte</th>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Cune</th>
+              <th>Mensaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngIf="!loading && data.length > 0; else notData">
+              <tr *ngFor="let item of data">
+                <td>{{ item.created_at | date: 'dd-MM-YYYY' }}</td>
+                <td>{{ item.code }}</td>
+                <td>
+                  <span
+                    [ngClass]="{
+                      'bg-danger': item.status == 'rejected',
+                      'bg-warning': item.status == 'deleted',
+                      'bg-success': item.status == 'succeded',
+                      'bg-dark': !item.status
+                    }"
+                    class="badge"
+                    >{{ item.status | payrollStatus }}</span
+                  >
+                </td>
+                <td>
+                  <p style="width: 350px">
+                    {{ item.cune }}
+                  </p>
+                </td>
+                <td>
+                  {{ item.message }}
+                  <ng-container *ngIf="item.errors">
+                    <br />
+                    <strong>Errores:</strong>
+                    {{ item.errors }}
+                  </ng-container>
+                </td>
+                <td></td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-end px-3">
+      <!--  <button type="button " class="btn btn-danger btn-sm me-2" (click)="modal.hide() ">Cerrar</button>
+            <button type="button " class="btn btn-success btn-sm " (click)="detalleCita()">Cancelar Cita</button> -->
+    </div>
+  </div>
+</app-modal-basic>
+
+<ng-template #notData>
+  <tr>
+    <td colspan="100%">
+      <app-not-data [loading]="loading"></app-not-data>
+    </td>
+  </tr>
+</ng-template>

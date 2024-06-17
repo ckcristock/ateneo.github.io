@@ -1,0 +1,72 @@
+<app-card [viewTitle]="titleCard" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="openManagePayroll(true)" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="data"
+    [pagination]="pagination"
+    (pageChange)="sendNewRequest()"
+  >
+    <ng-container titles>
+      <th scope="col">Nombre</th>
+      <th scope="col">Código</th>
+      <th scope="col">Nit</th>
+      <th scope="col" class="text-center">Estado</th>
+      <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of data; track $index) {
+        <tr class="text-center">
+          <td class="align-middle" scope="row">{{ item.name }}</td>
+          <td class="align-middle">{{ item.code ?? 'N/A' }}</td>
+          <td class="align-middle">{{ item.nit ?? 'N/A' }}</td>
+          <td class="align-middle text-center">
+            <app-status-badge [status]="item.status" />
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="openManagePayroll(false, item)" />
+              @if (item.status === 'Activo' || item.status === 'activo') {
+                <app-action-deactivate (action)="onChangeState(item.id, 'Inactivo')" />
+              } @else {
+                <app-action-activate (action)="onChangeState(item.id, 'Activo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <div class="row row-gap-3">
+    <app-automatic-search
+      class="col"
+      label="Nombre"
+      placeholder="Busca por nombre"
+      (searching)="filters.name = $event; onRequest()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Código"
+      placeholder="Busca por código"
+      (searching)="filters.code = $event; onRequest()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="NIT"
+      placeholder="Busca por NIT"
+      (searching)="filters.nit = $event; onRequest()"
+    ></app-automatic-search>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="filters.status" (selectionChange)="onRequest()">
+        @for (statu of status; track $index) {
+          <mat-option [value]="statu.value">
+            {{ statu.text }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</ng-template>

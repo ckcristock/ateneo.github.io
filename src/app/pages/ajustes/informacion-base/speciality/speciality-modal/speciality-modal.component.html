@@ -1,0 +1,62 @@
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Nueva especialidad</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            [(ngModel)]="speciality.name"
+            formControlName="name"
+            name="name"
+            autocomplete="off"
+            required
+          />
+          <mat-error>
+            <app-show-errors class="text-danger" [ctrl]="form.get('name')"></app-show-errors>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Código</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el código"
+            [(ngModel)]="speciality.code"
+            formControlName="code"
+            name="code"
+            autocomplete="off"
+            required
+          />
+          <mat-error>
+            <app-show-errors class="text-danger" [ctrl]="form.get('code')"></app-show-errors>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="close()">Cancelar</button>
+    <button
+      type="button"
+      (click)="createNewSpeciality()"
+      [disabled]="!form.valid"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>

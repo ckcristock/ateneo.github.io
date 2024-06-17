@@ -1,0 +1,60 @@
+<app-modal titleModal="Nuevo {{ titleReason }}">
+  <form [formGroup]="formReason">
+    <div class="row">
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Ingresa el nombre"
+          formControlName="name"
+          name="codigo"
+          required
+          autocomplete="off"
+        />
+        <button
+          type="submit"
+          matSuffix
+          mat-icon-button
+          (click)="onSaveReason()"
+          [disabled]="!formReason.valid"
+        >
+          <mat-icon>save</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+  </form>
+  <h6 class="mb-3 text-uppercase text-primary text-center">{{ titleReason | titlecase }}</h6>
+  <app-table
+    [loading]="loading"
+    [arrayData]="data"
+    [pagination]="pagination"
+    (pageChange)="onNewPage()"
+  >
+    <ng-container titles>
+      <th scope="col">Nombre del {{ titleReason }}</th>
+      @for (th of addColumns; track $index) {
+        <th>{{ th.name }}</th>
+      }
+      <th scope="col" class="text-center">Acción</th>
+    </ng-container>
+    <tbody content>
+      @for (type of data; track $index) {
+        <tr class="text-center">
+          <td>{{ type.text }}</td>
+          @for (td of addColumns; track $index) {
+            <th>{{ type[td.key] || 'N/A' }}</th>
+          }
+          <td>
+            @if (type.status === 'inactivo') {
+              <app-action-activate (action)="activateOrCancel(type, 'Activo')" />
+            }
+            @if (type.status === 'activo') {
+              <app-action-deactivate (action)="activateOrCancel(type, 'Inactivo')" />
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-modal>

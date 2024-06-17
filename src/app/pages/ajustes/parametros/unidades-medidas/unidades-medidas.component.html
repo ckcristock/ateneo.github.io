@@ -1,0 +1,101 @@
+<app-card
+  viewTitle="Unidades de medida"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters (click)="openConfirm(add, 'Nueva UM')" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="units"
+    [pagination]="pagination"
+    (pageChange)="getUnits()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Unidad</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of units; track $index) {
+        <tr class="text-center">
+          <td>{{ item.name }}</td>
+          <td>{{ item.unit }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="getUnit(item); openConfirm(add, 'Actualizar UM')" />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtro.name"
+    (searching)="filtro.name = $event; getUnits()"
+  ></app-automatic-search>
+</ng-template>
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <span aria-hidden="true"></span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            autocomplete="off"
+            formControlName="name"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Unidad</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa la sigla"
+            autocomplete="off"
+            formControlName="unit"
+            required
+          />
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="modal.dismiss('Cross click'); form.reset()"
+    >
+      Cancelar
+    </button>
+    <button type="button" [disabled]="!form.valid" (click)="save()" class="btn btn-primary">
+      Guardar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

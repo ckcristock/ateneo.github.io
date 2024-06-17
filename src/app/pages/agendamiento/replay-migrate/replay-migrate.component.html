@@ -1,0 +1,101 @@
+<app-card
+  viewTitle="Remigrar cita"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+  [expanded]="true"
+>
+  <app-table
+    [loading]="loading"
+    [arrayData]="citas"
+    [pagination]="pagination"
+    (pageChange)="getCitas()"
+  >
+    <ng-container titles>
+      <th>Fecha</th>
+      <th>Profesional</th>
+      <th>Paciente</th>
+      <th>Teléfono</th>
+      <th>Especialidad</th>
+      <th>Descripción</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (cita of citas; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">{{ cita.hour_start | date: 'dd/MM/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ cita.profesional_name }}</td>
+          <td class="align-middle">{{ cita.patient_name }}</td>
+          <td class="align-middle">{{ cita.phone }}</td>
+          <td class="align-middle">{{ cita.speciality }}</td>
+          <td class="align-middle col-md-3">
+            <app-view-more [text]="cita.observation" [length]="20" />
+          </td>
+          <td class="align-middle">{{ cita.state }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="search"
+                text="Detalle cita"
+                type="info"
+                (click)="detalleCita(cita)"
+              />
+              <app-action-button
+                icon="ban"
+                text="Cancelar Cita"
+                type="danger"
+                (click)="Cancel(cita)"
+              />
+              <app-action-button
+                icon="coins"
+                text="Migrar Cita"
+                type="secondary"
+                (click)="Migrate(cita.id)"
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-filter-scheduling [values]="filters" (filterEvent)="getCitas($event)">
+    <mat-form-field class="col-md-4" appearance="outline">
+      <mat-label>Fecha</mat-label>
+      <input
+        matInput
+        type="date"
+        [(ngModel)]="filters.space_date"
+        name="space_date"
+        required
+        (change)="getCitas()"
+      />
+    </mat-form-field>
+    <app-automatic-search
+      class="col"
+      label="Paciente"
+      placeholder="Nombre / Identificación"
+      [value]="filters.patient"
+      (searching)="filters.patient = $event; getCitas()"
+    ></app-automatic-search>
+    <mat-form-field class="col-md-2" appearance="outline">
+      <mat-label>EPS</mat-label>
+      <mat-select [(ngModel)]="filters.eps" name="eps" (selectionChange)="getCitas()">
+        <mat-option *ngFor="let item of epss" [value]="item.value">
+          {{ item.text }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col-md-2" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="filters.state" name="state" (selectionChange)="getCitas()">
+        <mat-option *ngFor="let item of states" [value]="item.value">
+          {{ item.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </app-filter-scheduling>
+</ng-template>
+<app-detalle-cita [modalData]="openModalDetalle"></app-detalle-cita>

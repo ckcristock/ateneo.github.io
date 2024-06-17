@@ -1,0 +1,533 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <form #FormActivoFijo="ngForm">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fecha</mat-label>
+          <input
+            matInput
+            type="date"
+            name="fecha"
+            id="fecha"
+            [(ngModel)]="ActivoFijoModel.Fecha"
+            (change)="getCodigo($event.target.value)"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre o NIT</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Busca por nombre o NIT"
+            autocomplete="off"
+            required
+            name="nit_empresa"
+            id="nit_empresa"
+            (change)="AsignarTercero()"
+            (blur)="validarCampo(TerceroSeleccionado, $event, 'Nit')"
+            [(ngModel)]="TerceroSeleccionado"
+            [ngbTypeahead]="search_tercero"
+            [resultTemplate]="rt_tercero"
+            [inputFormatter]="formatter_tercero"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            class="text-uppercase"
+            type="text"
+            placeholder="Ingresa el nombre"
+            name="Nombre"
+            id="nombre"
+            (change)="AsignarConcepto()"
+            [(ngModel)]="ActivoFijoModel.Nombre"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Documento</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el documento"
+            name="documento"
+            id="documento"
+            (change)="AsignarConcepto()"
+            [(ngModel)]="ActivoFijoModel.Documento"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Concepto</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Concepto"
+            name="concepto"
+            id="concepto"
+            [(ngModel)]="ActivoFijoModel.Concepto"
+            readonly
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <ng-container *ngIf="Crear; else tipo">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Tipo</mat-label>
+            <mat-select
+              name="Id_Tipo_Activo_Fijo"
+              id="tipo_activo"
+              required
+              [(ngModel)]="ActivoFijoModel.Id_Tipo_Activo_Fijo"
+            >
+              <mat-option *ngFor="let ta of TipoActivos" [value]="ta.Id_Tipo_Activo_Fijo">
+                {{ ta.Nombre_Tipo_Activo }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+          <div class="col">
+            <app-custumetypeahead
+              [Ruta]="Ruta"
+              [label]="'Centro costo'"
+              [Modelo]="typeahead"
+              [Campo]="Campo_Centro_Costo"
+              (RetornarId)="CapturarIdCentroCosto($event, 'Centro')"
+            ></app-custumetypeahead>
+          </div>
+        </ng-container>
+        <ng-template #tipo>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Tipo</mat-label>
+            <input
+              matInput
+              type="text"
+              name="Tipo_activo"
+              id="Tipo_Activo"
+              [(ngModel)]="ActivoFijoModel.Tipo_Activo"
+              readonly
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Centro costo</mat-label>
+            <input
+              matInput
+              type="text"
+              name="Centro_Costo"
+              id="Centro_Costo"
+              [(ngModel)]="ActivoFijoModel.Centro_Costo"
+              readonly
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+        </ng-template>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Referencia</mat-label>
+          <input
+            matInput
+            type="text"
+            name="referencia"
+            id="referencia"
+            [(ngModel)]="ActivoFijoModel.Referencia"
+            placeholder="Ingresa la referencia"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Cantidad</mat-label>
+          <input
+            matInput
+            type="text"
+            name="cantidad"
+            id="cantidad"
+            required
+            [(ngModel)]="ActivoFijoModel.Cantidad"
+            placeholder="Ingresa la cantidad"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Base</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Base"
+            required
+            (change)="AsignarValor('Pcga')"
+            [(ngModel)]="ActivoFijoModel.Base"
+            placeholder="Ingresa la base"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>IVA</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Iva"
+            required
+            (change)="AsignarValor('Pcga')"
+            [(ngModel)]="ActivoFijoModel.Iva"
+            placeholder="Ingresa el IVA"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Base NIIF</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Base"
+            required
+            (change)="AsignarValor('Niif')"
+            [(ngModel)]="ActivoFijoModel.Base_NIIF"
+            placeholder="Ingresa base NIIF"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>IVA NIIF</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Iva"
+            required
+            (change)="AsignarValor('Niif')"
+            [(ngModel)]="ActivoFijoModel.Iva_NIIF"
+            placeholder="Ingresa IVA NIIF"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Costo PCGA(Local)</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Costo_PCGA"
+            readonly
+            [(ngModel)]="ActivoFijoModel.Costo_PCGA"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Costo NIIF</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Costo_NIIF"
+            readonly
+            [(ngModel)]="ActivoFijoModel.Costo_NIIF"
+          />
+        </mat-form-field>
+        <div class="col">
+          <app-custumetypeahead
+            [Ruta]="Ruta_Cuenta_Renteciones"
+            [label]="'Cuenta retefuente'"
+            [Modelo]="typeahead_Rete_Fuente"
+            (RetornarId)="CapturarIdCentroCosto($event, 'Rete_Fuente')"
+            [Campo]="Campo_Rete_Fuente"
+          ></app-custumetypeahead>
+        </div>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Valor</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Costo_Rete_Fuente"
+            readonly
+            [(ngModel)]="ActivoFijoModel.Costo_Rete_Fuente"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Valor NIIF</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Costo_Rete_Fuente_NIIF"
+            readonly
+            [(ngModel)]="ActivoFijoModel.Costo_Rete_Fuente_NIIF"
+          />
+        </mat-form-field>
+        <div class="col">
+          <app-custumetypeahead
+            [Ruta]="Ruta_Cuenta_Renteciones"
+            [label]="'Cuenta reteica'"
+            [Modelo]="typeahead_Rete_Ica"
+            (RetornarId)="CapturarIdCentroCosto($event, 'Rete_Ica')"
+            [Campo]="Campo_Rete_Ica"
+          ></app-custumetypeahead>
+        </div>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Valor</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Costo_Rete_Ica"
+            readonly
+            [(ngModel)]="ActivoFijoModel.Costo_Rete_Ica"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Valor NIIF</mat-label>
+          <input
+            matInput
+            type="number"
+            name="Costo_Rete_Ica_NIIF"
+            readonly
+            [(ngModel)]="ActivoFijoModel.Costo_Rete_Ica_NIIF"
+          />
+        </mat-form-field>
+      </div>
+      <ng-container *ngIf="Mostrar_Facturas">
+        <h6 class="text-center">Facturas</h6>
+        <div class="rounden-top table-responsive">
+          <table class="table table-bordered table-striped table-sm">
+            <thead class="bg-light">
+              <tr class="text-center text-uppercase">
+                <th></th>
+                <th>Cuenta</th>
+                <th>Fecha</th>
+                <th>Documento</th>
+                <th>Vlr. Factura</th>
+                <th>Vlr. Abono</th>
+                <th>Vlr. Saldo</th>
+                <th>Abono</th>
+                <th>Nat</th>
+                <th>Movimiento Debito</th>
+                <th>Movimiento_Credito</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="Lista_Facturas.length == 0 && !Cargando" class="text-center">
+                <td colspan="100%" class="p-5">
+                  <i class="fa fa-exclamation-circle fa-9x m-4"></i>
+                  <h4>No existen facturas para mostrar</h4>
+                </td>
+              </tr>
+              <tr *ngFor="let item of Lista_Facturas; let i = index" id="fila{{ i }}">
+                <td class="text-center">
+                  <input
+                    type="checkbox"
+                    name="Factura{{ i }}"
+                    id="Factura{{ i }}"
+                    (change)="addListInvoice(item, i)"
+                  />
+                </td>
+                <td>{{ item.Codigo }}</td>
+                <td>{{ item.Fecha }}</td>
+                <td>{{ item.Factura }}</td>
+                <td class="text-end">
+                  {{ item.Valor_Factura | currency }}
+                </td>
+                <td class="text-end">
+                  {{ item.Valor_Abono | currency }}
+                </td>
+                <td class="text-end">
+                  {{ item.Valor_Saldo | currency }}
+                </td>
+                <td class="text-end">
+                  <input
+                    type="number"
+                    name="abono{{ i }}"
+                    id="abono{{ i }}"
+                    [(ngModel)]="item.Abono"
+                    (blur)="validarSaldoFactura(i, $event)"
+                  />
+                </td>
+                <td>{{ item.Nat }}</td>
+                <td class="text-end">
+                  {{ item.Movimiento_Debito | currency }}
+                </td>
+                <td class="text-end">
+                  {{ item.Movimiento_Credito | currency }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-primary btn-sm" (click)="addInvoicesToAccount()">Confirmar</button>
+      </ng-container>
+      <div class="row">
+        <div class="col-md-6">
+          <h6>Anticipo</h6>
+          <hr />
+          <div *ngFor="let item of Ctas_Anticipo; let i = index" class="row">
+            <div class="col">
+              <app-custumetypeahead
+                [Ruta]="Ruta_Cuentas"
+                [Modelo]="{
+                  placeholder: 'Cta Anticipo',
+                  name: 'Cta_Anticipo' + i,
+                  id: 'Cta_Anticipo' + i,
+                  Requerido: false
+                }"
+                [label]="'Cuenta anticipo'"
+                (RetornarId)="CapturarIdCentroCosto($event, 'Anticipo', i)"
+                [Campo]="item.Cta_Anticipo"
+              ></app-custumetypeahead>
+            </div>
+            <div class="col">
+              <app-custumetypeahead
+                [Ruta]="Ruta_Nit"
+                [Modelo]="{
+                  placeholder: 'Nombre o Nit',
+                  name: 'Nit' + i,
+                  id: 'Nit' + i,
+                  Requerido: false
+                }"
+                [label]="'Nombre o NIT'"
+                (RetornarId)="CapturarIdCentroCosto($event, 'Nit_Anticipo', i)"
+                [Campo]="item.Nit_Anticipo"
+              ></app-custumetypeahead>
+            </div>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Documento</mat-label>
+              <input
+                matInput
+                type="text"
+                name="documento_anticipo{{ i }}"
+                id="documento_anticipo{{ i }}"
+                [(ngModel)]="item.Documento"
+              />
+              <button mat-button matSuffix mat-icon-button (click)="showFacturas(i)">
+                <mat-icon>search</mat-icon>
+              </button>
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Concepto</mat-label>
+              <input
+                matInput
+                type="text"
+                name="detalles{{ i }}"
+                id="detalles{{ i }}"
+                [(ngModel)]="item.Detalles"
+              />
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Valor</mat-label>
+              <input
+                matInput
+                type="number"
+                name="valor_anticipo{{ i }}"
+                id="valor_anticipo{{ i }}"
+                [(ngModel)]="item.Valor"
+                (change)="calcularTotales()"
+              />
+              <button
+                *ngIf="Ctas_Anticipo.length - 1 != i"
+                mat-button
+                matSuffix
+                mat-icon-button
+                (click)="deleteRowCtaAnticipo(i)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h6>Por pagar</h6>
+          <hr />
+          <div class="row">
+            <div class="col">
+              <app-custumetypeahead
+                [Ruta]="Ruta_Cuentas"
+                [label]="'Cuenta por pagar'"
+                [Modelo]="typeahead_CuentaXPagar"
+                (RetornarId)="CapturarIdCentroCosto($event, 'CxP')"
+                [Campo]="Campo_CtaPorPagar"
+              ></app-custumetypeahead>
+            </div>
+            <div class="col">
+              <app-custumetypeahead
+                [Ruta]="Ruta_Nit"
+                [label]="'NIT'"
+                [Modelo]="typeahead_Terceros"
+                (RetornarId)="CapturarIdCentroCosto($event, 'Nit_CtaPorPagar')"
+                [Campo]="Campo_NitPorPagar"
+              ></app-custumetypeahead>
+            </div>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Documento</mat-label>
+              <input
+                matInput
+                type="text"
+                name="documento_cta_pagar"
+                id="documento_cta_pagar"
+                [(ngModel)]="ActivoFijoModel.Documento_CtaPorPagar"
+              />
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Concepto</mat-label>
+              <input
+                matInput
+                type="text"
+                name="detalles"
+                id="detalles"
+                [(ngModel)]="ActivoFijoModel.Detalles"
+              />
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Valor</mat-label>
+              <input
+                matInput
+                type="number"
+                name="valor_cta_pagar"
+                id="valor_cta_pagar"
+                [(ngModel)]="ActivoFijoModel.Valor_CtaPorPagar"
+                (change)="calcularTotales()"
+              />
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-top table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="bg-light">
+            <tr class="text-center text-uppercase">
+              <th>Total Debito</th>
+              <th>Total Credito</th>
+              <th>Diferencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="text-center">
+              <td>${{ Total_Debito | number: '1.2-2' }}</td>
+              <td>${{ Total_Credito | number: '1.2-2' }}</td>
+              <td>${{ Total_Debito - Total_Credito | number: '1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-primary btn-block" (click)="onSaveVoucher()">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<ng-template #rt_tercero let-r="result" let-t="term">
+  <span class="f-9">
+    {{ r.Nombre_Tercero }}
+  </span>
+</ng-template>
+
+<!-- ?ESTO NO VA -->
+<!-- <div class="col-md-6">
+  <div class="form-group">
+    <label for="tipo_activo">Contrapartida</label>
+    <app-custumetypeahead
+      [Ruta]="Ruta_Cuentas"
+      [Modelo]="typeahead_Cuenta"
+      (RetornarId)="CapturarIdCentroCosto($event, 'Contrapartida')"
+      [Campo]="Campo_Contrapartida"
+    ></app-custumetypeahead>
+  </div>
+</div> -->

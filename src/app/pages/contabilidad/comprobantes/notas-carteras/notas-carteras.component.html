@@ -1,0 +1,190 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-md-6">
+              <h5>Notas Cartera</h5>
+              <span>Notas de Cartera Realizadas en el Sistema</span>
+            </div>
+            <div class="col-md-6">
+              <div class="pull-right">
+                <div class="card-header-left">
+                  <button
+                    style="float: right"
+                    type="button"
+                    class="pull-left btn btn-primary btn-sm"
+                    [routerLink]="['/contabilidad/comprobantes/notas-cartera-crear']"
+                  >
+                    <i class="fa fa-plus"></i>
+                    Agregar Nueva Nota Cartera
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-block">
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table table-striped" style="font-size: 10px">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Documento</th>
+                    <th>Beneficiario</th>
+                    <th>Concepto</th>
+                    <th>Total Debito</th>
+                    <th>Total Credito</th>
+                    <th>Total Debito NIIF</th>
+                    <th>Total Credito NIIF</th>
+                    <th>Funcionario</th>
+                    <th>Estado</th>
+                    <th style="max-width: 70px; width: 70px !important">Acciones</th>
+                  </tr>
+                  <tr>
+                    <th class="tabla-filtro">
+                      <!-- Mirar commits anteriores a 16/10/23 -->
+                    </th>
+                    <th class="tabla-filtro">
+                      <input
+                        type="text"
+                        class="form-control input-sm"
+                        placeholder="Filtro Código"
+                        [(ngModel)]="filtros.codigo"
+                        (change)="filtrar()"
+                      />
+                    </th>
+                    <th class="tabla-filtro">
+                      <input
+                        type="text"
+                        class="form-control input-sm"
+                        placeholder="Filtro Cliente"
+                        [(ngModel)]="filtros.tercero"
+                        (change)="filtrar()"
+                      />
+                    </th>
+                    <th class="tabla-filtro"></th>
+                    <th class="tabla-filtro"></th>
+                    <th class="tabla-filtro"></th>
+                    <th class="tabla-filtro"></th>
+                    <th class="tabla-filtro"></th>
+                    <th class="tabla-filtro"></th>
+                    <th class="tabla-filtro">
+                      <select
+                        class="form-control input-sm"
+                        [(ngModel)]="filtros.estado"
+                        (change)="filtrar()"
+                      >
+                        <option value="">Todas</option>
+                        <option value="Activo">Activas</option>
+                        <option value="Anulada">Anuladas</option>
+                      </select>
+                    </th>
+                    <th class="tabla-filtro"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="Cargando">
+                    <td colspan="11" class="text-center">
+                      <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+                      <span class="sr-only">Cargando...</span>
+                      <h4>Cargando Notas Carteras...</h4>
+                    </td>
+                  </tr>
+                  <tr class="text-center" *ngIf="NotasCarteras.length == 0 && !Cargando">
+                    <td colspan="10" class="text-center">
+                      <i class="fa fa-exclamation-circle fa-5x"></i>
+                      <h4>No Existen Notas Contables para mostrar</h4>
+                    </td>
+                  </tr>
+                  <tr
+                    *ngFor="let item of NotasCarteras"
+                    [ngClass]="{ 'bg-danger': item.Estado == 'Anulada' }"
+                  >
+                    <td>{{ item.Fecha }}</td>
+                    <td>{{ item.Codigo }}</td>
+                    <td>{{ item.Beneficiario }} - {{ item.Tercero }}</td>
+                    <td>{{ item.Concepto }}</td>
+                    <td>{{ item.Total_Debe_PCGA | currency }}</td>
+                    <td>{{ item.Total_Haber_PCGA | currency }}</td>
+                    <td>{{ item.Total_Debe_NIIF | currency }}</td>
+                    <td>{{ item.Total_Haber_NIIF | currency }}</td>
+                    <td>{{ item.Funcionario }}</td>
+                    <td width="60">
+                      <span *ngIf="item.Estado != 'Anulada'" class="label label-success">{{
+                        item.Estado
+                      }}</span>
+                    </td>
+                    <td>
+                      <div class="text-center">
+                        <div ngbDropdown class="dropdown-primary">
+                          <button
+                            ngbDropdownToggle
+                            class="btn btn-secondary btn-mini waves-effect waves-light"
+                            type="button"
+                          >
+                            Acciones
+                          </button>
+                          <div ngbDropdownMenu>
+                            <a
+                              class="dropdown-item waves-light waves-effect caja-botones"
+                              href="{{
+                                envirom.ruta
+                              }}php/contabilidad/notascontables/descarga_pdf.php?id={{
+                                item.Id_Documento_Contable
+                              }}"
+                              target="_blank"
+                            >
+                              <i class="fa fa-print"></i> Ver PCGA</a
+                            >
+                            <a
+                              class="dropdown-item waves-light waves-effect caja-botones"
+                              href="{{
+                                envirom.ruta
+                              }}php/contabilidad/notascontables/descarga_pdf.php?id={{
+                                item.Id_Documento_Contable
+                              }}&tipo=Niif"
+                              target="_blank"
+                            >
+                              <i class="fa fa-print"></i> Ver NIIF</a
+                            >
+                            <a
+                              *ngIf="item.Estado != 'Anulada' && perfilUsuario == '27'"
+                              class="dropdown-item waves-light waves-effect caja-botones bg-danger"
+                              href="javascript:;"
+                              (click)="onCancelDoc(); IdDocumento = item.Id_Documento_Contable"
+                            >
+                              <i class="fa fa-close"></i> Anular</a
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              {{ page * maxSize - maxSize + 1 }} al
+              {{ page * maxSize > TotalItems ? TotalItems : page * maxSize }} de
+              {{ TotalItems }}
+              <ngb-pagination
+                size="sm"
+                class="d-flex justify-content-center pagination-rounded pagination-sm"
+                [rotate]="true"
+                [(collectionSize)]="TotalItems"
+                [(page)]="page"
+                [maxSize]="10"
+                [pageSize]="20"
+                size="sm"
+                (pageChange)="filtrar(true)"
+                [rotate]="true"
+                [boundaryLinks]="true"
+              ></ngb-pagination>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

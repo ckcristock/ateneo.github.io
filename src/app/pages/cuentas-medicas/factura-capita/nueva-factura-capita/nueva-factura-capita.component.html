@@ -1,0 +1,288 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      <form #FormFactura="ngForm">
+        <input
+          type="hidden"
+          name="Identificacion_Funcionario"
+        /><!-- [ngModel]="user.Identificacion_Funcionario" -->
+        <input type="hidden" name="Cuota_Moderadora" [(ngModel)]="Cuota" />
+        <div class="card" *ngIf="divFactura">
+          <div class="row invoice-contact" style="align-items: flex-start !important">
+            <div class="col-md-8">
+              <div class="invoice-box row">
+                <div class="col-sm-12">
+                  <table class="table table-responsive invoice-table table-borderless">
+                    <!-- <tbody>
+                      <tr>
+                        <td style="width: 100px">
+                          <img
+                            src="{{ globales.urlLogoColor }}"
+                            class="m-b-10 img-60"
+                            alt="Pro-H Software"
+                          />
+                        </td>
+                        <td>
+                          {{ globales.Nombre }}
+                          <br />
+                          {{ globales.Nit }} <br />
+                          {{ globales.Direccion }} <br />
+                          {{ globales.Telefono }}
+                        </td>
+                      </tr>
+                    </tbody> -->
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="row text-end" style="margin: 0">
+                <div class="col-sm-12">
+                  <h4>Nueva Factura Capita</h4>
+                  <div class="clearfix"></div>
+                  <h6>{{ Fecha | date: 'dd/MM/yyyy' }}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row invoive-info" style="margin-bottom: 0">
+              <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+                  <label>Departamento</label>
+                  <select
+                    class="form-control form-control-sm"
+                    ngModel
+                    (change)="cargarPuntos($event.target.value)"
+                    name="Id_Departamento"
+                    id="Id_Departamento"
+                    required
+                  >
+                    <option value="">Seleccion departamento</option>
+                    <option
+                      *ngFor="let departamento of Departamento"
+                      [value]="departamento.Id_Departamento"
+                    >
+                      {{ departamento.Nombre }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+                  <label>Punto Dispensación</label>
+                  <ng-select
+                    id="Puntos"
+                    name="Id_Punto_Dispensacion"
+                    class="f-9"
+                    placeholder="Seleccione el punto"
+                    [options]="Puntos"
+                    [(ngModel)]="Punto"
+                    required
+                  ></ng-select>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-6">
+                <div class="form-group">
+                  <label>Cliente</label>
+                  <input
+                    (change)="BuscarDatosCliente($event)"
+                    ngModel="{{ Cliente }}"
+                    type="text"
+                    name="Cliente"
+                    id="Cliente"
+                    class="form-control form-control-sm f-9"
+                    [readonly]="clientesReadOnly"
+                    [ngbTypeahead]="search"
+                    [resultTemplate]="rt"
+                    [inputFormatter]="formatter"
+                    required
+                  />
+
+                  <input
+                    hidden
+                    ngModel="{{ Idcliente }}"
+                    type="text"
+                    name="Id_Cliente"
+                    id="Id_Cliente"
+                    class="form-control form-control-sm f-9"
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+                  <label>Seleccione el mes</label>
+                  <input
+                    ngModel
+                    type="month"
+                    name="Mes"
+                    id="Mes"
+                    class="form-control form-control-sm f-9"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+                  <label>Seleccione el Regimen</label>
+                  <select
+                    name="Id_Regimen"
+                    id="Id_Regimen"
+                    ngModel
+                    class="form-control form-control-sm"
+                    (change)="getCuotasMod($event.target.value)"
+                  >
+                    <option value="">Seleccione</option>
+                    <option value="1">Contributivo</option>
+                    <option value="2">Subsidiado</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row invoive-info" style="margin-bottom: 0">
+              <div class="col-md-12 col-xs-12">
+                <div class="form-group">
+                  <label>Observaciones</label>
+                  <br />
+                  <textarea
+                    id="Observacion"
+                    name="Observacion"
+                    class="form-control"
+                    ngModel
+                    style="width: 100%"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top: 30px">
+              <div class="col-sm-12">
+                <div class="table-responsive tabla">
+                  <table class="table invoice-detail-table">
+                    <thead>
+                      <tr class="thead-default">
+                        <th style="width: 400px">Descripción</th>
+                        <th style="width: 20px">Cant.</th>
+                        <th style="width: 20px">Precio</th>
+                        <th style="width: 20px">Total</th>
+                        <th style="width: 20px">-</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of Lista_Factura; let i = index" id="fila{{ i }}">
+                        <td>
+                          <textarea
+                            class="form-control text-start f-9 inputDesc"
+                            name="Descripcion{{ i }}"
+                            [(ngModel)]="item.Descripcion"
+                            cols="30"
+                            rows="10"
+                          ></textarea>
+                        </td>
+                        <td>
+                          <input
+                            id="CantidadFactura{{ i }}"
+                            name="CantidadFactura{{ i }}"
+                            [(ngModel)]="item.Cantidad"
+                            type="number"
+                            min="1"
+                            class="form-control form-control-sm text-end f-9"
+                            (change)="CalculoTotal(i)"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            id="PrecioFactura{{ i }}"
+                            name="PrecioFactura{{ i }}"
+                            [(ngModel)]="item.Precio"
+                            type="text"
+                            min="1"
+                            class="form-control form-control-sm tabla text-end f-9"
+                            pattern="[0-9\.]+"
+                            (change)="CalculoTotal(i)"
+                          />
+                        </td>
+
+                        <td>
+                          <input
+                            name="SubtotalFactura{{ i }}"
+                            [(ngModel)]="item.Subtotal"
+                            type="number"
+                            min="1"
+                            class="form-control form-control-sm text-end f-9"
+                            readonly
+                          />
+                        </td>
+                        <td>
+                          <!-- Boton -->
+                          <button
+                            *ngIf="Lista_Factura.length - 1 != i"
+                            class="btn btn-mini btn-danger"
+                            (click)="EliminarProductoRemsion(i)"
+                          >
+                            <span>
+                              <i class="fa fa-trash-o"></i>
+                            </span>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-responsive invoice-table invoice-total">
+                  <tbody>
+                    <tr>
+                      <th>( = ) Subtotal :</th>
+                      <td>{{ SubtotalFactura | currency }}</td>
+                    </tr>
+                    <tr>
+                      <th>( - ) Cuotas Moderadoras :</th>
+                      <!-- <td>{{ Cuota | currency }}</td> -->
+                      <td>
+                        <input
+                          type="text"
+                          class="form-control form-control-sm text-end f-10"
+                          name="Cuota"
+                          [(ngModel)]="Cuota"
+                          pattern="[0-9]+(\.[0-9]+)?"
+                          (change)="actualizarValores()"
+                          required
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>( = ) Total :</th>
+                      <td>{{ TotalFactura | currency }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="text-end mrg-top-5">
+            <button
+              type="button"
+              [disabled]="!FormFactura.valid"
+              [swal]="confirmacionGuardar"
+              class="btn btn-primary btn-sm btn-block"
+            >
+              Realizar Factura
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombre }} </span>
+</ng-template>

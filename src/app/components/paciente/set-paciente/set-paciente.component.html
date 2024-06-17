@@ -1,0 +1,380 @@
+<div class="row">
+  <div class="col-12">
+    <div *ngIf="paciente.isNew" class="alert" role="alert">
+      <!-- (click)="save(formPatient)"> -->
+      <button
+        class="btn btn-sm btn-block btn-outline-info"
+        (click)="validateInfoPatient(formPatient)"
+      >
+        El paciente no se encuentra <br />
+        <strong>Click para validar información</strong>
+      </button>
+    </div>
+
+    <div class="row">
+      <form #formPatient="ngForm" class="mt-3 row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de identificación</mat-label>
+          <mat-select required name="type_document_id" [(ngModel)]="paciente.type_document_id">
+            <mat-option *ngFor="let type of typeDocuments" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Identificación</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el número de identificación"
+            [(ngModel)]="paciente.identifier"
+            (change)="getPatientAgain($event)"
+            name="identifier2"
+            autocomplete="off"
+            required
+            #identifier2="ngModel"
+            [ngClass]="{
+              'is-invalid': identifier2.invalid && identifier2.touched
+            }"
+            [disabled]="!paciente.isNew"
+          />
+          <input type="hidden" name="identifier" [ngModel]="paciente.identifier" />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Primer nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el primer nombre"
+            [(ngModel)]="paciente.firstname"
+            name="firstname"
+            autocomplete="off"
+            pattern="[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+"
+            #firstname="ngModel"
+            required
+            [ngClass]="{ 'is-invalid': firstname.invalid && firstname.touched }"
+            id="firstname"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Segundo nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el segundo nombre"
+            [(ngModel)]="paciente.middlename"
+            name="middlename"
+            autocomplete="off"
+            pattern="[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+"
+            #middlename="ngModel"
+            [ngClass]="{
+              'is-invalid': middlename.invalid && middlename.touched
+            }"
+            id="middlename"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Primer apellido</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el primer apellido"
+            [(ngModel)]="paciente.surname"
+            name="surname"
+            autocomplete="off"
+            pattern="[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+"
+            #surname="ngModel"
+            [ngClass]="{ 'is-invalid': surname.invalid && surname.touched }"
+            id="surname"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Segundo apellido</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el segundo apellido"
+            [(ngModel)]="paciente.secondsurname"
+            name="secondsurname"
+            autocomplete="off"
+            pattern="[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+"
+            #secondsurname="ngModel"
+            [ngClass]="{
+              'is-invalid': secondsurname.invalid && secondsurname.touched
+            }"
+            id="secondsurname"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>EPS</mat-label>
+          <mat-select
+            required
+            name="eps_id"
+            [(ngModel)]="paciente.eps_id"
+            #eps_id="ngModel"
+            [ngClass]="{ 'is-invalid': eps_id.invalid && eps_id.touched }"
+          >
+            <mat-option *ngFor="let type of eps" [value]="type.value">{{ type.text }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Regimen</mat-label>
+          <mat-select
+            required
+            name="regimen_id"
+            [(ngModel)]="paciente.regimen_id"
+            #regimen_id="ngModel"
+            [ngClass]="{
+              'is-invalid': regimen_id.invalid && regimen_id.touched
+            }"
+            (selectionChange)="changeRegime()"
+          >
+            <mat-option *ngFor="let type of typeRegimens" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nivel</mat-label>
+          <mat-select
+            required
+            name="level_id"
+            [(ngModel)]="paciente.level_id"
+            #level_id="ngModel"
+            [ngClass]="{ 'is-invalid': level_id.invalid && level_id.touched }"
+          >
+            <mat-option *ngFor="let type of levels" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de afiliación</mat-label>
+          <mat-select
+            required
+            name="affiliate_type"
+            [(ngModel)]="paciente.affiliate_type"
+            #type="ngModel"
+            [ngClass]="{ 'is-invalid': type.invalid && type.touched }"
+          >
+            <mat-option *ngFor="let type of types" [value]="type.value">{{ type.text }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!--  <div class="form-group">
+                      <fieldset class="form-group">
+                          <label>Selection Required</label>
+                          <ng-select [items]="levels" [(ngModel)]="paciente.level_id" name="licenseAuthorityId" bindValue="value" bindLabel="text" placeholder="Select" required>
+                          </ng-select>
+                      </fieldset>
+                  </div> -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fecha de nacimiento</mat-label>
+          <input
+            matInput
+            type="date"
+            required
+            placeholder="Ingresa la fecha de nacimiento"
+            [(ngModel)]="paciente.date_of_birth"
+            name="date_of_birth"
+            autocomplete="off"
+            #date_of_birth="ngModel"
+            [ngClass]="{
+              'is-invalid': date_of_birth.invalid && date_of_birth.touched
+            }"
+            id="date_of_birth"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Género</mat-label>
+          <mat-select
+            required
+            name="gener"
+            [(ngModel)]="paciente.gener"
+            #gener="ngModel"
+            [ngClass]="{ 'is-invalid': gener.invalid && gener.touched }"
+          >
+            <mat-option *ngFor="let type of genders" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Departamento</mat-label>
+          <mat-select
+            required
+            name="department_id"
+            [(ngModel)]="paciente.department_id"
+            (selectionChange)="getCities()"
+            #department_id="ngModel"
+            [ngClass]="{
+              'is-invalid': department_id.invalid && department_id.touched
+            }"
+          >
+            <mat-option *ngFor="let type of departments" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Ciudad</mat-label>
+          <mat-select
+            required
+            name="municipality_id"
+            [(ngModel)]="paciente.municipality_id"
+            (selectionChange)="getCompanies($event)"
+            #municipality_id="ngModel"
+            [ngClass]="{
+              'is-invalid': municipality_id.invalid && municipality_id.touched
+            }"
+          >
+            <mat-option *ngFor="let type of cities" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Empresa</mat-label>
+          <mat-select
+            required
+            name="company_id"
+            [(ngModel)]="paciente.company_id"
+            (selectionChange)="clearSede(); getLocations(paciente.company_id)"
+            #company_id="ngModel"
+            [ngClass]="{
+              'is-invalid': company_id.invalid && company_id.touched
+            }"
+          >
+            <mat-option *ngFor="let type of companies" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Sede</mat-label>
+          <mat-select
+            required
+            name="location_id"
+            [(ngModel)]="paciente.location_id"
+            (selectionChange)="getContracts(paciente)"
+            #location_id="ngModel"
+            [ngClass]="{
+              'ng-invalid': location_id.invalid && location_id.touched
+            }"
+          >
+            <mat-option *ngFor="let type of locations" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- <mat-form-field class="col-md-12 " appearance="outline">
+          <mat-label>Contrato</mat-label>
+          <mat-select
+            required
+            name="contract_id"
+            [(ngModel)]="paciente.contract_id"
+            (selectionChange)="changeContract()"
+            #contract_id="ngModel"
+            [ngClass]="{
+              'is-invalid': contract_id.invalid && contract_id.touched
+            }"
+          >
+            <mat-option *ngFor="let type of contracts" [value]="type.value">{{
+              type.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field> -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Dirección</mat-label>
+          <input
+            matInput
+            type="text"
+            required
+            placeholder="Ingresa la dirección"
+            [(ngModel)]="paciente.address"
+            name="address"
+            autocomplete="off"
+            #address="ngModel"
+            [ngClass]="{ 'is-invalid': address.invalid && address.touched }"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            required
+            placeholder="Ingresa el correo electrónico"
+            [(ngModel)]="paciente.email"
+            name="email"
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+            autocomplete="off"
+            #email="ngModel"
+            [ngClass]="{ 'is-invalid': email.invalid && email.touched }"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Teléfono</mat-label>
+          <input
+            matInput
+            type="number"
+            required
+            placeholder="Ingresa el teléfono"
+            [(ngModel)]="paciente.phone"
+            name="phone"
+            autocomplete="off"
+            #phone="ngModel"
+            [ngClass]="{ 'is-invalid': phone.invalid && phone.touched }"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Teléfono opcional</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el teléfono opcional"
+            [(ngModel)]="paciente.optional_phone"
+            name="optional_phone"
+            autocomplete="off"
+            #optional_phone="ngModel"
+            [ngClass]="{
+              'is-invalid': optional_phone.invalid && optional_phone.touched
+            }"
+          />
+        </mat-form-field>
+        <span *ngIf="formPatient.invalid">
+          <p class="text-danger text-center">Es necesario llenar datos del paciente</p>
+        </span>
+        <div class="col-12">
+          <button
+            type="button"
+            [disabled]="loading"
+            class="btn btn-primary btn-block"
+            (click)="save(formPatient)"
+          >
+            <span *ngIf="!loading; else status">
+              {{ paciente.isNew ? 'Guardar' : 'Actualizar' }}</span
+            >
+            <ng-template #status>
+              <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Cargando...
+            </ng-template>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- {{ show }}
+<ngb-toast *ngIf="show" header="Autohide can be cancelled" [delay]="5000" [autohide]="autohide"
+    (mouseenter)="autohide = false" (mouseleave)="autohide = true" (hide)="show = false; autohide = true"
+    [class.bg-warning]="!autohide"> -->
+
+<!-- <pre>{{ location_id.invalid }}</pre>
+<pre>{{ formPatient.invalid }}</pre>
+<pre>{{ formPatient.value | json }}</pre> -->

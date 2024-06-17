@@ -1,0 +1,205 @@
+<article class="row">
+  <app-card class="col-md-9" viewTitle="Contratos" [filterTemplate]="filterTemplate"
+    [activeFilters]="urlFiltersService.activeFilters">
+    <app-table [loading]="loading" [arrayData]="contracts" [pagination]="pagination" (pageChange)="getAllContracts()">
+      <ng-container titles>
+        <th>Funcionario</th>
+        <th>Documento</th>
+        <th>Tipo</th>
+        <th>F. Inicio</th>
+        <th>F. Fin</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (contract of contracts; track contract.id) {
+        <tr class="text-center">
+          <td>
+            {{ contract.full_names | uppercase }}
+          </td>
+          <td>
+            {{ contract.identifier | number: '1.0-0' }}
+          </td>
+          <td>
+            {{ contract.contractultimate_full_information?.work_contract_type?.name }}
+          </td>
+          <td>
+            {{ contract.contractultimate_full_information?.date_of_admission }}
+          </td>
+          <td>
+            <span *ngIf="contract.contractultimate_full_information?.date_end; else notConlcude">
+              {{ contract.contractultimate_full_information?.date_end }}
+            </span>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button icon="download" text="Descargar" type="success"
+                (click)="download(contract.id, contract)"></app-action-button>
+              <app-action-button icon="address-card" text="Ver perfil" type="info" [link]="{
+                    url: '/ajustes/informacion-base/funcionario/' + contract.id
+                  }"></app-action-button>
+              <app-action-button icon="money-bill" text="Preliquidar" type="warning"
+                (click)="modalPreliquidar.openModal(); funcionario = contract"></app-action-button>
+            </app-dropdown-actions>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <div class="card col">
+    <div class="card-body px-0">
+      <h5 class="text-center text-primary">Por vencer</h5>
+      <hr class="line" />
+      <div *ngIf="!contractData && contractsToExpire.length > 0; else notDataPorVencer">
+        <div class="list-group list-group-flush rounded">
+          <a *ngFor="let contractToExpire of contractsToExpire" role="button"
+            (click)="makeChoice(contractToExpire, renovarContrato)"
+            class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between" matBadgeSize="small" [matBadgeColor]="
+                contractToExpire.renewed
+                  ? 'primary'
+                  : contractToExpire.cantidad > 0
+                    ? 'accent'
+                    : 'warn'
+              " [matBadge]="contractToExpire.cantidad == 0 ? '!' : contractToExpire.cantidad"
+              [matBadgeHidden]="contractToExpire.renewed === null && contractToExpire.cantidad == 0">
+              <div class="mb-1">
+                {{ contractToExpire.first_name }}
+                {{ contractToExpire.first_surname }} <br />
+                <small class="text-muted">{{ contractToExpire.date_end | date: 'longDate' }}</small>
+              </div>
+              <div #tooltip="matTooltip" matTooltipPosition="above" [matTooltip]="
+                  contractToExpire.renewed
+                    ? 'Ya presenta información para renovación'
+                    : contractToExpire.cantidad > 0
+                      ? 'Ya ha sido renovado anteriormente'
+                      : contractToExpire.renewed == null
+                        ? ''
+                        : 'Ya ha sido asignado a preliquidación'
+                ">
+                <app-load-image [src]="contractToExpire.image"
+                  classImg="rounded-circle mx-auto img-fluid header-profile-user"></app-load-image>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <mat-paginator *ngIf="paginationMaterialExpire && !contractData && contractsToExpire.length > 0"
+        [length]="paginationMaterialExpire.total" [pageSize]="paginationMaterialExpire.per_page"
+        [pageIndex]="paginationMaterialExpire.current_page - 1" [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="handlePageEvent2($event)" aria-label="Select page">
+      </mat-paginator>
+    </div>
+  </div>
+</article>
+
+<ng-template #filterTemplate>
+  <app-filter-roles-company *ngIf="defaultParams" [defaultValues]="defaultParams" (newValues)="setFormFilters($event)">
+  </app-filter-roles-company>
+</ng-template>
+
+<ng-template #renovarContrato let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Renovar contrato</h4>
+    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="_modal.close()"></button>
+  </div>
+  <div class="modal-body pb-0">
+    <form [formGroup]="formContrato">
+      <div class="row">
+        <mat-form-field class="col-12" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input type="text" formControlName="name" matInput placeholder="Nombre del empleado" autocomplete="off"
+            readonly />
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de contrato</mat-label>
+          <mat-select formControlName="work_contract_type_id" placeholder="Término del contrato" required>
+            <mat-option *ngFor="let contractType of contractTypes" [value]="contractType.id">{{
+              contractType.name
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Término del contrato</mat-label>
+          <mat-select formControlName="contract_term_id" placeholder="Tipo de contrato" required>
+            <mat-option *ngFor="let term of terms" [value]="term.id">{{ term.name }} </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <app-filter-roles-company *ngIf="defaultValueContract" [defaultValues]="defaultValueContract"
+          [hideSelect]="{ person_id: true }" (newValues)="setContractRolValue($event)">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Salario</mat-label>
+            <input class="text-end" formControlName="salary" matInput currencyMask appInputPosition
+              [options]="masksMoney.maskCOP" placeholder="Salario" autocomplete="off" />
+          </mat-form-field>
+        </app-filter-roles-company>
+      </div>
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label for="Aplica_Separacion_Categorias">Turno</mat-label>
+          <mat-select formControlName="turn_type" placeholder="Tipos de turno"
+            (selectionChange)="getTurnsbyType($event.value)" required>
+            <mat-option *ngFor="let lista of listaTiposTurno" [value]="lista.tipoTurno">{{
+              lista.tipoTurno
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline" *ngIf="turnSelected == 'Fijo'">
+          <mat-label for="Aplica_Separacion_Categorias">Turno asignado</mat-label>
+          <mat-select formControlName="turn_id" placeholder="Turno" required>
+            <mat-option *ngFor="let turno of listaTurnos" [value]="turno.id">{{
+              turno.name | uppercase
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="col-4" appearance="outline">
+          <mat-label>Fecha de inicio</mat-label>
+          <input formControlName="date_of_admission" matInput type="date" autocomplete="off" readonly />
+        </mat-form-field>
+        <mat-form-field class="col-4" appearance="outline">
+          <mat-label>Número de días</mat-label>
+          <input type="number" formControlName="date_diff" matInput [min]="minRenewalPeriod.numDays"
+            (change)="calcularFecha($event)" placeholder="Número de días" required autocomplete="off" />
+          <mat-error *ngIf="formContrato.get('date_diff').hasError('required')">
+            El valor es <strong>requerido</strong>
+          </mat-error>
+          <!-- <mat-error *ngIf="formContrato.get('date_diff').hasError('min')">
+            La fecha de finalización debe ser posterior a <strong>{{ dateMin }}</strong>
+          </mat-error> -->
+        </mat-form-field>
+        <mat-form-field class="col-4" appearance="outline" *ngIf="formContrato.get('date_end').enabled">
+          <mat-label>Fecha de finalización</mat-label>
+          <input matInput type="date" [min]="minRenewalPeriod.date" (change)="calcularDias($event)"
+            (selectionChange)="calcularDias($event)" formControlName="date_end" placeholder="Fecha de finalización" />
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button type="button" (click)="saveRenewalConditions()" [disabled]="formContrato.invalid" class="btn btn-primary">
+      Guardar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data-sa [loading]="loading"></app-not-data-sa>
+</ng-template>
+<ng-template #notDataPorVencer>
+  <app-not-data-sa [loading]="contractData"></app-not-data-sa>
+</ng-template>
+<ng-template #image>
+  <img width="100%" src="../../../../assets/images/contratos.png" alt="" />
+</ng-template>
+<ng-template #notConlcude>
+  <span>No aplica</span>
+</ng-template>
+<app-modal-preliquidar #modalPreliquidar [funcionario]="funcionario"
+  (reload)="getAllContracts()"></app-modal-preliquidar>

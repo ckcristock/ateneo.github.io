@@ -1,0 +1,291 @@
+<app-card
+  viewTitle="Notas de crédito"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="UrlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]">
+    <button [routerLink]="['tipos']" class="btn btn-warning btn-sm">
+      <i class="fa fa-plus"></i>
+      Tipos
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary btn-sm"
+      [routerLink]="['/contabilidad/comprobantes/notas-credito/crear']"
+    >
+      <i class="fa fa-plus"></i>
+      Agregar
+    </button>
+  </ng-container>
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Notas"
+    [pagination]="pagination"
+    (pageChange)="onPagination($event)"
+  >
+    <ng-container titles>
+      <th>Código Nota</th>
+      <th>Fecha</th>
+      <th>Funcionario</th>
+      <th>Cliente</th>
+      <th>Código Factura</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (nota of Notas; track $index) {
+        <tr class="text-center text-uppercase">
+          <td>{{ nota.Codigo_Nota || 'N/A' }}</td>
+          <td class="text-center">
+            {{ nota.Fecha_Nota | date: 'dd/MM/yyyy' || 'N/A' }}
+          </td>
+          <td>{{ nota.Funcionario || 'N/A' }}</td>
+          <td>{{ nota.Cliente || 'N/A' }}</td>
+          <td>{{ nota.Codigo_Factura || 'N/A' }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="eye"
+                text="Ver Nota"
+                type="info"
+                [link]="{
+                  url: '/contabilidad/comprobantes/notas-credito/ver/' + nota.Id_Nota_Credito_Global
+                }"
+              ></app-action-button>
+              <app-action-button
+                icon="fas fa-file-pdf"
+                text="Imprimir"
+                type="danger"
+                (click)="getNotaCreditoPDF(nota.Id_Nota_Credito_Global)"
+              ></app-action-button>
+              <app-action-button
+                icon="fas fa-file-pdf"
+                text="Ver contabilización"
+                type="danger"
+                (click)="getNiif(nota.Id_Nota_Credito_Global, nota.Funcionario)"
+              ></app-action-button>
+              <!-- ////////borrar <a> abajo -->
+              <!-- <a
+                  class="dropdown-item"
+                  href="{{
+                    environment.ruta
+                  }}php/contabilidad/movimientoscontables/movimientos_nota_credito_global_pdf.php?id_registro={{
+                    nota.Id_Nota_Credito_Global
+                  }}&id_funcionario_elabora={{ idFuncionario }}&tipo_valor=Niif"
+                  target="_blank"
+                >
+                  <i class="fa fa-book"></i> Contab. NIIF
+                </a> -->
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+<!-- //////////////// borrar-->
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Notas de crédito</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button [routerLink]="['tipos']" class="btn btn-warning btn-sm">
+            <i class="fa fa-plus"></i>
+            Tipos
+          </button>
+          <button
+            [routerLink]="['/contabilidad/comprobantes/notas-credito/crear']"
+            class="btn btn-primary btn-sm"
+          >
+            <i class="fa fa-plus"></i>
+            Agregar
+          </button>
+          <button class="btn btn-info btn-sm"><i class="fas fa-sliders-h"></i> Filtros</button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel class="mat-elevation-z0">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha de inicio</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              autocomplete="off"
+              placeholder="Busca por fecha"
+            />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha de fin</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker2"
+              autocomplete="off"
+              placeholder="Busca por fecha"
+            />
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Código</mat-label>
+            <input matInput type="text" placeholder="Busca por código" />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Funcionario</mat-label>
+            <input matInput type="text" placeholder="Busca por funcionario" />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Cliente</mat-label>
+            <input matInput type="text" placeholder="Busca por cliente" />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Código Factura</mat-label>
+            <input matInput type="text" placeholder="Busca por código factura" />
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!Cargando && Notas.length > 0"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Código Nota</th>
+            <th>Fecha</th>
+            <th>Funcionario</th>
+            <th>Cliente</th>
+            <th>Código Factura</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let nota of Notas" class="text-center">
+            <td>{{ nota.Codigo_Nota }}</td>
+            <td class="text-center">
+              {{ nota.Fecha_Nota | date: 'dd/MM/yyyy' }}
+            </td>
+            <td>{{ nota.Funcionario }}</td>
+            <td>{{ nota.Cliente }}</td>
+            <td>{{ nota.Codigo_Factura }}</td>
+            <td>
+              <div ngbDropdown container="body" class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a
+                    class="dropdown-item"
+                    href=""
+                    [routerLink]="['/contabilidad/notas-credito/ver', nota.Id_Nota_Credito_Global]"
+                  >
+                    <i class="ti-eye"></i>Ver Nota</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    href="{{
+                      environment.ruta
+                    }}php/notas_credito_nuevo/descarga_pdf.php?tipo=Nota_Credito&id={{
+                      nota.Id_Nota_Credito_Global
+                    }}"
+                    target="_blank"
+                  >
+                    <i class="ti-printer"></i>Imprimir</a
+                  >
+                  <a
+                    *ngIf="perfilUsuario == '27' || perfilUsuario == '16'"
+                    class="dropdown-item"
+                    href="{{
+                      environment.ruta
+                    }}php/contabilidad/movimientoscontables/movimientos_nota_credito_global_pdf.php?id_registro={{
+                      nota.Id_Nota_Credito_Global
+                    }}&id_funcionario_elabora={{ funcionario }}"
+                    target="_blank"
+                  >
+                    <i class="fa fa-book"></i> Contab. PCGA
+                  </a>
+                  <a
+                    *ngIf="perfilUsuario == '27' || perfilUsuario == '16'"
+                    class="dropdown-item"
+                    href="{{
+                      environment.ruta
+                    }}php/contabilidad/movimientoscontables/movimientos_nota_credito_global_pdf.php?id_registro={{
+                      nota.Id_Nota_Credito_Global
+                    }}&id_funcionario_elabora={{ funcionario }}&tipo_valor=Niif"
+                    target="_blank"
+                  >
+                    <i class="fa fa-book"></i> Contab. NIIF
+                  </a>
+                  <!-- <a
+                    class="dropdown-item"
+                    href="{{
+                      environment.ruta
+                    }}php/facturasventas/factura_dis_pdf.php?id={{
+                      factura.Id_Factura_Administrativa
+                    }}"
+                    target="_blank"
+                  >
+                    <i class="ti-printer"></i>Imprimir Factura</a
+                  > -->
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- //////////////// -->
+<ng-template #filterTemplate>
+  <!-- rango de fechas -->
+  <app-date-picker class="col" [value]="filtros" (dateChange)="selectedDate($event)" />
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por código"
+      [(ngModel)]="filtros.cod_nota"
+      (input)="filtros1()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Funcionario</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por funcionario"
+      [(ngModel)]="filtros.funcionario"
+      (input)="filtros1()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Cliente</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por cliente"
+      [(ngModel)]="filtros.cliente"
+      (input)="filtros1()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código Factura</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por código factura"
+      [(ngModel)]="filtros.cod_factura"
+      (input)="filtros1()"
+    />
+  </mat-form-field>
+</ng-template>

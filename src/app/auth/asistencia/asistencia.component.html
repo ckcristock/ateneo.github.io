@@ -1,0 +1,31 @@
+<div class="strok">
+  <div id="asistencia" class="container-fluid smer h-100" [ngClass]="{ 'not-visible': !vista }">
+    <div class="card-border-asistencia">
+      <video #video id="video-asistencia" width="100%" height="100%" autoplay></video>
+    </div>
+    <div class="logo-border-asistencia">
+      <div class="logo-asistencia"></div>
+      <div class="indicadores-asistencia mt-2">
+        <!--  <div class="temperatura-asistencia">
+            <h1 class="detalle-temperatura">
+              <i class="iconsmind-Celsius"></i> {{ temp }}
+            </h1>
+          </div> -->
+        <div class="hora-asistencia">
+          <h1 class="detalle-hora"><i class="fa fa-user-clock float-left"></i> {{ time }}</h1>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="boton-captura" id="snap" (click)="capture()">Capture</button>
+    <canvas #canvas id="canvas" width="640" height="480"></canvas>
+  </div>
+  <div *ngIf="!vista" class="reconocimiento">
+    <img
+      class="img-reconocimiento"
+      alt="logo"
+      [src]="
+        company === 'ATENEO' ? 'assets/images/logo-dark.svg' : 'assets/images/logo-dark-emco.svg'
+      "
+    />
+  </div>
+</div>

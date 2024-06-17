@@ -1,0 +1,57 @@
+<app-card
+  viewTitle="Especialidades"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters (click)="openModal()" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="specialities"
+    [pagination]="pagination"
+    (pageChange)="getSpecialties()"
+  >
+    <ng-container titles>
+      <th scope="col">Nombre</th>
+      <th scope="col">Código Especialidad</th>
+      <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (speciality of specialities; track $index) {
+        <tr class="text-center">
+          <td scope="row">{{ speciality.name }}</td>
+          <td class="text-center">{{ speciality.code }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="edit(speciality.id)" />
+              @if (speciality.state == 'activo') {
+                <app-action-deactivate (action)="inactive(speciality.id, 'Inactivo')" />
+              }
+              @if (speciality.state == 'inactivo') {
+                <app-action-activate (action)="inactive(speciality.id, 'Activo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtros.name"
+    (searching)="filtros.name = $event; getSpecialties()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtros.code"
+    (searching)="filtros.code = $event; getSpecialties()"
+  ></app-automatic-search>
+</ng-template>
+
+<app-speciality-modal (dataChange)="getSpecialties()"></app-speciality-modal>

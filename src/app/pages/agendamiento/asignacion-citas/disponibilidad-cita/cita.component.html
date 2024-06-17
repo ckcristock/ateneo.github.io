@@ -1,0 +1,215 @@
+<div class="row">
+  <div class="col-12">
+    <form #agenda="ngForm">
+      <div class="panel-body">
+        <!-- /****************************************************************** -->
+        <div class="row">
+          <div class="col-12 mb-2 text-end">
+            <button
+              (click)="siguiente()"
+              *ngIf="
+                dataCitaToAssign.appointmentId &&
+                dataCitaToAssign.speciality &&
+                dataCitaToAssign.subappointmentId
+              "
+              class="btn btn-primary btn-sm"
+            >
+              <i class="fa fa-calendar-alt"> </i>
+              Añadir a lista de espera
+            </button>
+          </div>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Agenda</mat-label>
+            <mat-select
+              required
+              [(ngModel)]="dataCitaToAssign.appointmentId"
+              name="type_agenda_id"
+              (selectionChange)="getSubTypeAppointment(agenda)"
+            >
+              <mat-option *ngFor="let item of type_appointments" [value]="item.value">{{
+                item.text
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Consulta</mat-label>
+            <mat-select
+              required
+              [(ngModel)]="dataCitaToAssign.subappointmentId"
+              name="type_appointment_id"
+              (selectionChange)="getIps(); dispatchPerson(agenda)"
+            >
+              <mat-option *ngFor="let item of type_subappointments" [value]="item.value">{{
+                item.text
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Especialidad</mat-label>
+            <mat-select
+              required
+              [(ngModel)]="dataCitaToAssign.speciality"
+              name="speciality_id"
+              (selectionChange)="
+                dispatchSpeciality(dataCitaToAssign.speciality);
+                getProfesionals();
+                dispatchPerson(agenda)
+              "
+            >
+              <div class="input-group">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Busca especialidad"
+                  [(ngModel)]="searchEspecialidad"
+                  name="searchEspecialidad"
+                  class="form-control mx-2"
+                />
+                <div class="input-group-append" *ngIf="searchEspecialidad">
+                  <button
+                    class="btn btn-outline-secondary border-left-0 border"
+                    (click)="searchEspecialidad = ''"
+                  >
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <mat-option
+                *ngFor="let item of specialties | search: searchEspecialidad"
+                [value]="item.value"
+                >{{ item.text }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+          <!-- <mat-form-field class="col-md-4" appearance="outline">
+            <mat-label>Profesional</mat-label>
+            <mat-select
+              required
+              [(ngModel)]="dataCitaToAssign.person"
+              name="person_id"
+              (selectionChange)="dispatchPerson(agenda)"
+            >
+              <div class="input-group">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Busca profesional"
+                  [(ngModel)]="searchProfesional"
+                  name="searchEspecialidad"
+                  class="form-control mx-2"
+                />
+                <div class="input-group-append" *ngIf="searchProfesional">
+                  <button
+                    class="btn btn-outline-secondary border-left-0 border"
+                    (click)="searchProfesional = ''"
+                  >
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <mat-option
+                *ngFor="let item of persons | search: searchProfesional"
+                [value]="item.value"
+                >{{ item.text }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field> -->
+
+          <ng-select
+            [items]="persons"
+            bindLabel="text"
+            bindValue="value"
+            appearance="outline"
+            class="col-md-12"
+            [(ngModel)]="dataCitaToAssign.person"
+            placeholder="Profesional"
+            name="person_id"
+            [clearable]="false"
+            loadingText="loading"
+            ngDefaultControl
+            (change)="dispatchPerson(agenda)"
+          >
+          </ng-select>
+          <mat-form-field
+            class="col-md-6"
+            appearance="outline"
+            *ngIf="dataCitaToAssign.appointment.face_to_face"
+          >
+            <mat-label>IPS</mat-label>
+            <mat-select
+              required
+              [(ngModel)]="dataCitaToAssign.ipsId"
+              name="company_id"
+              (selectionChange)="getSedes()"
+            >
+              <div class="input-group">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Busca IPS"
+                  [(ngModel)]="searchIPS"
+                  name="searchEspecialidad"
+                  class="form-control mx-2"
+                />
+                <div class="input-group-append" *ngIf="searchIPS">
+                  <button
+                    class="btn btn-outline-secondary border-left-0 border"
+                    (click)="searchIPS = ''"
+                  >
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <mat-option *ngFor="let item of ipss | search: searchIPS" [value]="item.value">{{
+                item.text
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field
+            class="col-md-6"
+            appearance="outline"
+            *ngIf="dataCitaToAssign.appointment.face_to_face"
+          >
+            <mat-label>Sede</mat-label>
+            <mat-select
+              required
+              [(ngModel)]="dataCitaToAssign.sede"
+              name="location_id"
+              (selectionChange)="getSpecialties(); dispatchPerson(agenda)"
+            >
+              <div class="input-group">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Busca sede"
+                  [(ngModel)]="searchSede"
+                  name="searchEspecialidad"
+                  class="form-control mx-2"
+                />
+                <div class="input-group-append" *ngIf="searchSede">
+                  <button
+                    class="btn btn-outline-secondary border-left-0 border"
+                    (click)="searchSede = ''"
+                  >
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <mat-option *ngFor="let item of sedes | search: searchSede" [value]="item.value">{{
+                item.text
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <!-- /****************************************************************** -->
+    </form>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <div class="app-calendar" *ngIf="dataCitaToAssign.speciality">
+      <app-asignar-calendario (siguiente)="siguiente()"></app-asignar-calendario>
+    </div>
+  </div>
+</div>

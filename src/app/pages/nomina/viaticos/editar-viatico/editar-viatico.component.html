@@ -1,0 +1,5 @@
+@if (!loading && data) {
+  <app-crear-viaticos [data]="data" [id]="id" [title]="'Editar viático'"></app-crear-viaticos>
+} @else {
+  <app-placeholder-form></app-placeholder-form>
+}

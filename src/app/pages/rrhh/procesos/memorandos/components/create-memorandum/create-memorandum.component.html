@@ -1,0 +1,51 @@
+<app-modal titleModal="Nuevo memorando">
+  <form [formGroup]="formMemorando">
+    <div class="row">
+      <app-autocomplete-fc
+        class="col-md-12"
+        label="Funcionario"
+        placeholder="Seleccionar"
+        [control]="formMemorando.controls['person_id']"
+        [list]="people$ | async"
+        (optionSelectedEvent)="nameUser = $event"
+      ></app-autocomplete-fc>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Motivo</mat-label>
+        <mat-select formControlName="memorandum_type_id" required>
+          @for (item of typesLimitated; track $index) {
+            <mat-option [value]="item.value">{{ item.text }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Nivel</mat-label>
+        <mat-select formControlName="level">
+          <mat-option value="Leve">Leve</mat-option>
+          <mat-option value="Grave">Grave</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+        <mat-label>Detalles</mat-label>
+        <textarea
+          matInput
+          placeholder="Ingrese los detalles"
+          rows="5"
+          formControlName="details"
+          name="detalles"
+          [cdkTextareaAutosize]="true"
+          required
+        ></textarea>
+      </mat-form-field>
+      <app-multi-files class="col-md-12" typeUse="button" (sendFiles)="openMultiFiles($event)" />
+    </div>
+  </form>
+  <button
+    buttons
+    type="submit"
+    class="btn btn-primary"
+    [disabled]="!formMemorando.valid"
+    (click)="saveMemorandum()"
+  >
+    Guardar
+  </button>
+</app-modal>

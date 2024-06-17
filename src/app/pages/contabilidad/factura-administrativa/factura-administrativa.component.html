@@ -1,0 +1,188 @@
+<div class="page-body">
+  <div class="card">
+    <div class="card-block">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4>Facturación</h4>
+        <a
+          [routerLink]="['/contabilidad/ver-factura-administrativa']"
+          class="btn btn-primary btn-sm mb-2"
+        >
+          Crear Factura
+        </a>
+      </div>
+      <table class="table table-condesed table-striped">
+        <thead>
+          <tr>
+            <th style="width: 100px">Código</th>
+            <th style="width: 150px">Fecha</th>
+            <th style="width: 200px">Facturador</th>
+            <th style="width: 200">Cliente</th>
+            <th style="width: 120px">Tipo Cliente</th>
+            <th style="width: 120px">Estado</th>
+            <th style="width: 80px">Acciones</th>
+          </tr>
+          <tr>
+            <th class="table-filtro">
+              <input
+                type="text"
+                [(ngModel)]="filtro_cod_fact"
+                (blur)="filtros1()"
+                class="form-control input-sm"
+                placeholder="Filtro Código"
+              />
+            </th>
+            <th class="table-filtro">
+              <!-- Mirar commits anteriores a 16/10/23 -->
+            </th>
+            <th class="table-filtro">
+              <input
+                type="text"
+                [(ngModel)]="filtro_facturador"
+                (blur)="filtros1()"
+                class="form-control input-sm"
+                placeholder="Filtro Facturador"
+              />
+            </th>
+            <th class="table-filtro">
+              <input
+                type="text"
+                [(ngModel)]="filtro_cliente"
+                (blur)="filtros1()"
+                class="form-control input-sm"
+                placeholder="Filtro Cliente"
+              />
+            </th>
+            <th class="table-filtro"></th>
+
+            <th class="table-filtro">
+              <select
+                (change)="filtros1()"
+                [(ngModel)]="filtro_estado_fact"
+                class="form-control input-sm"
+              >
+                <option value="">Todas</option>
+                <option value="Sin Cancelar">Sin Cancelar</option>
+                <option value="Cancelada">Canceladas</option>
+              </select>
+            </th>
+            <th class="table-filtro"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="Facturas.length == 0 && !Cargando">
+            <td colspan="8" class="text-center">
+              <i class="fa fa-exclamation-circle fa-5x"></i>
+              <h4>No Existen Facturas para mostrar</h4>
+            </td>
+          </tr>
+          <tr *ngIf="Cargando">
+            <td colspan="14" class="text-center">
+              <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+              <span class="sr-only">Cargando...</span>
+              <h4>Cargando Facturas ...</h4>
+            </td>
+          </tr>
+          <tr
+            *ngFor="let factura of Facturas"
+            [ngClass]="{ 'bg-danger': factura.Estado_Factura == 'Anulada' }"
+          >
+            <td>
+              <strong>{{ factura.Codigo }}</strong>
+            </td>
+            <td class="text-center">
+              {{ factura.Fecha_Documento | date: 'dd/MM/yyyy' }}
+            </td>
+            <td>
+              {{ factura.Funcionario }}
+            </td>
+            <td>{{ factura.Cliente }}</td>
+            <td>
+              <div class="text-center">
+                <span
+                  class="label"
+                  [ngClass]="{
+                    'label-danger': factura.Tipo_Cliente == 'Funcionario',
+                    'label-success': factura.Tipo_Cliente == 'Proveedor',
+                    'label-info': factura.Tipo_Cliente == 'Cliente'
+                  }"
+                  >{{ factura.Tipo_Cliente }}</span
+                >
+              </div>
+            </td>
+            <td>
+              <div class="text-center">
+                <span
+                  class="label {{
+                    factura.Estado_Factura == 'Sin Cancelar' ? 'label-danger' : 'label-success'
+                  }}"
+                  >{{ factura.Estado_Factura }}</span
+                >
+              </div>
+            </td>
+            <td>
+              <div class="text-center">
+                <div ngbDropdown class="dropdown-primary">
+                  <button
+                    ngbDropdownToggle
+                    class="btn btn-secondary btn-mini waves-effect waves-light"
+                    type="button"
+                  >
+                    Acciones
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href=""
+                      [routerLink]="[
+                        '/facturaadministrativaver',
+                        factura.Id_Factura_Administrativa
+                      ]"
+                    >
+                      <i class="ti-eye"></i>Ver</a
+                    >
+
+                    <a
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href="{{ globales.ruta }}php/factura_administrativa/descarga_pdf.php?id={{
+                        factura.Id_Factura_Administrativa
+                      }}"
+                      target="_blank"
+                    >
+                      <i class="ti-printer"></i>Imprimir Factura</a
+                    >
+
+                    <a
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href="{{
+                        globales.ruta
+                      }}php/facturacion_electronica/descargar_xml.php?Tipo_Factura=Factura_Administrativa&Id_Factura={{
+                        factura.Id_Factura_Administrativa
+                      }}"
+                      target="_blank"
+                    >
+                      <i class="ti-printer"></i>Descargar XML</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {{ page1 * maxSize - maxSize + 1 }} al
+      {{ page1 * maxSize > TotalItems1 ? TotalItems1 : page1 * maxSize }} de
+      {{ TotalItems1 }}
+      <ngb-pagination
+        size="sm"
+        class="pull-right"
+        [collectionSize]="TotalItems1"
+        [(page)]="page1"
+        [maxSize]="10"
+        [pageSize]="maxSize"
+        size="sm"
+        (pageChange)="paginacion()"
+        [boundaryLinks]="true"
+      ></ngb-pagination>
+    </div>
+  </div>
+</div>

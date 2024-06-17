@@ -1,0 +1,145 @@
+.botonFlotante {
+  position: fixed;
+  display: scroll;
+  bottom: 10px;
+  right: 10px;
+}
+.tabla-arriba {
+  font-size: 15px !important;
+  line-height: 22px !important;
+}
+.form-control-sm {
+  font-size: 11px !important;
+  padding: 2px 5px !important;
+  height: 22px !important;
+  border-radius: 5px !important;
+}
+
+.table {
+  font-size: 10px;
+  td {
+    padding: 0.5rem;
+    vertical-align: middle;
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+  }
+}
+
+.btn-search {
+  display: inline-block;
+  border-radius: 100% !important;
+  i {
+    font-size: 12px;
+    vertical-align: top;
+    padding-top: 2px;
+  }
+  span {
+    font-size: 12px !important;
+  }
+}
+.text-muted {
+  color: #757575 !important;
+}
+
+.btn-xs {
+  height: 22px !important;
+  padding: 2px !important;
+  border-radius: 5px;
+}
+
+.imagen {
+  width: 50px !important;
+  height: 50px !important;
+  padding: 1px;
+}
+
+.facturas {
+  h6 {
+    margin-bottom: 10px;
+  }
+  border: 1px dotted gray;
+  background: #e9ecef;
+  text-align: center;
+  padding: 20px;
+}
+
+.detalles-productos-acta {
+  tr {
+    th {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+  }
+}
+.input-flotante {
+  transform: rotate(270deg);
+  position: fixed;
+  display: scroll;
+  left: 0;
+  /* margin: 0; */
+  top: 50%;
+  z-index: 999;
+  margin-left: -70px;
+  height: 22px !important;
+  border-radius: 5px !important;
+  padding: 2px 5px !important;
+  background: #e4e4e4;
+}
+.input-barras {
+  width: 40%;
+  margin-left: 30%;
+  font-size: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.tooltip-content4 {
+  background: #27766a !important;
+  border-bottom: 55px solid #27966a !important;
+}
+.tooltip-item2 {
+  color: #424446 !important;
+  font-size: 12px !important;
+}
+.mytooltip:hover .tooltip-item2 {
+  color: #fff !important;
+}
+
+.label-success {
+  background: linear-gradient(45deg, #b5f9c7, #c8f7d6);
+}
+
+.add-retenciones-container {
+  border: 0.6px solid rgb(150, 150, 150);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.custom-boton {
+  border: 0.5px solid #00bcd4;
+  border-radius: 50%;
+  padding: 10px;
+  transition: 0.3s all ease-out;
+  font-size: 10px;
+  cursor: pointer;
+  margin: 4px;
+
+  &:hover {
+    i {
+      color: white !important;
+    }
+
+    background-color: #0199ad9d;
+    border-color: white;
+    -webkit-box-shadow: 0px 2px 3px 2px rgba(107, 107, 107, 1);
+    -moz-box-shadow: 0px 2px 3px 2px rgba(107, 107, 107, 1);
+    box-shadow: 0px 2px 3px 2px rgba(107, 107, 107, 1);
+  }
+}
+.input-flete {
+  background: transparent;
+  border: none;
+  width: 84%;
+  text-align: right;
+}

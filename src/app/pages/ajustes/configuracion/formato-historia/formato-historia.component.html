@@ -1,0 +1,196 @@
+<div class="card">
+  <div class="card-body">
+    <form [formGroup]="forma">
+      <ng-container formArrayName="questions">
+        <ng-container
+          [formGroupName]="qi"
+          *ngFor="let question of questions.controls; let qi = index"
+        >
+          <div class="row">
+            <app-mat-input
+              [control]="question.controls['title']"
+              [label]="'Pregunta ' + (qi + 1)"
+              [type]="'text'"
+              [placeholder]="'Ingresa la pregunta ' + (qi + 1)"
+            />
+            <app-mat-select
+              [control]="question.controls['type']"
+              [label]="'Tipo de dato'"
+              [items]="typeInputs"
+            />
+            <ng-container formArrayName="options">
+              @if (
+                question.controls.type.value == 'select' || question.controls.type.value == 'check'
+              ) {
+                <ng-container
+                  [formGroupName]="oi"
+                  *ngFor="let option of question.controls.options.controls; let oi = index"
+                >
+                  <app-mat-input
+                    [control]="option.controls['value']"
+                    [label]="'Opción ' + (oi + 1)"
+                    [type]="'text'"
+                    [placeholder]="'Ingresa la opción ' + (oi + 1)"
+                  />
+                </ng-container>
+                <div class="col-12 mb-3">
+                  <button
+                    (click)="addOption(question.controls.options)"
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                  >
+                    <i class="fa fa-plus"></i> Agregar opción
+                  </button>
+                </div>
+              }
+            </ng-container>
+          </div>
+          <ng-container formArrayName="validations">
+            <ng-container
+              [formGroupName]="vi"
+              *ngFor="let validation of question.controls.validations.controls; let vi = index"
+            >
+              <div class="border border-info-subtle p-3 rounded mb-3">
+                <div class="d-flex justify-content-between mb-4">
+                  <h5>Validación:</h5>
+                  <button
+                    (click)="delete(question.controls.validations, vi)"
+                    type="button"
+                    class="btn-close"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="row">
+                  <ng-container formArrayName="rules">
+                    <ng-container
+                      [formGroupName]="o1"
+                      *ngFor="let cond of validation.controls.rules.controls; let o1 = index"
+                    >
+                      <div class="col-2">
+                        <ng-container *ngIf="0 != o1">
+                          <app-mat-select
+                            [control]="cond.controls['logic']"
+                            [label]="'Operador'"
+                            [items]="condicionals"
+                          />
+                        </ng-container>
+                      </div>
+                      <div class="col-10">
+                        <div class="row">
+                          <ng-container formArrayName="level2">
+                            <ng-container
+                              [formGroupName]="oi"
+                              *ngFor="let operator of cond.controls.level2.controls; let oi = index"
+                            >
+                              <app-mat-select
+                                [control]="operator.controls['id_question_selected']"
+                                [label]="'Pregunta'"
+                                [itemsObjects]="questions.value"
+                              />
+                              @if (
+                                operator.controls.question_selected &&
+                                operator.controls.question_selected.value?.type != 'select' &&
+                                operator.controls.question_selected.value.question_selected?.type !=
+                                  'check'
+                              ) {
+                                <app-mat-select
+                                  [control]="operator.controls['operator']"
+                                  [label]="'Operador'"
+                                  [items]="operators"
+                                />
+                                <app-mat-input
+                                  [control]="operator.controls['value']"
+                                  [label]="'Valor'"
+                                  [type]="'text'"
+                                  [placeholder]="'Ingresa el valor'"
+                                />
+                              } @else {
+                                <app-mat-select
+                                  [control]="operator.controls['operator']"
+                                  [label]="'Operador'"
+                                  [items]="operatorsSelect"
+                                />
+                                <app-mat-select
+                                  [control]="operator.controls['value']"
+                                  [label]="'Respuesta'"
+                                  [itemsObjects]="operator.controls.question_selected.value.options"
+                                />
+                              }
+                              @if (oi != cond.controls.level2.controls.length - 1) {
+                                <div class="col-12">
+                                  <app-mat-select
+                                    [control]="operator.controls['logic']"
+                                    [label]="'Operador'"
+                                    [items]="condicionals"
+                                  />
+                                </div>
+                              }
+                              <div class="d-flex mb-2">
+                                <button
+                                  (click)="delete(cond.controls.level2, oi)"
+                                  type="button"
+                                  class="btn btn-sm btn-danger w-100"
+                                >
+                                  <i class="fa fa-trash"></i> Eliminar regla
+                                </button>
+                              </div>
+                              <hr class="my-4 line" />
+                            </ng-container>
+                          </ng-container>
+                          <div class="d-flex mb-2">
+                            <button
+                              (click)="addRule(cond.controls.level2)"
+                              type="button"
+                              class="btn btn-sm btn-primary w-100"
+                            >
+                              <i class="fa fa-plus"></i> Agregar regla
+                            </button>
+                          </div>
+                          <hr class="my-4 line" />
+                        </div>
+                      </div>
+                    </ng-container>
+                  </ng-container>
+                </div>
+                <div class="col-12">
+                  <app-mat-input
+                    [control]="validation.controls['then']"
+                    [label]="'Entonces...'"
+                    [type]="'text'"
+                    [placeholder]="'Ingresa el valor'"
+                  />
+                </div>
+                <div class="d-flex">
+                  <button
+                    (click)="addRu(validation.controls.rules)"
+                    type="button"
+                    class="btn btn-sm btn-primary w-100"
+                  >
+                    <i class="fa fa-plus"></i> Agregar condición
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+            <div class="d-flex">
+              <button
+                (click)="addValidation(question.controls.validations)"
+                type="button"
+                class="btn btn-sm btn-primary w-100"
+              >
+                <i class="fa fa-plus"></i> Agregar validación
+              </button>
+            </div>
+          </ng-container>
+
+          <hr class="my-4 line" />
+        </ng-container>
+      </ng-container>
+    </form>
+    <button (click)="addQuestion()" class="btn btn-sm btn-block btn-primary">
+      <i class="fa fa-plus"></i> Pregunta
+    </button>
+    <button (click)="save()" class="btn btn-block btn-primary">
+      <i class="fa fa-lock"></i> Guardar modelo de historia clínica
+    </button>
+  </div>
+</div>

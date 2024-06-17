@@ -1,0 +1,16 @@
+<div
+  class="row"
+  [ngClass]="{
+    'card-title d-flex justify-content-between': title !== null
+  }"
+>
+  <div class="col-md-6 px-0">
+    <h4 class="text-primary">{{ title }}</h4>
+  </div>
+  <div [ngClass]="{ 'col-md-6 px-0 text-end': title !== null, 'col-md-12': title === null }">
+    <div [ngClass]="{ 'btn-group w-sm-100': title !== null }">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>
+<hr class="line" />

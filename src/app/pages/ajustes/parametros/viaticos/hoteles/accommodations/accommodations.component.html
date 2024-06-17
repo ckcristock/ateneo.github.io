@@ -1,0 +1,62 @@
+<ng-container [formGroup]="form">
+  <div class="row mb-3">
+    <mat-form-field class="col pb-0" appearance="outline">
+      <mat-label>{{ title }} alojamiento</mat-label>
+      <input
+        matInput
+        type="text"
+        placeholder="Ingresa el valor"
+        formControlName="name"
+        autocomplete="off"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="save()"
+        [disabled]="!form.valid"
+        [attr.aria-label]="'Guardar alojamiento'"
+      >
+        <mat-icon>save</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+</ng-container>
+<app-table
+  [loading]="loading"
+  [arrayData]="values"
+  [pagination]="pagination"
+  (pageChange)="getValues()"
+>
+  <ng-container titles>
+    <th>Cuenta Asociada</th>
+    <th>Tipo</th>
+    <th><i class="mdi mdi-chevron-down"></i></th>
+  </ng-container>
+  <tbody content>
+    @for (value of values; track $index) {
+      <tr class="text-center">
+        <td
+          class="align-middle"
+          scope="row"
+          [ngClass]="{
+            'text-danger': value.deleted_at != undefined
+          }"
+        >
+          {{ value.name }}
+        </td>
+        <td class="align-middle">{{ value.created_at | date }}</td>
+        <td>
+          <app-dropdown-actions>
+            <app-action-edit (action)="getValue(value)" />
+            @if (value.deleted_at == undefined) {
+              <app-action-deactivate (action)="anularOActivar(value, 'Inactivo')" />
+            }
+            @if (value.deleted_at != undefined) {
+              <app-action-activate (action)="anularOActivar(value, 'Activo')" />
+            }
+          </app-dropdown-actions>
+        </td>
+      </tr>
+    }
+  </tbody>
+</app-table>

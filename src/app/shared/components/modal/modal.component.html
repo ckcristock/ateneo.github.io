@@ -1,0 +1,23 @@
+<article class="modal-content">
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ titleModal }}</h4>
+    @if (canExit) {
+      <button
+        type="button"
+        class="btn-close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="close()"
+      ></button>
+    }
+  </div>
+  <div class="modal-body">
+    <ng-content></ng-content>
+  </div>
+  <div class="modal-footer">
+    @if (canExit) {
+      <button type="button" class="btn btn-danger" (click)="close()">Cerrar</button>
+    }
+    <ng-content select="[buttons]"></ng-content>
+  </div>
+</article>

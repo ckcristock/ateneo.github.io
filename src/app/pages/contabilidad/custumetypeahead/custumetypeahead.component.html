@@ -1,0 +1,25 @@
+<div class="row">
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>{{ label }}</mat-label>
+    <input
+      matInput
+      [attr.name]="Modelo.name"
+      [attr.id]="Modelo.id"
+      (change)="AsignarId()"
+      (blur)="validarCampo(Model, $event, Modelo.placeholder)"
+      [(ngModel)]="Model"
+      type="text"
+      [attr.placeholder]="Modelo.placeholder"
+      [ngbTypeahead]="search_tercero"
+      [required]="Modelo.Requerido"
+      [resultTemplate]="rt_tercero"
+      [inputFormatter]="formatter_tercero"
+    />
+  </mat-form-field>
+</div>
+
+<ng-template #rt_tercero let-r="result" let-t="term">
+  <span class="f-9">
+    {{ r.Nombre }}
+  </span>
+</ng-template>

@@ -1,0 +1,153 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="mb-0">Agendar cita</h4>
+      </div>
+      <div class="card-body">
+        <aw-wizard [navBarLayout]="'large-empty-symbols'">
+          <aw-wizard-step stepTitle="Disponibilidad">
+            <ng-template awWizardStepSymbol>1</ng-template>
+            <div class="row">
+              <div class="col-12">
+                <app-cita (siguiente)="siguiente()"></app-cita>
+              </div>
+            </div>
+            <ul class="list-inline wizard mb-0">
+              <li class="next list-inline-item float-right">
+                <button
+                  style="visibility: hidden"
+                  #next
+                  (click)="siguiente()"
+                  class="btn btn-primary"
+                  awNextStep
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </aw-wizard-step>
+
+          <aw-wizard-step stepTitle="Detalles">
+            <ng-template awWizardStepSymbol>2</ng-template>
+
+            <app-crear-cita (siguiente)="siguiente($event)"></app-crear-cita>
+
+            <ul class="list-inline wizard mb-0 d-none">
+              <li class="previous list-inline-item">
+                <button class="btn btn-primary" awPreviousStep>Previous</button>
+              </li>
+              <li class="next list-inline-item float-right">
+                <button #next class="btn btn-primary">Next</button>
+              </li>
+              <li class="next list-inline-item float-right">
+                <button #customStep class="btn btn-primary" [awGoToStep]="{ stepIndex: 0 }">
+                  CustomStep
+                </button>
+              </li>
+            </ul>
+          </aw-wizard-step>
+
+          <aw-wizard-step stepTitle="Finalizar">
+            <ng-template awWizardStepSymbol *ngIf="dataCita">3</ng-template>
+
+            <app-resumen [dataCita]="dataCita"></app-resumen>
+          </aw-wizard-step>
+        </aw-wizard>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Modal -->
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Add New Event</h5>
+    <button type="button" class="btn-close" aria-hidden="true" (click)="closeEventModal()">
+      ×
+    </button>
+  </div>
+  <div class="modal-body p-3">
+    <form (ngSubmit)="saveEvent()" [formGroup]="formData">
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group">
+            <label class="control-label">Event Name</label>
+            <input
+              class="form-control"
+              placeholder="Insert Event Name"
+              type="text"
+              name="title"
+              formControlName="title"
+              [ngClass]="{ 'is-invalid': submitted && form.title.errors }"
+            />
+            <div *ngIf="submitted && form.title.errors" class="invalid-feedback">
+              <span *ngIf="form.title.errors.required">This value is required.</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-group">
+            <label class="control-label">Category</label
+            ><select
+              class="form-control"
+              name="category"
+              formControlName="category"
+              [ngClass]="{ 'is-invalid': submitted && form.category.errors }"
+            >
+              <option *ngFor="let option of category" value="{{ option.value }}">
+                {{ option.name }}
+              </option>
+            </select>
+            <div *ngIf="submitted && form.category.errors" class="invalid-feedback">
+              <div *ngIf="form.category.errors.required">This value is required</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-end pt-4">
+        <button type="button" class="btn btn-light" (click)="closeEventModal()">Close</button>
+        <button type="submit" class="btn btn-success save-event ms-1">Save</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Edit event modal -->
+<ng-template #editcontent let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Edit Event</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-hidden="true"
+      (click)="modal.dismiss('Cross click')"
+    >
+      ×
+    </button>
+  </div>
+  <div class="modal-body p-3">
+    <form [formGroup]="formEditData" (ngSubmit)="editEventSave()">
+      <label>Change event name</label>
+      <div class="input-group m-b-15">
+        <input class="form-control" type="text" formControlName="editTitle" />
+      </div>
+      <label class="mt-2">Change event category</label>
+      <div class="input-group m-b-15">
+        <select class="form-control" name="ecategory" formControlName="editCategory">
+          <option *ngFor="let option of category" value="{{ option.value }}">
+            {{ option.name }}
+          </option>
+        </select>
+      </div>
+    </form>
+  </div>
+  <div class="text-end p-3">
+    <button type="button" class="btn btn-light" (click)="modal.dismiss('Close')">Close</button>
+    <button type="button" class="btn btn-danger delete-event ms-1" (click)="confirm()">
+      Delete
+    </button>
+    <button type="button" class="btn btn-success ms-1" (click)="editEventSave()">Save</button>
+  </div>
+</ng-template>

@@ -1,0 +1,197 @@
+<div class="modal-header">
+  <h4 class="text-primary modal-title">Nuevo préstamo o libranza</h4>
+  <button
+    type="button"
+    class="btn-close"
+    data-dismiss="modal"
+    aria-label="Close"
+    (click)="closeModal()"
+  ></button>
+</div>
+<div class="modal-body">
+  <form #FormPrestamo="ngForm" (ngSubmit)="save(FormPrestamo)">
+    <div class="row">
+      <app-autocomplete-mdl
+        class="col"
+        label="Funcionario"
+        placeholder="Busca por nombre del empleado"
+        [model]="modelo.person"
+        [list]="people$ | async"
+        [required]="true"
+        (optionSelectedEvent)="modelo.person = $event"
+      ></app-autocomplete-mdl>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select
+          name="type"
+          (selectionChange)="ComprobarPrestamo($event.value)"
+          [(ngModel)]="modelo.type"
+          required
+        >
+          <mat-option value="Prestamo">Prestamo</mat-option>
+          <mat-option value="Libranza">Libranza</mat-option>
+          <!-- <option value="Sancion">Sancion</option> -->
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field
+        class="col"
+        appearance="outline"
+        *ngIf="modelo.type != 'Libranza' && modelo.type != ''"
+      >
+        <mat-label>Intereses a</mat-label>
+        <mat-select
+          (selectionChange)="SinInteres($event.value)"
+          name="Interes"
+          id="interes"
+          [(ngModel)]="modelo.interest_type"
+          required
+        >
+          <mat-option value="Capital">Sobre capital</mat-option>
+          <mat-option value="Prestamo">Valor préstamo</mat-option>
+          <mat-option value="Sin">Sin interes</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field
+        class="col"
+        appearance="outline"
+        *ngIf="
+          modelo.interest_type != 'Sin' && modelo.interest_type != '' && modelo.type != 'Libranza'
+        "
+      >
+        <mat-label>% Interes</mat-label>
+        <input
+          matInput
+          type="text"
+          appInputPositionInitial
+          currencyMask
+          [options]="masksMoney.maskPorcentaje"
+          placeholder="Ingresa el porcentaje"
+          id="Porcentaje_Interes"
+          name="Porcentaje_Interes"
+          [(ngModel)]="modelo.interest"
+          required
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <app-autocomplete-mdl
+        *ngIf="modelo.type == 'Prestamo'"
+        class="col"
+        label="Plan de cuenta"
+        placeholder="Ingresa el plan de cuenta"
+        [model]="modelo.account_plain_id"
+        [list]="PlanesCuenta"
+        (optionSelectedEvent)="modelo.account_plain_id = $event"
+      ></app-autocomplete-mdl>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Valor del préstamo</mat-label>
+        <input
+          matInput
+          currencyMask
+          appInputPosition
+          [options]="masksMoney.maskCOP"
+          placeholder="Ingresa el valor"
+          id="Prestamo"
+          name="Prestamo"
+          [(ngModel)]="modelo.value"
+          required
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Pago a cuotas</mat-label>
+        <mat-select
+          name="pay_fees"
+          id="pay_fees"
+          [(ngModel)]="modelo.pay_fees"
+          (selectionChange)="changePagoCuota($event.value)"
+          required
+        >
+          <mat-option value="Si">Sí</mat-option>
+          <mat-option value="No">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>N° de cuotas</mat-label>
+        <input
+          matInput
+          currencyMask
+          appInputPositionInitial
+          [options]="masksMoney.maskNumbers"
+          placeholder="Ingresa el número de cuotas"
+          id="number_fees"
+          name="number_fees"
+          (change)="CalduloCuota()"
+          [(ngModel)]="modelo.number_fees"
+          [disabled]="cuotaDisabled"
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Cuota mensual</mat-label>
+        <input
+          matInput
+          currencyMask
+          appInputPosition
+          [options]="masksMoney.maskCOP"
+          placeholder="Ingresa la cuota mensual"
+          id="Cuota"
+          name="Cuota"
+          [(ngModel)]="modelo.monthly_fee"
+          [disabled]="cuotaDisabled"
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Tipo de descuento</mat-label>
+        <mat-select
+          name="Tipo_Descuento"
+          id="Tipo_Descuento"
+          [(ngModel)]="modelo.payment_type"
+          required
+        >
+          <mat-option value="Quincenal">Quincenal</mat-option>
+          <mat-option value="Mensual">Mensual</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Quincena primer descuento</mat-label>
+        <mat-select
+          name="payment_date"
+          id="payment_date"
+          [(ngModel)]="modelo.first_payment_date"
+          required
+        >
+          <mat-option *ngFor="let fecha of Quincenas" [value]="fecha.Fecha">
+            {{ fecha.Nombre }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+        <mat-label>Observaciones</mat-label>
+        <textarea
+          matInput
+          placeholder="Ingrese las observaciones"
+          name="observation"
+          id="observation"
+          rows="5"
+          [(ngModel)]="modelo.observation"
+          [cdkTextareaAutosize]="true"
+        ></textarea>
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="closeModal()">Cancelar</button>
+  <button class="btn btn-primary" (click)="save(FormPrestamo)">Guardar</button>
+</div>
+
+<ng-template #rt3 let-r="result" let-t="term">
+  <span class="f-9">{{ r.identifier }} - {{ r.text }}</span>
+</ng-template>
+<ng-template #rt1 let-r="result " let-t="term ">
+  <span class="f-9">{{ r.code }} </span>
+</ng-template>
+<ng-template #rt2 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo_Niif }} - {{ r.Nombre_Niif }}</span>
+</ng-template>

@@ -1,0 +1,21 @@
+<div class="card-title">
+  <h5 class="text-primary">{{ titleActivity }}</h5>
+</div>
+<hr class="line" />
+@for (activity of activities; track $index) {
+  <div class="pb-3">
+    <span class="text-info">{{ activity.title }}</span>
+    <div class="d-flex w-100 justify-content-between align-items-center">
+      <span class="col">{{ activity.full_name }}</span>
+      <app-load-image
+        classImg="d-block img-thumbnail rounded-circle img-fluid header-profile-user"
+        [src]="activity.image"
+      ></app-load-image>
+    </div>
+    <p class="mb-1">{{ activity.description }}</p>
+    <small>{{ activity.date | date: 'medium' }}</small>
+  </div>
+}
+@if (!activities?.length) {
+  <ng-content select="[loading]"></ng-content>
+}

@@ -1,0 +1,9 @@
+<app-reason
+  titleReason="tipos de actuaciones"
+  [pagination]="pagination"
+  [data]="actionsTypes"
+  [loading]="loading"
+  (saveReason)="saveActionType($event)"
+  (newRequest)="getActionsTypes($event)"
+  (changeStatus)="onChangeState($event)"
+></app-reason>

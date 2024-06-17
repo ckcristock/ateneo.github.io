@@ -1,0 +1,92 @@
+<article class="row">
+  <app-card
+    class="col-md-9"
+    viewTitle="Agendas"
+    [filterTemplate]="filterTemplate"
+    [activeFilters]="urlFiltersService.activeFilters"
+  >
+    <app-table
+      [loading]="loading"
+      [arrayData]="agendas"
+      [pagination]="pagination"
+      (pageChange)="getAgendamientos()"
+    >
+      <ng-container titles>
+        <th>Foto</th>
+        <th>Fecha</th>
+        <th class="col-1">Profesional</th>
+        <th class="col-1">Especialidad</th>
+        <th>Rango</th>
+        <th>Estado</th>
+        <th>Espacios</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (item of agendas; track $index) {
+          <tr class="text-center">
+            <td>
+              <app-load-image
+                classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                [src]="item?.usuario?.person?.image"
+              />
+            </td>
+            <td class="align-middle">
+              <i
+                [ngClass]="{
+                  'fa-user': item.type_appointment.face_to_face,
+                  'fa-video': !item.type_appointment.face_to_face
+                }"
+                class="fa"
+              ></i>
+              {{ item.created_at | date: 'dd/MM/yyy' }}
+            </td>
+            <td class="align-middle">{{ item.person.full_name }}</td>
+            <td class="align-middle">{{ item.speciality.name }}</td>
+            <td class="align-middle">
+              {{ item.date_start | date: 'dd/MM/yy' }}
+              @if (item.date_start != item.date_end) {
+                - {{ item.date_end | date: 'dd/MM/yy' }}
+              }
+            </td>
+            <td class="align-middle">{{ item.state }}</td>
+            <td class="align-middle">
+              <i class="fas fa-calendar"></i>
+              {{ item.spaces.length }} ({{ item.available_spaces.length }})
+            </td>
+            <td>
+              <app-dropdown-actions>
+                <app-action-view
+                  [link]="{
+                    url: '/agendamiento/detalle-agenda/' + item.id
+                  }"
+                />
+                @if (item.state != 'Cancelada' && item.assigned_spaces.length == 0) {
+                  <app-action-deactivate (action)="cancel(item.id)" />
+                }
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <div class="col-md-3 px-0">
+    <div class="position-fixed col-3">
+      <div *ngFor="let stat of statData" style="cursor: pointer" class="col-11">
+        <app-stats
+          (click)="searchDetailStat(stat)"
+          [title]="stat.title"
+          [value]="stat.value"
+          [icon]="stat.icon"
+        >
+        </app-stats>
+      </div>
+    </div>
+  </div>
+</article>
+
+<ng-template #filterTemplate>
+  <app-filter-scheduling [values]="filters" (filterEvent)="getAgendamientos($event)" />
+</ng-template>
+
+<app-detail-stats [showDeitalStat]="showDeitalStat"></app-detail-stats>

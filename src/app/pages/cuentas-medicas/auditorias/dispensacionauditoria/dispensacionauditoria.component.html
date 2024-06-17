@@ -1,0 +1,400 @@
+<div class="row">
+  <div class="col-3">
+    <!-- <app-actividad Modulo="auditoría" [Actividades]="Actividades" [Cargando]="Cargando">
+    </app-actividad> -->
+
+    <div class="card">
+      <div class="card-body">
+        <app-activity
+          class="card flex-grow-1"
+          [activities]="Actividades"
+          titleActivity="Seguimiento auditoría"
+          ><app-not-data loading [loading]="Cargando"></app-not-data
+        ></app-activity>
+      </div>
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="row">
+      <!-- No se ha realizado una dispensación asociada a esta auditoría -->
+      <div class="col-12">
+        <div class="card">
+          <div *ngIf="detalles?.Codigo != undefined; else notData">
+            <!-- cabecera -->
+            <div class="row card-body">
+              <app-cabecera [datosCabecera]="DatosCabecera"> </app-cabecera>
+            </div>
+            <hr class="line" />
+            <!-- datos interm -->
+            <div class="row card-body">
+              <div class="col-12">
+                <div class="">
+                  <div class="col-sm-12">
+                    <div class="rounded-top table-responsive">
+                      <table class="table table-bordered table-striped table-sm">
+                        <!-- titulos -->
+                        <thead class="bg-light">
+                          <tr class="text-center text-uppercase">
+                            <th>Direccion Punto</th>
+                            <th>Telefono Punto</th>
+                            <th>Tipo</th>
+                            <th>Entrega Actual</th>
+                            <th>Cantidad Entregas</th>
+                            <th>Punto dispensacion</th>
+                            <th>Departamento</th>
+                            <!-- <th>Codigo_Qr</th> -->
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="text-center align-middle text-uppercase">
+                            <td>
+                              {{ detalles?.Direccion_Punto || 'N/A' }}
+                            </td>
+                            <td>
+                              {{ detalles?.Telefono_Punto || 'N/A' }}
+                            </td>
+                            <td>{{ detalles?.Tipo || 'N/A' }}</td>
+                            <td>
+                              {{ detalles?.Entrega_Actual || 'N/A' }}
+                            </td>
+                            <td>
+                              {{ detalles?.Cantidad_Entregas || 'N/A' }}
+                            </td>
+                            <td>
+                              {{ detalles?.Punto_Dispensacion || 'N/A' }}
+                            </td>
+                            <td>
+                              {{ detalles?.Departamento || 'N/A' }}
+                            </td>
+                            <!-- <td>
+                            <img
+                              *ngIf="detalles?.Codigo_Qr != ''"
+                              src="{{ environment?.ruta }}IMAGENES/QR/{{ detalles?.Codigo_Qr }}"
+                              alt="Codigo Qr"
+                              class="img-fluid"
+                              style="margin-top: -20px"
+                            />
+                            <img
+                              *ngIf="detalles?.Codigo_Qr == ''"
+                              alt="Codigo Qr"
+                              src="assets/images/sinqr.png"
+                              class="img-fluid"
+                              style="margin-top: -20px"
+                            />
+                          </td> -->
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- tabla una linea -->
+            <div class="card-body">
+              <!-- detalles paciente -->
+              <div class="row d-flex justify-content-between">
+                <div class="col text-center align-middle">
+                  <strong>Paciente</strong>
+                  <p>{{ detalles?.Nombre_Paciente || 'N/A' }}</p>
+                </div>
+                <div class="col text-center align-middle">
+                  <strong>Identificación</strong>
+                  <p>{{ detalles?.Id_Paciente || 'N/A' }}</p>
+                </div>
+                <div class="col text-center align-middle">
+                  <strong>Dirección</strong>
+                  <p>{{ detalles?.Direccion_Paciente || 'N/A' }}</p>
+                </div>
+                <div class="col text-center align-middle">
+                  <strong>Eps</strong>
+                  <p>{{ detalles?.EPS || 'N/A' }}</p>
+                </div>
+                <div class="col text-center align-middle">
+                  <strong>Régimen</strong>
+                  <p>{{ detalles?.Regimen_Paciente || 'N/A' }}</p>
+                </div>
+              </div>
+              <!-- productos -->
+              <div class="row" style="margin-top: 5px">
+                <div *ngIf="!Cargando && productos.length > 0; else notData">
+                  <div class="col-sm-12">
+                    <div class="rounded-top table-responsive">
+                      <table class="table table-bordered table-striped table-sm">
+                        <thead class="bg-light">
+                          <tr class="text-center text-uppercase">
+                            <th>Producto</th>
+                            <th>Embalaje</th>
+                            <th>Lote</th>
+                            <th>Cant. Formulada</th>
+                            <th>Cant. Entregada</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            class="text-center align-middle text-uppercase"
+                            *ngFor="let item of productos; let i = index"
+                            id="fila{{ i }}"
+                          >
+                            <td>
+                              <strong>{{ item?.Nombre_Comercial || 'N/A' }}</strong> -
+                              <span class="text-muted" style="font-size: 9px">{{
+                                item?.Nombre || 'N/A'
+                              }}</span>
+                            </td>
+                            <td>
+                              {{ item?.Embalaje || 'N/A' }}
+                            </td>
+                            <td>
+                              {{ item?.Lote || 'N/A' }}
+                            </td>
+                            <td>
+                              {{ item?.Cantidad_Formulada || 'N/A' }}
+                            </td>
+                            <td>
+                              {{ item?.Cantidad_Entregada || 'N/A' }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="row d-flex justify-content-end">
+                  <div class="col-sm-4">
+                    <div class="rounded-top table-responsive">
+                      <table class="table table-responsive invoice-table invoice-total space">
+                        <tbody class="text-start align-middle">
+                          <tr>
+                            <td>
+                              <span class="fw-bold me-1">Productos solicitados:</span>
+                            </td>
+                            <td>{{ cant_formulada || 'N/A' }}</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <span class="fw-bold me-1">Productos entregados:</span>
+                            </td>
+                            <td>{{ cant_entregada || 'N/A' }}</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <span class="fw-bold me-1">Diferencia:</span>
+                            </td>
+                            <td>{{ cant_diferencia || 'N/A' }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" style="margin-top: 40px">
+                  <div class="col-sm-12">
+                    <div class="rounded-top table-responsive">
+                      <table class="table invoice-detail-table">
+                        <tbody>
+                          <tr class="text-center align-middle">
+                            <td style="width: 10%"></td>
+                            <td style="width: 35%"></td>
+                            <td style="width: 10%"></td>
+                            <td style="width: 35%">
+                              <!-- <img
+                              *ngIf="detalles?.Firma_Reclamante !== ''"
+                              src="{{ environment?.ruta }}/IMAGENES/FIRMAS-DIS/{{
+                                detalles?.Firma_Reclamante
+                              }}"
+                              class="img-fluid"
+                            /> -->
+                              <app-load-image
+                                [src]="
+                                  environment?.ruta +
+                                  'IMAGENES/FIRMAS-DIS/' +
+                                  detalles?.Firma_Reclamante
+                                "
+                                classImg="img-thumbnail rounded-circle header-profile-user d-block d-flex
+                              justify-content-start"
+                                style="object-fit: cover; min-height: 11rem"
+                              ></app-load-image>
+                            </td>
+                            <td style="width: 10%"></td>
+                          </tr>
+                          <tr>
+                            <td style="width: 10%; border-top: 2px solid #fff"></td>
+                            <td style="width: 35%; border-top: 2px solid #000">
+                              Elaborado por<br />{{ detalles?.Funcionario || 'N/A' }}
+                            </td>
+                            <td style="width: 10%; border-top: 2px solid #fff"></td>
+                            <td style="width: 35%; border-top: 2px solid #000">
+                              Recibí conforme<br />
+                              CC:
+                            </td>
+                            <td style="width: 10%; border-top: 2px solid #fff"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <!--<button class="btn btn-success btn-block">Entregar Dispensación</button>-->
+                    <a
+                      href="{{ environment?.ruta }}php/dispensaciones/dispensacion_pdf.php?id={{
+                        detalles?.Id_Dispensacion
+                      }}"
+                      target="_blank"
+                      class="btn btn-success btn-sm btn-block"
+                      ><i class="fa fa-print"></i> IMPRIMIR DISPENSACIÓN</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" *ngIf="detalles?.Codigo == undefined">
+              <div class="card-body text-center">
+                <app-not-data [loading]="Cargando"></app-not-data>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- documentos, seguimiento auditoria, no data -->
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title text-primary">Documentos</h6>
+              <div class="row">
+                <div class="col-md-12 text-left">
+                  <a
+                    *ngIf="auditoria?.Archivo != ''"
+                    href="{{ environment?.ruta }}IMAGENES/AUDITORIAS{{ auditoria?.Id_Auditoria }}/{{
+                      auditoria?.Archivo
+                    }}"
+                    target="_blank"
+                    class="btn btn-block btn-info btn-sm m-b-10"
+                    ><i class="fa fa-file-pdf-o"></i> ARCHIVOS ESCANEADOS</a
+                  >
+                  <div class="col-md-12 m-t-10">
+                    <div *ngIf="!Cargando && Soportes.length > 0; else notData">
+                      <div class="rounded-top table-responsive">
+                        <table class="table table-bordered table-striped table-sm">
+                          <thead class="bg-light">
+                            <tr class="text-center text-uppercase">
+                              <th>Soportes</th>
+                              <th>Cumple</th>
+                              <th>Recibido</th>
+                              <th>Paginas</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              class="text-center align-middle text-uppercase"
+                              *ngFor="let item of Soportes; let i = index"
+                              id="fila{{ i }}"
+                            >
+                              <td>{{ item?.Tipo_Soporte || 'N/A' }}</td>
+                              <td>
+                                <i class="fa fa-check text-success"></i>
+                              </td>
+                              <td>
+                                <i class="fa fa-check text-success"></i>
+                              </td>
+                              <td>
+                                <a
+                                  target="_blank"
+                                  *ngIf="item.Archivo != ''"
+                                  download
+                                  href="{{ environment?.ruta }}IMAGENES/AUDITORIAS/{{
+                                    item?.Id_Auditoria
+                                  }}/{{ item?.Archivo }}"
+                                >
+                                  <i class="fa fa-file-pdf-o"></i
+                                ></a>
+                                {{ item?.Paginas || 'N/A' }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <button
+                    *ngIf="
+                      auditoria?.Estado == 'Pre Auditado' || auditoria?.Estado == 'Con Observacion'
+                    "
+                    type="submit"
+                    class="btn btn-block btn-warning"
+                    (click)="AbrirModal1(id)"
+                  >
+                    <i class="ti-files"></i> Verificar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card chat-card" hidden>
+            <div class="card-header">
+              <h5>Mensajes</h5>
+            </div>
+            <div class="card-block" style="max-height: 190px; overflow: scroll">
+              <div *ngFor="let item of Mensajes">
+                <div class="{{ item?.clase }}">
+                  <app-load-image
+                    *ngIf="item?.Imagen !== '' && Funcionario == item?.Identificacion_Funcionario"
+                    [src]="environment?.ruta + 'IMAGENES/FUNCIONARIOS/' + item?.Imagen"
+                    classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                    style="object-fit: cover; min-height: 11rem"
+                  ></app-load-image>
+
+                  <!-- <img
+                *ngIf="item?.Imagen === ''"
+                src="{{ environment?.ruta }}/assets/images/user.jpg"
+                class="align-self-start {{ item?.claseimagen }} img-radius img-40"
+                alt=""
+              /> -->
+                  <div class="media-body">
+                    <h6 class="mt-0">{{ item?.Nombre }}</h6>
+                    <p class="m-t-10 msg">{{ item?.Mensaje }}</p>
+                    <p class="text-muted">{{ item?.Fecha }}</p>
+                  </div>
+                  <!-- <img
+                *ngIf="item?.Imagen !== '' && Funcionario == item?.Identificacion_Funcionario"
+                src="{{ environment?.ruta }}IMAGENES/FUNCIONARIOS/{{ item?.Imagen }}"
+                class="align-self-start {{ item?.claseimagen }} img-radius img-40"
+                alt="usrer image"
+              /> -->
+                </div>
+              </div>
+            </div>
+            <div class="card-footer chat-control">
+              <div class="chat-form">
+                <input
+                  type="text"
+                  id="Mensaje"
+                  class="form-control search-text"
+                  [(ngModel)]="Mensaje"
+                  placeholder="Escriba su Mensaje"
+                />
+                <div class="chat-btn">
+                  <button class="btn btn-primary btn-icon" (click)="EnviarMensaje()">
+                    <i class="fa fa-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <a [routerLink]="['/cuentas-medicas/auditorias']" class="btn btn-primary"> Volver </a> -->
+  </div>
+
+  <app-modalconfirmacion [AbrirModalEvent]="eventsSubject.asObservable()"> </app-modalconfirmacion>
+  <ng-template #notData>
+    <app-not-data [loading]="Cargando"></app-not-data>
+  </ng-template>
+</div>

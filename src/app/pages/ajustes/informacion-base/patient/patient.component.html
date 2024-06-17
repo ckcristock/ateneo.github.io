@@ -1,0 +1,165 @@
+<app-card
+  viewTitle="Pacientes"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-header-button
+    filters
+    icon="cloud-upload-alt"
+    text="Importar"
+    type="warning"
+    (click)="openImportPatient()"
+  ></app-header-button>
+  <app-table
+    [loading]="loading"
+    [arrayData]="patients"
+    [pagination]="pagination"
+    (pageChange)="getPatients()"
+  >
+    <ng-container titles>
+      <th>IDENTIF.</th>
+      <th>PACIENTE</th>
+      <th>TELEFONO</th>
+      <th>CORREO</th>
+      <th>EPS</th>
+      <th>NIVEL</th>
+      <th>REGIMEN</th>
+      <th>ESTADO</th>
+      <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (paciente of patients; track $index) {
+        <tr class="text-center">
+          <td>{{ paciente.identifier }}</td>
+          <td>
+            {{ paciente.firstname }} {{ paciente.middlename }} {{ paciente.surname }}
+            {{ paciente.secondsurname }}
+          </td>
+          <td>{{ paciente.phone || 'N/A' }}</td>
+          <td>{{ paciente.email || 'N/A' }}</td>
+          <td>{{ paciente.eps.name }}</td>
+          <td>{{ paciente.level.name }}</td>
+          <td>{{ paciente.regimentype.name }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-success': paciente.state == 'activo',
+                'bg-danger': paciente.state == 'Inactivo'
+              }"
+              >{{ paciente.state }}</span
+            >
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view (click)="openViewPatient(paciente)" />
+              <app-action-edit (action)="openEditPatient(paciente)" />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+  <hr />
+  @if (!loadingGraph) {
+    <section class="row mt-4">
+      <div class="col-md-6">
+        <h5 class="text-info">Estadísticas</h5>
+        @if (chartOptions.series.length) {
+          <apx-chart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [labels]="chartOptions.labels"
+          ></apx-chart>
+        }
+      </div>
+      <div class="col-md-6">
+        <h5 class="text-info">Estadísticas por régimen</h5>
+        <div class="col-md-12 min-heigth">
+          <div class="rounded-top table-responsive">
+            <table class="table table-bordered table-striped table-sm">
+              <tbody>
+                @for (item of statisticsEps; track item; let i = $index) {
+                  <tr>
+                    <th>DEPARTAMENTO</th>
+                    <td style="width: 150px">{{ item.EPS }}</td>
+                  </tr>
+                }
+                @for (item of statisticsData; track item; let i = $index) {
+                  <tr id="fila{{ i }}">
+                    <th>
+                      {{ item.name }}
+                    </th>
+                    <td>
+                      {{ item.count }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  } @else {
+    <app-not-data [loading]="loadingGraph"></app-not-data>
+  }
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Identificación"
+    placeholder="Filtro identificación"
+    [value]="filters.identifier"
+    (searching)="filters.identifier = $event; getPatients()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Paciente"
+    placeholder="Filtro paciente"
+    [value]="filters.name"
+    (searching)="filters.name = $event; getPatients()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="EPS"
+    placeholder="Filtro EPS"
+    [value]="filters.eps"
+    (searching)="filters.eps = $event; getPatients()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Nivel</mat-label>
+    <mat-select [(ngModel)]="filters.level_id" (selectionChange)="getPatients()">
+      <mat-option value=""> Todos </mat-option>
+      @for (level of levels; track $index) {
+        <mat-option [value]="level.value">
+          {{ level.text }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Régimen</mat-label>
+    <mat-select [(ngModel)]="filters.regimentype_id" (selectionChange)="getPatients()">
+      <mat-option value=""> Todos </mat-option>
+      @for (reg of regimen; track $index) {
+        <mat-option [value]="reg.value">
+          {{ reg.text }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filters.state" (selectionChange)="getPatients()">
+      <mat-option value=""> Todos </mat-option>
+      <mat-option value="Activo"> Activo </mat-option>
+      <mat-option value="Inactivo"> Inactivo </mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

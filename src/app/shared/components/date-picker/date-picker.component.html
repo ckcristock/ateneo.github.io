@@ -1,0 +1,33 @@
+<mat-form-field class="w-100" appearance="outline">
+  <mat-label>{{ label }}</mat-label>
+  <mat-date-range-input [formGroup]="formRange" [rangePicker]="picker">
+    <input
+      matStartDate
+      placeholder="Fecha de inicio"
+      required
+      formControlName="start_date"
+      name="start_date"
+    />
+    <input
+      matEndDate
+      placeholder="Fecha de fin"
+      required
+      formControlName="end_date"
+      name="end_date"
+    />
+  </mat-date-range-input>
+  @if (formRange.controls['start_date'].value && formRange.controls['end_date'].value) {
+    <mat-datepicker-toggle matIconSuffix (click)="clearFilters()">
+      <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+    </mat-datepicker-toggle>
+  }
+  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-date-range-picker #picker>
+    <mat-date-range-picker-actions>
+      <button mat-button matDateRangePickerCancel>Cancelar</button>
+      <button mat-raised-button color="primary" matDateRangePickerApply (click)="onDateChange()">
+        Aplicar
+      </button>
+    </mat-date-range-picker-actions>
+  </mat-date-range-picker>
+</mat-form-field>

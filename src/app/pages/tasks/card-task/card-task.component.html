@@ -1,0 +1,41 @@
+<div class="px-3 pt-3">
+  <div class="d-flex justify-content-between">
+    <div>
+      <small>
+        <i class="fas fa-user fa-sm"></i> Asignada {{ view_state ? 'a' : 'por' }}:
+        {{ view_state ? list.realizador.full_names : list.asignador.full_names }}
+      </small>
+    </div>
+    <div>
+      <i
+        class="fas fa-circle"
+        *ngIf="view_state"
+        [ngStyle]="
+          list.estado == 'Pendiente'
+            ? { color: '#ef476f' }
+            : list.estado == 'En ejecucion'
+              ? { color: '#ffd166' }
+              : list.estado == 'En espera'
+                ? { color: '#118ab2' }
+                : list.estado == 'Finalizado'
+                  ? { color: '#06d6a0' }
+                  : list.estado == 'Archivada'
+                    ? { color: 'gray' }
+                    : ''
+        "
+      >
+      </i>
+    </div>
+  </div>
+</div>
+<h6 class="px-3 text-truncate text-start">{{ list.titulo }}</h6>
+<div class="d-flex justify-content-start px-3 align-items-center">
+  <i class="mdi mdi-view-comfy task"></i>
+  <small class="quote2 pl-2">Categoría: {{ list.types.name }}</small>
+</div>
+<div class="d-flex justify-content-between px-3 align-items-center pb-3">
+  <div class="d-flex justify-content-start align-items-center">
+    <i class="mdi mdi-calendar-clock date"></i>
+    <small class="quote2 pl-2">Fecha: {{ list.fecha | date }} </small>
+  </div>
+</div>

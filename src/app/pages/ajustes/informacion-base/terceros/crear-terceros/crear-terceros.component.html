@@ -1,0 +1,674 @@
+@if (!loading) {
+  <div class="card">
+    <div class="card-body">
+      <ng-container>
+        <form [formGroup]="form">
+          <mat-horizontal-stepper [linear]="false">
+            <mat-step>
+              <ng-template matStepLabel>Datos básicos</ng-template>
+              <div class="row my-4">
+                <div class="col-md-3 mx-auto">
+                  <div class="form-group text-center">
+                    <img
+                      id="imageOutput"
+                      [src]="previsualizacionFoto"
+                      onerror="this.src='../../../../assets/images/noprofile.png'"
+                      alt="Imagen del funcionario"
+                      class="d-block img-thumbnail rounded-circle mx-auto img-fluid"
+                    />
+                    <div class="custom-input-file col-md-12 mt-3">
+                      <input
+                        type="file"
+                        aria-hidden="true"
+                        #fileInput
+                        id="image"
+                        class="input-file"
+                        (change)="onFileChanged($event)"
+                        accept="image/*"
+                      />
+                      Cargar imagen
+                    </div>
+                    <div class="col-md-12 text-center">
+                      @if (previsualizacionFoto) {
+                        <small class="text-success">Imagen cargada</small>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <app-department-municipality
+                  class="col-md-9"
+                  [showCountry]="true"
+                  [values]="valuesDepMun"
+                  [required]="true"
+                  [loading]="loading"
+                  (changeSelection)="changeMundep($event)"
+                />
+                <mat-form-field class="col-md-3" appearance="outline">
+                  <mat-label>Tipo de persona</mat-label>
+                  <mat-select
+                    formControlName="person_type"
+                    required
+                    (selectionChange)="personType()"
+                  >
+                    <mat-option value="natural">Natural</mat-option>
+                    <mat-option value="juridico">Jurídico</mat-option>
+                  </mat-select>
+                  <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                </mat-form-field>
+                @if (form?.get('person_type')?.value != 'juridico') {
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Tipo de documento</mat-label>
+                    <mat-select
+                      formControlName="document_type"
+                      required
+                      (selectionChange)="personType()"
+                    >
+                      @for (item of documentTypes; track item) {
+                        <mat-option [value]="item?.value"
+                          >{{ item?.code }} - {{ item?.text }}</mat-option
+                        >
+                      }
+                    </mat-select>
+                    <mat-icon matSuffix>branding_watermark</mat-icon>
+                    <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                  </mat-form-field>
+                }
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Identificación</mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    formControlName="nit"
+                    required
+                    autocomplete="off"
+                    (change)="validarDV($event?.target?.value)"
+                    placeholder="Ingresa el número de identificación"
+                  />
+                  <mat-icon matSuffix>badge</mat-icon>
+                  <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                </mat-form-field>
+                @if (
+                  this.nitSelected == this.form?.get('document_type')?.value &&
+                  this?.form?.get('country_id')?.value == 1
+                ) {
+                  <mat-form-field class="col-md-1" appearance="outline">
+                    <mat-label>DV</mat-label>
+                    <input
+                      aria-hidden="true"
+                      type="text"
+                      matInput
+                      formControlName="dv"
+                      autocomplete="off"
+                    />
+                    <mat-icon matSuffix>123</mat-icon>
+                    <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                  </mat-form-field>
+                }
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Tipo de tercero</mat-label>
+                  <mat-select
+                    formControlName="third_party_type"
+                    (selectionChange)="personType()"
+                    required
+                    multiple
+                  >
+                    <mat-option value="Cliente">Cliente</mat-option>
+                    <mat-option value="Proveedor">Proveedor</mat-option>
+                    <mat-option value="Otro">Otro</mat-option>
+                  </mat-select>
+                  <mat-icon matSuffix>title</mat-icon>
+                  <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                </mat-form-field>
+                @if (form?.get('first_name')?.enabled) {
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Primer nombre</mat-label>
+                    <input
+                      type="text"
+                      matInput
+                      formControlName="first_name"
+                      required
+                      autocomplete="off"
+                      placeholder="Ingrese el primer nombre"
+                    />
+                    <mat-icon matSuffix>looks_one</mat-icon>
+                    <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                  </mat-form-field>
+                }
+                @if (form?.get('second_name')?.enabled) {
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Segundo nombre</mat-label>
+                    <input
+                      type="text"
+                      matInput
+                      formControlName="second_name"
+                      autocomplete="off"
+                      placeholder="Ingrese el segundo nombre"
+                    />
+                    <mat-icon matSuffix>looks_two</mat-icon>
+                  </mat-form-field>
+                }
+                @if (form?.get('first_surname')?.enabled) {
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Primer apellido</mat-label>
+                    <input
+                      type="text"
+                      matInput
+                      formControlName="first_surname"
+                      autocomplete="off"
+                      required
+                      placeholder="Ingrese el primer apellido"
+                    />
+                    <mat-icon matSuffix>looks_one</mat-icon>
+                    <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                  </mat-form-field>
+                }
+                @if (form?.get('second_surname')?.enabled) {
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Segundo apellido</mat-label>
+                    <input
+                      type="text"
+                      matInput
+                      formControlName="second_surname"
+                      autocomplete="off"
+                      placeholder="Ingrese el primer apellido"
+                    />
+                    <mat-icon matSuffix>looks_two</mat-icon>
+                  </mat-form-field>
+                }
+                @if (form?.get('social_reason')?.enabled) {
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Razón social</mat-label>
+                    <input
+                      type="text"
+                      matInput
+                      formControlName="social_reason"
+                      autocomplete="off"
+                      required
+                      placeholder="Ingrese la razón social"
+                    />
+                    <mat-icon matSuffix>diversity_3</mat-icon>
+                    <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                  </mat-form-field>
+                }
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Nombre comercial</mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    formControlName="tradename"
+                    autocomplete="off"
+                    placeholder="Ingrese el nombre comercial"
+                  />
+                  <mat-icon matSuffix>workspace_premium</mat-icon>
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Teléfono fijo</mat-label>
+                  <input
+                    type="tel"
+                    matInput
+                    formControlName="landline"
+                    autocomplete="off"
+                    required
+                    placeholder="Ingrese el teléfono fijo"
+                  />
+                  <mat-icon matSuffix>phone</mat-icon>
+                  <mat-error> Campo <strong>obligatorio</strong> </mat-error>
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Teléfono celular</mat-label>
+                  <input
+                    type="tel"
+                    matInput
+                    formControlName="cell_phone"
+                    autocomplete="off"
+                    placeholder="Ingrese el teléfono celular"
+                  />
+                  <mat-icon matSuffix>phone_iphone</mat-icon>
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Correo electrónico</mat-label>
+                  <input
+                    type="email"
+                    matInput
+                    formControlName="email"
+                    autocomplete="off"
+                    required
+                    placeholder="Ingrese el correo"
+                  />
+                  <mat-icon matSuffix>email</mat-icon>
+                  @if (form?.get('email')?.errors?.email) {
+                    <mat-error> El correo es incorrecto </mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Zona</mat-label>
+                  <mat-select formControlName="zone_id">
+                    @for (zone of zones; track zone) {
+                      <mat-option [value]="zone?.value">{{ zone?.text | uppercase }} </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matSuffix>place</mat-icon>
+                </mat-form-field>
+                <app-autocomplete-fc
+                  class="col"
+                  placeholder="Ingresa la dirección"
+                  label="Dirección"
+                  [control]="form.controls['dian_address']"
+                  [list]="filteredDianDirection"
+                  required
+                ></app-autocomplete-fc>
+                <mat-form-field class="col-lg-1" appearance="outline">
+                  <mat-label></mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    formControlName="address_one"
+                    required
+                    autocomplete="off"
+                    placeholder="Ingrese el número"
+                  />
+                </mat-form-field>
+                <mat-form-field class="col-lg-1" appearance="outline">
+                  <mat-label>#</mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    formControlName="address_two"
+                    required
+                    autocomplete="off"
+                    placeholder="Ingrese el número"
+                  />
+                </mat-form-field>
+                <app-autocomplete-fc
+                  class="col"
+                  placeholder="Ingresa la dirección"
+                  label="Dirección"
+                  [control]="form.controls['address_three']"
+                  required
+                  [list]="filteredDianDirection"
+                ></app-autocomplete-fc>
+                <mat-form-field class="col-lg-1" appearance="outline">
+                  <mat-label></mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    formControlName="address_four"
+                    required
+                    autocomplete="off"
+                    placeholder="Ingrese el número"
+                  />
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Dirección cod. DIAN</mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    formControlName="cod_dian_address"
+                    autocomplete="off"
+                    required
+                    placeholder="Ingrese el número"
+                  />
+                  <mat-icon matSuffix>home_filled</mat-icon>
+                  <mat-error> Dirección no válida </mat-error>
+                </mat-form-field>
+                @for (item of fields; track item) {
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>{{ item?.label | titlecase }}</mat-label>
+                    <input
+                      [type]="item?.type"
+                      matInput
+                      aria-hidden="true"
+                      [required]="item?.required == 'Si'"
+                      [formControlName]="item?.name"
+                      autocomplete="off"
+                    />
+                  </mat-form-field>
+                }
+              </div>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-primary btn-sm" matStepperNext type="button">
+                  Siguiente
+                </button>
+              </div>
+            </mat-step>
+            <mat-step>
+              <ng-template matStepLabel>Datos financieros</ng-template>
+              <div class="example-container">
+                <div class="row mt-4">
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Tipo de régimen</mat-label>
+                    <mat-select formControlName="regime">
+                      @for (item of regimes; track item) {
+                        <mat-option [value]="item?.value">{{ item?.text }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Contacto pagos</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      placeholder="Ingrese contacto pagos"
+                      formControlName="contact_payments"
+                    />
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Teléfono pagos</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      placeholder="Ingrese teléfono pagos"
+                      formControlName="phone_payments"
+                    />
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Correo pagos</mat-label>
+                    <input
+                      matInput
+                      type="email"
+                      placeholder="Ingrese correo pagos"
+                      formControlName="email_payments"
+                      required
+                    />
+                    @if (form?.get('email_payments')?.errors?.email) {
+                      <mat-error> Correo es <strong>inválido</strong> </mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Responsabilidad fiscal</mat-label>
+                    <mat-select formControlName="fiscal_responsibility">
+                      @for (item of fiscalResponsibility; track item) {
+                        <mat-option [value]="item?.value"
+                          >{{ item?.code }} - {{ item?.text }}</mat-option
+                        >
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Animo lucro</mat-label>
+                    <mat-select formControlName="encourage_profit">
+                      <mat-option value="Si">Sí</mat-option>
+                      <mat-option value="No">No</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <div class="col-md-6">
+                    <ng-select
+                      [items]="ciiuCodes"
+                      bindLabel="text"
+                      bindValue="value"
+                      groupBy="title"
+                      placeholder="Actividad económica "
+                      appearance="outline"
+                      [clearable]="false"
+                      formControlName="ciiu_code_id"
+                      class="mt-1"
+                      [appendTo]="'body'"
+                    >
+                    </ng-select>
+                    <!-- <small>Actividad económica</small> -->
+                  </div>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Agente de retención</mat-label>
+                    <mat-select formControlName="withholding_agent">
+                      <mat-option value="Si">Sí</mat-option>
+                      <mat-option value="No">No</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>¿Retención en factura?</mat-label>
+                    <mat-select formControlName="withholding_oninvoice">
+                      <mat-option value="Si">Sí</mat-option>
+                      <mat-option value="No">No</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Tipo reteica</mat-label>
+                    <mat-select formControlName="reteica_type">
+                      <mat-option value="No">No</mat-option>
+                      <mat-option value="Supera Base">Supera base</mat-option>
+                      <mat-option value="Permanente">Permanente</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Cuenta reteica</mat-label>
+                    <input
+                      matInput
+                      type="text"
+                      placeholder="Busca por cuenta reteica"
+                      [ngbTypeahead]="search"
+                      [inputFormatter]="inputFormatListValue"
+                      [resultFormatter]="resultFormatListValue"
+                      (change)="searchAccount('Reteica')"
+                      formControlName="reteica_account_id"
+                    />
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Porcentaje reteica</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      placeholder="Ingrese %"
+                      [ngModelOptions]="{ standalone: true }"
+                      name="reteica"
+                      [(ngModel)]="retePercentage.reteica"
+                      readonly
+                    />
+                  </mat-form-field>
+                  <mat-slide-toggle
+                    class="col col-md-3 pt-0 pt-md-2"
+                    color="primary"
+                    formControlName="retefuente_applies"
+                  >
+                    ¿Aplica retefuente?
+                  </mat-slide-toggle>
+                  <mat-slide-toggle
+                    class="col col-md-3 pt-0 pt-md-2"
+                    color="primary"
+                    formControlName="reteiva_applies"
+                  >
+                    ¿Aplica reteiva?
+                  </mat-slide-toggle>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Condición de pago</mat-label>
+                    <mat-select formControlName="condition_payment">
+                      @for (item of pagos; track item) {
+                        <mat-option [value]="item?.valor">{{ item?.clave }} </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Cupo asignado</mat-label>
+                    <input
+                      matInput
+                      currencyMask
+                      [options]="masks?.maskCOP"
+                      appInputPosition
+                      placeholder="Ingrese el cupo"
+                      formControlName="assigned_space"
+                    />
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Descuento pronto pago</mat-label>
+                    <input
+                      matInput
+                      currencyMask
+                      [options]="masks?.maskPorcentaje"
+                      appInputPositionInitial
+                      placeholder="Ingrese el desc."
+                      formControlName="discount_prompt_payment"
+                    />
+                  </mat-form-field>
+                  <mat-form-field class="col" appearance="outline">
+                    <mat-label>Descuento en días</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      placeholder="Ingrese el desc."
+                      formControlName="discount_days"
+                    />
+                  </mat-form-field>
+                  <div class="col-md-4">
+                    <div class="form-group text-center">
+                      <div class="custom-input-file col-md-12 mb-3">
+                        <input
+                          type="file"
+                          #fileInput
+                          aria-hidden="true"
+                          id="fichero-tarifas"
+                          class="input-file"
+                          (change)="rutChange($event)"
+                        />
+                        Cargar RUT
+                      </div>
+                      <div class="col-md-12 text-center">
+                        @if (previsualizacionRut) {
+                          <small class="text-success">RUT cargado</small>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between">
+                <button class="btn btn-primary btn-sm" matStepperPrevious type="button">
+                  Anterior
+                </button>
+                <button class="btn btn-primary btn-sm" matStepperNext type="button">
+                  Siguiente
+                </button>
+              </div>
+            </mat-step>
+            <mat-step>
+              <ng-template matStepLabel>Personas</ng-template>
+              @if (personList?.controls?.length) {
+                @for (item of personList?.controls; track item; let i = $index) {
+                  <ng-container formArrayName="person">
+                    <div class="card card-shadow mt-3">
+                      <div class="card-body">
+                        <div class="row mt-4">
+                          <mat-form-field class="col" appearance="outline" [formGroupName]="i">
+                            <mat-label>Nombre</mat-label>
+                            <input
+                              matInput
+                              type="text"
+                              placeholder="Ingrese el nombre"
+                              formControlName="name"
+                              required
+                            />
+                            <mat-icon matSuffix>perm_identity</mat-icon>
+                          </mat-form-field>
+                          <mat-form-field class="col" appearance="outline" [formGroupName]="i">
+                            <mat-label>Documento</mat-label>
+                            <input
+                              matInput
+                              type="text"
+                              placeholder="Ingresa el nombre"
+                              formControlName="n_document"
+                              required
+                            />
+                            <mat-icon matSuffix>badge</mat-icon>
+                          </mat-form-field>
+                          <mat-form-field class="col" appearance="outline" [formGroupName]="i">
+                            <mat-label>Teléfono fijo</mat-label>
+                            <input
+                              matInput
+                              type="number"
+                              placeholder="Ingresa el número fijo"
+                              formControlName="landline"
+                              required
+                            />
+                            <mat-icon matSuffix>phone</mat-icon>
+                          </mat-form-field>
+                          <mat-form-field class="col" appearance="outline" [formGroupName]="i">
+                            <mat-label>Celular</mat-label>
+                            <input
+                              matInput
+                              type="number"
+                              placeholder="Ingresa el número de celular"
+                              formControlName="cell_phone"
+                            />
+                            <mat-icon matSuffix>phone_iphone</mat-icon>
+                          </mat-form-field>
+                          <mat-form-field class="col" appearance="outline" [formGroupName]="i">
+                            <mat-label>Email</mat-label>
+                            <input
+                              matInput
+                              type="email"
+                              placeholder="Ingresa el email"
+                              formControlName="email"
+                              required
+                            />
+                            <mat-icon matSuffix>email</mat-icon>
+                          </mat-form-field>
+                          <mat-form-field class="col" appearance="outline" [formGroupName]="i">
+                            <mat-label>Cargo</mat-label>
+                            <input
+                              matInput
+                              type="text"
+                              placeholder="Ingresa el cargo"
+                              formControlName="position"
+                            />
+                            <mat-icon matSuffix>assignment_ind</mat-icon>
+                          </mat-form-field>
+                          <mat-form-field
+                            class="col-md-12 mat-form-field-no-padding textarea"
+                            appearance="outline"
+                            [formGroupName]="i"
+                          >
+                            <mat-label>Observaciones</mat-label>
+                            <textarea
+                              matInput
+                              placeholder="Ingrese las observaciones"
+                              formControlName="observation"
+                              [cdkTextareaAutosize]="true"
+                              rows="5"
+                            ></textarea>
+                          </mat-form-field>
+                          <div class="col d-flex justify-content-end mb-3" [formGroupName]="i">
+                            <button
+                              class="btn btn-sm btn-danger"
+                              placement="top"
+                              type="button"
+                              (click)="deletePerson(i)"
+                            >
+                              <i class="fas fa-trash-alt"></i> Borrar persona
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                }
+              } @else {
+                <div class="alert alert-warning text-center mt-4" role="alert">
+                  Sin personas agregados
+                </div>
+              }
+              <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-sm btn-primary" (click)="createPerson()">
+                  <i class="fa fa-plus"></i> Agregar persona
+                </button>
+              </div>
+              <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-primary btn-sm" matStepperPrevious type="button">
+                  Anterior
+                </button>
+              </div>
+            </mat-step>
+          </mat-horizontal-stepper>
+        </form>
+        <button class="btn btn-block btn-primary mt-3" (click)="saveInformation()">Guardar</button>
+      </ng-container>
+    </div>
+  </div>
+} @else {
+  <app-placeholder-form></app-placeholder-form>
+}
+
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>
+
+<app-reload-button [reload]="reload" (reloadData)="reloadData()"></app-reload-button>

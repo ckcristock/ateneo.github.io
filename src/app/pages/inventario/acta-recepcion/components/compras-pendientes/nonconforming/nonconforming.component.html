@@ -1,0 +1,10 @@
+<app-reason
+  titleReason="no conforme"
+  [pagination]="pagination"
+  [data]="nonconforming"
+  [addColumns]="addColumns"
+  [loading]="loading"
+  (saveReason)="saveReason($event)"
+  (newRequest)="getNonconforming($event)"
+  (changeStatus)="onChangeStateReason($event)"
+></app-reason>

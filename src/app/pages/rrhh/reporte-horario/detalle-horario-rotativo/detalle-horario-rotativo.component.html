@@ -1,0 +1,257 @@
+<div class="rounded-top table-responsive">
+  <table class="table table-bordered table-striped table-sm mt-2">
+    <thead class="bg-light">
+      <tr class="text-center text-uppercase">
+        <th>Fecha</th>
+        <th>Entrada</th>
+        <th>break</th>
+        <th>break 2</th>
+        <th>Lunch 1</th>
+        <th>Lunch 2</th>
+        <th>Salida</th>
+        <th>Horas trabaj.</th>
+        <ng-container *ngIf="permissions.permissions.modify_hours">
+          <th><i class="mdi mdi-chevron-down"></i></th>
+        </ng-container>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let horario of horarios" class="text-center">
+        <td>
+          <span class="custom-label text-center">{{ horario.date }}</span>
+        </td>
+        <td>
+          <span
+            [ngbPopover]="entradaUno"
+            [popoverTitle]="popTitle"
+            class="custom-label text-info"
+            role="button"
+            triggers="mouseenter:mouseleave"
+            >{{ horario.entry_time_one | time }}
+          </span>
+          <ng-template #entradaUno>
+            <div>
+              <img [src]="horario.img_one" class="img-fluid" />
+            </div>
+          </ng-template>
+
+          <a class="btn btn-link p-0" *ngIf="horario.temp_one && horario.temp_one != '0.0'">
+            <i class="iconsmind-Celsius fw-bold"></i>
+            - {{ horario.temp_one }}
+          </a>
+        </td>
+
+        <td>
+          <div
+            *ngIf="horario.breack_time_one && horario.breack_time_one != '00:00:00'; else notHour2"
+          >
+            <span
+              [ngbPopover]="breakUno"
+              [popoverTitle]="popTitle"
+              class="custom-label text-info"
+              role="button"
+              triggers="mouseenter:mouseleave"
+              >{{ horario.breack_time_one | time }}
+            </span>
+            <ng-template #breakUno>
+              <div>
+                <img [src]="horario.img_breack_one" class="img-fluid" />
+              </div>
+            </ng-template>
+          </div>
+        </td>
+
+        <td>
+          <div
+            *ngIf="horario.breack_time_two && horario.breack_time_two != '00:00:00'; else notHour2"
+          >
+            <span
+              [ngbPopover]="breakDos"
+              [popoverTitle]="popTitle"
+              class="custom-label text-info"
+              role="button"
+              triggers="mouseenter:mouseleave"
+              >{{ horario.breack_time_two | time }}
+            </span>
+            <ng-template #breakDos>
+              <div>
+                <img [src]="horario.img_breack_two" class="img-fluid" />
+              </div>
+            </ng-template>
+          </div>
+        </td>
+
+        <td>
+          <div
+            *ngIf="horario.launch_time_one && horario.launch_time_one != '00:00:00'; else notHour2"
+          >
+            <span
+              [ngbPopover]="lunchUno"
+              [popoverTitle]="popTitle"
+              class="custom-label text-info"
+              role="button"
+              triggers="mouseenter:mouseleave"
+              >{{ horario.launch_time_one | time }}
+            </span>
+            <ng-template #lunchUno>
+              <div>
+                <img [src]="horario.img_launch_one" class="img-fluid" />
+              </div>
+            </ng-template>
+          </div>
+        </td>
+        <td>
+          <div
+            *ngIf="horario.launch_time_two && horario.launch_time_two != '00:00:00'; else notHour2"
+          >
+            <span
+              [ngbPopover]="lunchDos"
+              [popoverTitle]="popTitle"
+              class="custom-label text-info"
+              role="button"
+              triggers="mouseenter:mouseleave"
+              >{{ horario.launch_time_two | time }}
+            </span>
+            <ng-template #lunchDos>
+              <div>
+                <img [src]="horario.img_launch_two" class="img-fluid" />
+              </div>
+            </ng-template>
+          </div>
+        </td>
+
+        <td>
+          <div
+            *ngIf="horario.leave_time_one && horario.leave_time_one != '00:00:00'; else notHour2"
+          >
+            <span
+              [ngbPopover]="salidaUno"
+              [popoverTitle]="popTitle"
+              class="custom-label text-info"
+              role="button"
+              triggers="mouseenter:mouseleave"
+              ><i *ngIf="!horario.img_two" class="fas fa-exclamation-circle text-warning"></i>
+              {{ horario.leave_time_one | time }}
+            </span>
+            <ng-template #salidaUno>
+              <div *ngIf="horario.img_two; else noImage">
+                <img [src]="horario.img_two" class="img-fluid" />
+              </div>
+              <ng-template #noImage>
+                Esta hora se ha generado automaticamente con la información del turno porque el
+                funcionario no marcó salida.
+              </ng-template>
+            </ng-template>
+            <a class="btn btn-link p-0" *ngIf="horario.temp_two && horario.temp_two != '0.0'">
+              <i class="iconsmind-Celsius fw-bold"></i>
+              - {{ horario.temp_two }}
+            </a>
+          </div>
+        </td>
+        <td *ngIf="!horario.editHour; else inputEdit">
+          <div
+            *ngIf="horario.working_hours && horario.working_hours != '00:00:00'; else notHourFinal"
+          >
+            <!-- <span class="dot" [class]="horario.colors.leave"></span> -->
+            <span class="custom-label">Original: {{ convertHours(horario.working_hours) }} </span>
+          </div>
+          <div *ngIf="horario.edit.length > 0">
+            Editada:
+            {{ convertHours(horario.edit[0].hours) }}
+          </div>
+        </td>
+        <ng-template #inputEdit>
+          <td class="d-flex justify-content-end">
+            <input
+              class="form-control form-control-sm"
+              style="max-width: 4rem"
+              currencyMask
+              [options]="mask.maskNumbers2Decimal"
+              appInputPositionInitial
+              [(ngModel)]="horario.working_hours"
+            />
+          </td>
+        </ng-template>
+        <td *ngIf="!horario.editHour; else saveButton">
+          <div class="btn-group" role="group">
+            <button class="btn btn-sm btn-info" (click)="horario.editHour = true">
+              <i class="fas fa-edit"></i>
+            </button>
+            <ng-container *ngIf="horario.edit.length > 0">
+              <button
+                class="btn btn-sm btn-success"
+                title="Ver histórico de ediciones"
+                (click)="openModal(modal, horario)"
+              >
+                <i class="fas fa-history"></i>
+              </button>
+            </ng-container>
+          </div>
+        </td>
+        <ng-template #saveButton>
+          <td>
+            <div class="btn-group" role="group">
+              <button class="btn btn-sm btn-primary" (click)="update(horario)">
+                <i class="fas fa-save"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="horario.editHour = false">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </td>
+        </ng-template>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="alert alert-info text-center" role="alert">
+  Total horas trabajadas: {{ convertHours(horas) }} <br />
+  <ng-container *ngIf="horas != horasEditadas">
+    Total horas trabajadas editadas:
+    {{ convertHours(horasEditadas) }}
+  </ng-container>
+</div>
+<ng-template #notHourFinal>
+  <span>Original: Sin reportar</span>
+</ng-template>
+<ng-template #notHour2>
+  <span>Sin reportar</span>
+</ng-template>
+<ng-template #popTitle>Foto</ng-template>
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Historico de ediciones</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Fecha</th>
+            <th>Horas</th>
+            <th>Justificación</th>
+            <th>Editor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center" *ngFor="let item of horarioEditado">
+            <td>{{ item.created_at | date: 'MMM d, y, h:mm:ss a' }}</td>
+            <td>{{ convertHours(item.hours) }}</td>
+            <td>{{ item.justification }}</td>
+            <td>{{ item.person?.full_names }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cerrar</button>
+  </div>
+</ng-template>

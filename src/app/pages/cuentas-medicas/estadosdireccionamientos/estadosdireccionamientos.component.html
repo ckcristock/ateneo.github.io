@@ -1,0 +1,96 @@
+<article class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Consulta mipres directo</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button class="btn btn-info btn-sm" (click)="matPanel.toggle()">
+            <i class="fas fa-sliders-h"></i> Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel #matPanel class="mat-elevation-z0">
+        <div class="row">
+          <app-automatic-search
+            class="col"
+            label="Número de prescripción"
+            placeholder="Ingrese número prescripción"
+            [value]="Prescripcion"
+            (searching)="Prescripcion = $event; ConsultarPrescripcion()"
+          ></app-automatic-search>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="rounded-top table-responsive mt-3">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Fecha Dir</th>
+            <th>EPS</th>
+            <th>Prescripción</th>
+            <th>ID</th>
+            <th>ID Dir</th>
+            <th>Paciente</th>
+            <th>Entrega</th>
+            <th>Tipo Tec</th>
+            <th>Tecnología</th>
+            <th>Municipio</th>
+            <th>Departamento</th>
+            <th>Cantidad</th>
+            <th>F Max Ent</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (Cargando || !Direccionamientos.length) {
+            <tr class="text-center">
+              <td colspan="100%">
+                <app-not-data [loading]="Cargando"></app-not-data>
+              </td>
+            </tr>
+          } @else {
+            @for (dir of Direccionamientos; track $index) {
+              <tr class="text-center">
+                <td>{{ dir.FecDireccionamiento }}</td>
+                <td>{{ dir.NoIDEPS }}</td>
+                <td>{{ dir.NoPrescripcion }}</td>
+                <td>{{ dir.ID }}</td>
+                <td>{{ dir.IDDireccionamiento }}</td>
+                <td>{{ dir.TipoIDPaciente }} {{ dir.NoIDPaciente }}</td>
+                <td>{{ dir.NoEntrega }}</td>
+                <td>{{ dir.TipoTec }}</td>
+                <td>{{ dir.CodSerTecAEntregar }} {{ dir.Producto }}</td>
+                <td>{{ dir.Municipio }}</td>
+                <td>{{ dir.Departamento }}</td>
+                <td>{{ dir.CantTotAEntregar }}</td>
+                <td>{{ dir.FecMaxEnt }}</td>
+                <td>{{ dir.Estado }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'bg-success': dir.Existe == 'Si',
+                      'bg-danger': dir.Existe == 'No'
+                    }"
+                  >
+                    @if (dir.Existe == 'Si') {
+                      En Sistema
+                    } @else if (dir.Existe == 'No') {
+                      No Cargado
+                    }
+                  </span>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</article>

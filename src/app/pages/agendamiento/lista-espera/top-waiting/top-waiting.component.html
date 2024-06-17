@@ -1,0 +1,42 @@
+<div class="card">
+  <div class="card-body">
+    <div class="text-center mb-2">
+      <p class="mb-2"><i class="fa fa-clock"></i> Tiempo promedio de espera</p>
+      <h5>{{ statistics.averageTime }}</h5>
+    </div>
+    <div class="mb-2 text-center">
+      <p class="mb-2"><i class="fa fa-user-clock"></i> Cita más antigua</p>
+      <div>
+        <div
+          class="row flex-col align-items-center text-info"
+          *ngIf="statistics.lastAppointment; else notLast"
+        >
+          <div>{{ statistics.lastAppointment.date | date }}</div>
+          <div>{{ statistics.lastAppointment.patient_name }}</div>
+        </div>
+        <ng-template #notLast>
+          <span class="text-success"> No hay cita pendiente </span>
+        </ng-template>
+      </div>
+    </div>
+    <div class="text-center">
+      <p class="mb-2"><i class="fa fa-sort-amount-up-alt"></i> Top Especialidades en espera</p>
+    </div>
+    <div class="mt-2">
+      <table *ngIf="statistics.topAwait.length > 0; else notTop" class="table table-hover">
+        <tbody>
+          <tr *ngFor="let top of statistics.topAwait">
+            <td class="col-md-8">
+              {{ top.speciality }}
+            </td>
+            <td class="text-end">{{ top.total }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #notTop>
+      <span class="text-success"> No hay especialidades pendientes </span>
+    </ng-template>
+  </div>
+</div>

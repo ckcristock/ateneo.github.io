@@ -1,0 +1,39 @@
+@for (note of notes; track $index) {
+  <article class="border-info border-top d-flex flex-column gap-3">
+    <div class="mt-3 d-flex flex-column">
+      <h5 class="text-info">Nota crédito</h5>
+      <span>Codigo: {{ note.Codigo }}</span>
+      <span>Fecha: {{ note.Fecha | date: 'dd/MM/yy' }}</span>
+    </div>
+    <div class="bg-light p-2">
+      <span class="fs-6">Observaciones</span>
+      <p>{{ note.Observaciones }}</p>
+    </div>
+    <app-table [loading]="loading" [arrayData]="note.Productos_Nota">
+      <ng-container titles>
+        <th>Producto</th>
+        <th>Motivo</th>
+        <th>Observaciones</th>
+        <th>Valor Nota Crédito</th>
+      </ng-container>
+      <tbody content>
+        @for (item of note.Productos_Nota; track $index) {
+          <tr class="text-center">
+            <td>
+              {{ item.Nombre_Producto }}
+            </td>
+            <td>
+              {{ item.Motivo }}
+            </td>
+            <td>
+              {{ item.Observacion }}
+            </td>
+            <td>
+              {{ item.Valor_Nota_Credito | currency: 'COP' : 'symbol-narrow' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </article>
+}

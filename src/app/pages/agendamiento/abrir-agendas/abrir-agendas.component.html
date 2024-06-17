@@ -1,0 +1,95 @@
+<app-card viewTitle="Abrir agenda" [filterTemplate]="filterTemplate" [expanded]="true">
+  @if (filters?.person_id) {
+  <div class="app-calendar">
+    <app-callendar [person]="filters?.person_id"></app-callendar>
+  </div>
+  } @else {
+  <div class="row justify-content-center">
+    <div class="col-8 text-center">
+      <h4>Por favor selecciona los parámetros de búsqueda</h4>
+      <img src="/assets/images/abrir-agenda.webp" class="img-fluid" alt="" srcset="" />
+    </div>
+  </div>
+  }
+</app-card>
+
+<ng-template #filterTemplate>
+  <form #agenda="ngForm" class="row">
+    <app-filter-scheduling #filterScheduling [showAll]="false" (filterEvent)="onFilterScheduling($event)">
+      @if (filterScheduling.requestType.procedure) {
+      <app-autocomplete-mdl class="col" label="Procedimiento" placeholder="Busca procedimiento" [model]="procedureId"
+        [list]="cups" classList="pb-0" (optionSelectedEvent)="procedureId = $event"></app-autocomplete-mdl>
+      }
+    </app-filter-scheduling>
+    <ng-container *ngIf="filters?.person_id">
+      <mat-form-field class="col-md-2" appearance="outline">
+        <mat-label>Fecha de inicio</mat-label>
+        <input matInput type="date" [(ngModel)]="fechaInicio" name="date_start" required #date_start="ngModel"
+          value="2018-01-01" />
+      </mat-form-field>
+      <mat-form-field class="col-md-2" appearance="outline">
+        <mat-label>Fecha de fin</mat-label>
+        <input matInput type="date" [(ngModel)]="fechaFin" name="date_end" required />
+      </mat-form-field>
+      <mat-form-field class="col-md-2" appearance="outline">
+        <mat-label>Hora de inicio</mat-label>
+        <input matInput type="time" [(ngModel)]="hour_start" name="hour_start" required step="300" value="08:00"
+          ngModel />
+      </mat-form-field>
+      <mat-form-field class="col-md-2" appearance="outline">
+        <mat-label>Hora de fin</mat-label>
+        <input matInput type="time" [(ngModel)]="hour_end" name="hour_end" required value="18:00" ngModel />
+      </mat-form-field>
+      <mat-form-field class="col-md-2" appearance="outline">
+        <mat-label>Duración</mat-label>
+        <mat-select [(ngModel)]="long" name="long" ngModel>
+          <mat-option *ngFor="let item of optionesTime" [value]="item.value">{{ item.text }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-2" appearance="outline">
+        <mat-label>Días</mat-label>
+        <mat-select [(ngModel)]="days" name="days" ngModel required multiple>
+          <mat-option *ngFor="let item of diasSemana" [value]="item.value">{{ item.text }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="procedureId && procedureId.length > 0">
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label>Cupos por espacio</mat-label>
+        <mat-select [(ngModel)]="share" name="share" ngModel required>
+          <mat-option *ngFor="let item of optionesShare" [value]="item.value">{{ item.text }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="filters?.person_id && !filterScheduling.agendaType?.face_to_face">
+      <div class="d-flex justify-content-center">
+        <div class="col-md-4 form-group">
+          <div class="d-flex justify-content-between">
+            <label for="">Regional</label>
+            <label for="">Nacional</label>
+          </div>
+          <input class="form-control-range" type="range" min="0" name="regionalPercent" max="100"
+            [(ngModel)]="regionalPercent" step="5" (change)="showRange(regionalPercent)"
+            value="{{ regionalPercent }}" />
+          <label for="">Porcentaje para citas regionales
+            <span class="h6 text text-danger"> {{ regionalPercent }}% </span></label>
+        </div>
+      </div>
+    </ng-container>
+    <div class="d-flex justify-content-end">
+      <mat-slide-toggle *ngIf="filters?.person_id" ngModel name="holiday" [(ngModel)]="holiday"
+        style="font-weight: 100">
+        Agendar días festivos
+      </mat-slide-toggle>
+    </div>
+    <div class="col-md-12 my-2" *ngIf="filters?.person_id">
+      <button type="button" [disabled]="agenda.invalid" required class="btn btn-primary btn-block"
+        (click)="saveAgenda(agenda)">
+        Aperturar agenda
+      </button>
+    </div>
+  </form>
+</ng-template>

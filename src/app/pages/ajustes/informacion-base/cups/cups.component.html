@@ -1,0 +1,77 @@
+<app-card
+  viewTitle="CUPS"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters (click)="openModal()" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="cups"
+    [pagination]="pagination"
+    (pageChange)="getAllCups()"
+  >
+    <ng-container titles>
+      <th scope="col">Nombre</th>
+      <th scope="col">Código</th>
+      <th scope="col">Tipo</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (cup of cups; track $index) {
+        <tr class="text-center">
+          <td class="text-start" scope="row">
+            {{ cup.description }}
+          </td>
+          <td>{{ cup.code }}</td>
+          @if (cup.type_service.length) {
+            <td>
+              @for (item of cup.type_service; track item) {
+                <span>{{ item.name }}. </span>
+              }
+            </td>
+          } @else {
+            <td>Sin tipo</td>
+          }
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="edit(cup.id)" />
+              <!-- @if (cup.state == 'activo') {
+                <app-action-deactivate (action)="anularOActivar(cup, 'Inactivo')" />
+              } @else {
+                <app-action-activate (action)="anularOActivar(cup, 'Activo')" />
+              } -->
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="CUPS"
+    placeholder="Busca por CUPS"
+    [value]="filtros.description"
+    (searching)="filtros.description = $event; getAllCups()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtros.code"
+    (searching)="filtros.code = $event; getAllCups()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo</mat-label>
+    <mat-select [(ngModel)]="filtros.type_service_id" (selectionChange)="getAllCups()">
+      <mat-option value="">Todos</mat-option>
+      @for (item of cups_type; track item) {
+        <mat-option [value]="item.value">{{ item.text }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<app-modal-cup (dataChange)="getAllCups()"></app-modal-cup>

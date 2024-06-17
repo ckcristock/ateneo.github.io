@@ -1,0 +1,160 @@
+<app-card
+  viewTitle="Vacantes"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters routerLink="/rrhh/vacantes-crear" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="jobs"
+    [pagination]="pagination"
+    (pageChange)="getJobs()"
+  >
+    <ng-container titles>
+      <th *ngIf="checkCodigo">Código</th>
+      <th *ngIf="checkPublicacion">Publicación</th>
+      <th *ngIf="checkInicio">Inicio</th>
+      <th *ngIf="checkFin">Fin</th>
+      <th *ngIf="checkTitulo">Título</th>
+      <th *ngIf="checkDependencia">Dependencia</th>
+      <th *ngIf="checkCargo">Cargo</th>
+      <th *ngIf="checkDepartamento">Departamento</th>
+      <th *ngIf="checkMunicipio">Municipio</th>
+      <th *ngIf="checkEstado">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (job of jobs; track job.id) {
+        <tr class="text-center">
+          <td class="align-middle" *ngIf="checkCodigo">{{ job.code }}</td>
+          <td class="align-middle" *ngIf="checkPublicacion">
+            {{ job.created_at | date: 'dd/M/yyyy' }}
+          </td>
+          <td class="align-middle" *ngIf="checkInicio">
+            {{ job.date_start | date: 'dd/M/yyyy' }}
+          </td>
+          <td class="align-middle" *ngIf="checkFin">
+            {{ job.date_end | date: 'dd/M/yyyy' }}
+          </td>
+          <td class="align-middle" *ngIf="checkTitulo">
+            {{ job.title }}
+          </td>
+          <td class="align-middle" *ngIf="checkDependencia">
+            {{ job.position?.dependency?.name }}
+          </td>
+          <td class="align-middle" *ngIf="checkCargo">
+            {{ job.position.name }}
+          </td>
+          <td class="align-middle" *ngIf="checkDependencia">
+            {{ job.municipality?.department?.name }}
+          </td>
+          <td class="align-middle" *ngIf="checkMunicipio">
+            {{ job.municipality?.name }}
+          </td>
+          <td class="align-middle" *ngIf="checkEstado">
+            <div class="text-center">
+              <span
+                class="text-uppercase badge {{
+                  job.state == 'activo' ? 'bg-success' : 'bg-danger'
+                }}"
+                >{{ job.state }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit [routerLink]="'editar/' + job.id" />
+              <app-action-button
+                icon="eye"
+                text="Ver"
+                type="success"
+                [link]="{
+                  url: '/rrhh/vacantes-ver/' + job.id
+                }"
+              />
+              @if (job.state == 'activo') {
+                <app-action-deactivate (action)="cancelar(job.id)" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-filter-roles-company
+    [hideSelect]="{ person_id: true, group_id: true }"
+    [defaultValues]="defaultParams"
+    (newValues)="onSelectRol($event)"
+  >
+    <ng-container initContent>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Publicación</mat-label>
+        <input matInput type="date" [(ngModel)]="filtros.fecha" (change)="getJobs()" />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Rango de fechas</mat-label>
+        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+          <input
+            matStartDate
+            placeholder="Fecha de inicio"
+            required
+            formControlName="start"
+            name="date_start"
+          />
+          <input
+            matEndDate
+            placeholder="Fecha de fin"
+            required
+            formControlName="end"
+            name="date_end"
+          />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker>
+          <mat-date-range-picker-actions>
+            <button mat-button matDateRangePickerCancel>Cancelar</button>
+            <button
+              mat-raised-button
+              color="primary"
+              matDateRangePickerApply
+              (click)="selectedDate()"
+            >
+              Aplicar
+            </button>
+          </mat-date-range-picker-actions>
+        </mat-date-range-picker>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Título</mat-label>
+        <input
+          matInput
+          type="text"
+          [(ngModel)]="filtros.titulo"
+          (input)="getJobs()"
+          placeholder="Busca por título"
+        />
+      </mat-form-field>
+    </ng-container>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Departamento</mat-label>
+      <mat-select [(ngModel)]="filtros.departamento" (selectionChange)="getJobs()">
+        <mat-option value="">Todos</mat-option>
+        <mat-option *ngFor="let item of department" [value]="item.value">{{
+          item.text
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Municipio</mat-label>
+      <mat-select [(ngModel)]="filtros.municipio" (selectionChange)="getJobs()">
+        <mat-option value="">Todos</mat-option>
+        <mat-option *ngFor="let item of municipalities" [value]="item.value">{{
+          item.text
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </app-filter-roles-company>
+</ng-template>

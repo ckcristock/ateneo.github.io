@@ -1,0 +1,6 @@
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>
+<ng-container *ngIf="!loading; else placeholder">
+  <app-vacantes-crear [edit]="job"></app-vacantes-crear>
+</ng-container>

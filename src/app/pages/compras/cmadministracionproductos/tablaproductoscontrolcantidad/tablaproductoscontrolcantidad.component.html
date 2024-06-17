@@ -1,0 +1,57 @@
+<app-card viewTitle="Control de productos" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="AbrirModalControlarProductos('crear')" />
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="ProductosControlados"
+    [pagination]="pagination"
+    (pageChange)="ConsultaFiltrada()"
+  >
+    <ng-container titles>
+      <th>Producto</th>
+      <th>Codigo Cum</th>
+      <th>Cantidad Mínima</th>
+      <th>Cantidad Presentación</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (pc of ProductosControlados; track $index) {
+        <tr class="text-center">
+          <td>{{ pc.Nombre_Comercial }}</td>
+          <td class="text-right">{{ pc.Codigo_Cum || 'No hay dato' }}</td>
+          <td class="text-right">{{ pc.Cantidad_Minima }}</td>
+          <td class="text-right">{{ pc.Cantidad_Presentacion }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit
+                (action)="AbrirModalControlarProductos('editar', pc.Id_Producto_Control_Cantidad)"
+              />
+              <app-action-deactivate (action)="EliminarControl(pc.Id_Producto_Control_Cantidad)" />
+              <app-action-button
+                icon="warehouse"
+                text="Act. Disp."
+                type="info"
+                (click)="ActualizarDispensaciones(pc.Id_Producto_Control_Cantidad)"
+              ></app-action-button>
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Código CUM"
+    placeholder="Busca por código"
+    [value]="Filtros.cum"
+    (searching)="Filtros.cum = $event; ConsultaFiltrada()"
+  ></app-automatic-search>
+</ng-template>
+
+<app-modalcontrolproducto
+  [AbrirModal]="AbrirModalControlProductos.asObservable()"
+  (ActualizarTabla)="ConsultaFiltrada()"
+>
+</app-modalcontrolproducto>

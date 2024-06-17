@@ -1,0 +1,32 @@
+<div>
+  <hr />
+  <div class="text-center text-uppercase card-title mt-2">
+    <i class="fas fa-suitcase"></i>
+    Cálculo IBC Riesgos
+  </div>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-uppercase">
+          <th>Concepto</th>
+          <th class="text-center col-md-1">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of ibc; let i = index">
+          <td [ngClass]="{ bold: i === ibc.length - 1 }">{{ item.concepto }}</td>
+          <td class="text-center" [ngClass]="{ bold: i === ibc.length - 1 }">
+            {{ item.valor | currency: '' : '' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <small
+    ><b>
+      Tenga en cuenta que la base de cotización mensual a riesgos no puede ser inferior a 1 SMMLV.
+      En tal caso, se tomará como IBC Seguridad Social
+      {{ datosEmpresa.base_salary | currency: '' : '' }}
+    </b></small
+  >
+</div>

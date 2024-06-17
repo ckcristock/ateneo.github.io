@@ -1,0 +1,171 @@
+<article class="row">
+  <app-card class="col-md-4" viewTitle="Categorías">
+    @if (Categorias.length) {
+      @for (categoria of Categorias; track categoria) {
+        <mat-expansion-panel
+          class="mat-elevation-z0 my-0"
+          [expanded]="selectedCategory.categoria.id == categoria.Id_Categoria_Nueva"
+        >
+          <mat-expansion-panel-header class="px-1">
+            {{ categoria.Nombre }}
+          </mat-expansion-panel-header>
+          @if (categoria.subcategory?.length > 0) {
+            <mat-action-list dense class="small my-0 rounded">
+              @for (subcategoria of categoria.subcategory; track subcategoria) {
+                <button
+                  mat-list-item
+                  [ngClass]="{
+                    'bg-soft-primary':
+                      selectedCategory.categoria.id == subcategoria.Id_Categoria_Nueva &&
+                      selectedCategory.subcategoria.id == subcategoria.Id_Subcategoria
+                  }"
+                  (click)="
+                    getProductosBySubcategoria({
+                      categoria: {
+                        id: subcategoria.Id_Categoria_Nueva,
+                        nombre: categoria.Nombre
+                      },
+                      subcategoria: {
+                        id: subcategoria.Id_Subcategoria,
+                        nombre: subcategoria.Nombre
+                      }
+                    });
+                    getProducts()
+                  "
+                >
+                  {{ subcategoria.Nombre }}
+                </button>
+              }
+            </mat-action-list>
+          } @else {
+            <ul class="list-group">
+              <li class="list-group-item">No tiene subcategorias asignadas</li>
+            </ul>
+          }
+        </mat-expansion-panel>
+      }
+    } @else {
+      <app-not-data [loading]="loadingCategorias"></app-not-data>
+    }
+  </app-card>
+  <app-card
+    class="col-md-8"
+    viewTitle="Productos"
+    [filterTemplate]="filterTemplate"
+    [activeFilters]="urlFiltersService.activeFilters"
+  >
+    <ng-container ngProjectAs="[filters]">
+      <app-add-button [routerLink]="['/ajustes/informacion-base/catalogo/crear']" /><!--
+      <app-header-button
+        icon="box"
+        text="Embalaje"
+        type="warning"
+        (click)="addPackaging.openModal()"
+      ></app-header-button> -->
+    </ng-container>
+    @if (selectedCategory.categoria.id) {
+      <ng-container class="text-dark">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              {{ selectedCategory.categoria.nombre }}
+            </li>
+            <li class="breadcrumb-item">
+              {{ selectedCategory.subcategoria.nombre }}
+            </li>
+          </ol>
+        </nav>
+      </ng-container>
+    }
+    <app-table
+      [loading]="loadingProductos"
+      [arrayData]="Productos"
+      [pagination]="pagination"
+      (pageChange)="getProducts()"
+    >
+      <ng-container titles>
+        <th>Imagen</th>
+        <th>Nombre</th>
+        <th>Código de barras</th>
+        <th>Unidad</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (producto of Productos; track $index) {
+          <tr class="text-center">
+            <td class="p-0" style="width: 1rem">
+              <app-load-image
+                classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                srcDefault="./assets/images/product.jpg"
+                [src]="producto.Imagen"
+              ></app-load-image>
+            </td>
+            <td>
+              {{ producto.Nombre_General | uppercase }}
+            </td>
+            <td>
+              {{ producto.Codigo_Barras }}
+            </td>
+            <td>
+              {{ producto.unit?.name ?? 'N/A' | uppercase }}
+            </td>
+            <td>
+              <app-dropdown-actions>
+                <app-action-view
+                  [link]="{
+                    url: 'ver/' + producto.Id_Producto
+                  }"
+                />
+                <app-action-edit
+                  [routerLink]="['/ajustes/informacion-base/catalogo/editar', producto.Id_Producto]"
+                />
+                @if (producto.Estado == 'activo') {
+                  <app-action-deactivate (action)="cambiarEstado(producto, 'inactivo')" />
+                } @else {
+                  <app-action-activate (action)="cambiarEstado(producto, 'Activo')" />
+                }
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+
+  <ng-template #filterTemplate>
+    <form [formGroup]="formFiltros" id="formFiltros">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            type="text"
+            formControlName="nombre"
+            matInput
+            placeholder="Nombre del producto"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="estado">
+            <mat-option value="">Todos</mat-option>
+            <mat-option value="activo">Activo</mat-option>
+            <mat-option value="inactivo">Inactivo</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Imagen</mat-label>
+          <mat-select formControlName="imagen">
+            <mat-option value="">Todos</mat-option>
+            <mat-option value="con">Con foto</mat-option>
+            <mat-option value="sin">Sin foto</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </form>
+  </ng-template>
+</article>
+
+<!-- Modals -->
+
+<app-embalaje #addPackaging></app-embalaje>

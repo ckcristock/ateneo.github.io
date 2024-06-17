@@ -1,0 +1,84 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <form #FormMediosMag="ngForm">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Código formato</mat-label>
+          <input
+            type="text"
+            id="cod_formato"
+            matInput
+            name="codigo_formato"
+            [(ngModel)]="MediosMagModel.Codigo_Formato"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre formato</mat-label>
+          <input
+            type="text"
+            id="nombre_formato"
+            matInput
+            name="nombre_formato"
+            [(ngModel)]="MediosMagModel.Nombre_Formato"
+            required
+          />
+        </mat-form-field>
+      </div>
+    </form>
+    <h6>Tipos</h6>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Formatos</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of Formatos; let i = index" class="text-center">
+            <td>
+              <ng-select
+                id="formato{{ i }}"
+                name="formato{{ i }}"
+                [(ngModel)]="item.Formato"
+                appearance="outline"
+                [appendTo]="'body'"
+                (ngModelChange)="nuevoFormato(i)"
+                [clearable]="false"
+                [items]="listaFormatosEspeciales"
+                bindLabel="label"
+                bindValue="value"
+              ></ng-select>
+            </td>
+            <td>
+              <button
+                *ngIf="i != Formatos.length - 1"
+                class="btn btn-link text-danger"
+                (click)="eliminarFila(i)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button
+      class="btn btn-primary btn-block"
+      (click)="onSaveFormat()"
+      [disabled]="!FormMediosMag.valid"
+    >
+      <i class="fa fa-save"></i> Guardar
+    </button>
+  </div>
+</div>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9"
+    ><strong>{{ r.Nombre }}</strong>
+  </span>
+</ng-template>

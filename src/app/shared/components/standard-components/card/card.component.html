@@ -1,0 +1,26 @@
+<div [ngClass]="{ card: notWithCardStyle === null }">
+  <div
+    [ngClass]="{
+      'card-body': notWithCardStyle === null
+    }"
+  >
+    <app-header [title]="viewTitle">
+      <ng-content select="[filters]"></ng-content>
+      @if (filterTemplate) {
+        <app-filter-button [filtersAccordion]="accordion" />
+      }
+    </app-header>
+    <app-filters-accordion #accordion>
+      <ng-container *ngTemplateOutlet="filterTemplate"></ng-container>
+    </app-filters-accordion>
+    @if (activeFilters) {
+      <div class="alert alert-info" role="alert">
+        <strong>
+          Hay filtros de búsqueda activos, para mostrar todos los resultados has click
+        </strong>
+        <a role="button" (click)="accordion.matPanel.toggle()" class="alert-link">aquí</a>
+      </div>
+    }
+    <ng-content></ng-content>
+  </div>
+</div>

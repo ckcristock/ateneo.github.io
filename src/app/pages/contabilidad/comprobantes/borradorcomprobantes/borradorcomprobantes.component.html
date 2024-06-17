@@ -1,0 +1,9 @@
+<select
+  name="borrador"
+  id="borrador"
+  class="form-control form-control-sm"
+  (change)="sendDatosBorrador($event.target.value)"
+>
+  <option value="">Ninguno</option>
+  <option *ngFor="let item of borradores" [value]="item.ID">{{ item.Title }}</option>
+</select>

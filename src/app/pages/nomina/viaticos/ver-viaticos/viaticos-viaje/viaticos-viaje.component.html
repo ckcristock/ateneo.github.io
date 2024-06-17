@@ -1,0 +1,50 @@
+<h6>Información del viaje</h6>
+<app-table>
+  <ng-container titles>
+    <th>Funcionario</th>
+    <th>C.C</th>
+    <th>Cargo</th>
+    <th>N° Pasaporte</th>
+    <th>Visa americana</th>
+    <th>Tipo</th>
+  </ng-container>
+  <tbody content>
+    <tr class="text-center">
+      <td>
+        {{
+          (data.person.full_name != undefined
+            ? data.person.full_name
+            : data.person.first_name + ' ' + data.person.first_surname
+          ) | titlecase
+        }}
+      </td>
+      <td>{{ data.person.identifier }}</td>
+      <td>{{ data.person.contractultimate.position.name }}</td>
+      <td>
+        {{ data.person.passport_number ? data.person.passport_number : 'No tiene' }}
+      </td>
+      <td>{{ data.person.visa ? data.person.visa : 'No tiene' }}</td>
+      <td>Funcionario</td>
+    </tr>
+  </tbody>
+</app-table>
+<app-table>
+  <ng-container titles>
+    <th>Origen</th>
+    <th>Destino</th>
+    <th>Tipo de Viaje</th>
+    <th>Fecha de Salida</th>
+    <th>Fecha de Llegada</th>
+    <th>N° Días</th>
+  </ng-container>
+  <tbody content>
+    <tr class="text-center">
+      <td>{{ data.origin?.name }}</td>
+      <td>{{ data.destiny?.name }}</td>
+      <td>{{ data.travel_type }}</td>
+      <td>{{ data.departure_date }}</td>
+      <td>{{ data.arrival_date }}</td>
+      <td>{{ data.n_nights }}</td>
+    </tr>
+  </tbody>
+</app-table>

@@ -1,0 +1,34 @@
+<div class="card">
+  <form #saveForm="ngForm">
+    <div class="card-header">
+      <h4 class="mb-0">Otro Concepto</h4>
+    </div>
+    <div class="card-body row">
+      <input name="type_service_id" type="hidden" [ngModel]="tramiteData.type_service_id" />
+      <input name="formality_id" type="hidden" [ngModel]="tramiteData.formality_id" />
+      <input name="call_id" type="hidden" [ngModel]="call.id" />
+
+      <div class="col-12">
+        <div class="form-group">
+          <label for="staticEmail " required>Observación:</label>
+          <textarea
+            ngModel
+            name="observation"
+            rows="3"
+            class="form-control"
+            id="staticEmail "
+          ></textarea>
+        </div>
+      </div>
+      <div class="col-12">
+        <button
+          class="btn btn-primary btn-block"
+          [disabled]="saveForm.invalid"
+          (click)="save(saveForm)"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

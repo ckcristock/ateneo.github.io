@@ -1,0 +1,112 @@
+<div class="card">
+  <div class="card-body">
+    <div class="card-title">
+      <button class="btn btn-sm btn-primary" style="float: right" (click)="openModal()">
+        <i class="fa fa-plus"></i> Agregar
+      </button>
+      <h5 class="text-primary">Variables de alto Costo</h5>
+      <div class="form-row ms-0 mt-2">
+        <div class="form-group">
+          <label for="">Filtro nombre</label>
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            [(ngModel)]="filtro.name"
+            (change)="get()"
+            name="name"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+      <hr class="bg-primary" />
+    </div>
+    <table
+      class="table table-borderless table-striped mt-4"
+      *ngIf="!loading && models.length > 0; else notData"
+    >
+      <thead class="bg-light">
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>F. Creación</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- <tr *ngFor="let item of models">
+          <td> {{ item.name | uppercase }} </td>
+          <td> {{ item.description | uppercase }} </td>
+          <td> {{ item.created_at | date: 'dd-MM-YYYY' }} </td>
+          <td>
+            <div class="text-center">
+              <div ngbDropdown class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm waves-effect waves-light " type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a class="dropdown-item waves-light text-dark waves-effect caja-botones"
+                    (click)="getMaterial(item); modalVer.show()">
+                    <i class="far fa-eye"></i> Ver
+                  </a>
+                  <a class="dropdown-item waves-light text-info waves-effect caja-botones"
+                    (click)="editClinicalModel(item);">
+                    <i class="far fa-edit"></i> Editar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr> -->
+      </tbody>
+    </table>
+
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      [collectionSize]="pagination.collectionSize"
+      [pageSize]="pagination.pageSize"
+      [(page)]="pagination.page"
+      (pageChange)="get($event)"
+      aria-label="Default pagination"
+      maxSize="5"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+    >
+    </ngb-pagination>
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>
+<ng-template #si>
+  <p>Si</p>
+</ng-template>
+<ng-template #no>
+  <p>No</p>
+</ng-template>
+<ng-template #sinDatos>
+  <tr class="bg-light">
+    <td colspan="100%" class="text-center">
+      <p class="text-dark">Sin datos agregados</p>
+    </td>
+  </tr>
+</ng-template>
+
+<app-modal-basic [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="modal-title">Nuevo</h5>
+    <button type="button" class="close basic-close" (click)="closeModal()">
+      <span aria-hidden="true">
+        <i class="fas fa-times" (click)="closeModal()"></i>
+      </span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <app-builder-form [config]="config" (update)="update($event)"></app-builder-form>
+  </div>
+</app-modal-basic>

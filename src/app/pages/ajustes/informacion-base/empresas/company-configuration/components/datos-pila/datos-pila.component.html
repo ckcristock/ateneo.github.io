@@ -1,0 +1,106 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-10 px-0">
+        <h6 class="text-dark"><i class="fas fa-gavel"></i> Datos de pila</h6>
+      </div>
+      <div class="col-md-2 px-0 text-end">
+        <button class="btn btn-link" (click)="openModal(modal)">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+      </div>
+    </div>
+    @if (!loading && pilas) {
+    <div class="row">
+      <div class="col-lg-6 text-lg-end text-center text-primary">Operador de pago</div>
+      <div class="col-lg-6 text-lg-start text-center">
+        {{ pilas.paid_operator || 'N/A' }}
+      </div>
+      <div class="col-lg-6 text-lg-end text-center text-primary">Companía de ARL</div>
+      <div class="col-lg-6 text-lg-start text-center">
+        {{ pilas.arl?.name || 'N/A' }}
+      </div>
+      <div class="col-lg-6 text-lg-end text-center text-primary">Aplica ley 1429 de 2010</div>
+      <div class="col-lg-6 text-lg-start text-center">
+        {{ pilas.law_1429 ? 'Sí' : 'No' }}
+      </div>
+      <div class="col-lg-6 text-lg-end text-center text-primary">Aplica ley 590 de 2010</div>
+      <div class="col-lg-6 text-lg-start text-center">
+        {{ pilas.law_590 ? 'Sí' : 'No' }}
+      </div>
+      <div class="col-lg-6 text-lg-end text-center text-primary">Aplica ley de 1607 de 2012</div>
+      <div class="col-lg-6 text-lg-start text-center">
+        {{ pilas.law_1607 ? 'Sí' : 'No' }}
+      </div>
+    </div>
+    } @else {
+    <app-not-data [loading]="loading"></app-not-data>
+    }
+  </div>
+</div>
+
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Datos de pila</h4>
+    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    @if (!loadingModal) {
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Operador de pago</mat-label>
+          <mat-select formControlName="paid_operator" required>
+            @for (item of pay_operators; track item) {
+            <mat-option [value]="item.value"> {{ item.clave }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>ARL</mat-label>
+          <mat-select formControlName="arl_id" required>
+            @for (arl of arls; track arl) {
+            <mat-option [value]="arl.value"> {{ arl.text }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <div class="col-12">
+          <div class="form-row">
+            <div class="form-check ms-2 mb-2">
+              <input class="form-check-input" type="checkbox" value="" formControlName="law_1429" id="ley_1429"
+                checked />
+              <label class="form-check-label" for="ley_1429">
+                ¿Aplica Para La Ley 1429 de 2010?
+              </label>
+            </div>
+            <div class="form-check ms-2 mb-2">
+              <input class="form-check-input" type="checkbox" value="" formControlName="law_590" id="ley_590" checked />
+              <label class="form-check-label" for="ley_590">
+                ¿Aplica Para La Ley 590 de 2010?
+              </label>
+            </div>
+            <div class="form-check ms-2 mb-2">
+              <input class="form-check-input" type="checkbox" value="" formControlName="law_1607" id="ley_1607"
+                checked />
+              <label class="form-check-label" for="ley_1607">
+                ¿Aplica Para La Ley 1607 de 2012?
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    } @else {
+    <app-not-data [loading]="loadingModal"></app-not-data>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button type="button" [disabled]="!form.valid" (click)="savePilaData()" class="btn btn-primary">
+      Guardar
+    </button>
+  </div>
+</ng-template>

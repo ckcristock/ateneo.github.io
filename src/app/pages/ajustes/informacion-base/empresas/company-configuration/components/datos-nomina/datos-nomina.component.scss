@@ -1,0 +1,11 @@
+input[type='time']::-webkit-inner-spin-button,
+input[type='time']::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0;
+  height: 15px;
+  width: 15px;
+}
+
+.btn-link:hover {
+  color: var(--bs-btn-hover-color) !important;
+}

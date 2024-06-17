@@ -1,0 +1,328 @@
+<div class="card-title d-flex justify-content-between">
+  <h6><i class="fas fa-money-bill"></i> Salario</h6>
+  @if (userDetail?.contractultimate_full_information?.work_contract_type) {
+    <button class="btn btn-link" (click)="openConfirm(add)">
+      <i class="fas fa-pencil-alt"></i>
+    </button>
+  }
+</div>
+
+@if (!loading && userDetail?.contractultimate_full_information) {
+  <h5 class="text-center text-success">
+    ${{ userDetail?.contractultimate_full_information?.salary | number }}
+  </h5>
+
+  <div class="row">
+    <div class="col-lg-6 text-lg-end text-center text-primary">Tipo de contrato</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.contractultimate_full_information?.work_contract_type?.name | uppercase }}
+    </div>
+
+    <div class="col-lg-6 text-lg-end text-center text-primary">Término de contrato</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.contractultimate_full_information?.contract_term?.name | uppercase }}
+    </div>
+
+    <div class="col-lg-6 text-lg-end text-center text-primary">Fecha de ingreso</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.contractultimate_full_information?.date_of_admission }}
+    </div>
+
+    @if (userDetail?.contractultimate_full_information?.work_contract_type?.id == 2) {
+      <div class="col-lg-6 text-lg-end text-center text-primary">Fecha de retiro</div>
+      <div class="col-lg-6 text-lg-start text-center">
+        {{ userDetail?.contractultimate_full_information?.date_end || 'N/A' }}
+      </div>
+    }
+
+    <div class="col-lg-6 text-lg-end text-center text-primary">Auxilio de transporte</div>
+
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.contractultimate_full_information?.transport_assistance ? 'Sí' : 'No' }}
+    </div>
+  </div>
+  <hr />
+
+  <!-- Bonificaciones  -->
+  @if (userDetail?.contractultimate_full_information?.bonifications) {
+    <app-bono
+      [bonus]="userDetail?.contractultimate_full_information?.bonifications"
+      [id]="userDetail?.contractultimate_full_information?.id"
+      (updateSuccess)="getAllUserInfo()"
+    ></app-bono>
+  }
+} @else {
+  <app-not-data [loading]="loading" [text]="'Funcionario no está activo'"></app-not-data>
+}
+<!-- Historial de contratos -->
+<div class="d-flex justify-content-between">
+  <h6>Historial de contratos</h6>
+  <button type="button" (click)="openModalContracts(addContract)" class="btn btn-link btn-sm">
+    <i class="fas fa-plus"></i>
+  </button>
+</div>
+
+<div class="rounded-top table-responsive">
+  @if (userDetail.work_contracts.length > 0) {
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-center text-uppercase">
+          <th>Salario</th>
+          <th>Tipo</th>
+          <th>Ingreso</th>
+          <th>Finalización</th>
+          <th>Cargo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of userDetail.work_contracts; track item) {
+          <tr class="text-center">
+            <td>${{ item.salary | number }}</td>
+            <td>{{ item.work_contract_type.name }}</td>
+            <td>{{ item.date_of_admission | date }}</td>
+            <td>{{ item.date_end | date }}</td>
+            <td>{{ item.position.name }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <app-not-data [loading]="loadingHistory"></app-not-data>
+  }
+</div>
+
+<!--INICIO MODAL SALARIO -->
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Editar salario</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+
+  <!-- /*Body*/ -->
+  <div class="modal-body">
+    @if (!loadingInfo) {
+      <form [formGroup]="form">
+        <div class="row">
+          <!-- /*Selector de termino de contrato*/ -->
+          <mat-form-field class="col-md-6" appearance="outline">
+            <mat-label>Tipo de contrato</mat-label>
+            <mat-select formControlName="work_contract_type_id" required>
+              @for (contract_type of contract_types; track contract_type) {
+                <mat-option (click)="changeType(contract_type.conclude)" [value]="contract_type.id">
+                  {{ contract_type.name }}</mat-option
+                >
+              }
+            </mat-select>
+            @if (work_contract_type_id_valid) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <!-- /*Selector de tipo de contrato*/ -->
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Término de contrato</mat-label>
+            <mat-select formControlName="contract_term_id" required>
+              @for (contract_term of contractTerms; track contract_term) {
+                <mat-option [value]="contract_term.id">{{ contract_term.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-error>Campo obligatorio</mat-error>
+          </mat-form-field>
+          <!-- /*Selector de valor del salario*/ -->
+          <mat-form-field class="col-md-6" appearance="outline">
+            <mat-label>Salario</mat-label>
+            <input
+              matInput
+              currencyMask
+              appInputPosition
+              [options]="mask.maskCOP"
+              placeholder="Ingresa el salario"
+              formControlName="salary"
+              required
+              autocomplete="off"
+            />
+            @if (salary_valid) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <!-- /*Selector de fecha de ingreso*/ -->
+          <mat-form-field class="col-md-6" appearance="outline">
+            <mat-label>Fecha de ingreso</mat-label>
+            <input
+              matInput
+              type="date"
+              formControlName="date_of_admission"
+              id="fecha_ingreso"
+              required
+            />
+            @if (date_of_admission_valid) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <!-- /*Selector de fecha de fecha de retiro*/ -->
+          @if (conludeContract || form.get('date_end').enabled) {
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Fecha de retiro</mat-label>
+              <input matInput type="date" formControlName="date_end" id="fecha_retiro" required />
+              @if (retirement_date_valid) {
+                <mat-error> Campo obligatorio </mat-error>
+              }
+            </mat-form-field>
+          }
+          <!-- /*Selector de Auxilio de transporte*/ -->
+          <mat-checkbox class="col-md-12" color="primary" formControlName="transport_assistance"
+            >¿Pagar auxilio de transporte?</mat-checkbox
+          >
+        </div>
+      </form>
+    } @else {
+      <app-not-data [loading]="loadingInfo"></app-not-data>
+    }
+  </div>
+
+  <!-- /*Footer*/ -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      (click)="updateSalaryInfo()"
+      [disabled]="!form.valid"
+      class="btn btn-primary"
+    >
+      Actualizar
+    </button>
+  </div>
+</ng-template>
+<!--  FIN MODAL SALARIO -->
+
+<!--INICIO MODAL HISTORIAL DE CONTRATOS -->
+<ng-template #addContract let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Nuevo contrato</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <!-- <button
+      type="button"
+      class="btn btn-primary"
+      (click)="printForm()"
+    ></button> -->
+    <form [formGroup]="formHistoryContract">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de contrato</mat-label>
+          <mat-select formControlName="work_contract_type_id" required>
+            @for (contract_type of contract_types; track contract_type) {
+              <mat-option [value]="contract_type.id"> {{ contract_type.name }}</mat-option>
+            }
+          </mat-select>
+          @if (work_contract_type_id_valid) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+        <!-- Selector termino de contrato -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Término</mat-label>
+          <mat-select formControlName="contract_term_id" id="contract_term_id" required>
+            @for (contract_term of contractTerms; track contract_term) {
+              <mat-option [value]="contract_term.id">{{ contract_term.name }}</mat-option>
+            }
+          </mat-select>
+          @if (work_contract_type_id_valid) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- /*Selector de valor del salario*/ -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Salario</mat-label>
+          <input
+            matInput
+            currencyMask
+            appInputPosition
+            [options]="mask.maskCOP"
+            placeholder="Ingresa el salario"
+            formControlName="salary"
+            required
+            autocomplete="off"
+          />
+          @if (salary_valid) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- /*Selector de fecha de ingreso*/ -->
+        <!-- picker2 -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fecha de ingreso</mat-label>
+          <input
+            formControlName="date_of_admission"
+            matInput
+            [matDatepickerFilter]="dateFilter"
+            [matDatepicker]="picker1"
+            disabled
+          />
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker disabled="false" #picker1></mat-datepicker>
+        </mat-form-field>
+        <!-- fin picker2 -->
+
+        <!-- /*Selector de fecha de retiro*/ -->
+        <!-- pícker -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fecha de retiro</mat-label>
+          <input
+            formControlName="date_end"
+            matInput
+            [matDatepickerFilter]="dateFilter"
+            [matDatepicker]="picker2"
+            disabled
+          />
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-datepicker disabled="false" #picker2></mat-datepicker>
+        </mat-form-field>
+        <!--fin pícker -->
+
+        <!-- /*Selector de cargo de empleado*/ -->
+        <app-filter-roles-company
+          [showAll]="false"
+          [companyId]="formHistoryContract.controls['company_id'].value"
+          [hideSelect]="{ person_id: true }"
+          [formRef]="formRefRoles"
+          (newValues)="onSelectRol($event)"
+        >
+          <mat-form-field initContent appearance="outline" class="col">
+            <mat-label>Empresa</mat-label>
+            <mat-select formControlName="company_id" required>
+              @for (item of companies; track item) {
+                <mat-option [value]="item.value">
+                  {{ item.text }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </app-filter-roles-company>
+      </div>
+
+      <!-- //aqui voy -->
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button type="button" class="btn btn-primary" (click)="addHistoryContract()">Guardar</button>
+  </div>
+</ng-template>

@@ -1,0 +1,520 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      <input
+        type="hidden"
+        name="Identificacion_Funcionario"
+        [ngModel]="user.Identificacion_Funcionario"
+      />
+      <input type="hidden" name="Cuota_Moderadora" [(ngModel)]="Cuota" />
+      <div class="card" *ngIf="divFactura">
+        <div class="row invoice-contact" style="align-items: flex-start !important">
+          <div class="col-md-8">
+            <div class="invoice-box row">
+              <div class="col-sm-12">
+                <!-- <table class="table table-responsive invoice-table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:100px;">
+                                                <img src="{{globales.urlLogoColor}}" class="m-b-10 img-60" alt="Pro-H Software">
+                                            </td>
+                                            <td>
+                                                {{globales.Nombre}}
+                                                <br> {{globales.Nit}}
+                                                <br> {{globales.Direccion}}
+                                                <br> {{globales.Telefono}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="row text-end" style="margin: 0">
+              <div class="col-sm-12">
+                <h4>Nueva Factura Administrativa</h4>
+                <div class="clearfix"></div>
+                <h6>{{ Fecha | date: 'dd/MM/yyyy' }}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row invoive-info" style="margin-bottom: 0">
+            <div class="col-sm-1">
+              <div class="form-group">
+                <label>Activos</label>
+                <select
+                  name="Switch_Activos"
+                  [(ngModel)]="Switch_Activos"
+                  class="form-control form-control-sm f-9"
+                >
+                  <option value="Si">Si</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Tipo de Cliente</label>
+                <select
+                  name="tipoCliente"
+                  [(ngModel)]="TipoClienteSelected"
+                  class="form-control form-control-sm f-9"
+                  (change)="BuscarClientes()"
+                >
+                  <option *ngFor="let tipoCliente of TipoClientes" [value]="tipoCliente.Nombre">
+                    {{ tipoCliente.Nombre }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-4" *ngIf="TipoClienteSelected">
+              <div class="form-group">
+                <label>Cliente</label>
+                <input
+                  [(ngModel)]="DatosCliente"
+                  #datosCli
+                  type="text"
+                  id="Cliente"
+                  class="form-control form-control-sm f-9"
+                  [ngbTypeahead]="search"
+                  [resultTemplate]="rt"
+                  [inputFormatter]="formatter"
+                  (blur)="BuscarDatosCliente(datosCli)"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="Centro_Costo">Centro Costo</label>
+                <input
+                  [(ngModel)]="Centro_Costo_Selected"
+                  type="text"
+                  #centroCosto
+                  name="Centro_Costo_Selected"
+                  id="Centro_Costo"
+                  class="form-control form-control-sm f-9 tab"
+                  [ngbTypeahead]="search2"
+                  [resultTemplate]="rt"
+                  [inputFormatter]="formatter2"
+                  (blur)="validarCampo(Centro_Costo_Selected, centroCosto, 'Centro de Costo')"
+                />
+                <input type="hidden" name="Id_Centro_Costo" [(ngModel)]="Centro_Costo" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row invoive-info" style="margin-bottom: 0">
+            <div class="col-md-12 col-xs-12">
+              <div class="form-group">
+                <label>Observaciones</label>
+                <br />
+                <textarea
+                  id="Observacion"
+                  name="Observacion"
+                  class="form-control"
+                  [(ngModel)]="Observaciones"
+                  rows="6"
+                  style="width: 100%"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 30px">
+            <div class="col-md-2 col-xs-12 mgs">
+              <button
+                *ngIf="Switch_Activos == 'Si'"
+                (click)="modalProductos.show()"
+                class="btn btn-outline-danger btn-sm mgs"
+              >
+                Buscar Activo
+              </button>
+            </div>
+
+            <div class="col-sm-12">
+              <div class="table-responsive tabla">
+                <table class="table invoice-detail-table">
+                  <thead>
+                    <tr class="thead-default">
+                      <th style="width: 300px">Plan de cuenta</th>
+                      <th style="width: 80px">Referencia</th>
+                      <th style="width: 400px">Descripción</th>
+                      <th>Cant.</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th>Impuesto</th>
+                      <th>Total</th>
+                      <th>-</th>
+                    </tr>
+                  </thead>
+
+                  <tbody *ngIf="Switch_Activos == 'No'; else TableActivos">
+                    <tr *ngFor="let item of Lista_Factura; let i = index" id="fila{{ i }} ">
+                      <td>
+                        <input
+                          [disabled]="item.disabled"
+                          #PlanCuenta
+                          [(ngModel)]="item.PlanCuenta"
+                          type="text "
+                          name="PlanCuenta{{ i }} "
+                          id="PlanCuenta{{ i }} "
+                          class="form-control form-control-sm f-9"
+                          [ngbTypeahead]="search1"
+                          [resultTemplate]="rt1"
+                          [inputFormatter]="formatter1"
+                          (blur)="validarCampo(item.PlanCuenta, PlanCuenta, 'Cuenta', i)"
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          [disabled]="item.disabled"
+                          id="Referencia{{ i }} "
+                          name="Referencia{{ i }} "
+                          [(ngModel)]="item.Referencia"
+                          type="text "
+                          min="1 "
+                          class="form-control form-control-sm text-end"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          [disabled]="item.disabled"
+                          class="form-control text-start f-9 tabla"
+                          name="Descripcion{{ i }} "
+                          [(ngModel)]="item.Descripcion"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          [disabled]="item.disabled"
+                          id="CantidadFactura{{ i }} "
+                          name="CantidadFactura{{ i }} "
+                          [(ngModel)]="item.Cantidad"
+                          type="number "
+                          pattern="[0-9]+ "
+                          min="1 "
+                          class="form-control form-control-sm text-end f-9"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          [disabled]="item.disabled"
+                          id="PrecioFactura{{ i }} "
+                          name="PrecioFactura{{ i }} "
+                          [(ngModel)]="item.Precio"
+                          type="number "
+                          step="0.01 "
+                          min="1 "
+                          class="form-control form-control-sm tabla text-end f-9"
+                          pattern="[0-9\.]+ "
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          [disabled]="item.disabled"
+                          id="Descuento{{ i }} "
+                          name="Descuento{{ i }} "
+                          [(ngModel)]="item.Descuento"
+                          type="number "
+                          step="0.01 "
+                          min="1 "
+                          class="form-control form-control-sm tabla text-end f-9"
+                          pattern="[0-9\.]+ "
+                        />
+                      </td>
+                      <td>
+                        <select
+                          name="impuesto{{ i }} "
+                          [disabled]="item.disabled"
+                          class="form-control form-control-sm"
+                          [(ngModel)]="item.Impuesto"
+                        >
+                          <option selected value="0 ">0%</option>
+                          <option value="19 ">19%</option>
+                        </select>
+                      </td>
+
+                      <td>
+                        <input
+                          name="SubtotalFactura{{ i }} "
+                          [(ngModel)]="item.Subtotal"
+                          type="number "
+                          step="0.01 "
+                          min="1 "
+                          class="form-control form-control-sm text-end f-9"
+                          readonly
+                        />
+                      </td>
+                      <td class="d-flex flex-row justify-content-end">
+                        <button
+                          *ngIf="Lista_Factura.length - 1 != i"
+                          class="me-2 btn btn-mini btn-danger"
+                          (click)="EliminarProductoRemsion(Lista_Factura, i)"
+                        >
+                          <span>
+                            <i class="fa fa-trash-o"></i>
+                          </span>
+                        </button>
+                        <button
+                          *ngIf="Lista_Factura.length - 1 != i && item.disabled"
+                          class="btn btn-mini btn-primary"
+                          (click)="item.disabled = false"
+                        >
+                          <span>
+                            <i class="fa fa-pencil"></i>
+                          </span>
+                        </button>
+                        <button
+                          *ngIf="!item.disabled"
+                          class="btn btn-mini btn-success"
+                          (click)="validar(Lista_Factura, item, i)"
+                        >
+                          <span>
+                            <i class="fa fa-check"></i>
+                          </span>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12">
+              <table class="table table-responsive invoice-table invoice-total">
+                <tbody>
+                  <tr>
+                    <th>( = ) Total :</th>
+                    <td>{{ TotalFactura | currency }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="text-end mrg-top-5">
+          <button
+            type="button "
+            [disabled]="
+              (Switch_Activos == 'No' && Lista_Factura.length < 2) ||
+              (Switch_Activos == 'Si' && Carrito_Activos.length < 1)
+            "
+            (click)="onSaveInvoice()"
+            class="btn btn-primary btn-sm btn-block"
+          >
+            Realizar Factura
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #TableActivos>
+  <tbody>
+    <tr *ngFor="let item of Carrito_Activos; let i = index" id="fila{{ i }} ">
+      <td>
+        <input
+          [disabled]="item.disabled"
+          #PlanCuenta
+          [(ngModel)]="item.PlanCuenta"
+          type="text "
+          name="PlanCuenta{{ i }} "
+          id="PlanCuenta{{ i }} "
+          class="form-control form-control-sm f-9"
+          [ngbTypeahead]="search1"
+          [resultTemplate]="rt1"
+          [inputFormatter]="formatter1"
+          (blur)="validarCampo(item.PlanCuenta, PlanCuenta, 'Cuenta', i)"
+        />
+      </td>
+
+      <td>
+        <input
+          [disabled]="item.disabled"
+          id="Referencia{{ i }} "
+          name="Referencia{{ i }} "
+          [(ngModel)]="item.Referencia"
+          type="text "
+          min="1 "
+          class="form-control form-control-sm text-end"
+        />
+      </td>
+      <!-- <td><input [disabled]="item.disabled " class="form-control text-end f-9 tabla " name="Descripcion{{i}} " [(ngModel)]="item.Descripcion "></td> -->
+      <td>{{ item.Nombre }}</td>
+      <td>
+        <!-- <input readonly id="costo{{i}} " name="costo{{i}} " [value]="item.Costo_PCGA - item.Depreciacion_Acum_PCGA " class="form-control form-control-sm text-end f-9 "> -->
+        <input
+          readonly
+          id="CantidadFactura{{ i }} "
+          name="CantidadFactura{{ i }} "
+          [(ngModel)]="item.Cantidad"
+          class="form-control form-control-sm text-end f-9"
+        />
+      </td>
+      <td>
+        <input
+          [disabled]="item.disabled"
+          id="PrecioFactura{{ i }} "
+          name="PrecioFactura{{ i }} "
+          [(ngModel)]="item.Precio"
+          type="number "
+          step="0.01 "
+          min="1 "
+          class="form-control form-control-sm tabla text-end f-9"
+          pattern="[0-9\.]+ "
+        />
+      </td>
+
+      <td>
+        <input
+          [disabled]="item.disabled"
+          id="Descuento{{ i }} "
+          name="Descuento{{ i }} "
+          [(ngModel)]="item.Descuento"
+          type="number "
+          step="0.01 "
+          min="1 "
+          class="form-control form-control-sm tabla text-end f-9"
+          pattern="[0-9\.]+ "
+        />
+      </td>
+      <td>
+        <select
+          name="impuesto{{ i }} "
+          [disabled]="item.disabled"
+          class="form-control form-control-sm"
+          [(ngModel)]="item.Impuesto"
+        >
+          <option value="0 ">0%</option>
+          <option value="19 ">19%</option>
+        </select>
+      </td>
+
+      <td>
+        <input
+          name="SubtotalFactura{{ i }} "
+          [(ngModel)]="item.Subtotal"
+          type="number "
+          step="0.01 "
+          min="1 "
+          class="form-control form-control-sm text-end f-9"
+          readonly
+        />
+      </td>
+      <td class="d-flex flex-row justify-content-end">
+        <button
+          class="me-2 btn btn-mini btn-danger"
+          (click)="EliminarProductoRemsion(Carrito_Activos, i)"
+        >
+          <span>
+            <i class="fa fa-trash-o"></i>
+          </span>
+        </button>
+        <button
+          *ngIf="item.disabled"
+          class="btn btn-mini btn-primary"
+          (click)="item.disabled = false"
+        >
+          <span>
+            <i class="fa fa-pencil"></i>
+          </span>
+        </button>
+        <button
+          *ngIf="!item.disabled"
+          class="btn btn-mini btn-success"
+          (click)="validar(Carrito_Activos, item, i)"
+        >
+          <span>
+            <i class="fa fa-check"></i>
+          </span>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</ng-template>
+
+<ng-template #rt1 let-r="result " let-t="term ">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombre }} </span>
+</ng-template>
+
+<app-modal-basic #modalProductos [dialogClass]="'modal-lg modal-full'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Busqueda Activos</h4>
+    <button type="button " class="close basic-close" (click)="modalProductos.hide()">
+      <span aria-hidden="true ">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-md-12" style="max-height: 450px; overflow-y: scroll">
+        <table class="table table-product table-striped">
+          <thead>
+            <tr>
+              <th style="width: 200px">Activo</th>
+              <th class="text-end">Costo PCGA</th>
+              <th class="text-end">Costo NIIF</th>
+              <th class="text-end">Depreciacion PCGA</th>
+              <th class="text-end">Depreciacion NIIF</th>
+              <th class="text-end">Saldo PCGA</th>
+              <th class="text-end">Saldo NIIF</th>
+            </tr>
+            <tr></tr>
+            <tr>
+              <th style="width: 200px" class="tabla-filtro">
+                <input
+                  type="text "
+                  (blur)="filtrarActivos($event.target.value)"
+                  class="form-control input-sm"
+                  placeholder="Filtro Nombre "
+                />
+              </th>
+              <th class="tabla-filtro"></th>
+              <th class="tabla-filtro"></th>
+              <th class="tabla-filtro"></th>
+            </tr>
+          </thead>
+          <tbody class="tabla-activos">
+            <tr
+              *ngFor="let Activo of ActivosBuscar"
+              (click)="agregarActivo(Activo)"
+              [ngClass]="{ 'bg-success': Activo.selected === true }"
+            >
+              <td>{{ Activo.Nombre }}</td>
+              <td class="text-end">{{ Activo.Costo_PCGA | currency }}</td>
+              <td class="text-end">{{ Activo.Costo_NIIF | currency }}</td>
+              <td class="text-end">{{ Activo.Depreciacion_Acum_PCGA | currency }}</td>
+              <td class="text-end">{{ Activo.Depreciacion_Acum_NIIF | currency }}</td>
+              <td class="text-end">
+                {{ Activo.Costo_PCGA - Activo.Depreciacion_Acum_PCGA | currency }}
+              </td>
+              <td class="text-end">
+                {{ Activo.Costo_NIIF - Activo.Depreciacion_Acum_NIIF | currency }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-end">
+      <button type="button " class="btn btn-primary btn-sm" (click)="modalProductos.hide()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</app-modal-basic>

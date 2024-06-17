@@ -1,0 +1,108 @@
+<div class="row">
+  <app-stats
+    class="col"
+    [title]="'Pacientes confirmados'"
+    [value]="appointmentConfirm"
+    [icon]="'fas fa-user-friends'"
+  >
+  </app-stats>
+  <app-stats
+    class="col"
+    [title]="'Pacientes recaudados'"
+    [value]="appointmentCollection"
+    [icon]="'fas fa-user-check'"
+  >
+  </app-stats>
+  <app-stats
+    class="col"
+    [title]="'Valor recaudado'"
+    [value]="appointmentCollectionAll"
+    [icon]="'fas fa-money-bill-wave'"
+  >
+  </app-stats>
+</div>
+
+<app-card
+  viewTitle="Recaudos"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-table
+    [loading]="loading"
+    [arrayData]="citas"
+    [pagination]="pagination"
+    (pageChange)="searchPatient()"
+  >
+    <ng-container titles>
+      <th></th>
+      <th>Fecha</th>
+      <th>Profesional</th>
+      <th>Paciente</th>
+      <th>EPS</th>
+      <th>Copago</th>
+      <th class="col-md-3">Descripción</th>
+      <th>Estado</th>
+      <th></th>
+    </ng-container>
+    <tbody content>
+      @for (item of citas; track $index) {
+        <tr class="text-center">
+          <td class="align-middle text-info">
+            <i
+              [ngClass]="{
+                'fa-user': item.face_to_face,
+                'fa-video': !item.face_to_face
+              }"
+              class="fa"
+            ></i>
+          </td>
+          <td class="align-middle">
+            {{ item.date | date: 'dd/MM/yyyy hh:mm a' }}
+          </td>
+          <td class="align-middle">{{ item.professional }}</td>
+          <td class="align-middle">{{ item.patient }}</td>
+          <td class="align-middle">{{ item.eps }}</td>
+          <td class="align-middle">{{ item.copago | number }}</td>
+          <td class="align-middle">
+            <app-view-more [text]="item.description"></app-view-more>
+          </td>
+          <td class="align-middle">{{ item.state | uppercase }}</td>
+          <td class="align-middle" *ngIf="item.payed">
+            <a role="button" (click)="recaudoCuota(item)" title="Recaudo de Cuota">
+              <i class="fas fa-hand-holding-usd"></i>
+            </a>
+          </td>
+          <td class="align-middle text-info" *ngIf="!item.payed">
+            <i class="fa fa-thumbs-up"></i>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Número de documento"
+    placeholder="Busca por documento"
+    [value]="filters.patient"
+    (searching)="filters.patient = $event; searchPatient()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Fecha</mat-label>
+    <input
+      matInput
+      type="date"
+      [(ngModel)]="filters.date"
+      name="date"
+      autocomplete="off"
+      (change)="searchPatient()"
+    />
+  </mat-form-field>
+</ng-template>
+
+<app-modal-payment
+  [modalData]="openModalRecaudo"
+  (reloadData)="activeObservable()"
+></app-modal-payment>

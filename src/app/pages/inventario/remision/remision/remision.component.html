@@ -1,0 +1,220 @@
+<!-- <div class="page-body"> -->
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title">
+          <h5 class="text-primary">Seguimiento</h5>
+        </div>
+        <hr class="line" />
+        @if (!loadingHistory && Actividades.length) {
+          <ul class="list-group list-group-flush">
+            <li *ngFor="let Actividad of Actividades" class="list-group-item px-0">
+              <div class="card-title d-flex justify-content-between">
+                <div>
+                  <span
+                    class="badge {{ Actividad.Estado == 'Creacion' ? 'bg-info' : '' }} {{
+                      Actividad.Estado == 'Edicion' ? 'bg-warning' : ''
+                    }}{{ Actividad.Estado == 'Anulada' ? 'bg-danger' : '' }}{{
+                      Actividad.Estado == 'Alistamiento' ||
+                      Actividad.Estado == 'Fase 1' ||
+                      Actividad.Estado == 'Fase 2'
+                        ? 'bg-dark'
+                        : ''
+                    }}{{ Actividad.Estado == 'Enviada' ? 'bg-success ' : '' }} {{
+                      Actividad.Estado == 'Recibida' ? 'bg-light ' : ''
+                    }}{{ Actividad.Estado == 'Facturada' ? 'bg-secondary ' : '' }}"
+                    >{{ Actividad.Estado }}</span
+                  >
+                </div>
+                <img
+                  class="img-thumbnail rounded-circle header-profile-user img-fluid"
+                  [src]="Actividad.Imagen | image: 'users'"
+                  onerror="this.src='../../../../assets/images/noprofile.png'"
+                  alt=""
+                />
+              </div>
+              <p>
+                {{ Actividad.Detalles }} <br />
+                <small class="text-muted"> {{ Actividad.Fecha }}</small>
+              </p>
+            </li>
+          </ul>
+        } @else {
+          <app-not-data-sa [loading]="loadingHistory"></app-not-data-sa>
+        }
+        <a
+          *ngIf="remision.Id_Factura"
+          [routerLink]="['/inventario/ver-factura-venta', remision.Id_Factura]"
+          class="btn btn-block btn-info"
+        >
+          <i class="fa fa-file"></i> Ver Factura
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <app-cabecera [datosCabecera]="DatosCabecera"> </app-cabecera>
+        @if (!loading) {
+          <div class="rounded-top table-responsive">
+            <table class="table table-bordered table-sm">
+              <thead class="bg-light">
+                <tr class="text-center text-uppercase">
+                  <th colspan="2">Origen</th>
+                  <th colspan="2">Destino</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="align-middle">
+                    <strong *ngIf="origen; else noData">{{ origen.Nombre }}</strong>
+                  </td>
+                  <td class="align-middle">
+                    <span *ngIf="origen; else noData">
+                      <strong> Dirección: </strong> {{ origen.Direccion }}
+                    </span>
+                  </td>
+                  <td class="align-middle">
+                    <strong *ngIf="destino; else noData"> {{ destino.Nombre }}</strong>
+                  </td>
+                  <td class="align-middle">
+                    <span *ngIf="destino; else noData">
+                      <strong> Dirección: </strong>{{ destino.Direccion }}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="align-middle">
+                    <span *ngIf="origen; else noData">
+                      <strong>Teléfono: </strong> {{ origen.Telefono }}
+                    </span>
+                  </td>
+                  <td class="align-middle">
+                    <span *ngIf="origen; else noData">
+                      <strong> Correo: </strong> {{ origen.Correo || 'N/A' }}
+                    </span>
+                  </td>
+                  <td class="align-middle">
+                    <span *ngIf="destino; else noData">
+                      <strong> Teléfono: </strong>{{ destino.Telefono }}
+                    </span>
+                  </td>
+                  <td class="align-middle">
+                    <span *ngIf="destino; else noData">
+                      <strong> Correo: </strong>{{ destino.Correo || 'N/A' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr />
+          <div class="card bg-light">
+            <div class="card-body">
+              <h5 class="card-title">Observaciones</h5>
+              <p>{{ remision.Observaciones }}</p>
+            </div>
+          </div>
+          <div class="rounded-top table-responsive">
+            <table class="table table-bordered table-sm">
+              <thead class="bg-light">
+                <tr class="text-center text-uppercase">
+                  <th class="align-middle">Producto</th>
+                  <th class="align-middle">Cat</th>
+                  <th class="align-middle">Lote</th>
+                  <th class="align-middle">Fecha Vencimiento</th>
+                  <th class="align-middle">Cantidad</th>
+                  <th *ngIf="remision.Tipo == 'Cliente'" class="align-middle">Precio</th>
+                  <th *ngIf="remision.Tipo == 'Cliente'" class="align-middle">Descuento</th>
+                  <th *ngIf="remision.Tipo == 'Cliente'" class="align-middle">IVA</th>
+                  <th *ngIf="remision.Tipo == 'Cliente'" class="align-middle">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let item of productos; let i = index"
+                  id="fila{{ i }}"
+                  class="text-center"
+                >
+                  <td class="align-middle">{{ item.Nombre_Producto || 'N/A' }}</td>
+                  <td>
+                    @if (item.Id_Categoria == 9) {
+                      <i class="fa fa-registered"></i>
+                    } @else {
+                      N/A
+                    }
+                  </td>
+                  <td class="align-middle">{{ item.Lote }}</td>
+                  <td class="align-middle">{{ item.Fecha_Vencimiento }}</td>
+                  <td class="align-middle">{{ item.Cantidad }}</td>
+                  <td class="align-middle" *ngIf="remision.Tipo == 'Cliente'">
+                    {{ item.Precio }}
+                  </td>
+                  <td class="align-middle" *ngIf="remision.Tipo == 'Cliente'">
+                    {{ item.Descuento }}
+                  </td>
+                  <td class="align-middle" *ngIf="remision.Tipo == 'Cliente'">
+                    {{ item.Impuesto }}
+                  </td>
+                  <td class="align-middle" *ngIf="remision.Tipo == 'Cliente'">
+                    {{ item.Subtotal }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <app-not-data-sa [loading]="loading"></app-not-data-sa>
+        }
+        <div>
+          <!--<div *ngIf="remision.Tipo==Cliente" class="row">
+              <div class="col-sm-12">
+                <table class="table invoice-table invoice-total">
+                  <tbody>
+                    <tr>
+                      <th>Productos Solicitados :</th>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <th>Productos Entregados :</th>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <th>Diferencia :</th>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>-->
+          <div class="text-end">
+            <div class="btn-group" role="group" aria-label="Button group">
+              <button
+                type="button"
+                class="btn btn-success"
+                [disabled]="downloading.print"
+                (click)="action('imprimir')"
+              >
+                <i class="fa fa-print"></i>
+                {{ downloading.print ? 'Cargando...' : 'Imprimir' }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-info"
+                [disabled]="downloading.printPrice"
+                (click)="action('imprimirconprecio')"
+              >
+                <i class="fa fa-print"></i>
+                {{ downloading.printPrice ? 'Cargando...' : 'Imprimir con Precio' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+</div>
+<ng-template #noData> No existen datos </ng-template>

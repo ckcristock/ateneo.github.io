@@ -1,0 +1,219 @@
+<div class="card">
+  <div class="card-block">
+    <h4>Facturación</h4>
+    <table class="table table-condesed table-striped">
+      <thead>
+        <tr>
+          <th style="width: 100px">Codigo</th>
+          <th style="width: 150px">Fecha</th>
+          <th>Facturador</th>
+          <th>Cliente</th>
+          <th style="width: 100px">Tipo</th>
+          <th style="width: 100px">Modalidad</th>
+          <th style="width: 100px">Estado</th>
+          <th style="width: 80px">Acciones</th>
+        </tr>
+        <tr>
+          <th class="table-filtro">
+            <input
+              type="text"
+              [(ngModel)]="filtro_cod_fact"
+              (blur)="filtros1()"
+              class="form-control input-sm"
+              placeholder="Filtro Codigo"
+            />
+          </th>
+          <th class="table-filtro">
+            <!-- Mirar commits anteriores a 16/10/23 -->
+          </th>
+          <th class="table-filtro">
+            <input
+              type="text"
+              [(ngModel)]="filtro_facturador"
+              (blur)="filtros1()"
+              class="form-control input-sm"
+              placeholder="Filtro Facturador"
+            />
+          </th>
+          <th class="table-filtro">
+            <input
+              type="text"
+              [(ngModel)]="filtro_cliente"
+              (blur)="filtros1()"
+              class="form-control input-sm"
+              placeholder="Filtro Cliente"
+            />
+          </th>
+          <th class="table-filtro">
+            <select
+              (change)="filtros1()"
+              [(ngModel)]="filtro_tipo_fact"
+              class="form-control input-sm"
+            >
+              <option *ngFor="let item of Servicios" [value]="item.Id_Tipo_Servicio">
+                {{ item.Nombre }}
+              </option>
+            </select>
+          </th>
+          <th class="table-filtro">
+            <!-- <select (change)="filtros1()" [(ngModel)]="filtro_mod" class="form-control input-sm">
+              <option value="">Todas</option>
+              <option value="Factura">Factura</option>
+              <option value="Homologo">Homologo</option>
+            </select> -->
+          </th>
+          <th class="table-filtro">
+            <select
+              (change)="filtros1()"
+              [(ngModel)]="filtro_estado_fact"
+              class="form-control input-sm"
+            >
+              <option value="">Todas</option>
+              <option value="Sin Cancelar">Sin Cancelar</option>
+              <option value="Cancelada">Canceladas</option>
+              <option value="Nota_Credito">Nota C. 100%</option>
+            </select>
+          </th>
+          <th class="table-filtro"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="Facturas.length == 0">
+          <td colspan="8" class="text-center">
+            <i class="fa fa-exclamation-circle fa-5x"></i>
+            <h4>No Existen Facturas para mostrar</h4>
+          </td>
+        </tr>
+        <tr
+          *ngFor="let factura of Facturas"
+          [ngClass]="{
+            'bg-danger': factura.Estado_Factura == 'Anulada' || factura.Nota_Credito
+          }"
+        >
+          <td>
+            <strong>{{ factura.Codigo }} </strong>
+          </td>
+          <td class="text-center">
+            {{ factura.Fecha_Documento | date: 'dd/MM/yyyy' }}
+          </td>
+          <td>
+            {{ factura.Funcionario }}
+          </td>
+          <td>{{ factura.Cliente }}</td>
+          <td>
+            <div class="text-center">
+              <span class="label label-inverse">{{ factura.Tipo }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="label"
+                [ngClass]="{
+                  'label-primary': factura.Modalidad == 'Homologo',
+                  'label-success': factura.Modalidad == 'Factura'
+                }"
+                >{{ factura.Modalidad }}</span
+              >
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="label {{
+                  factura.Estado_Factura == 'Sin Cancelar' ? 'label-danger' : 'label-success'
+                }}"
+                >{{ factura.Estado_Factura }}</span
+              >
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <div ngbDropdown class="dropdown-primary">
+                <button
+                  ngbDropdownToggle
+                  class="btn btn-secondary btn-mini waves-effect waves-light"
+                  type="button"
+                >
+                  Acciones
+                </button>
+                <div ngbDropdownMenu>
+                  <!-- <a *ngIf="factura.Tipo == 'Evento' || factura.Tipo == 'NoPos'" class="dropdown-item waves-light waves-effect caja-botones" href="javascript:;" (click)="Id_Factura = factura.Id_Factura;modalInfoExtra.show()">
+                    <i class="fa fa-plus-circle"></i>Añadir Info Extra</a> -->
+                  <a
+                    *ngIf="factura.Tipo != 'Pos-Capita'"
+                    class="dropdown-item waves-light waves-effect caja-botones"
+                    href=""
+                    [routerLink]="[
+                      '/cmfacturaver',
+                      factura.Tipo_Fact == 'Factura'
+                        ? factura.Id_Factura
+                        : factura.Id_Factura_Asociada
+                    ]"
+                  >
+                    <i class="ti-eye"></i>Ver</a
+                  >
+                  <a
+                    *ngIf="factura.Tipo == 'Pos-Capita'"
+                    class="dropdown-item waves-light waves-effect caja-botones"
+                    href=""
+                    [routerLink]="['/cmfacturacapitaver', factura.Id_Factura]"
+                  >
+                    <i class="ti-eye"></i>Ver</a
+                  >
+                  <!-- Ver de Factura Capita -->
+                  <a
+                    *ngIf="factura.Tipo != 'Pos-Capita'"
+                    class="dropdown-item waves-light waves-effect caja-botones"
+                    href="{{ globales.ruta }}php/facturasventas/factura_dis_pdf.php?id={{
+                      factura.Id_Factura
+                    }}"
+                    target="_blank"
+                  >
+                    <i class="ti-printer"></i>Imprimir Factura</a
+                  >
+                  <a
+                    *ngIf="factura.Tipo == 'Pos-Capita'"
+                    class="dropdown-item waves-light waves-effect caja-botones"
+                    href="{{ globales.ruta }}php/factura_capita/factura_capita_pdf.php?id={{
+                      factura.Id_Factura
+                    }}"
+                    target="_blank"
+                  >
+                    <i class="ti-printer"></i>Imprimir Factura</a
+                  >
+                  <!-- Imprimir de Factura Capita -->
+
+                  <a
+                    class="dropdown-item waves-light waves-effect caja-botones"
+                    href="{{
+                      globales.ruta
+                    }}php/facturacion_electronica/descargar_xml.php?Tipo_Factura={{
+                      factura.Tipo != 'Pos-Capita' ? 'Factura' : 'Factura_Capita'
+                    }}&Id_Factura={{ factura.Id_Factura }}"
+                    target="_blank"
+                  >
+                    <i class="ti-printer"></i>Descargar XML</a
+                  >
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    {{ page1 * maxSize - maxSize + 1 }} al
+    {{ page1 * maxSize > TotalItems1 ? TotalItems1 : page1 * maxSize }} de
+    {{ TotalItems1 }}
+    <!-- <ngb-pagination size="sm"
+      class="pull-right"
+      [collectionSize]="TotalItems1"
+      [(page)]="page1"
+      [maxSize]="10"
+      [pageSize]="maxSize"
+      size="sm"
+      (pageChange)="paginacion()"
+      [boundaryLinks]="true"
+    ></ngb-pagination> -->
+  </div>
+</div>

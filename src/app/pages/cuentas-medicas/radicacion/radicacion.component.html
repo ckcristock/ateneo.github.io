@@ -1,0 +1,37 @@
+<div class="container-fuild">
+  <div class="row">
+    <div class="col-md-4">
+      <app-estadisticas-radicaciones
+        [UpdateEstadisticas]="updateEstadisticasSubject.asObservable()"
+      >
+      </app-estadisticas-radicaciones>
+
+      <!-- Dejar el siguiente bloque mientras se desarrolla
+         <app-generadorreporteexcelradicaciones></app-generadorreporteexcelradicaciones> -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <h4>Reportes de Radicación</h4>
+            </div>
+            <div class="card-body p-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <!-- <app-cabecera
+                [datosCabecera]="DatosCabecera">              
+              </app-cabecera> -->
+          <app-tabla-radicaciones
+            (MostrarSwal)="MostrarMensajeHijo($event)"
+            (ActualizarEstadisticas)="UpdateEstadisticas()"
+          >
+          </app-tabla-radicaciones>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

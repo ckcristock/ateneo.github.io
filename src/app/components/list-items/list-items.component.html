@@ -1,0 +1,36 @@
+<div class="row d-flex {{ justifyContent }} {{ mt }} text-uppercase">
+  <div [class]="col">
+    <ul class="list-group">
+      <li [class]="classList" *ngIf="title1">
+        {{ title1 }}
+        <span *ngIf="type1 == 'cop'">${{ var1 | number: '1.2-2' }}</span>
+        <span *ngIf="type1 == 'usd'">USD {{ var1 | number: '1.2-2' }}</span>
+        <span *ngIf="type1 == 'amount'">{{ var1 | number }}</span>
+      </li>
+      <li [class]="classList" *ngIf="title2">
+        {{ title2 }}
+        <span *ngIf="type2 == 'cop'">${{ var2 | number: '1.2-2' }}</span>
+        <span *ngIf="type2 == 'usd'">USD {{ var2 | number: '1.2-2' }}</span>
+        <span *ngIf="type2 == 'amount'">{{ var2 | number }}</span>
+      </li>
+      <li [class]="classList" *ngIf="title3">
+        {{ title3 }}
+        <span *ngIf="type3 == 'cop'">${{ var3 | number: '1.2-2' }}</span>
+        <span *ngIf="type3 == 'usd'">USD {{ var3 | number: '1.2-2' }}</span>
+        <span *ngIf="type3 == 'amount'">{{ var3 | number }}</span>
+      </li>
+      <li [class]="classList" *ngIf="title4">
+        {{ title4 }}
+        <span *ngIf="type4 == 'cop'">${{ var4 | number: '1.2-2' }}</span>
+        <span *ngIf="type4 == 'usd'">USD {{ var4 | number: '1.2-2' }}</span>
+        <span *ngIf="type4 == 'amount'">{{ var4 | number }}</span>
+      </li>
+      <li [class]="classList" *ngIf="title5">
+        {{ title5 }}
+        <span *ngIf="type5 == 'cop'">${{ var5 | number: '1.2-2' }}</span>
+        <span *ngIf="type5 == 'usd'">USD {{ var5 | number: '1.2-2' }}</span>
+        <span *ngIf="type5 == 'amount'">{{ var5 | number }}</span>
+      </li>
+    </ul>
+  </div>
+</div>

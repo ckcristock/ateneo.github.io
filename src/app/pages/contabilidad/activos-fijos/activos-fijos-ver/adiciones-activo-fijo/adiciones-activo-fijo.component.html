@@ -1,0 +1,73 @@
+<hr />
+<h5 class="text-center">Adiciones</h5>
+<div class="rounded-top table-responsive">
+  <table
+    class="table table-bordered table-striped table-sm"
+    *ngIf="!loading && Adiciones.length > 0; else notData"
+  >
+    <thead class="bg-light">
+      <tr class="text-center text-uppercase">
+        <th>Fecha</th>
+        <th>Nombre Adición</th>
+        <th>Concepto</th>
+        <th>Base</th>
+        <th>Iva</th>
+        <th>Total</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of Adiciones" class="text-center">
+        <td class="align-middle">{{ item.Fecha | date: 'dd/MM/yyyy' }}</td>
+        <td class="align-middle">{{ item.Nombre }}</td>
+        <td class="align-middle">{{ item.Concepto }}</td>
+        <td class="align-middle text-end">${{ item.Base | currency: '' : '' }}</td>
+        <td class="align-middle text-end">${{ item.Iva | currency: '' : '' }}</td>
+        <td class="align-middle text-end">${{ item.Costo | currency: '' : '' }}</td>
+        <td class="align-middle">
+          <div ngbDropdown container="body" class="dropdown-primary">
+            <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+              <i class="mdi mdi-chevron-down"></i>
+            </button>
+            <div ngbDropdownMenu>
+              <a
+                class="dropdown-item text-info"
+                href="{{
+                  envirom.base_url
+                }}php/contabilidad/movimientoscontables/movimientos_activo_fijo_pdf.php?id_adicion={{
+                  item.Id_Adicion_Activo_Fijo
+                }}&id_registro={{ item.Id_Activo_Fijo }}&id_funcionario_elabora={{
+                  1
+                }}&activo=Adicion"
+                target="_blank"
+              >
+                <i class="fa fa-print"></i> Ver PCGA</a
+              >
+              <a
+                class="dropdown-item text-info"
+                href="{{
+                  envirom.base_url
+                }}php/contabilidad/movimientoscontables/movimientos_activo_fijo_pdf.php?id_adicion={{
+                  item.Id_Adicion_Activo_Fijo
+                }}&id_registro={{ item.Id_Activo_Fijo }}&id_funcionario_elabora={{
+                  1
+                }}&activo=Adicion&tipo=Niif"
+                target="_blank"
+              >
+                <i class="fa fa-print"></i> Ver NIIF</a
+              >
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr class="text-end">
+        <th colspan="5" class="text-uppercase">Totales</th>
+        <th>${{ getTotal() | currency: '' : '' }}</th>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<ng-template #notData>
+  <app-not-data [loading]="loading" [text]="'No existen adiciones para este activo'"></app-not-data>
+</ng-template>

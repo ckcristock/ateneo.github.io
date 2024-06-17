@@ -1,0 +1,333 @@
+<app-card viewTitle="Inventario por puntos" [filterTemplate]="filterTemplate">
+  <app-table
+    [loading]="Cargando_Tabla"
+    [arrayData]="Inventarios"
+    [pagination]="pagination"
+    (pageChange)="paginacion()"
+  >
+    <ng-container titles>
+      <th>Categoría</th>
+      <th>Nombre Producto</th>
+      <th></th>
+      <th>Estiba</th>
+      <th>Grupo</th>
+      <th>Invima</th>
+      <th>Laboratorios</th>
+      <th>Cum</th>
+      <th>Lote</th>
+      <th>Fecha Vencimiento</th>
+      @if (!permiso && lista_informe) {
+        <th>Precio Venta</th>
+      }
+      <th>Cant. Disponible</th>
+      <th>Cant. Apartada</th>
+      <th>Cant. Borradores</th>
+      <th>Iva</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (inventario of Inventarios; track inventario.Id_Inventario_Nuevo; let i = $index) {
+        <tr class="text-center">
+          <td>
+            <strong>{{ inventario.Nombre_Categoria }}</strong>
+          </td>
+          <td>
+            <strong>{{ inventario.Nombre_Comercial }}</strong>
+            <br />
+            <span class="text-muted">
+              {{ inventario.Nombre_Producto }}
+            </span>
+          </td>
+          <td>
+            <div class="mytooltip tooltip-effect-2">
+              <span class="tooltip-item2">
+                <i class="fa fa-archive"></i>
+              </span>
+              <span class="tooltip-content4 clearfix">
+                <span class="tooltip-text2">{{ inventario.Embalaje }}</span>
+              </span>
+            </div>
+          </td>
+          <td>
+            <div class="mytooltip tooltip-effect-2">
+              <span class="tooltip-item2">
+                <i class="fa fa-th"></i>
+              </span>
+              <span class="tooltip-content4 clearfix">
+                <span class="tooltip-text2">{{ inventario.Nombre_Estiba }}</span>
+              </span>
+            </div>
+          </td>
+          <td>{{ inventario.Nombre_Grupo }}</td>
+          <td>{{ inventario.Invima || 'N/A' }}</td>
+          <td>
+            <strong>Comercial: </strong>
+            <span>{{ inventario.Laboratorio_Comercial }} </span> <br />
+            <strong>Genérico: </strong>
+            <span>{{ inventario.Laboratorio_Generico }} </span>
+          </td>
+          <td>{{ inventario.Codigo_CUM || 'N/A' }}</td>
+          <td>{{ inventario.Lote }}</td>
+          <td>{{ inventario.Fecha_Vencimiento | date: 'dd/MM/yyyy' }}</td>
+          @if (!permiso && lista_informe) {
+            <td style="color: rgb(17, 43, 129)">
+              {{ inventario.Precio_Lista | currency }}
+            </td>
+          }
+          <td class="fw-bold">
+            {{ permisos?.Editar == '1' ? inventario.Cantidad_Disponible : ('0' | number: '1.0-0') }}
+          </td>
+          <td>
+            {{ permisos?.Editar == '1' ? inventario.Cantidad_Apartada : ('0' | number: '1.0-0') }}
+          </td>
+          <td>
+            {{
+              permisos?.Editar == '1' ? inventario.Cantidad_Seleccionada : ('0' | number: '1.0-0')
+            }}
+          </td>
+          <td
+            [ngClass]="{
+              'text-danger': inventario.Gravado == 'Si',
+              'text-success': inventario.Gravado == 'No'
+            }"
+          >
+            {{ inventario.Gravado }}
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="ticket"
+                text="Imprimir etiqueta"
+                type="success"
+                [link]="{
+                  url:
+                    globales.ruta +
+                    '/php/archivos/descarga_etiqueta_controlado.php?id=' +
+                    inventario.Id_Inventario_Nuevo,
+                  target: '_blank'
+                }"
+              ></app-action-button>
+              <app-action-button
+                icon="cart-arrow-down"
+                text="Ver apartadas"
+                type="info"
+                (click)="verApartadas(inventario.Id_Inventario_Nuevo, i, modal)"
+              ></app-action-button>
+              <app-action-button
+                icon="cart-arrow-down"
+                text="Ver seleccionadas"
+                type="primary"
+                (click)="verSeleccionadas(inventario, modal)"
+              ></app-action-button>
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <div class="d-flex gap-2 col-md-6">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Seleccione el punto</mat-label>
+      <mat-select [(ngModel)]="subtipo_punto">
+        @for (item of puntosArray; track $index) {
+          <mat-option [value]="item.value">
+            {{ item.label }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <div>
+      <button type="button" class="btn btn-primary" (click)="filtro()">
+        <i class="fa fa-search"></i> Buscar
+      </button>
+    </div>
+  </div>
+  <div class="row row-gap-3">
+    <app-automatic-search
+      class="col"
+      label="Nombre producto"
+      placeholder="Busca por nombre del producto"
+      [value]="filtro_nom"
+      (searching)="filtro_nom = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Grupo estiba"
+      placeholder="Busca por grupo estiba"
+      [value]="filtro_grupo"
+      (searching)="filtro_grupo = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Laboratorio comercial"
+      placeholder="Busca laboratorio comercial"
+      [value]="filtro_lab"
+      (searching)="filtro_lab = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Laboratorio genérico"
+      placeholder="Busca laboratorio genérico"
+      [value]="filtro_lab_gen"
+      (searching)="filtro_lab_gen = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Invima"
+      placeholder="Busca por invima"
+      [value]="filtro_invima"
+      (searching)="filtro_invima = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Cod. CUM"
+      placeholder="Busca código CUM"
+      [value]="filtro_cum"
+      (searching)="filtro_cum = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Lote"
+      placeholder="Busca por lote"
+      [value]="filtro_lote"
+      (searching)="filtro_lote = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Cantidad disponible"
+      placeholder="Busca por cantidad disponible"
+      [value]="filtro_cant"
+      (searching)="filtro_cant = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Cantidad apartada"
+      placeholder="Busca por cantidad apartada"
+      [value]="filtro_cant_apar"
+      (searching)="filtro_cant_apar = $event; filtro()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Cantidad seleccionada"
+      placeholder="Busca por cantidad seleccionada"
+      [value]="filtro_cant_sel"
+      (searching)="filtro_cant_sel = $event; filtro()"
+    ></app-automatic-search>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>IVA</mat-label>
+      <mat-select [(ngModel)]="filtro_iva" (selectionChange)="filtro()">
+        <mat-option value="">Todos</mat-option>
+        <mat-option value="Si">Si</mat-option>
+        <mat-option value="No">No</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Rango de fechas</mat-label>
+      <mat-date-range-input [formGroup]="formRange" [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          formControlName="start"
+          name="date_start"
+        />
+        <input matEndDate placeholder="Fecha de fin" formControlName="end" name="date_end" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button
+            mat-raised-button
+            color="primary"
+            matDateRangePickerApply
+            (click)="onFilterDate()"
+          >
+            Aplicar
+          </button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+  </div>
+  <div class="d-flex gap-3">
+    <mat-checkbox [(ngModel)]="filtro_sin_inventario" (click)="filtro()">
+      Sin Inventario!
+    </mat-checkbox>
+    @if (permisos?.Editar === '1') {
+      <button class="btn btn-primary" (click)="DescargaExcel()">
+        <i class="fa fa-download"></i> Descargar
+      </button>
+    }
+  </div>
+</ng-template>
+
+<ng-template #modal>
+  <app-modal
+    titleModal="{{
+      isSelected
+        ? 'Borradores que seleccionaron el producto'
+        : 'Remisiones que apartaron el producto'
+    }}"
+  >
+    <table class="table table-bordered">
+      <tbody>
+        <tr>
+          <th>Nombre producto:</th>
+          <td class="table-active w-75">{{ nombre_producto }}</td>
+        </tr>
+        <tr>
+          <th>Lote:</th>
+          <td class="table-active w-75">{{ lote_producto }}</td>
+        </tr>
+        <tr>
+          <th>Fecha vencimiento:</th>
+          <td class="table-active w-75">{{ fecha_venc_producto | date: 'dd/MM/yyyy' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <app-table [loading]="false" [arrayData]="isSelected ? Seleccionados : Apartadas">
+      <ng-container titles>
+        <th>Código</th>
+        <th>Fecha</th>
+        <th>Identificación Funcionario</th>
+        @if (isSelected) {
+          <th>Origen</th>
+        }
+        <th>Destino</th>
+        <th>Cantidad</th>
+        @if (isSelected) {
+          <th>Lote</th>
+          <th>Tipo</th>
+        } @else {
+          <th>Fase</th>
+        }
+      </ng-container>
+      <tbody content>
+        @for (item of isSelected ? Seleccionados : Apartadas; track $index) {
+          <tr class="text-center">
+            <td>
+              <a [routerLink]="['/remision', item.Id_Remision]" style="font-size: 9px">{{
+                item.Codigo
+              }}</a>
+            </td>
+            <td>{{ item.Fecha | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ item.Identificacion_Funcionario }}</td>
+            @if (isSelected) {
+              <td>{{ item.Nombre_Origen }}</td>
+            }
+            <td>{{ item.Destino }}</td>
+            <td>{{ item.Cantidad }}</td>
+            @if (isSelected) {
+              <td>{{ item.Lote }}</td>
+              <td>{{ item.Tipo }}</td>
+            } @else {
+              <td>{{ item.Fase }}</td>
+            }
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-modal>
+</ng-template>

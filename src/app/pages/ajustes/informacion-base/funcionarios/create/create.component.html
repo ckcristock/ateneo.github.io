@@ -1,0 +1,40 @@
+<app-card viewTitle="Nuevo funcionario">
+  <mat-stepper #stepper [linear]="true">
+    <mat-step label="Datos funcionario" [completed]="isOfficerCompleted">
+      <app-datos-funcionario
+        (siguiente)="nextStepper('isOfficerCompleted')"
+      ></app-datos-funcionario>
+    </mat-step>
+    <mat-step label="Información empresa" [completed]="isCompanyCompleted">
+      <br />
+      <app-informacion-empresa
+        (siguiente)="nextStepper('isCompanyCompleted')"
+        (anterior)="previousStepper()"
+      >
+      </app-informacion-empresa>
+    </mat-step>
+    <mat-step label="Prestaciones sociales" [completed]="isBenefitsCompleted">
+      <br />
+      <app-prestaciones-sociales
+        (siguiente)="nextStepper('isBenefitsCompleted')"
+        (anterior)="previousStepper()"
+      >
+      </app-prestaciones-sociales>
+    </mat-step>
+    <mat-step label="Dotación" [completed]="isEndowmentCompleted">
+      <br />
+      <app-dotacion-tallas
+        (siguiente)="nextStepper('isEndowmentCompleted')"
+        (anterior)="previousStepper()"
+      >
+      </app-dotacion-tallas>
+    </mat-step>
+    <mat-step label="Permisos">
+      @if (person.id) {
+        <div class="col-12 mt-3">
+          <app-permissions [person_id]="person.id"></app-permissions>
+        </div>
+      }
+    </mat-step>
+  </mat-stepper>
+</app-card>

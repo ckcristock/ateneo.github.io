@@ -1,0 +1,157 @@
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Turno rotativo</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    @if (show) {
+      <form [formGroup]="forma">
+        <div class="row">
+          <mat-form-field class="col-md-6" appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="name"
+              [class.is-invalid]="invalid_name"
+              placeholder="Ingresa el nombre del turno"
+              required
+            />
+            @if (invalid_name) {
+              <mat-error>
+                <small> El campo debe tener al menos 5 caracteres </small>
+              </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Tolerancia de entrada</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="entry_tolerance"
+              [class.is-invalid]="invalid_entry_tolerance"
+              required
+            />
+            @if (invalid_entry_tolerance) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Tolerancia de salida</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="leave_tolerance"
+              [class.is-invalid]="invalid_leave_tolerance"
+              required
+            />
+            @if (invalid_leave_tolerance) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Horas extra</mat-label>
+            <mat-select name="extras" formControlName="extra_hours">
+              <mat-option value="0">No</mat-option>
+              <mat-option value="1">Sí</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Hora de entrada</mat-label>
+            <input
+              matInput
+              type="time"
+              formControlName="entry_time"
+              [class.is-invalid]="invalid_entry_time"
+              required
+            />
+            @if (invalid_entry_time) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Hora de salida</mat-label>
+            <input
+              matInput
+              type="time"
+              formControlName="leave_time"
+              [class.is-invalid]="invalid_leave_time"
+              required
+            />
+            @if (invalid_leave_time) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Sábado</mat-label>
+            <mat-select name="extras" formControlName="saturday_id">
+              @for (item of turns; track item) {
+                <mat-option [value]="item.value">{{ item.text }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Domingo</mat-label>
+            <mat-select name="extras" formControlName="sunday_id">
+              @for (item of turns; track item) {
+                <mat-option [value]="item.value">{{ item.text }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="row mb-4">
+          <mat-checkbox class="col-md-6" formControlName="launch" color="primary"
+            >Aplica lunch</mat-checkbox
+          >
+          <mat-checkbox class="col-md-6" formControlName="breack" color="primary"
+            >Aplica break</mat-checkbox
+          >
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Hora de inicio lunch</mat-label>
+            <input matInput type="time" formControlName="launch_time" required />
+            @if (forma.get('launch_time').invalid && forma.get('launch_time').touched) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Hora de fin lunch</mat-label>
+            <input matInput type="time" formControlName="launch_time_two" required />
+            @if (forma.get('launch_time_two').invalid && forma.get('launch_time_two').touched) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Hora de inicio break</mat-label>
+            <input matInput type="time" formControlName="breack_time" required />
+            @if (forma.get('breack_time').invalid && forma.get('breack_time').touched) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Hora de fin break</mat-label>
+            <input matInput type="time" formControlName="breack_time_two" required />
+            @if (forma.get('breack_time_two').invalid && forma.get('breack_time_two').touched) {
+              <mat-error> Campo obligatorio </mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </form>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button type="button" [disabled]="!forma.valid" (click)="save()" class="btn btn-primary">
+      Generar horario
+    </button>
+  </div>
+</ng-template>

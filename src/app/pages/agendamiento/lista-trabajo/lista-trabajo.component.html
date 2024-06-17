@@ -1,0 +1,131 @@
+<app-card
+  viewTitle="Lista de trabajo"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+  [expanded]="true"
+>
+  <app-table
+    [loading]="loading"
+    [arrayData]="citas"
+    [pagination]="pagination"
+    (pageChange)="getCitas()"
+  >
+    <ng-container titles>
+      <th><i class="fas fa-phone-alt"></i></th>
+      <th>Fecha</th>
+      <th>Profesional</th>
+      <th>Paciente</th>
+      <th>Teléfono</th>
+      <th>Especialidad</th>
+      <th>Eps</th>
+      <th>Descripción</th>
+      <th>Estado</th>
+      <th class="col-1"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (cita of citas; track $index) {
+        <tr class="text-center">
+          <td>
+            <a role="button" (click)="llamadaPaciente(cita)" aria-hidden="true">
+              <i class="fas fa-phone-alt"></i>
+            </a>
+          </td>
+          <td>
+            {{ cita.hour_start | date: 'dd/MM/yyyy hh:mm a' }}
+          </td>
+          <td>{{ cita.profesional_name }}</td>
+          <td>{{ cita.patient_name }}</td>
+          <td>{{ cita.phone }}</td>
+          <td>{{ cita.speciality }}</td>
+          <td>{{ cita.eps }}</td>
+          <td class="align-middle col-md-3">
+            <app-view-more [text]="cita.observation" [length]="20" />
+          </td>
+          <td>
+            <span
+              data-toggle="tooltip"
+              title="{{
+                cita.state == 'cancelado'
+                  ? cita.reason_cancellation
+                  : cita.state == 'confirmado'
+                    ? cita.message_confirm
+                    : cita.state
+              }}"
+              >{{ cita.state | uppercase }}
+            </span>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view (click)="detalleCita(cita)" />
+              <app-action-button
+                icon="book-medical"
+                text="Iniciar cita"
+                type="info"
+                [routerLink]="['cita', cita.id]"
+              />
+              @if (cita.state != 'confirmado' && cita.state != 'cancelado') {
+                <app-action-button
+                  icon="check"
+                  text="Confirmar cita"
+                  type="success"
+                  (click)="confirmarCita(cita)"
+                />
+              }
+              @if (cita.state != 'confirmado' && cita.state != 'cancelado') {
+                <app-action-button
+                  icon="ban"
+                  text="Cancelar cita"
+                  type="danger"
+                  (click)="Cancel(cita)"
+                />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <form class="row">
+    <app-filter-scheduling [values]="filters" (filterEvent)="getCitas($event)">
+      <mat-form-field class="col-md-4" appearance="outline">
+        <mat-label>Fecha</mat-label>
+        <input
+          matInput
+          type="date"
+          aria-hidden="true"
+          [(ngModel)]="filters.space_date"
+          name="space_date"
+          required
+          (change)="getCitas()"
+        />
+      </mat-form-field>
+      <app-automatic-search
+        class="col"
+        label="Paciente"
+        placeholder="Nombre / Identificación"
+        [value]="filters.patient"
+        (searching)="filters.patient = $event; getCitas()"
+      ></app-automatic-search>
+      <mat-form-field class="col-md-2" appearance="outline">
+        <mat-label>EPS</mat-label>
+        <mat-select [(ngModel)]="filters.eps" name="eps" (selectionChange)="getCitas()">
+          <mat-option *ngFor="let item of epss" [value]="item.value">
+            {{ item.text }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-2" appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select [(ngModel)]="filters.state" name="state" (selectionChange)="getCitas()">
+          <mat-option *ngFor="let item of states" [value]="item.value">
+            {{ item.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </app-filter-scheduling>
+  </form>
+</ng-template>
+<app-detalle-cita [modalData]="openModalDetalle"></app-detalle-cita>

@@ -1,0 +1,299 @@
+<!-- <a [routerLink]="['/ajustes/informacion-base/turnos']" routerLinkActive="router-link-active">Volver</a> -->
+<div class="card">
+  <div class="card-body">
+    <div class="card-title d-flex justify-content-between">
+      <h4 class="text-primary">Agregar - editar turno fijo</h4>
+    </div>
+    <hr class="line" />
+    <form [formGroup]="forma" (ngSubmit)="save()">
+      <div class="row">
+        <mat-form-field class="col-md-3" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            formControlName="name"
+            [class.is-invalid]="invalid_name"
+            autocomplete="off"
+          />
+          @if (invalid_name) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="col-md-3" appearance="outline">
+          <mat-label>Toleracia de entrada (min)</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa la tolerancia en minutos"
+            formControlName="entry_tolerance"
+            [class.is-invalid]="invalid_entry_tolerance"
+            autocomplete="off"
+          />
+          @if (invalid_entry_tolerance) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="col-md-3" appearance="outline">
+          <mat-label>Toleracia de salida (min)</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa la tolerancia en minutos"
+            formControlName="leave_tolerance"
+            [class.is-invalid]="invalid_leave_tolerance"
+            autocomplete="off"
+          />
+          @if (invalid_leave_tolerance) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="col-md-3" appearance="outline">
+          <mat-label>Horas extra</mat-label>
+          <mat-select name="extras" formControlName="extra_hours">
+            <mat-option value="0">No</mat-option>
+            <mat-option value="1">Sí</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <button class="btn btn-primary btn-block mb-3" (click)="openConfirm(add)" type="button">
+        Asignación masiva
+      </button>
+      <ng-container>
+        <div class="rounded-top table-responsive">
+          <table class="table table-striped table-sm">
+            <thead class="bg-light">
+              <tr class="text-center text-uppercase">
+                <th class="col-2">Día</th>
+                <th>Hora de entrada #1</th>
+                <th>Hora de salida #1</th>
+                <th>Hora de entrada #2</th>
+                <th>Hora de salida #2</th>
+              </tr>
+            </thead>
+            <tbody formArrayName="days">
+              @for (item of dayList.controls; track item; let i = $index) {
+                <tr>
+                  <td>
+                    {{ item.get('day').value }}
+                    <!-- <mat-form-field
+                    class="pb-0"
+                    appearance="outline"
+                    [formGroupName]="i"
+                  >
+                    <input
+                      matInput
+                      type="text"
+                      formControlName="day"
+                      disabled
+                      autocomplete="off"
+                    />
+                  </mat-form-field> -->
+                  </td>
+                  <td>
+                    <mat-form-field
+                      [ngClass]="
+                        item.get('entry_time_one').invalid && item.get('entry_time_one').touched
+                          ? ''
+                          : 'pb-0'
+                      "
+                      appearance="outline"
+                      [formGroupName]="i"
+                    >
+                      <input
+                        matInput
+                        type="time"
+                        [class.is-invalid]="
+                          item.get('entry_time_one').invalid && item.get('entry_time_one').touched
+                        "
+                        formControlName="entry_time_one"
+                        autocomplete="off"
+                      />
+                      @if (
+                        item.get('entry_time_one').invalid && item.get('entry_time_one').touched
+                      ) {
+                        <mat-error> Campo obligatorio </mat-error>
+                      }
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field
+                      [ngClass]="
+                        item.get('leave_time_one').invalid && item.get('leave_time_one').touched
+                          ? ''
+                          : 'pb-0'
+                      "
+                      appearance="outline"
+                      [formGroupName]="i"
+                    >
+                      <input
+                        matInput
+                        type="time"
+                        [class.is-invalid]="
+                          item.get('leave_time_one').invalid && item.get('leave_time_one').touched
+                        "
+                        formControlName="leave_time_one"
+                        autocomplete="off"
+                      />
+                      @if (
+                        item.get('leave_time_one').invalid && item.get('leave_time_one').touched
+                      ) {
+                        <mat-error> Campo obligatorio </mat-error>
+                      }
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field
+                      [ngClass]="
+                        item.get('entry_time_two').invalid && item.get('entry_time_two').touched
+                          ? ''
+                          : 'pb-0'
+                      "
+                      appearance="outline"
+                      [formGroupName]="i"
+                    >
+                      <input
+                        matInput
+                        type="time"
+                        [class.is-invalid]="
+                          item.get('entry_time_two').invalid && item.get('entry_time_two').touched
+                        "
+                        formControlName="entry_time_two"
+                        autocomplete="off"
+                      />
+                      @if (
+                        item.get('entry_time_two').invalid && item.get('entry_time_two').touched
+                      ) {
+                        <mat-error> Campo obligatorio </mat-error>
+                      }
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field
+                      [ngClass]="
+                        item.get('leave_time_two').invalid && item.get('leave_time_two').touched
+                          ? ''
+                          : 'pb-0'
+                      "
+                      appearance="outline"
+                      [formGroupName]="i"
+                    >
+                      <input
+                        matInput
+                        type="time"
+                        [class.is-invalid]="
+                          item.get('leave_time_two').invalid && item.get('leave_time_two').touched
+                        "
+                        formControlName="leave_time_two"
+                        autocomplete="off"
+                      />
+                      @if (
+                        item.get('leave_time_two').invalid && item.get('leave_time_two').touched
+                      ) {
+                        <mat-error> Campo obligatorio </mat-error>
+                      }
+                    </mat-form-field>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+      <button
+        type="submit"
+        [disabled]="!forma.valid"
+        (click)="save()"
+        class="btn btn-primary btn-block"
+      >
+        Guardar
+      </button>
+    </form>
+  </div>
+</div>
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Asignar horas masivamente</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="miniForm">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Hora de entrada #1</mat-label>
+          <input
+            matInput
+            type="time"
+            [class.is-invalid]="
+              miniForm.get('entry_time_one').invalid && miniForm.get('entry_time_one').touched
+            "
+            formControlName="entry_time_one"
+            autocomplete="off"
+          />
+          @if (miniForm.get('entry_time_one').invalid && miniForm.get('entry_time_one').touched) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Hora de salida #1</mat-label>
+          <input
+            matInput
+            type="time"
+            [class.is-invalid]="
+              miniForm.get('leave_time_one').invalid && miniForm.get('leave_time_one').touched
+            "
+            formControlName="leave_time_one"
+            autocomplete="off"
+          />
+          @if (miniForm.get('leave_time_one').invalid && miniForm.get('leave_time_one').touched) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Hora de entrada #2</mat-label>
+          <input
+            matInput
+            type="time"
+            [class.is-invalid]="
+              miniForm.get('entry_time_two').invalid && miniForm.get('entry_time_two').touched
+            "
+            formControlName="entry_time_two"
+            autocomplete="off"
+          />
+          @if (miniForm.get('entry_time_two').invalid && miniForm.get('entry_time_two').touched) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Hora de salida #2</mat-label>
+          <input
+            matInput
+            type="time"
+            [class.is-invalid]="
+              miniForm.get('leave_time_two').invalid && miniForm.get('leave_time_two').touched
+            "
+            formControlName="leave_time_two"
+            autocomplete="off"
+          />
+          @if (miniForm.get('leave_time_two').invalid && miniForm.get('leave_time_two').touched) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button type="button" (click)="asignarMasivamente()" class="btn btn-primary">Generar</button>
+  </div>
+</ng-template>

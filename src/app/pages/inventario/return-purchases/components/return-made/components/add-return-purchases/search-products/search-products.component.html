@@ -1,0 +1,107 @@
+<app-modal titleModal="Busqueda productos">
+  <p>
+    <strong>Nota:</strong> Para hacer más efectiva la busqueda, por favor digite el nombre completo
+    del producto.
+  </p>
+  <form class="row row-gap-3 mb-3">
+    <app-automatic-search
+      class="col"
+      label="Nombre"
+      placeholder="Busca por nombre"
+      (searching)="filters.nom = $event; getProducts()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Lab. Comercial"
+      placeholder="Buscar lab. Comercial"
+      (searching)="filters.lab_com = $event; getProducts()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Lab. Genérico"
+      placeholder="Buscar lab. Genérico"
+      (searching)="filters.lab_gen = $event; getProducts()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Cum"
+      placeholder="Busca por cum"
+      (searching)="filters.cum = $event; getProducts()"
+    ></app-automatic-search>
+  </form>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-center text-uppercase">
+          <th scope="col">Nombre</th>
+          <th scope="col">Lote</th>
+          <th scope="col">Lab. Comercial</th>
+          <th scope="col">Lab. Genérico</th>
+          <th scope="col">Cum</th>
+          <th scope="col">Embalaje</th>
+          <th scope="col">Grupo</th>
+          <th scope="col">Estiba</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (!loading && products.length) {
+          @for (product of products; track $index) {
+            <tr class="text-center">
+              <td class="d-flex align-items-center gap-2">
+                <mat-checkbox
+                  class="example-margin"
+                  [value]="product.Producto"
+                  (change)="handleProduct($event)"
+                ></mat-checkbox>
+                <app-load-image
+                  class="search-products__logo-product"
+                  classImg="img-radius imagen w-100 h-100"
+                  srcDefault="assets/images/product.jpg"
+                  [src]="product.Imagen"
+                ></app-load-image>
+                <div>
+                  <strong>{{ product.Nombre_Comercial }}</strong>
+                  <span class="text-muted d-block">{{ product.Nombre }}</span>
+                </div>
+              </td>
+              <td>{{ product.Lote ?? 'No hay dato' }}</td>
+              <td>
+                {{ product.Laboratorio_Comercial ?? 'No hay dato' }}
+              </td>
+              <td>
+                {{ product.Laboratorio_Generico ?? 'No hay dato' }}
+              </td>
+              <td>
+                {{ product.Codigo_Cum ?? 'No hay dato' }}
+              </td>
+              <td>
+                {{ product.Embalaje ?? 'No hay dato' }}
+              </td>
+              <td>
+                {{ product.Grupo_Estiba ?? 'No hay dato' }}
+              </td>
+              <td>
+                {{ product.Nombre_Estiba ?? 'No hay dato' }}
+              </td>
+            </tr>
+          }
+        } @else {
+          <tr class="text-center">
+            <td colspan="100%">
+              <app-not-data [loading]="loading"></app-not-data>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <button
+    buttons
+    type="button"
+    class="btn btn-primary"
+    [disabled]="!newProducts.length"
+    (click)="saveProducts()"
+  >
+    Agregar
+  </button>
+</app-modal>

@@ -1,0 +1,89 @@
+<app-card
+  viewTitle="Preliquidados"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <div
+    class="row d-flex align-items-stretch"
+    *ngIf="!loading && listPreliquidados.length > 0; else notData"
+  >
+    <div
+      class="col-xxxl-1 col-xxl-2 col-xl-3 col-md-4 col-sm-12 col mb-4 d-flex align-items-stretch"
+      *ngFor="let preliquidado of listPreliquidados"
+    >
+      <div class="card border border-3 border-light w-100 text-center">
+        <div class="card-body pb-0">
+          <img
+            [src]="preliquidado.image | image"
+            class="card-img-top"
+            alt=""
+            onerror="this.src='../../../../assets/images/noprofile.png'"
+          />
+          <div class="card-title">
+            <p class="mb-0 mt-2">
+              <strong>
+                {{ preliquidado.first_name }}
+                {{ preliquidado.first_surname }}
+              </strong>
+              <br />
+              <small>
+                {{ preliquidado.one_preliquidated_log.created_at | uppercase | date }}
+              </small>
+            </p>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="btn-group btn-group-sm btn-block" role="group" aria-label="Basic example">
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              placement="bottom"
+              ngbTooltip="No liquidar"
+              (click)="activate(preliquidado)"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              placement="bottom"
+              ngbTooltip="Liquidar"
+              (click)="alert(preliquidado.id)"
+            >
+              <i class="fas fa-id-card"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <mat-paginator
+    *ngIf="paginationMaterial"
+    [length]="paginationMaterial.total"
+    [pageSize]="paginationMaterial.per_page"
+    [pageIndex]="paginationMaterial.current_page - 1"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    (page)="handlePageEvent($event)"
+    aria-label="Select page"
+  >
+  </mat-paginator>
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container [formGroup]="formFilters">
+    <div class="col mat-form-field-wrapper">
+      <app-autocomplete-fc
+        class="col"
+        label="Funcionario"
+        placeholder="Seleccionar"
+        [control]="formFilters.controls['person_id']"
+        [class.is-invalid]="formFilters.get('person_id').invalid"
+        [list]="people$ | async"
+      ></app-autocomplete-fc>
+    </div>
+  </ng-container>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

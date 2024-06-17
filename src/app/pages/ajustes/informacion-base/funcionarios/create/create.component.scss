@@ -1,0 +1,17 @@
+@media (max-width: 320px) {
+  aw-wizard ::ng-deep .horizontal ul.steps-indicator li a .label {
+    display: none;
+  }
+}
+
+@media (max-width: 481px) {
+  aw-wizard ::ng-deep .horizontal ul.steps-indicator li a .label {
+    display: none;
+  }
+}
+
+@media (max-width: 641px) {
+  aw-wizard ::ng-deep .horizontal ul.steps-indicator li a .label {
+    display: none;
+  }
+}

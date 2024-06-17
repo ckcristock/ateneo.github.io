@@ -1,0 +1,125 @@
+<div class="row" *ngIf="existPtientForShow">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body" [class.p-0]="typification.loading">
+        <app-tipificacion #typification></app-tipificacion>
+      </div>
+    </div>
+    @if (!typification.loading) {
+    <div *ngIf="operation.component == 'Asignar Citas'">
+      <app-agendar-citas></app-agendar-citas>
+    </div>
+
+    <div *ngIf="operation.component == 'Reasignar Citas'">
+      <app-lista-citas [canOverride]="'true'" [getAppointments]="getClitasE" [operation]="operation.name"
+        [patient]="patient.paciente.identifier" (canceled)="canceledAppointment($event)">
+      </app-lista-citas>
+    </div>
+
+    <div *ngIf="operation.component == 'Tipificar'">
+      <app-otro-concepto></app-otro-concepto>
+    </div>
+    }@else{
+    <div class="card">
+      <div class="card-body">
+        <app-not-data-sa [loading]="true" />
+      </div>
+    </div>
+    }
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <ul ngbNav #customNav="ngbNav" [(activeId)]="active" class="nav-tabs nav-tabs-custom nav-justified">
+          <li [ngbNavItem]="1">
+            <button ngbNavLink>Paciente</button>
+            <ng-template ngbNavContent>
+              <div class="mt-1">
+                <app-set-paciente></app-set-paciente>
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="2">
+            <button ngbNavLink>Citas</button>
+            <ng-template ngbNavContent>
+              <div class="mt-4">
+                <app-resumen-citas [patient]="patient.paciente.identifier"></app-resumen-citas>
+              </div>
+            </ng-template>
+          </li>
+        </ul>
+        <div [ngbNavOutlet]="customNav"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="!existPtientForShow">
+  <div class="col-12" *ngIf="configComponent.permissions.receive_calls; else presential">
+    <div class="card">
+      <div class="card-body">
+        <div class="row justify-content-center">
+          <div class="col-8 text-center">
+            <h4>En espera de una llamada entrante</h4>
+            <img src="./../../../../assets/images/CallCenter.webp" class="img-fluid" alt="" srcset="" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #presential>
+  <app-card class="col-md-4 m-auto" viewTitle="Asignación de citas">
+    <app-tipificacion #typification [sizeCol]="true"></app-tipificacion>
+    @if (tramiteData && !typification.loading) {
+    <form #formD="ngForm" (ngSubmit)="newCall(formD)">
+      <div class="row">
+        <input name="type" class="d-none" [(ngModel)]="typeCall" />
+        <input name="Ambito" class="d-none" required [(ngModel)]="tramiteData.ambit_id" />
+        <input name="Tipo_Tramite" class="d-none" required [(ngModel)]="tramiteData.formality_id" />
+        <input name="Tipo_Servicio" class="d-none" required [(ngModel)]="tramiteData.type_service_id" />
+        <mat-form-field class="col-md-12" appearance="outline">
+          <mat-label>Documento del paciente</mat-label>
+          <input required matInput type="number" ngModel pattern="\d+" step="1" placeholder="Ingresa el documento"
+            autocomplete="off" name="Identificacion_Paciente" />
+        </mat-form-field>
+      </div>
+      <button class="btn btn-primary btn-block" [disabled]="loadingReqAppointment">
+        @if (loadingReqAppointment) {
+        <i class="fas fa-spinner fa-spin"></i> Cargando...
+        } @else {
+        Iniciar gestión
+        }
+      </button>
+    </form>
+    } @else {
+    <app-not-data-sa [loading]="true" />
+    }
+  </app-card>
+</ng-template>
+@if (configComponent.permissions.receive_calls) {
+<app-modal-basic [dialogClass]="'modal-lg'" #mymodal id="mymodal">
+  <div class="app-modal-header">
+    <div class="row">
+      <h4 class="text text-center justify-content-center modal-title p-1"></h4>
+    </div>
+  </div>
+  <div class="app-modal-body text-center">
+    <p class="h5">
+      Tienes una gestión pendiente con el paciente :
+      <span> {{ mypatient?.name }} con documento {{ mypatient?.identifier }} </span>
+    </p>
+    <app-tipificacion></app-tipificacion>
+    ¿Que sucedió?
+    <textarea class="form-control" name="observacion" id="" cols="30" rows="10" [(ngModel)]="observation"></textarea>
+    <small>¿ Que proceso realizaste ?, Debes finalizar esta gestíón antes de continuar</small>
+  </div>
+</app-modal-basic>
+}
+
+<!-- <button class="btn btn-primary" (click)="show('asignar')">Asignación</button>
+<button class="btn btn-primary" (click)="show('tipificar')">
+  Tipificación
+</button>
+<button class="btn btn-primary" (click)="show('citas')">Citas</button> -->

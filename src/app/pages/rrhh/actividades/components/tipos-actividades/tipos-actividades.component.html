@@ -1,0 +1,117 @@
+<div class="row card-title d-flex justify-content-between">
+  <div class="col-md-12 px-0 text-end">
+    <div class="btn-group rounded w-sm-100">
+      <button class="btn btn-primary btn-sm" (click)="openModal(add, 'Nuevo tipo de actividades')">
+        <i class="fa fa-plus"></i> Agregar
+      </button>
+      <!-- <button class="btn btn-info btn-sm" (click)="openClose()">
+        <i class="fas fa-sliders-h"></i> Filtros
+      </button> -->
+    </div>
+  </div>
+</div>
+<mat-accordion multi>
+  <mat-expansion-panel class="mat-elevation-z0">
+    <div class="alert alert-danger" role="alert">Aún no tenemos filtros para esta sección.</div>
+  </mat-expansion-panel>
+</mat-accordion>
+<app-table
+  [loading]="loading"
+  [arrayData]="activityTypes"
+  [pagination]="pagination"
+  (pageChange)="getActivityTypes()"
+>
+  <ng-container titles>
+    <th>Nombre</th>
+    <th class="col-1">Color</th>
+    <th class="col-1">Estado</th>
+    <th class="col-1"><i class="mdi mdi-chevron-down"></i></th>
+  </ng-container>
+  <tbody content>
+    @for (item of activityTypes; track $index) {
+      <tr class="text-center">
+        <td class="align-middle">{{ item.name }}</td>
+        <td class="align-middle">
+          <span
+            class="badge"
+            [ngStyle]="{
+              'background-color': item.color,
+              color: item.color
+            }"
+            >________</span
+          >
+        </td>
+        <td>
+          <span [ngClass]="item.state == 'cancelado' ? 'badge bg-danger' : 'badge bg-primary'">
+            {{ item.state | uppercase }}
+          </span>
+        </td>
+        <td>
+          <app-dropdown-actions>
+            <app-action-edit
+              (action)="getActivity(item); openModal(add, 'Editar tipo de actividad')"
+            />
+            @if (item.state == 'activo') {
+              <app-action-deactivate (action)="changeStatus(item.id, 'Cancelado')" />
+            } @else {
+              <app-action-activate (action)="changeStatus(item.id, 'Activo')" />
+            }
+          </app-dropdown-actions>
+        </td>
+      </tr>
+    }
+  </tbody>
+</app-table>
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modalService.close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            formControlName="name"
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col">
+          <mat-label>Color</mat-label>
+          <input
+            matInput
+            type="color"
+            name="color"
+            aria-label="color"
+            id="actividad"
+            formControlName="color"
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modalService.close()">Cancelar</button>
+    <button type="button" [disabled]="!form.valid" (click)="save()" class="btn btn-primary">
+      Guardar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

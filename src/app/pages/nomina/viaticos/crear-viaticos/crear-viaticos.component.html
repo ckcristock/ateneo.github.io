@@ -1,0 +1,703 @@
+<app-card [viewTitle]="title">
+  <form action="" [formGroup]="form">
+    <div class="text-center">
+      <h5>Información del viaje</h5>
+    </div>
+    <ng-container formGroupName="travel">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-6">
+              <app-autocomplete-fc
+                class="col"
+                label="Funcionario"
+                placeholder="Ingresa funcionario"
+                [control]="form.controls.travel.get('person_id')"
+                [list]="people"
+                (optionSelectedEvent)="onSetOfficer()"
+              ></app-autocomplete-fc>
+            </div>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>C.C</mat-label>
+              <input matInput type="text" readonly [value]="func?.identifier" />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Cargo</mat-label>
+              <input
+                matInput
+                type="text"
+                readonly
+                [value]="func?.contractultimate?.position?.position"
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>N° pasaporte</mat-label>
+              <input matInput type="text" readonly [value]="func?.passport_number" />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Visa americana</mat-label>
+              <input matInput type="text" readonly [value]="func?.visa" />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Tipo</mat-label>
+              <input matInput type="text" readonly [value]="func?.type" />
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-6">
+              <app-autocomplete-fc
+                class="col"
+                label="Origen"
+                placeholder="Ingresa el origin"
+                [control]="form.controls.travel.get('origin_id')"
+                [list]="city"
+              ></app-autocomplete-fc>
+            </div>
+            <div class="col-md-6">
+              <app-autocomplete-fc
+                class="col"
+                label="Destino"
+                placeholder="Ingresa el origin"
+                [control]="form.controls.travel.get('destinity_id')"
+                [list]="city"
+              ></app-autocomplete-fc>
+            </div>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Tipo de viaje</mat-label>
+              <mat-select formControlName="travel_type" required>
+                <mat-option *ngFor="let o of origen" [value]="o"> {{ o }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Fecha de salida</mat-label>
+              <input matInput type="date" formControlName="departure_date" required />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Fecha de llegada</mat-label>
+              <input matInput type="date" formControlName="arrival_date" required />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>N° días</mat-label>
+              <input
+                matInput
+                appInputPositionInitial
+                currencyMask
+                [options]="masks.maskNumbers"
+                formControlName="n_nights"
+                required
+              />
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <!-- Termina información de viaje -->
+    <!-- Comienza Hospedaje -->
+    <hr />
+    <div class="text-center">
+      <h5>Hospedaje</h5>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="hospedajeList.controls.length; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Destino</th>
+            <th>Hotel</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Acomodación</th>
+            <th>Tarifa</th>
+            <th># Días</th>
+            <th>Desayuno</th>
+            <th>Responsable</th>
+            <th>total</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="hospedaje">
+          <ng-container>
+            <tr
+              *ngFor="let item of hospedajeList.controls; let i = index"
+              [formGroupName]="i"
+              class="text-center"
+            >
+              <td>
+                <select
+                  class="form-control form-control-sm"
+                  (change)="changeTipo($event.target.value, item)"
+                  formControlName="tipo"
+                >
+                  <option *ngFor="let tipo of tipos" [value]="tipo">
+                    {{ tipo }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <select
+                  class="form-control form-control-sm"
+                  formControlName="hotel_id"
+                  (change)="seleccionHotel($event, item)"
+                >
+                  <option *ngIf="item.get('tipo').value == 'Selecciona'" value="">
+                    Selecciona tipo
+                  </option>
+                  <option
+                    *ngFor="let hotel of item['controls']['hoteles']['value']"
+                    [value]="hotel.id"
+                  >
+                    {{ hotel.name | uppercase }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                {{ item.get('address').value || 'SELECCIONA HOTEL' | uppercase }}
+              </td>
+              <td>
+                {{ item.get('phone').value || 'SELECCIONA HOTEL' | uppercase }}
+              </td>
+              <td>
+                <select class="form-control form-control-sm" formControlName="accommodation">
+                  <option
+                    *ngFor="let item of item['controls']['acomodationForHotel']['value']"
+                    [value]="item.id"
+                  >
+                    {{ item.name }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <input
+                  currencyMask
+                  [options]="masks.maskCOP"
+                  appInputPosition
+                  formControlName="rate"
+                  class="form-control form-control-sm"
+                />
+              </td>
+              <td>
+                <input
+                  currencyMask
+                  [options]="masks.maskNumbers"
+                  appInputPositionInitial
+                  formControlName="n_night"
+                  class="form-control form-control-sm"
+                />
+              </td>
+              <td>
+                <select formControlName="breakfast" class="form-control form-control-sm">
+                  <option value="Si">Si</option>
+                  <option value="No">No</option>
+                </select>
+              </td>
+              <td>
+                <select formControlName="who_cancels" class="form-control form-control-sm">
+                  <option value="agencia">Agencia</option>
+                  <option value="viajero">Viajero</option>
+                </select>
+              </td>
+              <td>${{ item.get('total').value | number: '1.2-2' }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-end">
+      <div class="btn-group">
+        <button
+          class="btn btn-danger btn-sm"
+          type="button"
+          (click)="deleteHospedaje($event.target.value)"
+          placement="bottom"
+          ngbTooltip="Borrar"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
+          type="button"
+          (click)="newHospedaje()"
+          placement="bottom"
+          ngbTooltip="Agregar"
+        >
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    <hr />
+    <div class="text-center">
+      <h5>Transporte terrestre</h5>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="transporteList.controls.length; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Tipo</th>
+            <th>Trayecto</th>
+            <th>Empresa</th>
+            <th>Pago Tiquete</th>
+            <th>Hora Salida</th>
+            <th>Valor Tiquete</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="transporte">
+          <ng-container>
+            <tr *ngFor="let item of transporteList.controls; let i = index" [formGroupName]="i">
+              <td>
+                <select formControlName="type" class="form-control form-control-sm">
+                  <option *ngFor="let tipo of tipo_transporte" [value]="tipo">
+                    {{ tipo }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <input type="text" formControlName="journey" class="form-control form-control-sm" />
+              </td>
+              <td>
+                <input type="text" formControlName="company" class="form-control form-control-sm" />
+              </td>
+              <td>
+                <select formControlName="ticket_payment" class="form-control form-control-sm">
+                  <option value="Agencia">Agencia</option>
+                  <option value="Viajero">Viajero</option>
+                </select>
+              </td>
+              <td>
+                <input
+                  type="time"
+                  formControlName="departure_date"
+                  class="form-control form-control-sm"
+                />
+              </td>
+              <td>
+                <input
+                  currencyMask
+                  [options]="masks.maskCOP"
+                  appInputPosition
+                  formControlName="ticket_value"
+                  class="form-control form-control-sm"
+                />
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-end">
+      <div class="btn-group">
+        <button
+          class="btn btn-danger btn-sm"
+          placement="bottom"
+          type="button"
+          ngbTooltip="Borrar"
+          (click)="deleteTransporte($event.target.value)"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
+          placement="bottom"
+          type="button"
+          ngbTooltip="Agregar"
+          (click)="newTransporte()"
+        >
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    <hr />
+    <div class="text-center">
+      <h5>Transporte aéreo</h5>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="airTransportList.controls.length; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Tipo</th>
+            <th>Trayecto</th>
+            <th>Empresa</th>
+            <th>Pago Tiquete</th>
+            <th>Hora Salida</th>
+            <th>Valor Tiquete</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="air">
+          <ng-container>
+            <tr *ngFor="let item of airTransportList.controls; let i = index" [formGroupName]="i">
+              <td>
+                <select formControlName="type" class="form-control form-control-sm">
+                  <option *ngFor="let tipo of tipo_transporte" [value]="tipo">
+                    {{ tipo }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <input type="text" formControlName="journey" class="form-control form-control-sm" />
+              </td>
+              <td>
+                <input type="text" formControlName="company" class="form-control form-control-sm" />
+              </td>
+              <td>
+                <select formControlName="ticket_payment" class="form-control form-control-sm">
+                  <option value="Agencia">Agencia</option>
+                  <option value="Viajero">Viajero</option>
+                </select>
+              </td>
+              <td>
+                <input
+                  type="time"
+                  formControlName="departure_date"
+                  class="form-control form-control-sm"
+                />
+              </td>
+              <td>
+                <input
+                  currencyMask
+                  [options]="masks.maskCOP"
+                  appInputPosition
+                  formControlName="ticket_value"
+                  class="form-control form-control-sm"
+                />
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-end">
+      <div class="btn-group">
+        <button
+          class="btn btn-danger btn-sm"
+          placement="bottom"
+          type="button"
+          ngbTooltip="Borrar"
+          (click)="deleteAirTransport()"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
+          placement="bottom"
+          type="button"
+          ngbTooltip="Agregar"
+          (click)="addAirTransport()"
+        >
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    <hr />
+    <div class="text-center">
+      <h5>Taxis</h5>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="taxiList.controls.length; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Trayecto</th>
+            <th>Ciudad</th>
+            <th>Tipo</th>
+            <th>Tarifa</th>
+            <th>Trayectos</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="taxi">
+          <ng-container>
+            <tr
+              *ngFor="let item of taxiList.controls; let i = index"
+              [formGroupName]="i"
+              class="text-center"
+            >
+              <td>
+                <select formControlName="journey_id" class="form-control form-control-sm">
+                  <option *ngFor="let route of item['value']['journey']" [value]="route.id">
+                    {{ route.route | uppercase }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <select formControlName="taxi_city_id" class="form-control form-control-sm">
+                  <option
+                    *ngFor="let taxi_city of item['value']['taxi_cities']"
+                    [value]="taxi_city.id"
+                  >
+                    {{ taxi_city.city.name }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                {{ item['value']['city_selected']?.type }}
+              </td>
+              <td>
+                <input
+                  currencyMask
+                  [options]="masks.maskCOP"
+                  appInputPosition
+                  formControlName="rate"
+                  class="form-control form-control-sm"
+                />
+              </td>
+              <td>
+                <input
+                  currencyMask
+                  [options]="masks.maskNumbers"
+                  appInputPositionInitial
+                  formControlName="journeys"
+                  class="form-control form-control-sm"
+                />
+              </td>
+              <td>${{ item.get('total').value | number: '1.2-2' }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-end">
+      <div class="btn-group">
+        <button
+          class="btn btn-danger btn-sm"
+          placement="bottom"
+          ngbTooltip="Borrar"
+          type="button"
+          (click)="deleteTaxi($event.target.value)"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
+          placement="bottom"
+          ngbTooltip="Agregar"
+          type="button"
+          (click)="newTaxi()"
+        >
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    <hr />
+    <div class="text-center">
+      <h5>Alimentación</h5>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="FeedingList.controls.length; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Estadía</th>
+            <th>¿incluye desayuno?</th>
+            <th>Tarifa</th>
+            <th>N° días Estadía</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="feeding">
+          <ng-container>
+            <tr *ngFor="let item of FeedingList.controls; let i = index" [formGroupName]="i">
+              <td>
+                <select formControlName="type" class="form-control form-control-sm">
+                  <option *ngFor="let item of tipos" [value]="item | lowercase">
+                    {{ item }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <select formControlName="breakfast" class="form-control form-control-sm">
+                  <option value="si">Si</option>
+                  <option value="no">No</option>
+                </select>
+              </td>
+              <td>
+                <input
+                  currencyMask
+                  [options]="masks.maskCOP"
+                  appInputPosition
+                  formControlName="rate"
+                  class="form-control form-control-sm"
+                />
+              </td>
+              <td>
+                <input
+                  currencyMask
+                  [options]="masks.maskNumbers"
+                  appInputPositionInitial
+                  formControlName="stay"
+                  class="form-control form-control-sm"
+                />
+              </td>
+              <td>${{ item.get('total').value | number: '1.2-2' }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-end">
+      <div class="btn-group">
+        <button
+          class="btn btn-danger btn-sm"
+          placement="bottom"
+          ngbTooltip="Borrar"
+          type="button"
+          (click)="deleteFeeding($event.target.value)"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
+          placement="bottom"
+          ngbTooltip="Agregar"
+          type="button"
+          (click)="newFeeding()"
+        >
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    <hr />
+    <mat-form-field class="col-md-12 px-0 mat-form-field-no-padding textarea" appearance="outline">
+      <mat-label>Observaciones</mat-label>
+      <textarea
+        matInput
+        placeholder="Ingrese las observaciones"
+        rows="5"
+        formControlName="observation"
+        [cdkTextareaAutosize]="true"
+      ></textarea>
+    </mat-form-field>
+    <hr />
+    <div class="text-center">
+      <h5>Total viáticos</h5>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th class="col-md-3">Item</th>
+            <th>Dolares</th>
+            <th>Pesos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            <th class="align-middle col-2">Hospedaje</th>
+            <td class="col-2">USD {{ form.get('total_hotels_usd').value | number: '1.2-2' }}</td>
+            <td class="col-2">${{ form.get('total_hotels_cop').value | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr class="text-center">
+            <th class="align-middle">Transporte terrestre</th>
+            <td>USD {{ 0 | number: '1.2-2' }}</td>
+            <td>${{ form.get('total_transports_cop').value | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr class="text-center">
+            <th class="align-middle">Transporte aéreo</th>
+            <td>USD {{ 0 | number: '1.2-2' }}</td>
+            <td>${{ form.get('total_air_transport_cop').value | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr class="text-center">
+            <th class="align-middle">Taxis</th>
+            <td>USD {{ form.get('total_taxis_usd').value | number: '1.2-2' }}</td>
+            <td>${{ form.get('total_taxis_cop').value | number: '1.2-2' }}</td>
+          </tr>
+
+          <tr class="text-center">
+            <th class="align-middle">Alimentación</th>
+            <td>
+              USD
+              {{ form.get('total_feedings_usd').value | number: '1.2-2' }}
+            </td>
+            <td>${{ form.get('total_feedings_cop').value | number: '1.2-2' }}</td>
+          </tr>
+          <tr class="text-center">
+            <th class="align-middle col-2">Lavanderia</th>
+            <td class="col-2">
+              <input
+                currencyMask
+                [options]="masks.maskUSD"
+                appInputPositionUsd
+                formControlName="total_laundry_usd"
+                class="form-control form-control-sm"
+              />
+            </td>
+            <td class="col-2">
+              <input
+                currencyMask
+                [options]="masks.maskCOP"
+                appInputPosition
+                formControlName="total_laundry_cop"
+                class="form-control form-control-sm"
+              />
+            </td>
+          </tr>
+          <tr class="text-center">
+            <th class="align-middle">Sobre equipaje</th>
+            <td>
+              <input
+                currencyMask
+                [options]="masks.maskUSD"
+                appInputPositionUsd
+                formControlName="baggage_usd"
+                class="form-control form-control-sm"
+              />
+            </td>
+            <td>
+              <input
+                currencyMask
+                [options]="masks.maskCOP"
+                appInputPosition
+                formControlName="baggage_cop"
+                class="form-control form-control-sm"
+              />
+            </td>
+          </tr>
+          <tr class="text-center">
+            <th class="align-middle">Otros gastos</th>
+            <td>
+              <input
+                currencyMask
+                [options]="masks.maskUSD"
+                appInputPositionUsd
+                formControlName="other_expenses_usd"
+                class="form-control form-control-sm"
+              />
+            </td>
+            <td>
+              <input
+                currencyMask
+                [options]="masks.maskCOP"
+                appInputPosition
+                formControlName="other_expenses_cop"
+                class="form-control form-control-sm"
+              />
+            </td>
+          </tr>
+          <tr class="text-center">
+            <th class="align-middle">TOTAL</th>
+            <th>USD {{ form.get('total_usd').value | number: '1.2-2' }}</th>
+            <th>${{ form.get('total_cop').value | number: '1.2-2' }}</th>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary btn-block" (click)="crearViatico()">Guardar</button>
+  </form>
+</app-card>
+<ng-template #notData>
+  <div class="alert alert-warning text-center" role="alert">¡No hay datos agregados!</div>
+</ng-template>

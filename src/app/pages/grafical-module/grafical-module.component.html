@@ -1,0 +1,222 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row pt-2">
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Regional</mat-label>
+            <mat-select [multiple]="true" required="true" [(ngModel)]="regional" name="regional">
+              <mat-option *ngFor="let item of regionals" [value]="item.value">{{
+                item.text
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Rango de fechas</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+              <input
+                matStartDate
+                placeholder="Fecha de inicio"
+                required
+                [(ngModel)]="dateStart"
+                (dateInput)="selectedDate()"
+              />
+              <input
+                matEndDate
+                placeholder="Fecha de fin"
+                required
+                [(ngModel)]="dateEnd"
+                (dateInput)="selectedDate()"
+              />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </mat-form-field>
+
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Especialidades</mat-label>
+            <mat-select required="true" [(ngModel)]="speciality" name="speciality[]">
+              <div class="input-group">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Busca especialidad"
+                  [(ngModel)]="searchEspecialidades"
+                  class="form-control mx-2"
+                />
+                <div class="input-group-append" *ngIf="searchEspecialidades">
+                  <button
+                    class="btn btn-outline-secondary border-left-0 border"
+                    (click)="searchEspecialidades = ''"
+                  >
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <mat-option
+                *ngFor="let item of specialities | search: searchEspecialidades"
+                [value]="item.value"
+                >{{ item.text }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="col-md-3" appearance="outline">
+            <mat-label>Departamento</mat-label>
+            <mat-select required="true" [(ngModel)]="department" name="department">
+              <div class="input-group">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Busca departamento"
+                  [(ngModel)]="searchDepartamento"
+                  class="form-control mx-2"
+                />
+                <div class="input-group-append" *ngIf="searchDepartamento">
+                  <button
+                    class="btn btn-outline-secondary border-left-0 border"
+                    (click)="searchDepartamento = ''"
+                  >
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <mat-option
+                *ngFor="let item of departments | search: searchDepartamento"
+                [value]="item.value"
+                >{{ item.text }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+
+          <div class="col-md-12 mx-auto text-center mb-4">
+            <button class="btn btn-primary btn-block" (click)="graficar()" [disabled]="disabled">
+              {{ text }}
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="!loading; else notData">
+          <div class="row" *ngIf="show">
+            <div *ngFor="let stat of statData" class="col-md-4">
+              <app-stat [title]="stat.title" [value]="stat.value" [icon]="stat.icon"></app-stat>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="show">
+            <div class="col-md-4">
+              <div class="card border">
+                <div class="card-body">
+                  <h4 class="card-title">Tipos de tramite</h4>
+                  <apx-chart
+                    class="apex-charts"
+                    dir="ltr"
+                    [series]="simplePieChart.series"
+                    [chart]="simplePieChart.chart"
+                    [labels]="simplePieChart.labels"
+                    [legend]="simplePieChart.legend"
+                    [colors]="simplePieChart.colors"
+                    [responsive]="simplePieChart.responsive"
+                  >
+                  </apx-chart>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card border">
+                <div class="card-body">
+                  <h4 class="card-title">Regionales</h4>
+                  <apx-chart
+                    class="apex-charts"
+                    dir="ltr"
+                    [series]="donutChart.series"
+                    [chart]="donutChart.chart"
+                    [labels]="donutChart.labels"
+                    [legend]="donutChart.legend"
+                    [colors]="donutChart.colors"
+                    [responsive]="donutChart.responsive"
+                  >
+                  </apx-chart>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card border">
+                <div class="card-body">
+                  <h4 class="card-title">Departamentos</h4>
+                  <apx-chart
+                    class="apex-charts"
+                    dir="ltr"
+                    [series]="simplePieChart.series"
+                    [chart]="simplePieChart.chart"
+                    [labels]="simplePieChart.labels"
+                    [legend]="simplePieChart.legend"
+                    [colors]="simplePieChart.colors"
+                    [responsive]="simplePieChart.responsive"
+                  >
+                  </apx-chart>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end row -->
+
+          <div class="row" *ngIf="show">
+            <div class="col-lg-6">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title mb-4">Spline Area</h4>
+                  <apx-chart
+                    class="apex-charts"
+                    dir="ltr"
+                    [series]="splineAreaChart.series"
+                    [chart]="splineAreaChart.chart"
+                    [dataLabels]="splineAreaChart.dataLabels"
+                    [stroke]="splineAreaChart.stroke"
+                    [colors]="splineAreaChart.colors"
+                    [xaxis]="splineAreaChart.xaxis"
+                    [grid]="splineAreaChart.grid"
+                    [tooltip]="splineAreaChart.tooltip"
+                  ></apx-chart>
+                </div>
+              </div>
+              <!--end card-->
+            </div>
+
+            <div class="col-lg-6">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title mb-4">Column Charts</h4>
+
+                  <apx-chart
+                    class="apex-charts"
+                    dir="ltr"
+                    [series]="basicColumChart.series"
+                    [chart]="basicColumChart.chart"
+                    [plotOptions]="basicColumChart.plotOptions"
+                    [yaxis]="basicColumChart.yaxis"
+                    [grid]="basicColumChart.grid"
+                    [tooltip]="basicColumChart.tooltip"
+                    [stroke]="basicColumChart.stroke"
+                    [dataLabels]="basicColumChart.dataLabels"
+                    [xaxis]="basicColumChart.xaxis"
+                    [colors]="basicColumChart.colors"
+                    [fill]="basicColumChart.fill"
+                  >
+                  </apx-chart>
+                </div>
+              </div>
+              <!--end card-->
+            </div>
+          </div>
+          <!-- end row -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

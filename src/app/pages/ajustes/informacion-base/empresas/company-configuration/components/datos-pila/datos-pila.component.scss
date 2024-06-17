@@ -1,0 +1,32 @@
+.datos {
+  margin: 20px 20px 50px;
+}
+
+#employee-salary {
+  font-size: 1.28rem;
+  font-weight: 700;
+}
+
+.edit {
+  font-size: 1.1rem;
+  color: #2a93d5;
+  font-weight: bold;
+}
+
+.edit:hover {
+  text-decoration: none;
+  color: #4eb4f8;
+}
+
+.item-subtitle,
+item-subtitle2 {
+  text-align: right;
+  color: #275c9c;
+}
+
+.item-data p {
+  font-size: 0.8rem;
+}
+.btn-link:hover {
+  color: var(--bs-btn-hover-color) !important;
+}

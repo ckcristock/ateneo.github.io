@@ -1,0 +1,10 @@
+{{ text | viewMore: length }}&nbsp;
+<a
+  *ngIf="text.length > length"
+  role="button"
+  class="text-info view-more"
+  container="body"
+  [ngbPopover]="text"
+>
+  ver más...
+</a>

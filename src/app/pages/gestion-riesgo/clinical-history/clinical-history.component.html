@@ -1,0 +1,42 @@
+<div class="card col-md-6 mx-auto">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Historias clínicas</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button class="btn btn-primary btn-sm" (click)="newClinicalHistory()">
+            <i class="fa fa-plus"></i> Crear
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <div class="row">
+      <mat-form-field class="col-md-12" appearance="outline">
+        <mat-label>Documento</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Ingresa el documento"
+          [(ngModel)]="identifier"
+          autocomplete="off"
+        />
+      </mat-form-field>
+
+      <div class="col-md-12">
+        <button
+          [disabled]="loading"
+          class="btn btn-primary btn-block mb-3"
+          (click)="getClinicalHistory()"
+        >
+          <span *ngIf="loading; else elseTemplate">Cargando...</span>
+          <ng-template #elseTemplate>Ver historia clínica</ng-template>
+        </button>
+      </div>
+    </div>
+
+    <app-detail-clinical-history [histories]="histories"> </app-detail-clinical-history>
+  </div>
+</div>

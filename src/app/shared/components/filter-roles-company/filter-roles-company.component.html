@@ -1,0 +1,45 @@
+<form class="row" [formGroup]="formRoles">
+  <ng-content select="[initContent]"></ng-content>
+  <!-- GROUPS -->
+  <mat-form-field *ngIf="!hideSelect.group_id" class="col" appearance="outline">
+    <mat-label>Grupo</mat-label>
+    <mat-select formControlName="group_id">
+      <mat-option *ngIf="showAll" value=""> Todos </mat-option>
+      <mat-option *ngFor="let group of groups" [value]="group.value">
+        {{ group.text }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- DEPENDENCIES -->
+  <mat-form-field *ngIf="!hideSelect.dependency_id" class="col" appearance="outline">
+    <mat-label>Dependencia</mat-label>
+    <mat-select formControlName="dependency_id">
+      <mat-option *ngIf="showAll" value=""> Todas </mat-option>
+      <mat-option *ngFor="let dependency of dependencies" [value]="dependency.value">
+        {{ dependency.value == '' ? 'Todas' : dependency.text }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- POSITION -->
+  <mat-form-field *ngIf="!hideSelect.position" class="col" appearance="outline">
+    <mat-label>Cargo</mat-label>
+    <mat-select formControlName="position">
+      <mat-option *ngIf="showAll" value=""> Todos </mat-option>
+      <mat-option *ngFor="let position of positions" [value]="position.value"
+        >{{ position.text }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- PEOPLE -->
+  <app-search-select
+    *ngIf="!hideSelect.person_id"
+    class="col"
+    placeholder="Buscar funcionario"
+    label="Funcionarios"
+    [showAll]="showAll"
+    [list]="people"
+    [control]="formRoles.controls['person_id']"
+    [multiSelect]="multiSelectPerson"
+  ></app-search-select>
+  <ng-content></ng-content>
+</form>

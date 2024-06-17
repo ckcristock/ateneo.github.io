@@ -1,0 +1,71 @@
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Nueva caja</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="forma">
+      <div class="row">
+        <mat-form-field class="col-md-12" appearance="outline">
+          <mat-label>Nombre de caja</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="description"
+            placeholder="Ingresa el nombre de la caja"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <div class="col-md-12 mat-form-field-wrapper">
+          <ng-select
+            [items]="people"
+            [class.is-invalid]="forma.get('person_id').invalid"
+            formControlName="person_id"
+            bindLabel="text"
+            appearance="outline"
+            [appendTo]="'body'"
+            placeholder="Funcionario responsable *"
+            bindValue="value"
+            loadingText="loading"
+            [clearable]="false"
+          >
+          </ng-select>
+        </div>
+        <div class="col-md-12 mat-form-field-wrapper">
+          <ng-select
+            [items]="accounts"
+            [class.is-invalid]="forma.get('account_plan_id').invalid"
+            formControlName="account_plan_id"
+            bindLabel="text"
+            appearance="outline"
+            [appendTo]="'body'"
+            placeholder="Plan de cuenta *"
+            bindValue="value"
+            loadingText="loading"
+            [clearable]="false"
+          >
+          </ng-select>
+        </div>
+        <div class="col-md-12 text-center">
+          <h5>
+            <span class="badge rounded-pill bg-success">
+              ${{ forma.get('initial_balance')?.value || 0 | currency: '' : '' }}
+            </span>
+          </h5>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button type="submit" class="btn btn-primary" (click)="save()">Guardar</button>
+  </div>
+</ng-template>

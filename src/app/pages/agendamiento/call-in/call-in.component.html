@@ -1,0 +1,50 @@
+<app-card
+  viewTitle="Llamadas por paciente"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-table
+    [loading]="loading"
+    [arrayData]="calls"
+    [pagination]="pagination"
+    (pageChange)="searchIdentifier()"
+  >
+    <ng-container titles>
+      <th>Fecha Inicio</th>
+      <th>Fecha Fin</th>
+      <th>ID Llamda</th>
+      <th>Agente</th>
+      <th>Tramite</th>
+      <th>Ambito</th>
+      <th>Servicio</th>
+      <th>Observación</th>
+    </ng-container>
+    <tbody content>
+      @for (item of calls; track $index) {
+        <tr class="text-center">
+          <td>{{ item.created_at | date: 'dd/MM/yyyy hh:mm a' || 'N/A' }}</td>
+          <td>{{ (item.finalized_at | date: 'dd/MM/yyyy hh:mm a') || 'N/A' }}</td>
+          <td>{{ item.Id_Llamada || 'N/A' }}</td>
+          <td>
+            {{ item.usuario?.person?.first_name || 'N/A' }}
+            {{ item.usuario?.person?.first_surname || 'N/A' }}
+          </td>
+          <td>{{ item?.formality?.name || 'N/A' }}</td>
+          <td>{{ item?.ambito?.name || 'N/A' }}</td>
+          <td>{{ item?.servicio?.name || 'N/A' }}</td>
+          <td>{{ item.observation || 'N/A' }}</td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col col-md-6 pb-2"
+    label="Documento"
+    placeholder="Busca por documento"
+    [value]="filters.identifier"
+    (searching)="filters.identifier = $event; searchIdentifier()"
+  ></app-automatic-search>
+</ng-template>

@@ -1,0 +1,65 @@
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Importar PUC comercial</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="alert alert-info" role="alert">
+      Sube un archivo compatible y organizado de la siguiente manera: En la columna A irán los
+      códigos, en la columna B los nombres y en la C el código del padre al que pertenece. La
+      primera fila tendrá los títulos y a partir de la segunda fila se ingresarán los datos
+    </div>
+    <mat-checkbox color="primary" [(ngModel)]="deletePlans"
+      >Marca esta casilla si deseas eliminar todo el plan de cuentas existente y reemplazarlo por el
+      que vas a subir.</mat-checkbox
+    >
+    <table class="table table-bordered text-uppercase text-center">
+      <thead class="thead-dark">
+        <tr>
+          <th></th>
+          <th>A</th>
+          <th>B</th>
+          <th>C</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>1</th>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Código padre</th>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>...</td>
+          <td>...</td>
+          <td>...</td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" class="btn btn-primary btn-block" (click)="fileInput.click()">
+      <i class="fas fa-file-excel"></i> Subir archivo
+    </button>
+    <input
+      #fileInput
+      (change)="onFileSelected($event)"
+      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+      hidden
+      type="file"
+    />
+    <div *ngIf="cargado" class="alert alert-success text-center mt-3" role="alert">
+      Archivo cargado con éxito
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button type="button" (click)="save()" class="btn btn-primary">Guardar</button>
+  </div>
+</ng-template>

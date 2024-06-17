@@ -1,0 +1,251 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-md-4">
+      <app-activity
+        class="card flex-grow-1"
+        [activities]="Actividades"
+        titleActivity="Seguimiento Factura Venta"
+        ><app-not-data-sa loading [loading]="true"></app-not-data-sa
+      ></app-activity>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body" style="padding-top: 0">
+          <div class="row">
+            <div class="col-sm-12">
+              <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+              <div class="table-responsive">
+                <table class="table invoice-detail-table space">
+                  <tbody>
+                    <tr>
+                      <td style="width: 140px; padding: 5px">
+                        <strong>Cliente</strong>
+                      </td>
+                      <td class="text-left" style="padding: 5px">
+                        {{ detalles.NombreCliente || 'N/A' }}
+                      </td>
+                      <td class="text-left" style="width: 150px; padding: 5px">
+                        <strong>N.I.T o C.C.</strong>
+                      </td>
+                      <td class="text-left" style="width: 150px; padding: 5px">
+                        {{ detalles.IdCliente || 'N/A' }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-left" style="width: 140px; padding: 5px">
+                        <strong> Dirección</strong>
+                      </td>
+                      <td class="text-left" style="padding: 5px">
+                        {{ detalles.DireccionCliente || 'N/A' }}
+                      </td>
+                      <td class="text-left" style="width: 150px; padding: 5px">
+                        <strong>Telefóno </strong>
+                      </td>
+                      <td class="text-left" style="width: 150px; padding: 5px">
+                        {{ detalles.Telefono || 'N/A' }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-left" style="width: 140px; padding: 5px">
+                        <strong>Ciudad</strong>
+                      </td>
+                      <td class="text-left" style="padding: 5px">
+                        {{ detalles.CiudadCliente || 'N/A' }}
+                      </td>
+                      <td class="text-left" style="width: 150px; padding: 5px">
+                        <strong>Cond. de pago</strong>
+                      </td>
+                      <td class="text-left" style="width: 150px; padding: 5px">
+                        {{
+                          detalles.Condicion_Pago == 'CONTADO'
+                            ? detalles.Condicion_Pago
+                            : detalles.Condicion_Pago + ' días'
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 10px">
+            <div class="col-sm-12">
+              @if (productos.length > 0) {
+                <table
+                  class="table invoice-detail-table space"
+                  style="table-layout: auto !important"
+                >
+                  <thead>
+                    <tr class="thead-default">
+                      <th>Nombre</th>
+                      <th>Lote</th>
+                      <th>Venc.</th>
+                      <th>Unidad de medida</th>
+                      @for (key of variablesKeys; track $index) {
+                        <th>{{ key }}</th>
+                      }
+                      <th>Cant</th>
+                      <th>Iva</th>
+                      <th>Precio</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let producto of productos; let i = index" id="fila{{ i }}">
+                      <td>{{ producto.producto.Nombre_General || 'N/A' }}</td>
+                      <td>{{ producto.Lote || 'N/A' }}</td>
+                      <td>
+                        {{
+                          producto.Vencimiento ? (producto.Vencimiento | date: 'dd/MM/yy') : 'N/A'
+                        }}
+                      </td>
+                      <td>{{ producto.producto.Unidad_Medida || 'N/A' }}</td>
+                      @for (key of variablesKeys; track $index) {
+                        <td>{{ producto?.variables[key] }}</td>
+                      }
+                      <td>{{ producto.Cantidad || 'N/A' }}</td>
+                      <td>{{ producto.Impuesto || 'N/A' }}</td>
+                      <td>
+                        {{ producto.Precio_Venta ? (producto.Precio_Venta | currency) : 'N/A' }}
+                      </td>
+                      <td>{{ producto.Subtotal ? (producto.Subtotal | currency) : 'N/A' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              } @else {
+                <app-not-data-sa [loading]="true" />
+              }
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 10px">
+            <div class="col-md-8">
+              <div class="row" style="margin-left: 0">
+                <div class="col-md-12 claro">
+                  <p><strong>Valor en Letras: </strong>{{ valorLetra }}</p>
+                </div>
+              </div>
+              <div class="row" style="margin-left: 0">
+                <div class="col-md-6 claro">
+                  <h6>Observaciones:</h6>
+                  <p>{{ detalles.observacion }} - {{ detalles.Observaciones2 }}</p>
+                </div>
+                <div class="col-md-6 claro">
+                  <h6>Resolución:</h6>
+                  <p>
+                    {{ resolucion.Descripcion }} {{ resolucion.Resolucion }} desde
+                    {{ resolucion.Fecha_Inicio | date: 'dd/MM/yyyy' }} hasta
+                    {{ resolucion.Fecha_Fin | date: 'dd/MM/yyyy' }} habilita del Nº
+                    {{ resolucion.Numero_Inicial }} al Nº {{ resolucion.Numero_Final }} Actividad
+                    Economica Principal 4645
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <table class="table table-responsive invoice-table invoice-total space">
+                <tbody>
+                  <tr>
+                    <td style="font-weight: bold">( = ) Subtotal :</td>
+                    <td>{{ Subtotal | currency }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold">( + ) Iva 19% :</td>
+                    <td>{{ impuesto | currency }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold">( = ) Total :</td>
+                    <td>{{ Total | currency }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div
+            *ngIf="resolucion.Tipo_Resolucion == 'Resolucion_Electronica'"
+            class="row"
+            style="margin: 0; margin-top: 10px"
+          >
+            <div class="col-md-12 oscuro">
+              <p style="font-size: 11px; margin: 0 !important">Cufe: {{ detalles.Cufe }}</p>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 40px">
+            <div class="col-sm-12">
+              <table class="table invoice-detail-table">
+                <tbody>
+                  <tr>
+                    <td style="width: 10%; border-top: 2px solid #fff"></td>
+                    <td style="width: 35%; border-top: 2px solid #000">
+                      Elaborado por: {{ firmaUsuario }}
+                    </td>
+                    <td style="width: 10%; border-top: 2px solid #fff"></td>
+                    <td style="width: 35%; border-top: 2px solid #000">
+                      Recibí conforme:
+                      <br />
+                      CC:
+                    </td>
+                    <td style="width: 10%; border-top: 2px solid #fff"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 10px"></div>
+
+          <div *ngIf="perfilUsuario == '27' || perfilUsuario == '50'" class="row mb-2">
+            <div class="col-md-6">
+              <a
+                href="{{
+                  globales.ruta
+                }}php/contabilidad/movimientoscontables/movimientos_factura_venta_pdf.php?id_registro={{
+                  detalles.Id_Factura_Venta
+                }}&id_funcionario_elabora={{ funcionario.Identificacion_Funcionario }}"
+                target="_blank"
+                class="btn btn-info btn-block"
+              >
+                <i class="fa fa-book"></i> Ver Contabilización PCGA</a
+              >
+            </div>
+            <div class="col-md-6">
+              <a
+                href="{{
+                  globales.ruta
+                }}php/contabilidad/movimientoscontables/movimientos_factura_venta_pdf.php?id_registro={{
+                  detalles.Id_Factura_Venta
+                }}&id_funcionario_elabora={{
+                  funcionario.Identificacion_Funcionario
+                }}&tipo_valor=Niif"
+                target="_blank"
+                class="btn btn-info btn-block"
+              >
+                <i class="fa fa-book"></i> Ver Contabilización NIIF</a
+              >
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <a
+                target="_blank"
+                class="btn btn-success btn-block"
+                (click)="downloadInvoice(detalles.Id_Factura_Venta)"
+                ><i class="fa fa-print"></i> Imprimir Factura</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- tipos de factura en bd Factura - Factura_Venta - Factura_Administrativa - Factura_Capita -->
+      <app-notascreditoverdefacturas
+        [idFactura]="id"
+        [tipoFactura]="'Factura_Venta'"
+      ></app-notascreditoverdefacturas>
+    </div>
+  </div>
+</div>

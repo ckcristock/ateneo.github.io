@@ -1,0 +1,18 @@
+<mat-form-field [class]="class" appearance="outline">
+  <mat-label>{{ label }}</mat-label>
+  <mat-select [formControl]="control" [errorStateMatcher]="matcher" [required]="required">
+    @if (itemsObjects && itemsObjects.length) {
+      @for (item of itemsObjects; track $index) {
+        <mat-option [value]="item.id ?? item.value">{{
+          item.title ?? item.value | titlecase
+        }}</mat-option>
+      }
+    } @else {
+      @for (item of items; track $index) {
+        <mat-option [value]="item">{{ item | titlecase }}</mat-option>
+      }
+    }
+  </mat-select>
+  <mat-error>Campo requerido</mat-error>
+</mat-form-field>
+

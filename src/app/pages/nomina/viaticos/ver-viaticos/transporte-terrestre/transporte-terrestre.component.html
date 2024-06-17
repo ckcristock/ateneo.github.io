@@ -1,0 +1,51 @@
+<hr />
+<h6>Transporte {{ type === 'ground' ? 'terrestre' : 'aéreo' }}</h6>
+<div class="rounded-top table-responsive">
+  <table class="table table-bordered table-striped table-sm">
+    <thead class="bg-light">
+      <tr class="text-center text-uppercase">
+        <th>Tipo</th>
+        <th>Trayecto</th>
+        <th>Empresa</th>
+        <th>Pago Tiquete</th>
+        <th>Hora Salida</th>
+        <th>Valor Tiquete</th>
+        <th *ngIf="legal">Legalizar</th>
+        <th *ngIf="legal">Archivo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of transports; let i = index" class="text-center">
+        <td>{{ item.type }}</td>
+        <td>{{ item.journey }}</td>
+        <td>{{ item.company }}</td>
+        <td>{{ item.ticket_payment }}</td>
+        <td>{{ item.departure_date }}</td>
+        <td class="text-end">${{ item.ticket_value | number: '1.2-2' }}</td>
+        <td *ngIf="legal">
+          <input
+            currencyMask
+            [options]="masks.maskCOP"
+            appInputPosition
+            class="form-control form-control-sm"
+            placeholder="Ingresa el valor reportado"
+            [(ngModel)]="item.reported"
+          />
+        </td>
+        <td *ngIf="legal">
+          <div class="image-upload">
+            <label for="file-input-tr{{ i }}" class="text-end">
+              <i class="fas fa-cloud-upload-alt text-primary"></i>
+            </label>
+            <input
+              #file
+              (change)="onFileChanged($event, i, item)"
+              id="file-input-tr{{ i }}"
+              type="file"
+            />
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

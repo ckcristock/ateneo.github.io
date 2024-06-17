@@ -1,0 +1,88 @@
+<app-card viewTitle="Rotativos" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="create()" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="turnosRotativo"
+    [pagination]="pagination"
+    (pageChange)="getAll()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Sábado</th>
+      <th>Domingo</th>
+      <th>Horario</th>
+      <th>Lunch</th>
+      <th>Break</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (turno of turnosRotativo; track $index) {
+        <tr class="text-center">
+          <td>{{ turno.text }}</td>
+          <td>
+            @if (turno.saturday_id) {
+              {{ turno.saturday?.name }}
+            } @else {
+              Descanso
+            }
+          </td>
+          <td>
+            @if (turno.sunday_id) {
+              {{ turno.sunday?.name }}
+            } @else {
+              Descanso
+            }
+          </td>
+          <td>
+            {{ '01/01/2000 ' + turno.entry_time | date: 'HH:mm' }} -
+            {{ '01/01/2000 ' + turno.leave_time | date: 'HH:mm' }}
+          </td>
+          @if (turno.launch == 1) {
+            <td>
+              {{ '01/01/2000 ' + turno.launch_time | date: 'HH:mm' }} -
+              {{ '01/01/2000 ' + turno.launch_time_two | date: 'HH:mm' }}
+            </td>
+          } @else {
+            <td><i class="fas fa-times"></i></td>
+          }
+          @if (turno.breack == 1) {
+            <td>
+              {{ '01/01/2000 ' + turno.breack_time | date: 'HH:mm' }} -
+              {{ '01/01/2000 ' + turno.breack_time_two | date: 'HH:mm' }}
+            </td>
+          } @else {
+            <td><i class="fas fa-times"></i></td>
+          }
+
+          <td>
+            <app-status-badge [status]="turno.state" />
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="create(turno.value)" />
+              @if (turno.state == 'activo') {
+                <app-action-deactivate (action)="changeState(turno.value)" />
+              }
+              @if (turno.state == 'inactivo') {
+                <app-action-activate (action)="changeState(turno.value)" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtro.name"
+    (searching)="filtro.name = $event; getAll()"
+  ></app-automatic-search>
+</ng-template>
+
+<app-create-turno-rotativo (saved)="getAll()" [openModal]="showModal"> </app-create-turno-rotativo>

@@ -1,0 +1,24 @@
+.stats {
+  i {
+    font-size: 30px;
+    color: white !important;
+  }
+
+  h4 {
+    font-size: 25px;
+  }
+
+  p,
+  h4 {
+    margin: 0 !important;
+  }
+}
+
+.texto-vertical {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+}
+
+.border-3 {
+  border-width: 3px !important;
+}

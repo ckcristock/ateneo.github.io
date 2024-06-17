@@ -1,0 +1,21 @@
+<mat-nav-list>
+  <form [formGroup]="formSearch">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Buscar</mat-label>
+      <input
+        aria-label="Buscar"
+        matInput
+        formControlName="name"
+        type="text"
+        placeholder="Busca por nombre de la sección"
+      />
+    </mat-form-field>
+  </form>
+  @if (sections && sections.length > 0 && !loading()) { @for (section of sections; track section) {
+  <a mat-list-item (click)="openLink(section)" class="py-4">
+    <span matListItemTitle>{{ section.name }}</span>
+  </a>
+  } } @else {
+  <app-not-data [loading]="loading()" />
+  }
+</mat-nav-list>

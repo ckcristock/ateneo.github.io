@@ -1,0 +1,109 @@
+<app-card
+  viewTitle="Lista de actas"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters routerLink="/agendamiento/actaaplicacion" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="listMinutes"
+    [pagination]="pagination"
+    (pageChange)="filtersCertificates()"
+  >
+    <ng-container titles>
+      <th>Fecha</th>
+      <th>Paciente</th>
+      <th>Funcionario</th>
+      <th>Cups</th>
+      <th>Diagnostico</th>
+      <th>Observacion</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of listMinutes; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">{{ item.date | date: 'dd/MM/yyyy' }}</td>
+          <td class="align-middle">{{ item.Paciente }}</td>
+          <td class="align-middle">{{ item.Funcionario }}</td>
+          <td class="align-middle">
+            <app-view-more [text]="item.Cup" [length]="20"></app-view-more>
+          </td>
+          <td class="align-middle">
+            <app-view-more [text]="item.diagnostic" [length]="20"></app-view-more>
+          </td>
+          <td class="align-middle">{{ item.observation }}</td>
+          <td class="align-middle">{{ item.state }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="check"
+                text="Detalles"
+                type="info"
+                (click)="detailCertificates(modal)"
+              />
+              @if (item.state != 'Anulada') {
+                <app-action-deactivate (action)="cancelCertificates(item.id)" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Documento"
+    placeholder="Busca por documento"
+    [value]="filters.patient"
+    (searching)="filters.patient = $event; filtersCertificates()"
+  ></app-automatic-search>
+  <mat-form-field class="col-md-3" appearance="outline">
+    <mat-label>Fecha</mat-label>
+    <input
+      matInput
+      type="date"
+      placeholder="Busca por documento"
+      [(ngModel)]="filters.date"
+      name="date"
+      autocomplete="off"
+      (change)="filtersCertificates()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col-md-3" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select
+      [(ngModel)]="filters.state"
+      required
+      name="state"
+      id="state"
+      (selectionChange)="filtersCertificates()"
+    >
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Activas">Activas</mat-option>
+      <mat-option value="Anuladas">Anuladas</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<ng-template #modal let-modal>
+  <app-modal titleModal="Listado de productos">
+    <app-table [loading]="false" [arrayData]="listProducts">
+      <ng-container titles>
+        <th></th>
+        <th>Nombre</th>
+        <th>Cum</th>
+        <th>Lote</th>
+        <th>Cantidad</th>
+      </ng-container>
+      <tbody content>
+        @for (item of listProducts; track $index) {
+          <tr class="text-center"></tr>
+        }
+      </tbody>
+    </app-table>
+  </app-modal>
+</ng-template>

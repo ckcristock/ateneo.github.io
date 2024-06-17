@@ -1,0 +1,19 @@
+<table class="table" style="max-height: 400px">
+  <thead>
+    <tr class="thead-default">
+      <th>Cuenta</th>
+      <th>Nit</th>
+      <th style="width: 13%">Factura</th>
+      <th>Documento</th>
+      <th>Debe</th>
+      <th style="width: 10%">Haber</th>
+      <th>Debe NIIF</th>
+      <th style="width: 70px; max-width: 100px">Haber NIIF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let Fact of Facturas_Faltantes; let i = index" id="fila{{ i }}">
+      <td *ngFor="let F of Fact[0]">{{ F }}</td>
+    </tr>
+  </tbody>
+</table>

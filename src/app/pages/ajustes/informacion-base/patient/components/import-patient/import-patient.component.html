@@ -1,0 +1,87 @@
+<app-modal titleModal="Importar pacientes">
+  <app-department-municipality
+    [loading]="loading"
+    (loadData)="loadMunDep = true"
+    (changeSelection)="changeMundep($event)"
+  ></app-department-municipality>
+  @if (!loading && loadMunDep) {
+    <form class="row" [formGroup]="formImport">
+      <app-autocomplete-fc
+        class="col-md-6"
+        label="EPS"
+        placeholder="Ingresa la EPS"
+        [control]="formImport.controls['eps_id']"
+        [list]="eps"
+      ></app-autocomplete-fc>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Régimen</mat-label>
+        <mat-select formControlName="regimen_id">
+          @for (reg of regimen; track $index) {
+            <mat-option [value]="reg.value">
+              {{ reg.text }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <div class="col-md-6">
+        <div class="form-group text-center">
+          <label for="fileInvolved" class="custom-input-file col-md-12"> Cargar archivo </label>
+          <input
+            id="fileInvolved"
+            type="file"
+            class="d-none"
+            [accept]="typeFile"
+            (change)="onFileChanged($event)"
+          />
+          <div class="col-md-12 text-center">
+            @if (loadFile) {
+              <small class="text-success">Archivo cargado</small>
+            }
+          </div>
+        </div>
+      </div>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="state">
+          <mat-option value="Activo" selected> Activo </mat-option>
+          <mat-option value="Inactivo"> Inactivo </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+    <hr />
+    <h6>Datos de importación</h6>
+    <a class="btn btn-success btn-block" target="_blank" [href]="urlDownloadTemplate">
+      <i class="fas fa-file-excel"></i>
+      Descargar plantilla para importar pacientes
+    </a>
+    <div class="row mt-4">
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Consultar id de tipo de documento</mat-label>
+        <mat-select (selectionChange)="idDocumentType = $event.value">
+          @for (doc of documents; track $index) {
+            <mat-option [value]="doc.value"> {{ doc.value }} - {{ doc.text }} </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Consultar id del nivel</mat-label>
+        <mat-select (selectionChange)="idLevel = $event.value">
+          @for (level of levels; track $index) {
+            <mat-option [value]="level.value"> {{ level.value }} - {{ level.text }} </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  } @else {
+    <app-not-data [loading]="true"></app-not-data>
+  }
+  <button
+    buttons
+    type="button"
+    class="btn btn-primary"
+    [disabled]="formImport.invalid"
+    (click)="importFile()"
+  >
+    Guardar
+  </button>
+</app-modal>

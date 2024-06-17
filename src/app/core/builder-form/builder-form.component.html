@@ -1,0 +1,88 @@
+<div class="row" *ngIf="show">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="dataForm" novalidate (ngSubmit)="onSubmit()">
+          <ng-container formArrayName="modulesForm">
+            <ng-container
+              *ngFor="let item of dataFormModules.controls; let indice = index"
+              [formGroupName]="indice"
+            >
+              <div class="row" formArrayName="variables">
+                <ng-container
+                  *ngFor="let vari of item.controls.variables.controls; let iter = index"
+                >
+                  <ng-container *ngIf="vari.get('show').value">
+                    <div class="col-md-{{ config.size }}" [formGroupName]="iter">
+                      <label
+                        for="validationServerUsername"
+                        *ngIf="vari.get('show').value && vari.controls.type.value != 'hidden'"
+                        >{{ vari.get('property').value | titlecase }}</label
+                      >
+                      <div class="input-group">
+                        <ng-container
+                          *ngIf="
+                            vari.get('show').value &&
+                            vari.controls.type.value != 'select' &&
+                            vari.controls.type.value != 'check' &&
+                            vari.controls.type.value != 'textarea'
+                          "
+                        >
+                          <input
+                            [type]="vari.controls.type.value"
+                            class="form-control"
+                            id="{{ vari.controls.name.value }}"
+                            placeholder="{{ vari.controls.name.valor }}"
+                            [required]="vari.controls.required.value"
+                            formControlName="valor"
+                          />
+                        </ng-container>
+
+                        <ng-container
+                          *ngIf="vari.get('show').value && vari.controls.type.value == 'textarea'"
+                        >
+                          <textarea
+                            name=""
+                            id=""
+                            cols="30"
+                            rows="5"
+                            class="form-control"
+                            formControlName="valor"
+                          ></textarea>
+                        </ng-container>
+
+                        <ng-container
+                          *ngIf="
+                            (vari.get('show').value && vari.controls.type.value == 'check') ||
+                            vari.controls.type.value == 'select'
+                          "
+                        >
+                          <ng-select
+                            placeholder="Seleccione"
+                            [multiple]="vari.controls.type.value == 'select' ? false : true"
+                            class="w-100"
+                            formControlName="valor"
+                          >
+                            <ng-option
+                              [value]="option.id"
+                              *ngFor="let option of vari.controls.values_for_select.value"
+                            >
+                              {{ option.name }}
+                            </ng-option>
+                          </ng-select>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </ng-container>
+                </ng-container>
+              </div>
+            </ng-container>
+          </ng-container>
+
+          <div class="w-100"></div>
+          <button type="submit" class="btn btn-sm btn-info my-2 pull-right">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

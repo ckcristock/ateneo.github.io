@@ -1,0 +1,27 @@
+<div class="row">
+  @if(!loading){
+  <mat-form-field [class]="sizeCol ? 'col-12' : 'col-md-4'" appearance="outline">
+    <mat-label>Trámite</mat-label>
+    <mat-select name="Id_Tramite" required (selectionChange)="format(); tramiteWasChanged()"
+      [(ngModel)]="data.Id_Tramite">
+      <mat-option *ngFor="let type of formalities" [value]="type.id">{{ type.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field [class]="sizeCol ? 'col-12' : 'col-md-4'" appearance="outline" *ngIf="tramiteSelected.hasAmbits == 1">
+    <mat-label>Tipo de ámbito</mat-label>
+    <mat-select name="Id_Tipo_Identificacion" required (selectionChange)="changes()" [(ngModel)]="data.Id_Ambito">
+      <mat-option *ngFor="let type of ambits" [value]="type.id">{{ type.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field [class]="sizeCol ? 'col-12' : 'col-md-4'" appearance="outline"
+    *ngIf="tramiteSelected.hasTypeServices == 1">
+    <mat-label>Tipo de servicio</mat-label>
+    <mat-select name="Id_Tipo_Identificacion" required (selectionChange)="changes()"
+      [(ngModel)]="data.Id_Tipo_Servicio">
+      <mat-option *ngFor="let type of typeServices" [value]="type.id">{{ type.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  }
+</div>

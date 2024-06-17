@@ -1,0 +1,300 @@
+<article class="row gap-3">
+  <app-card class="col-md-8" viewTitle="Ajuste Individual" [filterTemplate]="filterTemplate">
+    <app-add-button filters routerLink="crear" />
+    <app-table
+      [loading]="false"
+      [arrayData]="Ajustes"
+      [pagination]="pagination"
+      (pageChange)="onPagination()"
+    >
+      <ng-container titles>
+        <th>Código</th>
+        <th>Fecha</th>
+        <th>Funcionario</th>
+        <th>Tipo</th>
+        <th>Bodega/Punto</th>
+        <th>Estado</th>
+        <th>Ajuste</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (item of Ajustes; track $index) {
+          <tr class="text-center">
+            <td>{{ item.Codigo }}</td>
+            <td>
+              {{ item.Fecha | date: 'dd/MM/yyyy' }}
+            </td>
+            <td>
+              {{ item.Funcionario }}
+            </td>
+            <td
+              [ngClass]="{
+                'text-success': item.Id_Salida && item.Estado != 'Anulada',
+                'text-danger': item.Cambio_Estiba && !item.Id_Salida && item.Estado != 'Anulada'
+              }"
+            >
+              {{ item.Cambio_Estiba == 1 ? 'Cambio - ' + item.Tipo : item.Tipo }}
+            </td>
+            <td>{{ item.Bodega }}</td>
+            <td>
+              {{ item.Tipo == 'Entrada' ? item.Estado_Entrada_Bodega : item.Estado_Salida_Bodega }}
+            </td>
+            @if (item.Estado !== 'Anulada') {
+              <td
+                [ngClass]="{
+                  'text-success': item.Estado != 'Anulada' && item.Tipo == 'Entrada',
+                  'text-danger': item.Estado != 'Anulada' && item.Tipo == 'Salida'
+                }"
+                class="font-weight-bold"
+              >
+                {{ item.Tipo == 'Entrada' ? '+' : '-' }}{{ item.Valor_Ajuste | customcurrency }}
+              </td>
+            } @else {
+              <td class="font-weight-bold">
+                {{ item.Tipo == 'Entrada' ? '+' : '-' }}{{ item.Valor_Ajuste | customcurrency }}
+              </td>
+            }
+            <td>
+              <app-dropdown-actions>
+                <app-action-view
+                  [link]="{
+                    url: 'ver/' + item.Id_Ajuste_Individual
+                  }"
+                />
+                <app-action-button
+                  icon="print"
+                  text="Imprimir archivo"
+                  type="secondary"
+                  [link]="{
+                    url:
+                      globales.ruta +
+                      'php/ajusteindividual/descarga_pdf.php?id=' +
+                      item.Id_Ajuste_Individual,
+                    target: '_blank'
+                  }"
+                />
+                @if (perfilUsuario == '27' || perfilUsuario == '16') {
+                  <app-action-button
+                    icon="book"
+                    text="Contab. PCGA"
+                    type="info"
+                    [link]="{
+                      url:
+                        globales.ruta +
+                        'php/contabilidad/movimientoscontables/movimientos_ajuste_individual_pdf.php?id_registro=' +
+                        item.Id_Ajuste_Individual +
+                        '&id_funcionario_elabora=' +
+                        User?.Identificacion_Funcionario,
+                      target: '_blank'
+                    }"
+                  />
+                }
+                @if (perfilUsuario == '27' || perfilUsuario == '16') {
+                  <app-action-button
+                    icon="book"
+                    text="Contab. NIIF"
+                    type="primary"
+                    [link]="{
+                      url:
+                        globales.ruta +
+                        'php/contabilidad/movimientoscontables/movimientos_ajuste_individual_pdf.php?id_registro=' +
+                        item.Id_Ajuste_Individual +
+                        '&id_funcionario_elabora=' +
+                        User?.Identificacion_Funcionario +
+                        '&tipo_valor=Niif',
+                      target: '_blank'
+                    }"
+                  />
+                }
+                @if (item.Estado != 'Anulada' && miPerfil == '16' && item.Estado != 'Acomodada') {
+                  <app-action-deactivate
+                    (action)="modalAnular.show(); Id_Ajuste = item.Id_Ajuste_Individual"
+                  />
+                }
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <ng-template #filterTemplate>
+    <app-automatic-search
+      class="col"
+      label="Filtro código"
+      placeholder="Busca por código"
+      [value]="filtro_cod"
+      (searching)="filtro_cod = $event; filtros()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Filtro funcionario"
+      placeholder="Busca por funcionario"
+      [value]="filtro_fun"
+      (searching)="filtro_fun = $event; filtros()"
+    ></app-automatic-search>
+    <app-automatic-search
+      class="col"
+      label="Filtro bodega/punto"
+      placeholder="Busca por bodega/punto"
+      [value]="filtro_bodega"
+      (searching)="filtro_bodega = $event; filtros()"
+    ></app-automatic-search>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="filtro_tipo" (selectionChange)="filtros()">
+        <mat-option value="">Todas</mat-option>
+        <mat-option value="Entrada">Entrada</mat-option>
+        <mat-option value="Salida">Salida</mat-option>
+        <mat-option value="Lotes">Lotes</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Rango de fechas</mat-label>
+      <mat-date-range-input [formGroup]="formRange" [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          required
+          formControlName="start"
+          name="date_start"
+        />
+        <input
+          matEndDate
+          placeholder="Fecha de fin"
+          required
+          formControlName="end"
+          name="date_end"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button
+            mat-raised-button
+            color="primary"
+            matDateRangePickerApply
+            (click)="onFilterDate()"
+          >
+            Aplicar
+          </button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+  </ng-template>
+  <section class="card col">
+    <div class="card-body">
+      <app-reporteajusteinventario></app-reporteajusteinventario>
+    </div>
+  </section>
+</article>
+
+<app-modal-basic #modalLotes [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Lotes del Productos</h4>
+    <button
+      type="button"
+      class="close basic-close"
+      (click)="modalLotes.hide(); limpiar_Producto_Salida()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-md-12 contenido">
+        <h6>Producto</h6>
+        <p>
+          {{ Nombre }} <br /><br />
+          <strong>Embalaje:</strong> {{ Producto_Salida.Embalaje }}
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <table class="table tabla">
+          <thead>
+            <tr class="thead-default">
+              <th style="width: 20px"></th>
+              <th>Lote</th>
+              <th>Cantidad</th>
+              <th>Fecha Venc.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of Lotes; let i = index" id="fila{{ i }}">
+              <td>
+                <input type="checkbox" id="check{{ i }}" (change)="habilitarCampos(i)" />
+              </td>
+              <td>{{ item.Lote }}</td>
+              <td>{{ item.Cantidad }}</td>
+              <td>{{ item.Fecha_Vencimiento }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button
+        type="button"
+        class="btn btn-default btn-sm"
+        (click)="modalLotes.hide(); limpiar_Producto_Salida()"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalAnular>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Anular Ajuste</h4>
+    <button type="button" class="close basic-close" (click)="modalAnular.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <form #FormAnular="ngForm">
+      <div class="row">
+        <div class="col-md-12">
+          <input
+            type="hidden"
+            name="Funcionario_Anula"
+            [(ngModel)]="ModelAnular.Funcionario_Anula"
+          />
+          <div class="form-group">
+            <label for="">¿Cual es la razón de la anulación?</label>
+            <textarea
+              style="max-height: 100px"
+              name="Observaciones"
+              id=""
+              cols="30"
+              rows="10"
+              class="form-control"
+              [(ngModel)]="ModelAnular.Observacion_Anulacion"
+              required
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button type="button" class="btn btn-default btn-sm" (click)="modalAnular.hide()">
+        Cerrar
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger btn-sm"
+        [disabled]="!FormAnular.valid"
+        (click)="onAjustCancel()"
+      >
+        Anular
+      </button>
+    </div>
+  </div>
+</app-modal-basic>

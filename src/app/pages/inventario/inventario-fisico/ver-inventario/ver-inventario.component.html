@@ -1,0 +1,65 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera" />
+    <h4 class="text-center text-primary">Listado de productos</h4>
+    <app-table [loading]="loading" [arrayData]="inventario">
+      <ng-container titles>
+        <th class="text-center">Documento</th>
+        <th class="text-center">Producto</th>
+        <th class="text-center">Estiba</th>
+        <th class="text-center">1er Conteo</th>
+        <th class="text-center">Fecha 1er Conteo</th>
+        <th class="text-center">2do Conteo</th>
+        <th class="text-center">Fecha 2do Conteo</th>
+        <th class="text-center">Cant Inventario</th>
+        <th class="text-center">Diferencia</th>
+      </ng-container>
+      <tbody content>
+        @if (!loading && inventario?.length > 0) {
+          @for (producto of inventario; track producto.Id_Doc_Inventario_Fisico; let i = $index) {
+            <tr class="text-center">
+              <td>
+                <strong>{{ producto.Id_Doc_Inventario_Fisico || 'N/A' }}</strong>
+              </td>
+              <td class="d-flex flex-column">
+                <strong>{{ producto.Nombre_Comercial || 'N/A' }}</strong>
+                <span class="text-muted">{{ producto.Nombre_Producto || 'N/A' }}</span>
+              </td>
+
+              <td>
+                {{ producto.Nombre_Estiba || 'N/A' }}
+              </td>
+              <td>
+                {{ (producto.Primer_Conteo | number) || 'N/A' }}
+              </td>
+              <td>
+                {{ producto.Fecha_Primer_Conteo || 'N/A' }}
+              </td>
+              <td>
+                {{ (producto.Segundo_Conteo | number) || 'N/A' }}
+              </td>
+              <td>
+                {{ producto.Fecha_Segundo_Conteo || 'N/A' }}
+              </td>
+
+              <td>
+                {{ (producto.Cantidad_Inventario | number) || 'N/A' }}
+              </td>
+              <td class="text-center">
+                <span
+                  [ngClass]="{
+                    'text-danger font-weight-bold': producto.Cantidad_Diferencial < 0,
+                    'text-success': producto.Cantidad_Diferencial > 0
+                  }"
+                >
+                  <span *ngIf="producto.Cantidad_Diferencial > 0">+</span>
+                  {{ (producto.Cantidad_Diferencial | number) || 'N/A' }}
+                </span>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </app-table>
+  </div>
+</div>

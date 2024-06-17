@@ -1,0 +1,443 @@
+<form [formGroup]="form" (ngSubmit)="save()">
+  <div class="row">
+    <div class="col-md-3 mx-auto">
+      <div class="form-group text-center">
+        <img
+          id="imageOutput"
+          [src]="fileString"
+          alt="Imagen del funcionario"
+          class="d-block img-thumbnail rounded-circle mx-auto img-fluid"
+        />
+        <div class="custom-input-file col-md-12 mt-3">
+          <input
+            type="file"
+            aria-label="imagen"
+            id="image"
+            name="image"
+            class="input-file"
+            (change)="onFileChanged($event)"
+            accept="image/*"
+          />
+          Cargar imagen
+        </div>
+        <div class="text-center">
+          @if (form.get('image').invalid) {
+            <small class="text-danger"> Imagen es obligatoria </small>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Tipo de documento</mat-label>
+      <mat-select formControlName="type_document_id" required>
+        @for (item of documenttypes; track item) {
+          <mat-option [value]="item.value">
+            {{ item.text }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>branding_watermark</mat-icon>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Documento de identidad</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa documento de identidad"
+        type="number"
+        formControlName="identifier"
+        [class.is-invalid]="identifier_valid"
+        (change)="validarCedula($event)"
+        name="document"
+        class="numberInput"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>badge</mat-icon>
+      @if (identifier_valid) {
+        <mat-error>
+          @for (item of form.get('identifier').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Primer nombre</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el primer nombre"
+        type="text"
+        formControlName="first_name"
+        [class.is-invalid]="first_name_valid"
+        name="first-name"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>looks_one</mat-icon>
+      @if (first_name_valid) {
+        <mat-error>
+          @for (item of form.get('first_name').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Segundo nombre</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el segundo nombre"
+        type="text"
+        formControlName="second_name"
+        [class.is-invalid]="second_name_valid"
+        name="second-name"
+        autocomplete="off"
+      />
+      <mat-icon matSuffix>looks_two</mat-icon>
+      @if (second_name_valid) {
+        <mat-error>
+          <small> Es necesario el segundo nombre</small>
+        </mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <div class="row">
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Primer apellido</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el primer apellido"
+        type="text"
+        formControlName="first_surname"
+        [class.is-invalid]="first_surname_valid"
+        name="first_surname"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>looks_one</mat-icon>
+      @if (first_surname_valid) {
+        <mat-error>
+          @for (item of form.get('first_surname').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Segundo apellido</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el segundo apellido"
+        type="text"
+        formControlName="second_surname"
+        [class.is-invalid]="second_surname_valid"
+        name="second_surname"
+        autocomplete="off"
+      />
+      <mat-icon matSuffix>looks_two</mat-icon>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Correo electrónico</mat-label>
+      <input
+        matInput
+        placeholder="Ej: example@example.com"
+        type="email"
+        formControlName="email"
+        [class.is-invalid]="email_valid"
+        name="email"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>email</mat-icon>
+      @if (first_surname_valid) {
+        <mat-error>
+          @for (item of form.get('email').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Fecha de nacimiento</mat-label>
+      <input
+        matInput
+        type="date"
+        placeholder="Selecciona la fecha de nacimiento"
+        formControlName="birth_date"
+        required
+      />
+      <!-- <mat-icon matSuffix>event</mat-icon> -->
+      @if (birth_date_valid) {
+        <mat-error>
+          @for (item of form.get('birth_date').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Lugar de nacimiento</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el lugar de nacimiento"
+        type="text"
+        formControlName="place_of_birth"
+        [class.is-invalid]="place_of_birth_valid"
+        name="city"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>location_city</mat-icon>
+      @if (place_of_birth_valid) {
+        <mat-error>
+          @for (item of form.get('place_of_birth').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Dirección de residencia</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa la dirección de residencia"
+        type="text"
+        formControlName="address"
+        [class.is-invalid]="direction_valid"
+        name="direction"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>home_filled</mat-icon>
+      @if (direction_valid) {
+        <mat-error>
+          @for (item of form.get('address').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Género</mat-label>
+      <mat-select [class.is-invalid]="gener_valid" formControlName="gener" required>
+        <mat-option value="Masculino">Masculino</mat-option>
+        <mat-option value="Femenino">Femenino</mat-option>
+      </mat-select>
+      <mat-icon matSuffix>people</mat-icon>
+      @if (gener_valid) {
+        <mat-error>
+          @for (item of form.get('gener').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Número de pasaporte</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa número de pasaporte"
+        type="text"
+        formControlName="passport_number"
+        autocomplete="off"
+      />
+      <mat-icon matSuffix>flight_takeoff</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="row">
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Teléfono fijo</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el telefono fijo"
+        type="text"
+        formControlName="phone"
+        name="phone"
+        autocomplete="off"
+      />
+      <mat-icon matSuffix>phone</mat-icon>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Teléfono celular</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el telefono celular"
+        type="text"
+        formControlName="cell_phone"
+        [class.is-invalid]="cell_phone_valid"
+        name="cell-phone"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>phone_iphone</mat-icon>
+      @if (cell_phone_valid) {
+        <mat-error>
+          @for (item of form.get('cell_phone').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Tipo de sangre</mat-label>
+      <mat-select [class.is-invalid]="blood_type_valid" formControlName="blood_type" required>
+        @for (tipo of tipoSangre; track tipo) {
+          <mat-option [value]="tipo.valor">
+            {{ tipo.clave }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>bloodtype</mat-icon>
+      @if (blood_type_valid) {
+        <mat-error>
+          @for (item of form.get('blood_type').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Estado civil</mat-label>
+      <mat-select
+        [class.is-invalid]="marital_status_valid"
+        formControlName="marital_status"
+        required
+      >
+        @for (estado of estados; track estado) {
+          <mat-option [value]="estado.valor">
+            {{ estado.clave }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>favorite</mat-icon>
+      @if (marital_status_valid) {
+        <mat-error>
+          @for (item of form.get('marital_status').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Número de hijos</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el número de hijos"
+        type="number"
+        class="numberInput"
+        formControlName="number_of_children"
+        [class.is-invalid]="number_of_children_valid"
+        name="children"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>escalator_warning</mat-icon>
+      @if (number_of_children_valid) {
+        <mat-error>
+          @for (item of form.get('number_of_children').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Nivel académico</mat-label>
+      <mat-select [class.is-invalid]="degree_valid" formControlName="degree" required>
+        @for (grado of instruccion; track grado) {
+          <mat-option [value]="grado.valor">
+            {{ grado.clave }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>school</mat-icon>
+      @if (degree_valid) {
+        <mat-error>
+          @for (item of form.get('degree').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Título</mat-label>
+      <input
+        matInput
+        placeholder="Ingresa el nombre del título"
+        type="text"
+        formControlName="title"
+        [class.is-invalid]="title_valid"
+        name="children"
+        autocomplete="off"
+        required
+      />
+      <mat-icon matSuffix>verified</mat-icon>
+      @if (title_valid) {
+        <mat-error>
+          @for (item of form.get('title').errors | ObjToArrayPipe; track item) {
+            <small class="text-danger">
+              {{ item?.msj }}
+            </small>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col">
+      <mat-label>Visa</mat-label>
+      <mat-select formControlName="visa">
+        <mat-option value="Si">Sí</mat-option>
+        <mat-option value="No">No</mat-option>
+      </mat-select>
+      <mat-icon matSuffix>flight</mat-icon>
+    </mat-form-field>
+    <div class="col-12">
+      <div class="input-group">
+        <span class="input-group-text">Firma del funcionario</span>
+        <label class="form-control" tabindex="0"
+          >{{ titleFile ? titleFile : 'Selecciona imagen' }}
+          <input
+            type="file"
+            class="invisible"
+            accept=".png,.jpg,.jpeg,.svg"
+            (change)="onFileChangedSignature($event)"
+          />
+        </label>
+      </div>
+    </div>
+    <small>La imagen debe ser de 800px de ancho por 450px de alto</small>
+    <div class="col-12 d-flex justify-content-end">
+      <button type="submit" mat-button>Siguiente</button>
+    </div>
+  </div>
+</form>
+
+<app-reload-button [reload]="reload" (reloadData)="reloadData()"></app-reload-button>

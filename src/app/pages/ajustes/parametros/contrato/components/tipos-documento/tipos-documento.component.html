@@ -1,0 +1,85 @@
+<app-card viewTitle="Tipos de documentos" [filterTemplate]="filterTemplate">
+  <app-table [loading]="loading" [arrayData]="documents" [pagination]="pagination" (pageChange)="getDocumentTypes()">
+    <app-add-button filters (click)="openModal(modal)" />
+    <ng-container titles>
+      <th>CÓDIGO</th>
+      <th>NOMBRE</th>
+      <th>CÓDIGO DIAN</th>
+      <th class="col-1">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (document of documents; track $index) {
+      <tr class="text-center">
+        <td>{{ document.code }}</td>
+        <td class="text-start">{{ document.name }}</td>
+        <td>{{ document.dian_code }}</td>
+        <td><app-status-badge [status]="document.status" /></td>
+        <td>
+          <app-dropdown-actions>
+            <app-action-edit (action)="getData(document, modal)" />
+            @if (document.status == 'activo') {
+            <app-action-deactivate (action)="activateOrInactivate(document, 'Inactivo')" />
+            } @else {
+            <app-action-activate (action)="activateOrInactivate(document, 'Activo')" />
+            }
+          </app-dropdown-actions>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search class="col pb-3" label="Nombre" placeholder="Busca por nombre" [value]="filtro.name"
+    (searching)="filtro.name = $event; getDocumentTypes()"></app-automatic-search>
+</ng-template>
+
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ selected }}</h4>
+    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="close()"></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Cógido</mat-label>
+          <input matInput type="text" placeholder="Ingresa el código" formControlName="code" name="name" maxlength="5"
+            autocomplete="off" required />
+          @if (code_invalid) {
+          <mat-error>Es necesario el código</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Código DIAN</mat-label>
+          <input matInput type="number" placeholder="Ingresa el código DIAN" formControlName="dian_code"
+            autocomplete="off" required />
+          @if (code_invalid) {
+          <mat-error>Es necesario el código</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Nombre</mat-label>
+          <input matInput type="text" placeholder="Ingresa el nombre" formControlName="name" name="name"
+            autocomplete="off" required />
+          @if (name_invalid) {
+          <mat-error>Es necesario el nombre</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="close()">Cancelar</button>
+    <button type="button" [disabled]="!form.valid" (click)="createNewDocument()" class="btn btn-primary">
+      Guardar
+    </button>
+  </div>
+</ng-template>
+<ng-template #notData>
+  <app-not-data-sa [loading]="loading"></app-not-data-sa>
+</ng-template>

@@ -1,0 +1,11 @@
+<app-payroll-param-card
+  class="d-flex flex-column flex-grow-1"
+  titleCard="Caja de compensación"
+  [data]="compensations"
+  [length]="length"
+  [loading]="loading"
+  (newRequest)="getCompensationFound($event)"
+  (changeState)="activateOrInactivate($event)"
+  (added)="newCompensationFound($event)"
+  (edited)="newCompensationFound($event)"
+></app-payroll-param-card>

@@ -1,0 +1,137 @@
+<div class="page-body" *ngFor="let Nota of Notas">
+  <div class="row d-flex justify-content-center">
+    <div class="col-12">
+      <form #FormNotaCredito="ngForm">
+        <div class="card">
+          <div class="row invoice-contact" style="align-items: flex-start !important">
+            <!-- <div class="col-md-8">
+                            <div class="invoice-box row">
+                                <div class="col-sm-12">
+                                    <table class="table table-responsive invoice-table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:100px;">
+                                                    <img src="{{globales.urlLogoColor}}" class="m-b-10 img-60" alt="Pro-H Software">
+                                                </td>
+                                                <td> {{globales.Nombre}}
+                                                    <br> {{globales.Nit}}
+                                                    <br> {{globales.Direccion}}
+                                                    <br> {{globales.Telefono}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div> -->
+            <div class="row text-md-end text-center" style="margin: 0">
+              <div class="col-sm-12">
+                <h5 class="text-primary">Nota Crédito</h5>
+                <h4>Código:{{ Nota.Codigo }}</h4>
+                <h6>Fecha: {{ Nota.Fecha | date: 'longDate' }}</h6>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-12">
+                <div style="margin-bottom: 40px" *ngIf="perfilUsuario == '27'">
+                  <a
+                    class="btn btn-outline-primary btn-sm pull-right"
+                    href="{{
+                      globales.ruta
+                    }}php/contabilidad/movimientoscontables/movimientos_nota_credito_pdf.php?id_registro={{
+                      Nota.Id_Nota_Credito
+                    }}&id_funcionario_elabora={{ user.Identificacion_Funcionario }}"
+                    target="_blank"
+                  >
+                    <i class="fa fa-book"></i> Ver contabilización
+                  </a>
+                </div>
+                <table class="table invoice-detail-table tabla">
+                  <thead>
+                    <tr class="thead-default">
+                      <th>Cliente</th>
+                      <th>Factura</th>
+                      <th>Fecha Factura</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p>
+                          {{ Cliente.Nombre_Cliente }}
+                        </p>
+                      </td>
+                      <td>
+                        <p>
+                          {{ Factura.Codigo }}
+                        </p>
+                      </td>
+                      <td>
+                        <p>
+                          {{ Factura.Fecha_Documento | date: 'dd/MM/yy' }}
+                        </p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="row m-0">
+              <div class="col-md-12 ver">
+                <h6>Observaciones</h6>
+                <p>{{ Nota.Observaciones }}</p>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top: 30px" *ngIf="Nota.Productos_Nota.length > 0">
+              <div class="col-sm-12">
+                <div class="table-responsive">
+                  <table class="table invoice-detail-table space">
+                    <thead>
+                      <tr class="thead-default">
+                        <th style="width: 40px">Producto</th>
+                        <th style="width: 20px">Motivo</th>
+                        <th style="width: 20px">Observaciones</th>
+                        <th style="width: 20px">Valor Nota Crédito</th>
+                      </tr>
+                    </thead>
+                    <tbody *ngIf="Nota.Productos_Nota.length > 0">
+                      <tr *ngFor="let item of Nota.Productos_Nota; let i = index" id="fila{{ i }}">
+                        <td class="text-left">
+                          {{ item.Nombre_Producto }}
+                        </td>
+                        <td class="text-center">
+                          {{ item.Motivo }}
+                        </td>
+                        <td class="text-center">
+                          {{ item.Observacion }}
+                        </td>
+
+                        <td class="text-right">
+                          {{ item.Valor_Nota_Credito | currency }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-responsive invoice-table invoice-total space">
+                  <tbody>
+                    <tr>
+                      <td style="font-weight: bold">(=) Total :</td>
+                      <td>{{ Nota.Total | currency }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

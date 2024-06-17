@@ -1,0 +1,144 @@
+<article class="row gap-3">
+  <section class="col-12 col-md-3 d-flex flex-column h-100">
+    <app-activity class="card flex-grow-1" [activities]="activities">
+      <app-not-data loading [loading]="loading"></app-not-data>
+    </app-activity>
+  </section>
+  <section class="card col">
+    <div class="card-body">
+      <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+      <hr class="line" />
+      <div class="d-flex flex-column gap-3">
+        <div class="table-responsive">
+          <table class="table table-light space">
+            <tbody>
+              <tr class="text-left">
+                <th>Cliente</th>
+                <td>{{ details['NombreCliente'] ?? 'Sin nombre' }}</td>
+                <th>N.I.T o C.C.</th>
+                <td>{{ details['IdCliente'] ?? 'Sin documento' }}</td>
+              </tr>
+              <tr class="text-left">
+                <th>Dirección</th>
+                <td>{{ details['DireccionCliente'] || 'Sin dirección' }}</td>
+                <th>Telefóno</th>
+                <td>{{ details['Telefono'] ?? 'Sin teléfono' }}</td>
+              </tr>
+              <tr class="text-left">
+                <th>Ciudad</th>
+                <td>{{ details['CiudadCliente'] ?? 'Sin ciudad' }}</td>
+                <th>Cond. de pago</th>
+                <td>
+                  {{
+                    details['Condicion_Pago'] == 'CONTADO'
+                      ? details['Condicion_Pago']
+                      : 'No hay dato'
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <app-table [loading]="loading" [arrayData]="products">
+          <ng-container titles>
+            <th>Descripción</th>
+            <th>Lab.</th>
+            <th>Lote</th>
+            <th>Venc.</th>
+            <th>Presentación</th>
+            <th>Cant</th>
+            <th>Iva</th>
+            <th>Precio</th>
+            <th>Total</th>
+          </ng-container>
+          <tbody content>
+            @for (item of products; track $index) {
+              <tr class="text-center">
+                <td>{{ item.producto || 'N/A' }}</td>
+                <td>{{ item.Laboratorio || 'N/A' }}</td>
+                <td>{{ item.Lote || 'N/A' }}</td>
+                <td>{{ item.Vencimiento | date: 'dd/MM/yy' }}</td>
+                <td>{{ item.Presentacion || 'N/A' }}</td>
+                <td>{{ item.Cantidad || 'N/A' }}</td>
+                <td>{{ item.Impuesto || 'N/A' }}</td>
+                <td>{{ item.PrecioVenta | currency: 'COP' : 'symbol-narrow' || 'N/A' }}</td>
+                <td>{{ item.Subtotal | currency: 'COP' : 'symbol-narrow' || 'N/A' }}</td>
+              </tr>
+            }
+          </tbody>
+        </app-table>
+        <div class="d-flex gap-3">
+          <div class="bg-light p-2">
+            <p><strong>Valor en Letras: </strong>{{ letterValue }}</p>
+            <div class="row">
+              <div class="col">
+                <h6>Observaciones:</h6>
+                <p>{{ details['observacion'] }} - {{ details['Observaciones2'] }}</p>
+              </div>
+              <div class="col">
+                <h6>Resolución:</h6>
+                <p>
+                  {{ resolution['Descripcion'] }} {{ resolution['Resolucion'] }} desde
+                  {{ resolution['Fecha_Inicio'] | date: 'dd/MM/yyyy' }} hasta
+                  {{ resolution['Fecha_Fin'] | date: 'dd/MM/yyyy' }} habilita del Nº
+                  {{ resolution['Numero_Inicial'] }} al Nº
+                  {{ resolution['Numero_Final'] }} Actividad Economica Principal 4645
+                </p>
+              </div>
+            </div>
+          </div>
+          <app-list-items
+            class="d-block col-md-4 mb-4"
+            col="col-md-12"
+            title1="SUBTOTAL"
+            [var1]="subtotal"
+            type1="cop"
+            title2="IVA"
+            [var2]="tax"
+            type2="cop"
+            title3="Total"
+            [var3]="total"
+            type3="cop"
+            mt="mt-2"
+          >
+          </app-list-items>
+        </div>
+        <span class="p-2 bg-light fs-5 text-center">
+          Esta Factura se asimila en sus efectos legales a una letra de cambio Art. 774 del Codigo
+          de Comercio
+        </span>
+        <div>
+          <p>
+            <strong>Nota: </strong>
+            No se aceptan devoluciones de ningún medicamento de cadena de frío o controlado.
+          </p>
+          <p>
+            <strong>Cuentas bancarias: </strong>
+            Banco Davivienda Cta Cte 047 769 996 647 - Banco de Bogotá Cta Cte 600851588 -
+            Bancolombia Cta Cte 302 786 049 52
+          </p>
+        </div>
+        <div class="d-flex gap-5 mt-5">
+          <div class="d-flex flex-column col">
+            <p class="border-bottom border-dark"></p>
+            <span>Elaborado por: {{ userSignature }}</span>
+          </div>
+          <div class="d-flex flex-column col">
+            <p class="border-bottom border-dark"></p>
+            <span>Recibí conforme: </span>
+            <span> CC: </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-success btn-block"
+          [disabled]="downloading"
+          (click)="onDownloadPrint(details['Id_Factura_Venta'])"
+        >
+          <i class="fas fa-print"></i> {{ downloading ? 'Cargando...' : 'Imprimir Factura' }}
+        </button>
+        <app-credit-notes invoiceType="Factura_Venta" [id]="id"></app-credit-notes>
+      </div>
+    </div>
+  </section>
+</article>

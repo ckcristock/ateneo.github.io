@@ -1,0 +1,230 @@
+<app-card
+  viewTitle="Llegadas tarde"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  @if (companies.length && !loading) {
+    <div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card text-white bg-warning">
+            <div class="card-body stats align-items-center d-flex">
+              <div class="col-md-1">
+                <i class="fa text-info fa-stopwatch"></i>
+              </div>
+              <div class="col-md-10 text-center">
+                <h4 class="text-white">
+                  {{ dataDiary.time_diff_total }}
+                </h4>
+                <span>Horas/minutos de tiempo acumulado</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card text-white bg-danger">
+            <div class="card-body stats align-items-center d-flex">
+              <div class="col-md-1">
+                <i class="fa text-info fa-user-clock"></i>
+              </div>
+              <div class="col-md-10 text-center">
+                <h4 class="text-white">{{ dataDiary.total }}</h4>
+                <span>Número total de llegadas tarde</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 d-flex align-items-stretch">
+          <div class="card border border-3 border-light w-100">
+            <div class="card-body">
+              <h4 class="weight-bold text-center">Llegadas tarde en los últimos 15 días</h4>
+              <div class="row">
+                <div class="col-md-1 d-flex m-0 p-0">
+                  <div class="texto-vertical text-center">#LLegadas tarde</div>
+                </div>
+                <div class="col-md-11 ms-0 ps-0">
+                  <canvas
+                    baseChart
+                    height="200"
+                    [datasets]="lineChartData"
+                    [labels]="lineChartLabels"
+                    [options]="options"
+                  ></canvas>
+                  <p class="text-center fw-bolder">- Días del mes -</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-stretch">
+          <div class="card border border-3 border-light w-100">
+            <div class="card-body">
+              <h4 class="d-block weight-bold mb-3 text-center">Estadisticas</h4>
+              <div #studentChart>
+                <canvas
+                  baseChart
+                  [labels]="donutChart.labels"
+                  [datasets]="donutChart.datasets"
+                  chartType="doughnut"
+                  [options]="donutChart.options"
+                  height="260"
+                >
+                </canvas>
+              </div>
+              <div class="card-footer bg-transparent mt-2">
+                <h5 class="weight-bold mb-2 text-center">Áreas de la empresa</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="card border border-3 border-light">
+            <div class="card-body">
+              <div class="row card-title d-flex justify-content-between">
+                <div class="col-md-6 px-0">
+                  <h6><i class="fa fa-users text-primary"></i> Funcionarios que llegaron tarde</h6>
+                </div>
+                <div class="col-md-6 px-0 text-end">
+                  <div class="btn-group rounded w-sm-100">
+                    <button
+                      type="button"
+                      (click)="downloadLateArrivals()"
+                      class="btn btn-success btn-sm"
+                    >
+                      <span
+                        ><i
+                          class="fas"
+                          [class]="!donwloading ? 'fa-file-download' : 'fa-spinner fa-spin'"
+                        ></i>
+                        {{ !donwloading ? 'Descargar' : 'Descargando' }}</span
+                      >
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <hr class="line" />
+              <div *ngFor="let company of companies">
+                <h4 *ngIf="companies.length > 1">{{ company.name }}</h4>
+                <div *ngFor="let group of company.groups">
+                  <h5 class="text-uppercase fw-bold text-primary">
+                    Grupo:
+                    <span class="text-secondary">{{ group.name }}</span>
+                  </h5>
+                  <div *ngFor="let dependency of group.dependencies">
+                    <h6 class="fw-bold text-center text-uppercase">
+                      {{ dependency.name }}
+                    </h6>
+                    <div class="mb-3" *ngIf="dependency.people.length > 0; else alertNoData">
+                      <mat-accordion class="mb-3">
+                        <mat-expansion-panel
+                          class="mat-elevation-z0"
+                          *ngFor="let person of dependency.people"
+                        >
+                          <mat-expansion-panel-header>
+                            <div class="col-1">
+                              <img
+                                src="{{ person?.image | image: 'users' }}"
+                                onerror="this.src='../../../../assets/images/noprofile.png'"
+                                class="rounded-circle mx-auto header-profile-user"
+                              />
+                            </div>
+                            <div class="col d-flex align-items-center">
+                              {{ person.first_name | titlecase }}
+                              {{ person.first_surname | titlecase }}
+                            </div>
+                            <div class="col d-flex align-items-center">
+                              <div class="fw-bold">
+                                <i class="fas fa-clock"></i>
+                                {{ person?.late_arrivals?.length }} -
+                                <strong> ACUMULADO: {{ person.averageTime }} </strong>
+                              </div>
+                            </div>
+                          </mat-expansion-panel-header>
+                          <app-detalle-llegada [person]="person"></app-detalle-llegada>
+                        </mat-expansion-panel>
+                      </mat-accordion>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <app-not-data [loading]="loading" [text]="'No hay registro de llegadas tarde'"></app-not-data>
+  }
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container [formGroup]="formFilters">
+    <app-autocomplete-fc
+      [control]="formFilters.get('group_id')"
+      [list]="groupList"
+      [label]="'Grupo'"
+      class="col"
+      [placeholder]="'Selecciona'"
+    ></app-autocomplete-fc>
+    <app-autocomplete-fc
+      [control]="formFilters.get('dependency_id')"
+      [list]="dependencyList"
+      [label]="'Dependencia'"
+      class="col"
+      [placeholder]="'Selecciona'"
+    ></app-autocomplete-fc>
+    <app-autocomplete-fc
+      [control]="formFilters.get('people_id')"
+      [list]="people$ | async"
+      [label]="'Funcionario'"
+      class="col"
+      [placeholder]="'Selecciona'"
+    ></app-autocomplete-fc>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Rango de fechas</mat-label>
+      <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          required
+          formControlName="start"
+          name="date_start"
+        />
+        <input
+          matEndDate
+          placeholder="Fecha de fin"
+          required
+          formControlName="end"
+          name="date_end"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button mat-raised-button color="primary" matDateRangePickerApply>Aplicar</button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+  </ng-container>
+</ng-template>
+
+<ng-template #alertNoData>
+  <div class="alert alert-info" role="alert">No hemos encontrado nada aquí.</div>
+</ng-template>
+<!--   <div class="col-md-12 col-xl-12">
+    <div class="card text-white bg-info">
+      <div class="card-body stats align-items-center d-flex">
+        <div style="width: 30%">
+          <i class="fa fa-percent"></i>
+        </div>
+        <div>
+          <h4 class="text-white">{{ dataDiary.percentage }}</h4>
+          <p>LLegadas Tarde</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->

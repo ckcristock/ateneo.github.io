@@ -1,0 +1,222 @@
+<app-card viewTitle="Órdenes de compra" [filterTemplate]="filterTemplate">
+  <app-add-button filters [routerLink]="['/compras/crear-nacional']" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="comprasnacionales"
+    [pagination]="pagination"
+    (pageChange)="listarComprasNacionales()"
+  >
+    <ng-container titles>
+      <th>Código</th>
+      <th>Funcionario</th>
+      <th>Creación</th>
+      <th>Entrega probable</th>
+      <th>Entrega real</th>
+      <th>Proveedor</th>
+      <th>Estado</th>
+      <th>Aprobación</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (compra of comprasnacionales; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">
+            {{ compra.Codigo }}
+          </td>
+          <td class="align-middle">
+            {{ compra?.person?.full_names }}
+          </td>
+          <td class="align-middle">
+            {{ compra?.created_at | date }}
+          </td>
+          <td class="align-middle">
+            {{ compra?.Fecha_Entrega_Probable | date }}
+          </td>
+          <td class="align-middle">
+            {{ (compra?.Fecha_Entrega_Real | date) || 'Sin entregar' }}
+          </td>
+          <td class="align-middle">
+            {{ compra?.third?.full_name }}
+          </td>
+          <td class="align-middle">
+            <span
+              class="badge {{
+                compra.Estado == 'anulada'
+                  ? 'bg-danger'
+                  : compra.Estado == 'pendiente'
+                    ? 'bg-warning'
+                    : compra.Estado == 'recibida'
+                      ? 'bg-success'
+                      : ''
+              }}"
+              >{{ compra.Estado | uppercase }}
+            </span>
+          </td>
+          <td class="align-middle">
+            <span
+              class="badge {{
+                compra.Aprobacion == 'rechazada'
+                  ? 'bg-danger'
+                  : compra.Aprobacion == 'pendiente'
+                    ? 'bg-warning'
+                    : compra.Aprobacion == 'aprobada'
+                      ? 'bg-success'
+                      : ''
+              }}"
+              >{{ compra.Aprobacion | uppercase }}
+            </span>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view
+                [link]="{
+                  url: '/compras/ver-nacional/' + compra.Id_Orden_Compra_Nacional
+                }"
+              />
+              @if (compra.Aprobacion == 'aprobada') {
+                <app-action-button
+                  type="danger"
+                  [icon]="!downloading ? 'file-download' : 'spinner fa-spin'"
+                  [text]="!downloading ? 'Descargar' : 'Descargando'"
+                  (click)="download(compra.Id_Orden_Compra_Nacional)"
+                ></app-action-button>
+              }
+              @if (compra.Estado == 'anulada') {
+                <app-action-button
+                  icon="check"
+                  text="Activar"
+                  type="success"
+                  (click)="setEstadoCompra(compra.Id_Orden_Compra_Nacional, 'Pendiente')"
+                ></app-action-button>
+              }
+              @if (compra.Estado == 'pendiente') {
+                <app-action-deactivate
+                  (action)="setEstadoCompra(compra.Id_Orden_Compra_Nacional, 'Anulada')"
+                />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Funcionario</mat-label>
+    <input
+      type="text"
+      matInput
+      name="nit"
+      [(ngModel)]="filtros.func"
+      (input)="listarComprasNacionales()"
+      autocomplete="off"
+      placeholder="Busca por funcionario"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Rango de fechas</mat-label>
+    <mat-date-range-input [rangePicker]="picker">
+      <input
+        matStartDate
+        placeholder="Fecha de inicio"
+        required
+        [(ngModel)]="filtros.startDate"
+        name="date_start"
+      />
+      <input
+        matEndDate
+        placeholder="Fecha de fin"
+        required
+        [(ngModel)]="filtros.endDate"
+        name="date_end"
+        (dateChange)="selectedDate()"
+      />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtros.cod"
+      (input)="listarComprasNacionales()"
+      autocomplete="off"
+      placeholder="Busca por código"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Proveedor</mat-label>
+    <input
+      type="text"
+      matInput
+      name="nit"
+      [(ngModel)]="filtros.prov"
+      (input)="listarComprasNacionales()"
+      autocomplete="off"
+      placeholder="Busca por proveedor"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filtros.est" (selectionChange)="listarComprasNacionales()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option *ngFor="let item of estadosCompra" [value]="item"> {{ item }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<app-modal-basic #configuracion>
+  <div class="app-modal-header">
+    <h4>Configuración</h4>
+    <button
+      aria-hidden="true"
+      type="button"
+      class="close basic-close"
+      (click)="configuracion.hide()"
+    ></button>
+  </div>
+  <div class="app-modal-body">
+    <h5>Caducidad en la compra</h5>
+    <p>Según el número de días que escriba se anularán las compras sin acta de recepción.</p>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label for="dias"> Modifique los dias: </label>
+          <input
+            type="number"
+            pattern="[0-9]+"
+            [(ngModel)]="dias_anulacion"
+            placeholder="numero de días"
+            class="form-control mb-4"
+          />
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label for="responsable"> Modifique el responsable: </label>
+          <select class="form-control" [(ngModel)]="funcionario_anulacion" id="responsable">
+            <option
+              *ngFor="let func of funcionarios_anulacion"
+              [value]="func.Identificacion_Funcionario"
+            >
+              {{ func.Funcionario }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button class="btn btn-sm btn-success" (click)="setDiasAnulacion()">Actualizar</button>
+    <button class="btn btn-sm btn-danger" (click)="configuracion.hide()">Cerrar</button>
+  </div>
+</app-modal-basic>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

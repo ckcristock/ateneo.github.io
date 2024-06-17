@@ -1,0 +1,165 @@
+<div class="page-body">
+  <div class="row d-flex justify-content-center">
+    <div class="col-10">
+      <form #FormNotaCredito="ngForm">
+        <div class="card">
+          <!-- cabecera -->
+          <div class="row invoice-contact" style="align-items: flex-start !important">
+            <div class="col-md-8">
+              <div class="invoice-box row">
+                <div class="col-sm-12">
+                  <div class="rounded-top table-responsive">
+                    <table class="table invoice-table table-borderless">
+                      <tbody>
+                        <tr>
+                          <td style="width: 100px">
+                            <img
+                              src="{{ enviromen.urlLogoColor }}"
+                              class="m-b-10 img-60"
+                              alt="Pro-H Software"
+                            />
+                          </td>
+                          <td>
+                            {{ enviromen.Nombre }} <br />
+                            {{ enviromen.Nit }} <br />
+                            {{ enviromen.Direccion }} <br />
+                            {{ enviromen.Telefono }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="row text-end" style="margin: 0">
+                <div class="col-sm-12">
+                  <h5>Nota Crédito</h5>
+                  <h4>{{ Datos.Codigo }}</h4>
+                  <h6>{{ Datos.Fecha | date: 'dd/MM/yy' }}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- tabla 1 -->
+            <div class="row">
+              <div class="col-sm-12">
+                <div style="margin-bottom: 40px" *ngIf="perfilUsuario == '27'">
+                  <a
+                    class="btn btn-outline-primary btn-sm pull-right"
+                    href="{{
+                      enviromen.ruta
+                    }}php/contabilidad/movimientoscontables/movimientos_nota_credito_global_pdf.php?id_registro={{
+                      Datos.Id_Nota_Credito_Global
+                    }}&id_funcionario_elabora={{ user.Identificacion_Funcionario }}"
+                    target="_blank"
+                  >
+                    <i class="fa fa-book"></i> Ver contabilización
+                  </a>
+                </div>
+                <!-- tabla 1 -->
+                <app-table [loading]="Cargando" [arrayData]="Datos">
+                  <ng-container titles>
+                    <th>Cliente</th>
+                    <th>Factura</th>
+                    <th>Fecha Factura</th>
+                  </ng-container>
+                  <tbody content>
+                    <tr class="text-center align-middle text-uppercase">
+                      <td>
+                        {{ Datos.Cliente.Nombre_Cliente }}
+                      </td>
+                      <td>
+                        {{ Datos.Factura.Codigo }}
+                      </td>
+                      <td>
+                        {{ Datos.Factura.Fecha_Documento | date: 'dd/MM/yy' }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </app-table>
+              </div>
+            </div>
+            <!-- observaciones -->
+            <div class="row m-0">
+              <div class="col-md-12 ver">
+                <h6>Observaciones</h6>
+                <p>{{ Datos.Observaciones }}</p>
+              </div>
+            </div>
+            <!-- tabla 2 -->
+            <app-table [loading]="Cargando" [arrayData]="Lista_Productos">
+              <ng-container titles>
+                <th>Producto</th>
+                <th>Motivo</th>
+                <th>Observaciones</th>
+                <th>Impuesto</th>
+                <th>T.Impuesto</th>
+                <th>Valor Nota Credito</th>
+              </ng-container>
+              <tbody content>
+                @for (item of Lista_Productos; track $index) {
+                  <tr class="text-center align-middle text-uppercase">
+                    <td class="text-start">
+                      {{ item.Nombre_Producto }}
+                    </td>
+                    <td class="text-center">
+                      {{ item.Motivo }}
+                    </td>
+                    <td class="text-center">
+                      {{ item.Observacion }}
+                    </td>
+                    <td class="text-end">
+                      {{ item.Impuesto | currency }}
+                    </td>
+                    <td class="text-end">
+                      {{ item.Total_Impuesto | currency }}
+                    </td>
+
+                    <td class="text-end">
+                      {{ item.Valor_Nota_Credito | currency }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </app-table>
+            <!-- totales -->
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="rounded-top table-responsive">
+                  <table class="table invoice-table invoice-total space">
+                    <tbody>
+                      <tr>
+                        <td style="font-weight: bold; margin-bottom: 15px">(=) Total Impuesto :</td>
+                        <td>{{ TotalImpuesto | currency }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">(=) Total :</td>
+                        <td>{{ Total | currency }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <!-- botón volver -->
+            <!-- <div class="row">
+              <div class="col-md-2">
+                <button
+                  href=""
+                  [routerLink]="['/contabilidad/comprobantes/notas-credito']"
+                  type="button"
+                  class="btn btn-success btn-block btn-enviar"
+                >
+                  Volver
+                </button>
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

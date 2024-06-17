@@ -1,0 +1,79 @@
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+        <hr class="line" />
+        <form #FormFiltros="ngForm">
+          <div class="row">
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Fecha inicial</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="CertificadoRetencionModel.Fecha_Inicial"
+                (change)="setQueryParams()"
+                name="Fecha_Inicial"
+                id="Fecha_Inicial"
+                required
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Fecha de corte</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="CertificadoRetencionModel.Fecha_Final"
+                (change)="setQueryParams()"
+                name="Fecha_Corte"
+                id="Fecha_Corte"
+                required
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>NIT o C.C</mat-label>
+              <input
+                matInput
+                type="text"
+                [(ngModel)]="TerceroSeleccionado"
+                (change)="AsignarTercero(TerceroSeleccionado)"
+                name="Nit"
+                placeholder="Ingrese NIT o C.C"
+                [ngbTypeahead]="search_tercero"
+                [resultTemplate]="rt_tercero"
+                [inputFormatter]="formatter_tercero"
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Fecha de expedición</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="CertificadoRetencionModel.Fecha_Expedicion"
+                name="fecha_expedicion"
+                id="fecha_expedicion"
+                required
+              />
+            </mat-form-field>
+          </div>
+        </form>
+        <button
+          class="btn btn-primary btn-lg btn-block"
+          [disabled]="!FormFiltros.valid"
+          (click)="generarCertificado()"
+        >
+          <i class="fa fa-eye"></i> Generar certificado
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>
+<ng-template #rt_tercero let-r="result" let-t="term">
+  <span class="f-9">
+    {{ r.Nombre_Tercero }}
+  </span>
+</ng-template>

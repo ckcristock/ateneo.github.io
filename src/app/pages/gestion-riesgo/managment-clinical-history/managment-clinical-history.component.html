@@ -1,0 +1,130 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Modelos de historias clínicas</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button class="btn btn-sm btn-primary" (click)="openModal()">
+            <i class="fa fa-plus"></i> Agregar
+          </button>
+          <button class="btn btn-info btn-sm" (click)="openClose()">
+            <i class="fas fa-sliders-h"></i> Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel class="mat-elevation-z0">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por nombre"
+              [(ngModel)]="filtro.name"
+              (change)="get()"
+              name="name"
+              autocomplete="off"
+            />
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <table
+      class="table table-borderless table-striped mt-4"
+      *ngIf="!loading && models.length > 0; else notData"
+    >
+      <thead class="bg-light">
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Sub tipo</th>
+          <th>Descripción</th>
+          <th>F. Creación</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of models">
+          <td>{{ item.name | uppercase }}</td>
+          <td>{{ item?.type_clinical_history_model?.name | uppercase }}</td>
+          <td>{{ item?.sub_type_clinical_history_model?.name | uppercase }}</td>
+          <td>{{ item?.description | uppercase }}</td>
+          <td>{{ item?.created_at | date: 'dd-MM-YYYY' }}</td>
+          <td>
+            <div class="text-center">
+              <div ngbDropdown class="dropdown-primary">
+                <button
+                  ngbDropdownToggle
+                  class="btn btn-primary btn-sm waves-effect waves-light"
+                  type="button"
+                >
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a
+                    class="dropdown-item waves-light text-dark waves-effect caja-botones"
+                    (click)="getMaterial(item); modalVer.show()"
+                  >
+                    <i class="far fa-eye"></i> Ver
+                  </a>
+                  <a
+                    class="dropdown-item waves-light text-info waves-effect caja-botones"
+                    (click)="editClinicalModel(item)"
+                  >
+                    <i class="far fa-edit"></i> Editar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      [collectionSize]="pagination.collectionSize"
+      [pageSize]="pagination.pageSize"
+      [(page)]="pagination.page"
+      (pageChange)="get($event)"
+      aria-label="Default pagination"
+      maxSize="5"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+    >
+    </ngb-pagination>
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>
+<ng-template #si>
+  <p>Si</p>
+</ng-template>
+<ng-template #no>
+  <p>No</p>
+</ng-template>
+
+<app-modal-basic [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="modal-title">Nuevo modelo</h5>
+    <button type="button" class="close basic-close" (click)="closeModal()">
+      <span aria-hidden="true">
+        <i class="fas fa-times" (click)="closeModal()"></i>
+      </span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <app-builder-form [config]="config" (update)="update($event)"></app-builder-form>
+  </div>
+</app-modal-basic>

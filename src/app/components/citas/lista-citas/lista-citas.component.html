@@ -1,0 +1,122 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="m-0 p-0">Historials de Citas</h4>
+      </div>
+      <div class="card-body">
+        <div class="col-12 mb-2">
+          <button
+            *ngIf="operation == 'Consulta Información Citas'"
+            (click)="finish()"
+            class="btn btn-sm btn-block btn-info"
+          >
+            Finalizar Consulta
+          </button>
+        </div>
+        <div class="col-12">
+          <table class="table" *ngIf="!loading && citas.length > 0; else notData">
+            <thead class="thead-dark">
+              <tr>
+                <th style="width: 20%">Fecha</th>
+                <th style="width: 15%">Especialidad</th>
+                <th style="width: 45%">Descripción</th>
+                <th style="width: 5%">Estado</th>
+                <th style="width: 15%">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cita of citas">
+                <th scope="row">{{ cita.hour_start | date }}</th>
+                <td>{{ cita.speciality }}</td>
+                <td>{{ cita.observation }}</td>
+                <td>{{ cita.state }}</td>
+                <td class="text-end">
+                  <span class="me-2 accion">
+                    <i
+                      title="Detalle de cita"
+                      (click)="detalleCita(cita)"
+                      class="fas fa-notes-medical"
+                    ></i>
+                  </span>
+                  <!--   <span class="me-2 accion">
+                                        <i title="Paciente llegó"   (click)="confirmarCita()" class="fas fa-user-check text-primary"></i>
+                                    </span> -->
+                  <span
+                    *ngIf="canOverride == 'true' && cita.state == 'Agendado'"
+                    class="accion"
+                    (click)="openCancelCita(cita)"
+                  >
+                    <i title="Cancelar" class="fas fa-ban text-danger"></i>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-sm-12">
+          <div class="text-md-end float-md-right pagination-rounded">
+            <ngb-pagination
+              size="sm"
+              [maxSize]="5"
+              [collectionSize]="pagination.collectionSize"
+              (pageChange)="getCitas($event)"
+              [pageSize]="pagination.pageSize"
+              [(page)]="pagination.page"
+              aria-label="Default pagination "
+            >
+            </ngb-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-detalle-cita [modalData]="openModalDetalle"></app-detalle-cita>
+<app-modal-basic #cancelarCitaModal [dialogClass]="'modal-lg modal-full'">
+  <div class="app-modal-header">
+    <div class="row">
+      <h4 class="text text-center justify-content-center modal-title px-3">Cancelar Cita</h4>
+      <button type="button" class="close basic-close" (click)="cancelarCitaModal.hide()"></button>
+    </div>
+  </div>
+  <div class="app-modal-body">
+    <form #formAnular="ngForm">
+      <div class="row mt-3 px-3">
+        <div class="form-group col-12">
+          <label for="reason_cancellation">Motivo de cancelación</label>
+          <input
+            type="text"
+            required
+            class="form-control"
+            name="reason_cancellation"
+            ngModel
+            id="reason_cancellation"
+            placeholder="Ingrese el motivo"
+          />
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-end px-3">
+      <button type="button " class="btn btn-danger btn-sm me-2" (click)="cancelarCitaModal.hide()">
+        Cerrar
+      </button>
+      <button
+        type="button "
+        class="btn btn-success btn-sm"
+        [disabled]="formAnular.invalid"
+        (click)="cancelarCita(formAnular)"
+      >
+        Cancelar Cita
+      </button>
+    </div>
+  </div>
+</app-modal-basic>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

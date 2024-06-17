@@ -1,0 +1,112 @@
+<ng-template #ModalControlProductos>
+  <app-modal titleModal="Control productos">
+    <div class="row">
+      <div class="d-flex flex-column gap-3 col">
+        <h5 class="text-info">Para asociar</h5>
+        <app-automatic-search
+          label="Nombre"
+          placeholder="Busca por nombre"
+          [value]="Filtros.nombre"
+          (searching)="Filtros.nombre = $event; ConsultaFiltrada()"
+        ></app-automatic-search>
+        <app-automatic-search
+          label="CUM"
+          placeholder="Busca por CUM"
+          [value]="Filtros.cum"
+          (searching)="Filtros.cum = $event; ConsultaFiltrada()"
+        ></app-automatic-search>
+        <app-automatic-search
+          label="Invima"
+          placeholder="Busca por invima"
+          [value]="Filtros.invima"
+          (searching)="Filtros.invima = $event; ConsultaFiltrada()"
+        ></app-automatic-search>
+        <app-table [loading]="false" [arrayData]="ListaProductos">
+          <ng-container titles>
+            <th>Nombre</th>
+            <th>Codigo Cum</th>
+            <th>Invima</th>
+          </ng-container>
+          <tbody content>
+            @for (p of ListaProductos; track $index) {
+              <tr
+                class="text-center"
+                role="button"
+                (click)="SeleccionarProducto(p.Seleccionado, p.Id_Producto, p)"
+              >
+                <td>
+                  <strong>{{ p.Nombre_Comercial }}</strong>
+                  <p>{{ p.Principio_Activo }}</p>
+                </td>
+                <td>
+                  {{ p.Codigo_Cum }}
+                </td>
+                <td>
+                  {{ p.Invima }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </app-table>
+      </div>
+      <div class="col">
+        <h5 class="text-info">Controlado</h5>
+        <app-table [loading]="false" [arrayData]="ProductosAsociados">
+          <ng-container titles>
+            <th>Nombre</th>
+            <th>Codigo Cum</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </ng-container>
+          <tbody content>
+            @for (p of ProductosAsociados; track $index) {
+              <tr class="text-center">
+                <td>
+                  {{ p.Nombre_Comercial }}
+                </td>
+                <td>
+                  {{ p.Codigo_Cum }}
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="EliminarAsignado(p.Id_Producto)"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </app-table>
+        @if (ProductoControlado.Id_Producto) {
+          <div class="row">
+            <p class="col-12">
+              Cantidad presentación: {{ ProductoControlado.Cantidad_Presentacion }}
+            </p>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Múltiplo</mat-label>
+              <input
+                matInput
+                type="number"
+                [placeholder]="placeholder"
+                [(ngModel)]="ProductoControlado.Multiplo"
+              />
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Cantidad Mínima</mat-label>
+              <input
+                matInput
+                type="number"
+                [placeholder]="placeholder"
+                [(ngModel)]="ProductoControlado.Cantidad_Minima"
+                (change)="ValidarNumeroMultiplo($event.target.value, 'minima')"
+              />
+            </mat-form-field>
+          </div>
+        }
+      </div>
+    </div>
+    <button buttons type="button" class="btn btn-primary" (click)="onSaveControl()">Guardar</button>
+  </app-modal>
+</ng-template>

@@ -1,0 +1,235 @@
+<div class="row" *ngIf="!loading; else placeholder">
+  <div class="col-xl-4 col-lg-12" *ngIf="data?.orden?.activity?.length > 0">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title">
+          <h5 class="text-primary">Seguimiento</h5>
+        </div>
+        <hr class="line" />
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item px-0" *ngFor="let activity of data?.orden?.activity">
+            <div class="d-flex w-100 justify-content-between">
+              <div>
+                <h6 class="mb-0">
+                  <span
+                    class="badge"
+                    [class]="
+                      activity.Estado == 'Creacion'
+                        ? 'bg-info'
+                        : activity.Estado == 'Edicion'
+                          ? 'bg-warning'
+                          : activity.Estado == 'Anulada' || activity.Estado == 'Rechazada'
+                            ? 'bg-danger'
+                            : activity.Estado == 'Aprobacion'
+                              ? 'bg-success '
+                              : activity.Estado == 'Recepcion'
+                                ? 'bg-primary '
+                                : ''
+                    "
+                  >
+                    {{ activity.Estado }}</span
+                  >
+                </h6>
+                <p class="mb-1">{{ activity.Detalles }}</p>
+                <small>{{ activity.Fecha }}</small>
+                <small class="d-block">{{ activity.person.full_names }}</small>
+              </div>
+              <img
+                alt="foto funcionario"
+                class="d-block img-thumbnail rounded-circle img-fluid header-profile-user"
+                [src]="activity.person.image"
+                onerror="this.src='../../../../../assets/images/noprofile.png'"
+              />
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+        <hr class="line" />
+        <div class="d-flex justify-content-end mb-2">
+          <span class="badge bg-info">{{ data.Estado }}</span>
+        </div>
+        <div class="rounded-top table-responsive">
+          <table class="table table-bordered table-sm">
+            <thead class="bg-light">
+              <tr class="text-center text-uppercase">
+                <th>Compra</th>
+                <th>Bodega</th>
+                <th>Productos Ingresados</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center">
+                <td>
+                  <a
+                    [routerLink]="['/compras/ver-nacional', data.orden?.Id_Orden_Compra_Nacional]"
+                    target="_blank"
+                    >{{ data.orden?.Codigo }}</a
+                  >
+                </td>
+                <td>{{ data.bodega?.Nombre | titlecase }}</td>
+                <td>
+                  <!-- {{ Datos.ConteoProductos }} Producto{{
+                    Datos.ConteoProductos > 1 ? "s" : ""
+                  }}
+                  Diferente{{ Datos.ConteoProductos > 1 ? "s" : "" }} -->
+                </td>
+              </tr>
+            </tbody>
+            <thead class="bg-light">
+              <tr class="text-center text-uppercase">
+                <th>Proveedor</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center">
+                <td>
+                  <a
+                    [routerLink]="['/ajustes/informacion-base/terceros/ver', data.third?.id]"
+                    target="_blank"
+                    >{{ data.third?.full_name | titlecase }}</a
+                  >
+                </td>
+                <td>{{ data.third?.cod_dian_address }}</td>
+                <td>{{ data.third?.landline }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h6>Facturas</h6>
+        <div class="rounded-top table-responsive">
+          <table class="table table-bordered table-sm">
+            <thead class="bg-light">
+              <tr class="text-center text-uppercase">
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Fecha</th>
+                <th>Cufe</th>
+                <th>Archivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of data.facturas; let i = index" class="text-center">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.Factura | uppercase }}</td>
+                <td>{{ item.Fecha_Factura }}</td>
+                <td>
+                  <app-view-more [text]="item.Cufe" [length]="20"></app-view-more>
+                </td>
+                <td>
+                  <a [href]="item.Archivo_Factura" target="_blank">
+                    <i class="fas fa-file-pdf text-danger"></i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr />
+        <div class="rounded-top table-responsive">
+          <table class="table table-borderless table-sm">
+            <thead class="bg-light">
+              <tr class="text-uppercase">
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  {{ data.Observaciones || 'Sin observaciones' | uppercase }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-container *ngIf="data.products.length > 0">
+          <h6>Productos</h6>
+          <div class="rounded-top table-responsive">
+            <table class="table table-bordered table-sm">
+              <thead class="bg-light">
+                <tr class="text-center text-uppercase">
+                  <th>#</th>
+                  <th>Producto</th>
+                  <th>Lote</th>
+                  <th>Fecha Vencimiento</th>
+                  <th>Solicitadas</th>
+                  <th>Cantidad</th>
+                  <th>Precio</th>
+                  <th>Iva</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of data.products; let i = index" class="text-center">
+                  <td class="align-middle">
+                    {{ i + 1 }}
+                  </td>
+                  <td class="align-middle">
+                    <a
+                      [routerLink]="[
+                        '/ajustes/informacion-base/catalogo/ver',
+                        item.product?.Id_Producto
+                      ]"
+                      target="_blank"
+                      >{{ item.product?.Nombre_Comercial | uppercase }}</a
+                    >
+                  </td>
+                  <td class="align-middle">
+                    {{ item.Lote }}
+                  </td>
+                  <td class="align-middle">
+                    {{ item.Fecha_Vencimiento }}
+                  </td>
+                  <td class="align-middle">
+                    {{ item.Cantidad | number }}
+                  </td>
+                  <td class="align-middle">
+                    {{ item.Cantidad | number }}
+                  </td>
+                  <td class="align-middle">${{ item.Precio | number: '1.2-2' }}</td>
+                  <td class="align-middle">{{ item.Impuesto }}%</td>
+                  <td class="align-middle">${{ item.Precio * item.Cantidad | number: '1.2-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="data.Id_Causal_Anulacion">
+          <h6>Causa y observaciones de la anulación</h6>
+          <div>Causa: {{ data.causal.Nombre }}</div>
+          <div>Observaciones: {{ data.Observaciones_Anulacion }}</div>
+        </ng-container>
+        <!-- <app-list-items
+          [title1]="'SUBTOTAL'"
+          [var1]="Datos.Subtotal"
+          [type1]="'cop'"
+          [title2]="'IVA'"
+          [var2]="Datos.Impuesto"
+          [type2]="'cop'"
+          [title3]="'TOTAL'"
+          [var3]="Datos.Total"
+          [type3]="'cop'"
+        ></app-list-items> -->
+        <button
+          *ngIf="data.Estado == 'Pendiente' || data.Estado == 'Creada'"
+          (click)="aprobarActa(data.Id_Acta_Recepcion, data.Id_Bodega_Nuevo)"
+          type="button"
+          class="btn btn-primary btn-block mt-3"
+        >
+          Aprobar acta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>

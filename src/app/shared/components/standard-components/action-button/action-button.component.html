@@ -1,0 +1,31 @@
+@if (link) {
+  @if (link.target) {
+    <a
+      role="button"
+      [href]="link.url"
+      aria-hidden="true"
+      [target]="link.target"
+      rel="noopener noreferrer"
+      class="dropdown-item px-3 text-{{ type }}"
+    >
+      <ng-container *ngTemplateOutlet="content"></ng-container>
+    </a>
+  } @else {
+    <a
+      role="button"
+      [routerLink]="link.url"
+      aria-hidden="true"
+      [queryParams]="link.params"
+      class="dropdown-item px-3 text-{{ type }} px-3"
+    >
+      <ng-container *ngTemplateOutlet="content"></ng-container>
+    </a>
+  }
+} @else {
+  <button aria-hidden="true" type="button" class="dropdown-item px-3 text-{{ type }} px-3">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+  </button>
+}
+<ng-template #content>
+  <i class="fas fa-{{ icon }} text-center action-button-icon"></i> {{ text }}
+</ng-template>

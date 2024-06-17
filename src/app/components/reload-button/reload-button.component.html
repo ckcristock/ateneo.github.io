@@ -1,0 +1,8 @@
+<button
+  class="btn btn-info fixed-bottom-right"
+  type="button"
+  (click)="reloadData()"
+  [title]="title"
+>
+  <i [class]="!reload ? 'fas fa-sync-alt' : 'fas fa-sync-alt fa-spin'"></i>
+</button>

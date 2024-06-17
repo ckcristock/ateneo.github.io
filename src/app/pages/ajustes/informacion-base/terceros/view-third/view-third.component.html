@@ -1,0 +1,220 @@
+<h4 class="text-dark text-center">
+  {{ third_data?.full_name | uppercase }}
+</h4>
+
+<div class="row d-flex align-items-stretch">
+  <div class="col-lg-12 d-flex align-items-stretch">
+    <div class="card w-100" [class.placeholder]="loading">
+      @if (!loading) {
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 pt-2 text-center">
+              <img
+                class="img-fluid img-third"
+                [src]="third_data?.image"
+                onerror="this.src='../../../../assets/images/noprofile.png'"
+                alt=""
+              />
+            </div>
+            <div class="col-md-9 pt-2">
+              <div class="d-flex justify-content-between overflow-auto">
+                <div class="d-flex align-items-center text-truncate">
+                  <mat-icon class="mat-icon-font d-flex align-items-center">location_on</mat-icon>
+                  {{ third_data?.country?.name | capitalLetter }}
+                </div>
+                <div class="d-flex align-items-center text-truncate">
+                  <mat-icon color="primary" class="mat-icon-font d-flex align-items-center"
+                    >mail</mat-icon
+                  >
+                  {{ third_data?.email | lowercase }}
+                </div>
+                <div class="d-flex align-items-center text-truncate">
+                  <mat-icon color="primary" class="mat-icon-font d-flex align-items-center"
+                    >call</mat-icon
+                  >
+                  {{ third_data?.landline }}
+                  {{ third_data?.landline && third_data?.cell_phone ? '-' : '' }}
+                  {{ third_data?.cell_phone }}
+                </div>
+                <div class="d-flex align-items-center text-truncate">
+                  <mat-icon color="primary" class="mat-icon-font d-flex align-items-center"
+                    >person_add</mat-icon
+                  >
+                  {{ third_data?.is_client ? 'Cliente. ' : ('' | capitalLetter) }}
+                  {{ third_data?.is_supplier ? 'Proveedor' : ('' | capitalLetter) }}
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-lg-6">
+                  <div class="table-responsive">
+                    <table class="table table-borderless">
+                      <tbody>
+                        <tr>
+                          <th>Tipo doc.:</th>
+                          <td>
+                            {{ third_data?.document_type_?.code | uppercase }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Número:</th>
+                          <td>
+                            {{ third_data?.nit | number }}
+                            {{ third_data?.dv ? '-' + third_data?.dv : '' }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Persona:</th>
+                          <td>{{ third_data?.person_type | uppercase }}</td>
+                        </tr>
+                        <tr>
+                          <th>Dirección:</th>
+                          <td>
+                            {{ third_data?.cod_dian_address | uppercase }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="table-responsive">
+                    <table class="table table-borderless">
+                      <tbody>
+                        <tr>
+                          <th>Departamento:</th>
+                          <td>
+                            {{ third_data?.department?.name | uppercase }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Municipio:</th>
+                          <td>
+                            {{ third_data?.municipality?.name | uppercase }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Teléfono pagos:</th>
+                          <td>
+                            {{ third_data?.phone_payments | uppercase }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Correo pagos:</th>
+                          <td>
+                            {{ third_data?.email_payments || 'No disponible' | uppercase }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="button" (click)="openModal(fields)" class="btn btn-primary btn-sm">
+              Ver campos especiales
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card" [class.placeholder]="loading">
+      @if (!loading) {
+        <div class="card-body">
+          <h4 class="card-title text-center text-dark fw-bold">PERSONAS</h4>
+          <div class="rounded-top table-responsive">
+            @if (!loading && people?.length > 0) {
+              <table class="table table-bordered table-striped table-sm mb-0">
+                <thead class="bg-light">
+                  <tr class="text-center text-uppercase">
+                    <th>Nombre</th>
+                    <th>Documento</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Cargo</th>
+                    <th>Observación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (person of people; track person) {
+                    <tr class="text-center">
+                      <td class="align-middle">
+                        {{ person?.name | titlecase }}
+                      </td>
+                      <td class="align-middle">
+                        {{ person?.n_document || 'Sin informacion' | number }}
+                      </td>
+                      <td class="align-middle">
+                        {{ person?.cell_phone || 'Sin información' }}
+                      </td>
+                      <td class="align-middle">
+                        {{ person?.email | lowercase }}
+                      </td>
+                      <td class="align-middle">
+                        {{ person?.position | capitalLetter }}
+                      </td>
+                      <td class="align-middle">
+                        {{ person?.observation || 'Sin información' | capitalLetter }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            } @else {
+              <app-not-data [loading]="loading"></app-not-data>
+            }
+          </div>
+          @if (paginacionPeople) {
+            <mat-paginator
+              [length]="paginacionPeople?.total"
+              [pageSize]="paginacionPeople?.per_page"
+              [pageIndex]="paginacionPeople?.current_page - 1"
+              (page)="handlePageEvent($event)"
+              aria-label="Select page"
+            >
+            </mat-paginator>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<ng-template #fields let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Campos especiales</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal?.close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    @if (third_party_fields?.length > 0) {
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <tbody>
+            @for (item of third_party_fields; track item) {
+              <tr>
+                @if (third_data[item?.name]) {
+                  <th>{{ item?.name | uppercase }}</th>
+                  <td>{{ third_data[item?.name] }}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="alert alert-warning" role="alert">Sin información</div>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal?.close()">Cerrar</button>
+  </div>
+</ng-template>

@@ -1,0 +1,9 @@
+.company-logo {
+  width: 100%;
+  max-height: 10rem;
+  object-fit: contain;
+}
+
+.btn-link:hover {
+  color: var(--bs-btn-hover-color) !important;
+}

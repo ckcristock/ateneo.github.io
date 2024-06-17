@@ -1,0 +1,200 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Cierres contables</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button class="btn btn-primary btn-sm" (click)="abrirModalCierre('Mes')">
+            <i class="fa fa-lock"></i> Cerrar mes
+          </button>
+          <button class="btn btn-primary btn-sm" (click)="abrirModalCierre('Anio')">
+            <i class="fa fa-lock"></i> Cerrar año
+          </button>
+          <button class="btn btn-warning btn-sm" (click)="abrirPlanesCuenta.emit('Mensual')">
+            <i class="fa fa-list"></i> Plan cuentas mes
+          </button>
+          <button class="btn btn-warning btn-sm" (click)="abrirPlanesCuenta.emit('Anual')">
+            <i class="fa fa-list"></i> Plan cuentas año
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+
+    <div class="row">
+      <div class="col-lg-6">
+        <h6>Cierre de mes</h6>
+        <div class="rounded-top table-responsive">
+          <table
+            class="table table-bordered table-striped table-sm"
+            *ngIf="!Cargando && Cierres.Mes.length > 0; else notData"
+          >
+            <thead class="bg-light">
+              <tr class="text-center text-uppercase">
+                <th>Foto</th>
+                <th>Creación</th>
+                <th>Mes</th>
+                <th>Año</th>
+                <th>Observaciones</th>
+                <th><i class="mdi mdi-chevron-down"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of Cierres.Mes; let i = index" class="text-center">
+                <td class="align-middle p-0">
+                  <img
+                    [src]="item.image"
+                    onerror="this.src='../../../../assets/images/noprofile.png'"
+                    class="img-rounded d-block img-thumbnail rounded-circle mx-auto img-fluid header-profile-user"
+                  />
+                </td>
+                <td class="align-middle">
+                  {{ item.Created_At | date: 'dd/MM/yyyy' }}
+                </td>
+                <td class="align-middle">{{ nombreMes(item.Mes) }}</td>
+                <td class="align-middle">{{ item.Anio }}</td>
+                <td class="align-middle text-success">
+                  <span role="button" [matTooltip]="item.Observaciones || 'Sin observaciones'"
+                    >Ver observaciones</span
+                  >
+                </td>
+                <td class="align-middle">
+                  <div ngbDropdown container="body" class="dropdown-primary">
+                    <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                      <i class="mdi mdi-chevron-down"></i>
+                    </button>
+                    <div ngbDropdownMenu>
+                      <a class="dropdown-item text-danger" href="javascript:;">
+                        <i class="fa fa-power-off"></i>
+                        {{ item.Estado == 'Cerrado' ? 'Habilitar' : 'Cerrar' }}</a
+                      >
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <h6>Cierres de año</h6>
+        <div class="rounded-top table-responsive">
+          <table
+            class="table table-bordered table-striped table-sm"
+            *ngIf="!Cargando && Cierres.Anio.length > 0; else notData"
+          >
+            <thead class="bg-light">
+              <tr class="text-center text-uppercase">
+                <th>Foto</th>
+                <th>Creación</th>
+                <th>Documento</th>
+                <th>Año</th>
+                <th>Observaciones</th>
+                <th><i class="mdi mdi-chevron-down"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of Cierres.Anio; let i = index"
+                class="text-center"
+                [ngClass]="{
+                  'text-danger font-weight-bold': item.Estado == 'Anulado'
+                }"
+              >
+                <td class="align-middle p-0">
+                  <img
+                    [src]="item.image"
+                    onerror="this.src='../../../../assets/images/noprofile.png'"
+                    class="img-rounded d-block img-thumbnail rounded-circle mx-auto img-fluid header-profile-user"
+                  />
+                </td>
+                <td class="align-middle">
+                  {{ item.Created_At | date: 'dd/MM/yyyy' }}
+                </td>
+                <td class="align-middle">{{ item.Codigo }}</td>
+                <td class="align-middle">{{ item.Anio }}</td>
+                <td class="align-middle text-success">
+                  <span role="button" [matTooltip]="item.Observaciones || 'Sin observaciones'"
+                    >Ver observaciones</span
+                  >
+                </td>
+                <td class="align-middle">
+                  <div ngbDropdown container="body" class="dropdown-primary">
+                    <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                      <i class="mdi mdi-chevron-down"></i>
+                    </button>
+                    <div ngbDropdownMenu>
+                      <a
+                        *ngIf="item.Estado != 'Anulado'"
+                        class="dropdown-item text-danger"
+                        href="javascript: void(0);"
+                        (click)="anularCierreAnio(item.Id_Cierre_Contable)"
+                      >
+                        <i class="fa fa-trash"></i> Anular</a
+                      >
+                      <a
+                        class="dropdown-item text-info"
+                        target="_blank"
+                        href="{{
+                          envirom.base_url
+                        }}/php/contabilidad/movimientoscontables/movimientos_cierreanio_excel.php?id_registro={{
+                          item.Id_Cierre_Contable
+                        }}&id_funcionario_elabora={{ 1 }}"
+                      >
+                        <i class="fa fa-table"></i> Cont. PCGA</a
+                      >
+                      <a
+                        class="dropdown-item text-info"
+                        target="_blank"
+                        href="{{
+                          envirom.base_url
+                        }}/php/contabilidad/movimientoscontables/movimientos_cierreanio_excel.php?id_registro={{
+                          item.Id_Cierre_Contable
+                        }}&id_funcionario_elabora={{ 1 }}&tipo_valor=Niif"
+                      >
+                        <i class="fa fa-table"></i> Cont. NIIF</a
+                      >
+                      <a
+                        class="dropdown-item text-info"
+                        target="_blank"
+                        href="{{
+                          envirom.base_url
+                        }}/php/contabilidad/movimientoscontables/movimientos_cierreanio_excel.php?id_registro={{
+                          item.Id_Cierre_Contable
+                        }}&id_funcionario_elabora={{ 1 }}&tipo_rep=act-pas"
+                      >
+                        <i class="fa fa-table"></i> Cont. PCGA Activos-Pasivos</a
+                      >
+                      <a
+                        class="dropdown-item text-info"
+                        target="_blank"
+                        href="{{
+                          envirom.base_url
+                        }}/php/contabilidad/movimientoscontables/movimientos_cierreanio_excel.php?id_registro={{
+                          item.Id_Cierre_Contable
+                        }}&id_funcionario_elabora={{ 1 }}&tipo_valor=Niif&tipo_rep=act-pas"
+                      >
+                        <i class="fa fa-table"></i> Cont. NIIF Activos-Pasivos</a
+                      >
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>
+<app-modalcierrecontable
+  [abrirModal]="modalCierre.asObservable()"
+  (recargarListas)="listaCierres()"
+>
+</app-modalcierrecontable>
+<app-modalplancuentas [abrirPlanesCuenta]="abrirPlanesCuenta"></app-modalplancuentas>

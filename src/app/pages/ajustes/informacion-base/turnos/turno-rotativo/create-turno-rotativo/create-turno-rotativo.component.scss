@@ -1,0 +1,14 @@
+/* ng-select select-dropdown > div {
+    z-index: 2;
+}
+
+.ng-dropdown-panel { display: block !important; } */
+
+input[type='time']::-webkit-inner-spin-button,
+input[type='time']::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0;
+  top: 8px;
+  height: 15px;
+  width: 15px;
+}

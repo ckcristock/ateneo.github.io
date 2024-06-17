@@ -1,0 +1,45 @@
+<form [formGroup]="formPerson">
+  <div class="row">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Tablero permitido</mat-label>
+      <mat-select formControlName="boardId">
+        <mat-option [value]="0">SIN ASIGNAR</mat-option>
+        @for (item of personConfigData.boards; track item.value) {
+          <mat-option [value]="item.value">{{ item.text }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Empresas permitidas</mat-label>
+      <mat-select formControlName="companiesId" multiple="true">
+        @for (item of personConfigData.companies; track item.value) {
+          <mat-option [value]="item.value">{{ item.text }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Punto de disensación</mat-label>
+      <mat-select formControlName="pointId">
+        <mat-option [value]="0">SIN ASIGNAR</mat-option>
+        @for (item of personConfigData.points; track item.value) {
+          <mat-option [value]="item.value">{{ item.text }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Carpeta permitida</mat-label>
+      <mat-select formControlName="folderId">
+        <mat-option [value]="0">SIN ASIGNAR</mat-option>
+        @for (item of personConfigData.folders; track item.value) {
+          <mat-option [value]="item.value">{{ item.text }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <div class="col-12">
+      <button class="btn btn-primary w-100 btn-sm mb-4" type="button" (click)="putPersonConfig()">
+        <i class="fa fa-save"></i>
+        Guardar
+      </button>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,483 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-md-offset-4">
+      <div class="card">
+        <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+        <!-- Layout de Cabecera. -->
+
+        <div class="card-body" style="padding-bottom: 0px">
+          <form #FormNotaContable="ngForm">
+            <input type="hidden" name="Id_Borrador" [(ngModel)]="idBorrador" />
+            <div class="row invoive-info" style="margin-bottom: 0; padding-bottom: 0px">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Tipo Doc.</label>
+                  <select
+                    name="Tipo_Doc"
+                    id="Tipo_Doc"
+                    class="form-control form-control-sm"
+                    [(ngModel)]="Tipo_Documento"
+                    (change)="getCodigoNuevaNota()"
+                  >
+                    <option value="">Seleccione</option>
+                    <option value="Debito-Cliente">Debito Cliente</option>
+                    <option value="Credito-Cliente">Credito Cliente</option>
+                    <option value="Debito-Proveedor">Debito Proveedor y/o Acreedor</option>
+                    <option value="Credito-Proveedor">Credito Proveedor y/o Acreedor</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Fecha</label>
+                  <input
+                    type="date"
+                    name="Fecha_Documento"
+                    id="Fecha_Nota_Contable"
+                    [(ngModel)]="Fecha_Nota_Contable"
+                    class="form-control form-control-sm tab"
+                    (keyup)="tab($event, 'Cliente')"
+                    (change)="getCodigoNuevaNota($event.target.value)"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Empresa</label>
+                  <select
+                    [(ngModel)]="Id_Empresa"
+                    name="company_id"
+                    id="company_id"
+                    class="form-control form-control-sm"
+                    required
+                  >
+                    <option *ngFor="let item of companies" [value]="item.value">
+                      {{ item.text }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Beneficiario Documento</label>
+                  <input
+                    [(ngModel)]="Nom_Cliente"
+                    type="text"
+                    name="Cliente"
+                    id="Cliente"
+                    class="form-control form-control-sm f-9 tab"
+                    [ngbTypeahead]="search"
+                    [resultTemplate]="rt"
+                    [inputFormatter]="formatter"
+                    (keyup)="tab($event, 'Centro_Costo')"
+                    (ngModelChange)="BuscarDatosCliente(Nom_Cliente)"
+                    (blur)="validarCampo(Nom_Cliente, $event, 'Beneficiario')"
+                  />
+                  <input
+                    hidden
+                    [(ngModel)]="Id_Cliente"
+                    name="Beneficiario"
+                    id="Beneficiario"
+                    class="form-control form-control-sm"
+                    required
+                  />
+                  <input
+                    hidden
+                    [(ngModel)]="Tipo_Beneficiario"
+                    name="Tipo_Beneficiario"
+                    id="Tipo_Beneficiario"
+                    class="form-control form-control-sm"
+                    required
+                  />
+                  <!-- <input hidden [(ngModel)]="Funcionario.Identificacion_Funcionario" name="Identificacion_Funcionario" id="Id_Funcionario" class="form-control form-control-sm " required> -->
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label for="Centro_Costo">Centro Costo</label>
+                  <input
+                    [(ngModel)]="Nom_Centro_Costo"
+                    type="text"
+                    name="Nom_Centro_Costo"
+                    id="Centro_Costo"
+                    class="form-control form-control-sm f-9 tab"
+                    [ngbTypeahead]="search2"
+                    [resultTemplate]="rt2"
+                    [inputFormatter]="formatter2"
+                    (keyup)="tab($event, 'Documento')"
+                    (ngModelChange)="BuscarDatosCentro(Nom_Centro_Costo)"
+                    (blur)="validarCampo(Nom_Centro_Costo, $event, 'Centro de Costo')"
+                  />
+                  <input type="hidden" name="Id_Centro_Costo" [(ngModel)]="Centro_Costo" />
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label for="">Documento</label>
+                  <input
+                    type="text"
+                    name="Documento"
+                    id="Documento"
+                    (keyup)="tab($event, 'Concepto')"
+                    [(ngModel)]="Documento"
+                    class="form-control form-control-sm"
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Concepto</label>
+                  <textarea
+                    name="Concepto"
+                    id="Concepto"
+                    class="form-control"
+                    (keyup)="tab($event, 'Cuenta0')"
+                    [(ngModel)]="Concepto"
+                    rows="3"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="col-md-6"></div>
+
+              <!-- Componente para listar los borradores de los comprobantes contables. -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="borrador">Borradores</label>
+                  <app-borradorcomprobantes
+                    [Tipo_Comprobante]="Tipo_Comprobante"
+                    (Borrador)="setDatosBorrador($event)"
+                  ></app-borradorcomprobantes>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <div *ngIf="Mostrar_Facturas" class="row">
+            <div class="col-md-12 text-center">
+              <h6>Facturas</h6>
+            </div>
+            <div class="col-sm-12">
+              <table class="table invoice-detail-table tabla">
+                <thead>
+                  <tr class="thead-default">
+                    <th style="width: 25px"></th>
+                    <th style="width: 50px">Cuenta</th>
+                    <th style="width: 50px">Fecha</th>
+                    <th style="width: 60px">Documento</th>
+                    <th style="width: 80px; text-align: right">Vlr. Factura</th>
+                    <th style="width: 80px; text-align: right">Vlr. Abono</th>
+                    <th style="width: 80px; text-align: right">Vlr. Saldo</th>
+                    <th style="width: 80px; text-align: right">Abono</th>
+                    <th style="width: 20px">Nat</th>
+                    <th style="width: 60px; text-align: right">Movimiento Debito</th>
+                    <th style="width: 60px; text-align: right">Movimiento_Credito</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="Lista_Facturas.length == 0 && !Cargando">
+                    <td colspan="11">
+                      <i class="fa fa-exclamation-circle fa-5x"></i>
+                      <h4>No Existen Facturas para mostrar</h4>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let item of Lista_Facturas; let i = index" id="fila{{ i }}">
+                    <td style="width: 25px" class="text-center">
+                      <input
+                        type="checkbox"
+                        name="Factura{{ i }}"
+                        id="Factura{{ i }}"
+                        (change)="addListInvoice(item, i)"
+                      />
+                    </td>
+                    <td style="width: 50px">{{ item.Codigo }}</td>
+                    <td style="width: 50px">{{ item.Fecha }}</td>
+                    <td style="width: 60px">{{ item.Factura }}</td>
+                    <td style="width: 80px; text-align: right">
+                      {{ item.Valor_Factura | currency }}
+                    </td>
+                    <td style="width: 80px; text-align: right">
+                      {{ item.Valor_Abono | currency }}
+                    </td>
+                    <td style="width: 80px; text-align: right">
+                      {{ item.Valor_Saldo | currency }}
+                    </td>
+                    <td style="width: 80px; text-align: right">
+                      <input
+                        type="number"
+                        name="abono{{ i }}"
+                        id="abono{{ i }}"
+                        [(ngModel)]="item.Abono"
+                        (blur)="validarSaldoFactura(i, $event)"
+                      />
+                    </td>
+                    <td style="width: 20px">{{ item.Nat }}</td>
+                    <td style="width: 60px; text-align: right">
+                      {{ item.Movimiento_Debito | currency }}
+                    </td>
+                    <td style="width: 60px; text-align: right">
+                      {{ item.Movimiento_Credito | currency }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="Lista_Facturas.length > 0">
+                    <td colspan="7"></td>
+                    <td style="width: 80px; text-align: right">
+                      <b>Total: {{ Total_Abono | currency }}</b>
+                    </td>
+                    <td colspan="3"></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <button class="btn btn-info btn-sm pull-left" (click)="addInvoicesToAccount()">
+                Confirmar
+              </button>
+            </div>
+          </div>
+
+          <hr />
+          <div class="row">
+            <div class="col-md-12">
+              <button
+                class="btn btn-link btn-sm pull-right"
+                title="Recargar datos iniciales (Terceros, PUC, Centro Costos)"
+                (click)="reloadData()"
+              >
+                <i class="fas fa-sync-alt"></i> Recargar
+              </button>
+              <table class="table invoice-detail-table tabla">
+                <thead>
+                  <tr class="thead-default">
+                    <th style="width: 200px">Cuenta</th>
+                    <th>Nit</th>
+                    <th>Centro Costo</th>
+                    <th>Documento</th>
+                    <th>Concepto</th>
+                    <th>Base</th>
+                    <th>Debito</th>
+                    <th>Credito</th>
+                    <th>Deb Niif</th>
+                    <th>Cred Niif</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of Cuentas_Contables; let i = index" id="fila{{ i }}">
+                    <td>
+                      <input
+                        [(ngModel)]="item.Cuenta"
+                        type="text"
+                        name="Cuenta"
+                        id="Cuenta{{ i }}"
+                        class="form-control form-control-sm f-9"
+                        [ngbTypeahead]="search1"
+                        [resultTemplate]="rt1"
+                        [inputFormatter]="formatter1"
+                        (ngModelChange)="BuscarCuenta(item.Cuenta, i)"
+                        (keyup)="tab($event, 'Nit' + i)"
+                        (blur)="armarDatosBorrador(); validarCampo(item.Cuenta, $event, 'Cuenta')"
+                        [required]="Cuentas_Contables.length - 1 != i"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        [(ngModel)]="item.Nit"
+                        type="text"
+                        name="Nit{{ i }}"
+                        id="Nit{{ i }}"
+                        class="form-control form-control-sm f-9"
+                        [ngbTypeahead]="search"
+                        [resultTemplate]="rt"
+                        [inputFormatter]="formatter"
+                        (keyup)="tab($event, 'Centro_Costo' + i)"
+                        (ngModelChange)="BuscarDatosCliente(item.Nit, i)"
+                        (blur)="armarDatosBorrador(); validarCampo(item.Nit, $event, 'Nit')"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        [(ngModel)]="item.Centro_Costo"
+                        type="text"
+                        name="Centro_Costo{{ i }}"
+                        id="Centro_Costo{{ i }}"
+                        class="form-control form-control-sm f-9"
+                        [ngbTypeahead]="search2"
+                        [resultTemplate]="rt2"
+                        [inputFormatter]="formatter2"
+                        (ngModelChange)="BuscarDatosCentro(item.Centro_Costo, i)"
+                        (keyup)="tab($event, 'Documento' + i)"
+                        (blur)="
+                          armarDatosBorrador();
+                          validarCampo(item.Centro_Costo, $event, 'Centro de Costo')
+                        "
+                      />
+                    </td>
+                    <td>
+                      <input
+                        name="Documento{{ i }}"
+                        id="Documento{{ i }}"
+                        (keyup)="tab($event, 'Concepto' + i)"
+                        [(ngModel)]="item.Documento"
+                        class="form-control form-control-sm text-end input-document"
+                        (blur)="armarDatosBorrador()"
+                        type="text"
+                      />
+                      <a href="javascript:;" (click)="showFacturas(item.Nit_Cuenta, i)">
+                        <i style="font-weight: bold" class="fa fa-search"></i>
+                      </a>
+                    </td>
+                    <td>
+                      <input
+                        name="Concepto{{ i }}"
+                        id="Concepto{{ i }}"
+                        (blur)="armarDatosBorrador()"
+                        (keyup)="tab($event, 'Base' + i)"
+                        [(ngModel)]="item.Concepto"
+                        class="form-control form-control-sm"
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        name="Base{{ i }}"
+                        id="Base{{ i }}"
+                        (blur)="armarDatosBorrador()"
+                        (keyup)="tab($event, 'Debito' + i)"
+                        (change)="calcularBase(i, $event.target.value)"
+                        [(ngModel)]="item.Base"
+                        class="form-control form-control-sm text-end"
+                        readonly
+                      />
+                    </td>
+                    <td>
+                      <input
+                        name="Debito{{ i }}"
+                        id="Debito{{ i }}"
+                        (blur)="armarDatosBorrador()"
+                        (keyup)="tab($event, 'Credito' + i)"
+                        (change)="ActualizaValores(i); validarDebCred(i, 'Debito')"
+                        [(ngModel)]="item.Debito"
+                        class="form-control form-control-sm text-end"
+                        type="number"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        name="Credito{{ i }}"
+                        id="Credito{{ i }}"
+                        (blur)="armarDatosBorrador()"
+                        (keyup)="tab($event, 'Deb_Niif' + i)"
+                        (change)="ActualizaValores(i); validarDebCred(i, 'Credito')"
+                        [(ngModel)]="item.Credito"
+                        class="form-control form-control-sm text-end"
+                        type="number"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        name="Deb_Niif{{ i }}"
+                        id="Deb_Niif{{ i }}"
+                        (blur)="armarDatosBorrador()"
+                        (keyup)="tab($event, 'Cred_Niif' + i)"
+                        (change)="validarDebCred(i, 'Debito')"
+                        [(ngModel)]="item.Deb_Niif"
+                        class="form-control form-control-sm text-end"
+                        type="number"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        name="Cred_Niif{{ i }}"
+                        id="Cred_Niif{{ i }}"
+                        (blur)="armarDatosBorrador()"
+                        (keyup)="tab($event, 'Cuenta' + (i + 1))"
+                        (change)="validarDebCred(i, 'Credito')"
+                        [(ngModel)]="item.Cred_Niif"
+                        class="form-control form-control-sm text-end"
+                        type="number"
+                      />
+                    </td>
+                    <td class="text-center">
+                      <a
+                        *ngIf="Cuentas_Contables.length - 1 != i"
+                        href="javascript:;"
+                        (click)="EliminarCuenta(i); armarDatosBorrador()"
+                      >
+                        <span>
+                          <i class="fa fa-trash-o text-danger"></i>
+                        </span>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <table class="table table-responsive invoice-table invoice-total">
+                <tbody>
+                  <tr>
+                    <th>Total Debito:</th>
+                    <td>{{ Total_Debito | currency }}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Total Credito:</th>
+                    <td>{{ Total_Credito | currency }}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Diferencia:</th>
+                    <td>{{ Total_Debito - Total_Credito | currency }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-8"></div>
+        <div class="col-md-2 botonFlotante1">
+          <button
+            href=""
+            [routerLink]="['/contabilidad/comprobantes/notas-cartera']"
+            type="button"
+            class="btn btn-success btn-block btn-enviar"
+          >
+            Volver
+          </button>
+        </div>
+        <div class="col-md-2 botonFlotante">
+          <button
+            type="button"
+            class="btn btn-success btn-block btn-enviar"
+            [disabled]="Total_Debito != Total_Credito"
+          >
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9"
+    ><strong>{{ r.Nombre }}</strong>
+  </span>
+</ng-template>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>
+
+<ng-template #rt2 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombre }} </span>
+</ng-template>

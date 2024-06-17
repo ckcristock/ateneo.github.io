@@ -1,0 +1,88 @@
+<app-card
+  viewTitle="Profesionales"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters (click)="createOrUpdated()" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="persons"
+    [pagination]="pagination"
+    (pageChange)="getProfessionals()"
+  >
+    <ng-container titles>
+      <th>Imagen</th>
+      <th>Nombre</th>
+      <th>Identificación</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of persons; track item.id) {
+        <tr class="text-center">
+          <td class="p-0">
+            <app-load-image
+              classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+              [src]="item?.image"
+            ></app-load-image>
+          </td>
+          <td class="text-start">{{ item.full_name }}</td>
+          <td>{{ item.identifier | number }}</td>
+          <td>
+            <span
+              [ngClass]="
+                item.status == 'inactivo'
+                  ? 'badge bg-danger'
+                  : item.status == 'activo'
+                    ? 'badge bg-success'
+                    : 'badge bg-warning'
+              "
+            >
+              {{ item.status | uppercase }}
+            </span>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="update(item.id)" />
+              @if (item.status == 'activo') {
+                <app-action-deactivate (action)="suspend()" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Identificación"
+    placeholder="Busca por identificación"
+    [value]="filtros.identifier"
+    (searching)="filtros.identifier = $event; getProfessionals()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtros.name"
+    (searching)="filtros.name = $event; getProfessionals()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Empresa"
+    placeholder="Busca por empresa"
+    [value]="filtros.company"
+    (searching)="filtros.company = $event; getProfessionals()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select (selectionChange)="getProfessionals()" [(ngModel)]="filtros.status">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Activo">Activo</mat-option>
+      <mat-option value="Inactivo">Inactivo</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

@@ -1,0 +1,90 @@
+<ng-template #ModalProductosRemision>
+  <app-modal titleModal="Agregar productos">
+    <div class="row mb-4">
+      <app-automatic-search
+        class="col"
+        label="Nombre"
+        placeholder="Busca por nombre"
+        [value]="Filtros.nombre"
+        (searching)="Filtros.nombre = $event; ConsultaFiltrada()"
+      ></app-automatic-search>
+      @for (item of categoryService.categoryFields; track item.cv_id) {
+        <app-automatic-search
+          class="col"
+          [label]="item.label"
+          [placeholder]="'Busca por ' + (item.label | lowercase)"
+          [value]="fieldFilter[item.cv_id]"
+          (searching)="fieldFilter[item.cv_id] = $event; ConsultaFiltrada(item.cv_id)"
+        />
+      }
+    </div>
+    <div class="form-row">
+      <div class="col-md-2" *ngIf="Tipo != 'Remision'">
+        <input
+          type="checkbox"
+          checked
+          name="sin-inventario"
+          id="sin-inventario"
+          (change)="ConsultaFiltrada()"
+        />
+        Sin Inventario
+      </div>
+      <app-table [loading]="Cargando" [arrayData]="ListaProductos">
+        <ng-container titles>
+          <th>Producto</th>
+          <th>Emb.</th>
+          <th>Cat.</th>
+          <th>Cant. Disp.</th>
+          <th *ngIf="Pendiente">Cant. Pend.</th>
+          @for (item of dynamicColumns; track $index) {
+            <th>{{ item }}</th>
+          }
+        </ng-container>
+        <tbody content>
+          @for (p of ListaProductos; track p.Id_Producto; let i = $index) {
+            <tr
+              (click)="SeleccionarProducto(p.Seleccionado, p.Id_Producto, p, i)"
+              class="text-center"
+              [ngClass]="{ 'bg-selected': p.Seleccionado == 1 }"
+              style="cursor: pointer"
+            >
+              <td>
+                <strong>{{ p.Nombre_Comercial || 'N/A' }}</strong>
+                <p class="text-muted" style="font-size: 9px">{{ p.Nombre || 'N/A' }}</p>
+              </td>
+              <td>
+                <br />
+                <i
+                  class="fa fa-archive"
+                  placement="left"
+                  ngbTooltip="{{ p.Embalaje || 'N/A' }}"
+                ></i>
+              </td>
+              <td>
+                {{ p.Categoria || 'N/A' }}
+              </td>
+              <td>
+                {{ p.Cantidad_Disponible || 'N/A' }}
+              </td>
+              <td *ngIf="Pendiente">
+                {{ p.Cantidad_Pendiente || 'N/A' }}
+              </td>
+              @for (item of dynamicColumns; track $index) {
+                <td>{{ p.variables[item] }}</td>
+              }
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    </div>
+    <button
+      buttons
+      type="button"
+      class="btn btn-primary"
+      (click)="AgregarProductosTabla()"
+      [disabled]="ProductosAgregar.length == 0"
+    >
+      Agregar y cerrar
+    </button>
+  </app-modal>
+</ng-template>

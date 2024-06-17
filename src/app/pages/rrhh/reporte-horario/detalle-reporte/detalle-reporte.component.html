@@ -1,0 +1,76 @@
+<div *ngIf="reporteHorarios.length">
+  <div *ngFor="let company of reporteHorarios">
+    <h4 class="text-primary text-uppercase fw-bold" *ngIf="reporteHorarios.length > 1">
+      {{ company.name }}
+    </h4>
+    <div *ngFor="let group of company.groups">
+      <h5 class="text-uppercase fw-bold text-primary">
+        Grupo: <span class="text-secondary">{{ group.name }}</span>
+      </h5>
+      <div *ngFor="let dependency of group.dependencies">
+        <h6 class="fw-bold text-center text-uppercase">
+          {{ dependency.name }}
+        </h6>
+        <div *ngIf="dependency.people.length > 0; else alertNoData">
+          <div class="rounded-top table-responsive">
+            <table class="table table-sm">
+              <tbody>
+                <ng-container *ngFor="let person of dependency.people; let i = index">
+                  <tr class="text-center" (click)="person.show = !person.show" role="button">
+                    <td class="col-1">
+                      <img
+                        src="{{ person.image | image: 'users' }}"
+                        onerror="this.src='../../../../assets/images/noprofile.png'"
+                        class="rounded-circle mx-auto header-profile-user"
+                      />
+                    </td>
+                    <td>{{ person.completed_name | titlecase }}</td>
+                    <td class="col-1">
+                      <i
+                        [ngClass]="person.show ? 'fa-angle-up' : 'fa-angle-down'"
+                        class="fas text-primary"
+                        role="button"
+                        (click)="person.show = !person.show"
+                      ></i>
+                    </td>
+                  </tr>
+                  <ng-container *ngIf="person.show">
+                    <tr>
+                      <td colspan="100%">
+                        <ng-container *ngIf="type == 'Rotativo'; else detalleFijo">
+                          <app-detalle-horario-rotativo
+                            [horas]="person.totalHours"
+                            [horasEditadas]="person.totalHoursEdit"
+                            [permissions]="permissions"
+                            [horarios]="person.diaries"
+                            (update)="updateList()"
+                          ></app-detalle-horario-rotativo>
+                        </ng-container>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="100%">
+                        <ng-template #detalleFijo>
+                          <app-detalle-horario
+                            [horas]="person.totalHours"
+                            [horasEditadas]="person.totalHoursEdit"
+                            [permissions]="permissions"
+                            [horarios]="person.diaries"
+                            (update)="updateList()"
+                          ></app-detalle-horario>
+                        </ng-template>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #alertNoData>
+  <div class="alert alert-info" role="alert">No hemos encontrado nada aquí.</div>
+</ng-template>

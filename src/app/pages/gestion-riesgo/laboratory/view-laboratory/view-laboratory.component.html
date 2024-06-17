@@ -1,0 +1,132 @@
+<div class="card">
+  <div class="card-body" *ngIf="!loading && laboratory; else notData">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-5 px-0">
+        <h4 class="text-primary">Ver laboratorio</h4>
+      </div>
+      <div class="col-md-7 h4 px-0 text-md-end text-center">
+        <span class="badge bg-info mx-1">
+          {{ laboratory.date | date: 'longDate' }}
+        </span>
+        <!-- <span
+          class="badge bg-info mx-1"
+          *ngIf="laboratory.status == 'Tomado'"
+        >
+          {{ laboratory.hour }}
+        </span> -->
+        <span
+          class="badge mx-1"
+          [ngClass]="
+            laboratory.status == 'Tomado'
+              ? 'bg-success'
+              : laboratory.status == 'Ingresado'
+                ? 'bg-warning'
+                : 'bg-danger'
+          "
+        >
+          {{ laboratory.status }}
+        </span>
+      </div>
+    </div>
+    <hr class="line" />
+    <div class="table-responsive text-center">
+      <table class="table table-borderless table-sm">
+        <thead>
+          <tr class="text-uppercase border-top border-bottom">
+            <th scope="col">Nombre</th>
+            <th scope="col">Documento</th>
+            <th scope="col">EPS</th>
+            <th scope="col">Ciudad</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Teléfono</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              {{ laboratory.patient.firstname }}
+              {{ laboratory.patient.middlename }}
+              {{ laboratory.patient.surname }}
+              {{ laboratory.patient.secondsurname }}
+            </td>
+            <td>{{ laboratory.patient.identifier }}</td>
+            <td>{{ laboratory.patient.eps.name }}</td>
+            <td>{{ laboratory.patient.municipality.name }}</td>
+            <td>{{ laboratory.patient.email }}</td>
+            <td>{{ laboratory.patient.phone }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-responsive text-center" *ngIf="laboratory.status == 'Anulado'">
+      <hr />
+      <table class="table table-borderless table-sm">
+        <thead>
+          <tr class="text-uppercase border-top border-bottom">
+            <th scope="col">Motivo anulación</th>
+            <th scope="col">Observaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ laboratory.motivo.Nombre }}</td>
+            <td>{{ laboratory.observations }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <hr />
+    <div class="table-responsive text-center">
+      <table class="table table-borderless table-sm">
+        <thead>
+          <tr class="text-uppercase border-top border-bottom">
+            <th>Diagnóstico</th>
+            <th>Contrato</th>
+            <th>Laboratorio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              {{ laboratory.cie10.code }} -
+              {{ laboratory.cie10.description }}
+            </td>
+            <td>{{ laboratory.contract.name }}</td>
+            <td>{{ laboratory.place.name }} - {{ laboratory.place.city }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <hr />
+    <h5 class="text-center">Procedimientos</h5>
+    <div class="table-responsive text-center">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-uppercase">
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Estado</th>
+            <!-- <th>Acciones</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of laboratory.cup">
+            <td>{{ item.cup.code }}</td>
+            <td>{{ item.cup.description }}</td>
+            <td>
+              <span
+                class="badge rounded-pill"
+                [ngClass]="item.state == 'Pendiente' ? 'bg-warning' : 'bg-success'"
+                >{{ item.state }}</span
+              >
+            </td>
+            <!-- <td></td> -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

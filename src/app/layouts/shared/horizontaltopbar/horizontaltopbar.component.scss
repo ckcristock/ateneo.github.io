@@ -1,0 +1,52 @@
+.notification-item {
+  cursor: pointer;
+}
+
+.iconClass {
+  position: relative;
+}
+
+.iconClass span {
+  position: absolute;
+  top: 10px;
+  right: 0px;
+  display: block;
+}
+
+.logo-sm img {
+  max-width: 6.5rem;
+  object-fit: contain;
+}
+
+.circular-background {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #7ca01a;
+}
+
+.active-border {
+  border-left: green 4px solid;
+}
+
+.floating-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.scroll-container {
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.btn-menu:hover,
+#page-header-notifications-dropdown:hover,
+#page-header-user-dropdown:hover,
+.btn-menu:active {
+  color: #636e75 !important;
+}

@@ -1,0 +1,92 @@
+<app-card viewTitle="Devoluciones realizadas" [filterTemplate]="filterTemplate">
+  <app-add-button filters routerLink="crear" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="purchases"
+    [pagination]="pagination"
+    (pageChange)="getReturnMade()"
+  >
+    <ng-container titles>
+      <th scope="col">Código</th>
+      <th scope="col">Fecha</th>
+      <th scope="col">Proveedor</th>
+      <th scope="col">Estado</th>
+      <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of purchases; track item.Id_Devolucion_Compra; let i = $index) {
+        <tr class="text-center">
+          <td class="text-start">
+            <app-load-image
+              classImg="rounded-circle mx-auto img-fluid header-profile-user"
+              [src]="item.image"
+            ></app-load-image>
+            <span>
+              {{ item.Codigo }}
+            </span>
+          </td>
+          <td>{{ item.Fecha | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ item.Nombre }}</td>
+          <td><app-status-badge [status]="item.Estado" /></td>
+          <td>
+            <app-dropdown-actions [loading]="indexLoading === i">
+              <app-action-view
+                [link]="{
+                  url: 'verdetalledevolucion/' + item.Id_Devolucion_Compra
+                }"
+              />
+              @if (item.Estado !== 'anulada') {
+                <app-action-button
+                  icon="server"
+                  text="Contabilizar"
+                  type="info"
+                  [link]="{
+                    url:
+                      RUTA +
+                      '/php/contabilidad/movimientoscontables/movimientos_devolucion_compras.php?id_registro=' +
+                      item.Id_Devolucion_Compra +
+                      '&id_funcionario_elabora=' +
+                      userId +
+                      '&tipo_valor=Niif',
+                    target: '_blank'
+                  }"
+                />
+                <app-action-button
+                  icon="print"
+                  text="Imprimir"
+                  type="secondary"
+                  (click)="postPrintReturnMade(i, item)"
+                />
+                <app-action-deactivate (click)="cancelReturn(item.Id_Devolucion_Compra)" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Código"
+    placeholder="Filtro código"
+    (searching)="onFilters('cod', $event)"
+  ></app-automatic-search>
+  <app-date-picker class="col" [value]="filters" (dateChange)="selectedDate($event)" />
+  <app-automatic-search
+    class="col pb-3"
+    label="Proveedor"
+    placeholder="Filtro proveedor"
+    (searching)="onFilters('prov', $event)"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filters.estado" (selectionChange)="getReturnMade()">
+      <mat-option value=""> Todas </mat-option>
+      <mat-option value="Activa"> Activas </mat-option>
+      <mat-option value="Anulada"> Anuladas </mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

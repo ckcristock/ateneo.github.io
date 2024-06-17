@@ -1,0 +1,47 @@
+<app-card
+  viewTitle="Tipos de servicios"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters routerLink="crear/0" />
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Lista_Servicios"
+    [pagination]="pagination"
+    (pageChange)="filtros()"
+  >
+    <ng-container titles>
+      <th>Tipo</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of Lista_Servicios; track item.Id_Tipo_Servicio) {
+        <tr class="text-center">
+          <td>{{ item.Nombre || 'No hay dato' }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit [routerLink]="['crear', item.Id_Tipo_Servicio]" />
+              <button
+                type="button"
+                class="dropdown-item text-danger px-3"
+                (click)="EliminarTipoServicio(item.Id_Tipo_Servicio)"
+              >
+                <i class="fas fa-trash-alt text-center" style="min-width: 20px"></i> Eliminar
+              </button>
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col mb-3"
+    label="Tipo"
+    placeholder="Busca por tipo"
+    [value]="filtro_tipo"
+    (searching)="filtro_tipo = $event; filtros()"
+  ></app-automatic-search>
+</ng-template>

@@ -1,0 +1,215 @@
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>
+@if (!loading) {
+  <div class="card">
+    <div class="card-body">
+      <h5 class="text-primary">{{ title || 'Agregar producto' }}</h5>
+      <hr class="line" />
+      <form [formGroup]="form">
+        <div class="row">
+          <div class="col-lg-2 mx-auto">
+            <div class="align-items-center">
+              <app-load-image
+                srcDefault="./assets/images/product.jpg"
+                classImg="d-block img-thumbnail mx-auto img-fluid img-product"
+                [src]="imageProduct"
+              ></app-load-image>
+              <!-- <img id="imageOutput" [src]="photoPreview" class="d-block img-thumbnail mx-auto img-fluid img-product" /> -->
+              <input
+                hidden
+                (change)="onFileSelected($event)"
+                #photoInput
+                type="file"
+                accept=".png, .jpg, .jpeg"
+              />
+              <div class="col-md-12 text-center">
+                @if (isLoadImage) {
+                  <small class="text-success">Imagen cargada</small>
+                }
+              </div>
+              <button
+                type="button"
+                class="btn btn-info btn-block mt-3"
+                (click)="photoInput.click()"
+              >
+                Cargar imagen
+              </button>
+            </div>
+          </div>
+          <div class="col-lg-10 d-flex flex-column justify-content-between">
+            <div class="row">
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input
+                  type="text"
+                  formControlName="Nombre_Comercial"
+                  matInput
+                  placeholder="Nombre del producto"
+                  autocomplete="off"
+                  required
+                />
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Categoría</mat-label>
+                <mat-select formControlName="Id_Categoria" required>
+                  @for (item of categories; track item) {
+                    <mat-option [value]="item.value">{{ item.text }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Subcategoría</mat-label>
+                <mat-select formControlName="Id_Subcategoria" required>
+                  @for (item of subcategories; track item) {
+                    <mat-option [value]="item.value">{{ item.text }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <!-- <mat-form-field class="col" appearance="outline">
+                <mat-label>Precio</mat-label>
+                <input
+                  formControlName="Precio"
+                  matInput
+                  placeholder="Ingresa el precio"
+                  currencyMask
+                  [options]="masks.maskCOP"
+                  appInputPosition
+                  autocomplete="off"
+                  required
+                />
+              </mat-form-field> -->
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Codigo de barras</mat-label>
+                <input
+                  type="text"
+                  formControlName="Codigo_Barras"
+                  matInput
+                  placeholder="Codigo de barras"
+                  autocomplete="off"
+                />
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Unidad de medida</mat-label>
+                <mat-select formControlName="Unidad_Medida" required>
+                  @for (unidad of unidades_medida; track unidad) {
+                    <mat-option [value]="unidad.value">{{ unidad.text }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Impuesto</mat-label>
+                <mat-select formControlName="impuesto_id" required>
+                  @for (tax of taxes; track tax) {
+                    <mat-option [value]="tax.value">{{ tax.text }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Referencia</mat-label>
+                <input
+                  type="text"
+                  formControlName="Referencia"
+                  matInput
+                  placeholder="Ingresa la referencia"
+                  autocomplete="off"
+                />
+              </mat-form-field>
+              @if (category_variables.value.length > 0) {
+                <ng-container formArrayName="category_variables">
+                  @for (item of category_variables.controls; track item; let i = $index) {
+                    <ng-container [formGroupName]="i">
+                      <mat-form-field class="col" appearance="outline">
+                        <mat-label>{{ item.get('label').value }}</mat-label>
+                        <input
+                          [type]="item.get('type').value"
+                          formControlName="valor"
+                          matInput
+                          placeholder="Ingresa el dato"
+                          autocomplete="off"
+                          [required]="item.get('required').value"
+                        />
+                      </mat-form-field>
+                    </ng-container>
+                  }
+                </ng-container>
+              }
+              @if (subcategory_variables.value.length > 0) {
+                <ng-container formArrayName="subcategory_variables">
+                  @for (item of subcategory_variables.controls; track item; let i = $index) {
+                    <ng-container [formGroupName]="i">
+                      <mat-form-field class="col" appearance="outline">
+                        <mat-label>{{ item.get('label').value }}</mat-label>
+                        <input
+                          [type]="item.get('type').value"
+                          formControlName="valor"
+                          matInput
+                          placeholder="Ingresa el dato"
+                          autocomplete="off"
+                          name="no-password"
+                          [required]="item.get('required').value"
+                        />
+                      </mat-form-field>
+                    </ng-container>
+                  }
+                </ng-container>
+              }
+              <mat-form-field class="col-12" appearance="outline">
+                <mat-label>Nombre general</mat-label>
+                <input
+                  type="text"
+                  formControlName="Nombre_General"
+                  matInput
+                  placeholder="Ingresa el nombre general"
+                  autocomplete="off"
+                  readonly="true"
+                  required
+                />
+              </mat-form-field>
+              <div class="d-flex flex-wrap gap-2">
+                <mat-checkbox (change)="onHandleCheckbox($event, 'nombre')"
+                  >Nombre comercial</mat-checkbox
+                >
+                <mat-checkbox (change)="onHandleCheckbox($event, 'medida')"
+                  >Unidad de medida</mat-checkbox
+                >
+                <mat-checkbox (change)="onHandleCheckbox($event, 'referencia')"
+                  >Referencia</mat-checkbox
+                >
+                @if (category_variables.value.length > 0) {
+                  @for (item of category_variables.controls; track item; let i = $index) {
+                    <mat-checkbox (change)="onHandleCheckbox($event, 'cat', item)">{{
+                      item.get('label').value
+                    }}</mat-checkbox>
+                  }
+                }
+                @if (subcategory_variables.value.length > 0) {
+                  @for (item of subcategory_variables.controls; track item; let i = $index) {
+                    <mat-checkbox (change)="onHandleCheckbox($event, 'subcat', item)">{{
+                      item.get('label').value
+                    }}</mat-checkbox>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button type="button" (click)="saveProductos()" class="btn btn-primary btn-block">
+        Guardar
+      </button>
+    </div>
+  </div>
+} @else {
+  <app-placeholder-form></app-placeholder-form>
+}
+
+@if (id) {
+  <app-reload-button
+    [title]="'Recargar campos adicionales'"
+    [reload]="laodingReload"
+    (reloadData)="reload()"
+  ></app-reload-button>
+}

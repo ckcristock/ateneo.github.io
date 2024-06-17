@@ -1,0 +1,79 @@
+<app-card viewTitle="Tipos de contrato" [filterTemplate]="filterTemplate">
+  <app-table
+    [loading]="loading"
+    [arrayData]="contracts"
+    [pagination]="pagination"
+    (pageChange)="getContractsType()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (contract of contracts; track $index) {
+        <tr class="text-center">
+          <td>{{ contract.name }}</td>
+          <td class="col-1">
+            <app-dropdown-actions>
+              <app-action-edit (action)="getData(contract, modalNg)" />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtro.name"
+    (searching)="filtro.name = $event; getContractsType()"
+  ></app-automatic-search>
+</ng-template>
+
+<ng-template #modalNg>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4 class="text-primary modal-title">{{ selected }}</h4>
+      <button
+        type="button"
+        class="btn-close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="close()"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="form">
+        <div class="row">
+          <div class="col-12">
+            <ckeditor
+              [editor]="_texteditor.Editor"
+              (ready)="_texteditor.onReady($event)"
+              [config]="_texteditor.configEditor"
+              formControlName="template"
+            >
+            </ckeditor>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button (click)="close()" type="button" class="btn btn-danger">Cancelar</button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!form.valid"
+        (click)="createContractType()"
+      >
+        Guardar
+      </button>
+    </div>
+  </div>
+</ng-template>
+<ng-template #notData>
+  <app-not-data-sa [loading]="loading"></app-not-data-sa>
+</ng-template>

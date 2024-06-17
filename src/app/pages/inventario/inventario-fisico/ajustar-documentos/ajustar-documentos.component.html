@@ -1,0 +1,136 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <!--Encabezado-->
+          <!-- <app-cabecera [datosCabecera]="DatosCabecera">
+                  </app-cabecera> -->
+        </div>
+
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12 col-sm-12 listado-sin-diferencia">
+              <h4 class="text-center" style="color: blue">Listado de Productos</h4>
+              <!-- ///////////////////// revisar si son necesarios -->
+              <!-- [loading]="Cargando2"
+            [arrayData]="Inventarios_Terminados"
+            [pagination]="adjInvPag"
+            (pageChange)="ConsultaFiltrada()" -->
+              <app-table>
+                <ng-container titles>
+                  <th class="text-center" style="width: 60px">Documento</th>
+                  <th class="text-center">Producto</th>
+                  <th class="text-center">Estiba</th>
+                  <th class="text-center">Grupo Estiba</th>
+                  <th class="text-center">Primer Conteo</th>
+                  <th class="text-center">Fecha Primer Conteo</th>
+                  <th class="text-center">Segundo Conteo</th>
+                  <th class="text-center">Fecha Segundo Conteo</th>
+                  <th class="text-center">Cantidad_Inventario</th>
+                  <th class="text-center">Lote</th>
+                  <th class="text-center">Diferencia</th>
+                  <th class="text-center"><i class="mdi mdi-chevron-down"></i></th>
+                </ng-container>
+                <tbody content>
+                  @if (productos.length > 0) {
+                    @for (producto of productos; track $index) {
+                      <tr class="text-center">
+                        <td class="text-center">
+                          <strong>{{ producto.Id_Doc_Inventario_Fisico }}</strong
+                          ><br />
+                        </td>
+                        <td>
+                          <strong>{{ producto.Nombre_Comercial }}</strong
+                          ><br />
+                          <span class="text-muted">{{ producto.Nombre_Producto }}</span>
+                        </td>
+
+                        <td class="text-center">
+                          {{ producto.Nombre_Estiba }}
+                        </td>
+                        <td class="text-center">
+                          {{ producto.Nombre_Grupo }}
+                        </td>
+                        <td class="text-center">
+                          {{ producto.Primer_Conteo }}
+                        </td>
+                        <td class="text-center">
+                          {{ producto.Fecha_Primer_Conteo }}
+                        </td>
+                        <td class="text-center">
+                          {{ producto.Segundo_Conteo }}
+                        </td>
+                        <td class="text-center">
+                          {{ producto.Fecha_Segundo_Conteo }}
+                        </td>
+                        <td class="text-center">
+                          {{ producto.Cantidad_Inventario }}
+                        </td>
+                        <td class="text-center">
+                          {{ producto.Lote }}
+                        </td>
+                        <td class="text-center font-size: 14px;font-weight: bold">
+                          <span
+                            [ngClass]="{
+                              'text-danger font-weight-bold': producto.Cantidad_Diferencial < 0,
+                              'text-success': producto.Cantidad_Diferencial > 0
+                            }"
+                          >
+                            <span *ngIf="producto.Cantidad_Diferencial > 0">+</span>
+                            {{ producto.Cantidad_Diferencial }}
+                          </span>
+                        </td>
+                        <td class="d-flex d-flex justify-content-end">
+                          <!-- Para Editar Cantidad  -->
+                          <div class="form-row d-flex align-items-center">
+                            <div
+                              class="col-9"
+                              *ngIf="producto.Cantidad_Auditada || producto.editar"
+                            >
+                              <input
+                                type="number"
+                                class="form-control"
+                                [disabled]="!producto.editar"
+                                placeholder="Cantidad Final"
+                                [(ngModel)]="producto.Cantidad_Auditada"
+                              />
+                            </div>
+
+                            <div class="col d-flex justify-content-end" *ngIf="!producto.editar">
+                              <button
+                                class="btn btn-secondary btn-sm botones"
+                                (click)="editarProducto(producto)"
+                              >
+                                <i style="padding-left: 5px" class="fas fa-edit"></i>
+                              </button>
+                            </div>
+
+                            <div class="col d-flex justify-content-end" *ngIf="producto.editar">
+                              <button
+                                class="btn btn-success btn-sm botones"
+                                (click)="producto.editar = false"
+                              >
+                                <i style="padding-left: 5px" class="fas fa-check-circle"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </app-table>
+            </div>
+          </div>
+          <div class="row">
+            <!-- <div class="col-md-12 ">
+                          <button type="button " (click)="confirmacionGuardar.fire() " class="btn btn-primary btn-sm btn-block ">
+                         <i class="fa fa-check "></i> Terminar Inventario</button>
+                      </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

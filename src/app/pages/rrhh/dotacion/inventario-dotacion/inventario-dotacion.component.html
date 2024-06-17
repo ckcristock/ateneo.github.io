@@ -1,0 +1,188 @@
+<app-card
+  viewTitle="Inventario de dotación y EPP"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="UrlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]">
+    <app-add-button (click)="openModal(add); listarGrupo()" />
+    <app-header-button
+      icon="file-download"
+      [text]="downloading ? 'Cargando...' : 'Descargar'"
+      type="success"
+      [class.disabled]="downloading"
+      (click)="DownloadInventoryDotation()"
+    ></app-header-button>
+  </ng-container>
+  <app-table
+    [loading]="loading"
+    [arrayData]="Inventarios"
+    [pagination]="pagination"
+    (pageChange)="ListaInventario()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Talla</th>
+      <th>Calidad</th>
+      <th>Tipo</th>
+      <th>Costo</th>
+      <th class="col-1">Cantidad</th>
+      <th *ngIf="person_id == 1"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (inventario of Inventarios; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">{{ inventario?.name || 'N/A' }}</td>
+          <td class="align-middle">{{ inventario?.size || 'N/A' }}</td>
+          <td class="align-middle text-uppercase">{{ inventario?.status || 'N/A' }}</td>
+          <td class="align-middle">{{ inventario?.type || 'N/A' }}</td>
+          <td class="text-end align-middle">$ {{ inventario?.cost | number | puntos }}</td>
+          <td class="align-middle" *ngIf="!inventario?.edit; else inputEditTemplate">
+            {{ inventario?.remaining_stock || 'N/A' }}
+          </td>
+          <ng-template #inputEditTemplate>
+            <td class="d-flex justify-content-end">
+              <input
+                #inputEdit
+                class="form-control form-control-sm"
+                style="max-width: 4rem"
+                currencyMask
+                [options]="mask.maskNumbers"
+                appInputPositionInitial
+                [ngModel]="inventario.remaining_stock"
+              />
+            </td>
+          </ng-template>
+          <!-- cancelar -->
+
+          <!-- ----------- -->
+          @if (!inventario.edit && person_id == 1) {
+            <td>
+              <button class="btn btn-sm btn-info" (click)="inventario.edit = true">
+                <i class="fas fa-edit"></i>
+              </button>
+            </td>
+          } @else if (person_id == 1) {
+            <td>
+              <!-- cancelar -->
+              <button class="btn btn-sm btn-secondary me-1" (click)="inventario.edit = false">
+                <i class="fas fa-ban"></i>
+              </button>
+              <button class="btn btn-sm btn-primary" (click)="update(inventario, $index)">
+                <i class="fas fa-save"></i>
+              </button>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Talla"
+    placeholder="Busca por talla"
+    [value]="filtros.talla"
+    (searching)="filtros.talla = $event; ListaInventario()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre del elemento"
+    placeholder="Busca por nombre del elemento"
+    [value]="filtros.nombre"
+    (searching)="filtros.nombre = $event; ListaInventario()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Calidad</mat-label>
+    <mat-select [(ngModel)]="filtros.calidad" (selectionChange)="ListaInventario()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="nuevo">Nuevo</mat-option>
+      <mat-option value="usado">Usado</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo</mat-label>
+    <mat-select [(ngModel)]="filtros.tipo" id="" name="" (selectionChange)="ListaInventario()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="dotacion">Dotacion</mat-option>
+      <mat-option value="epp">EPP</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<!-- gráfica -->
+<!-- <div class="card">
+  <div class="card-body">
+    <div class="card-title">
+      <h5 class="text-center text-primary">Dotación y EPP por categorías</h5>
+    </div>
+    <div #dotacion_chart>
+      <canvas
+        baseChart
+        [datasets]="barChartData"
+        [labels]="barChartLabels"
+        [options]="barChartOptions"
+        [legend]="barChartLegend"
+      >
+      </canvas>
+    </div>
+  </div>
+</div> -->
+
+<ng-template #add>
+  <app-modal titleModal="Nueva categoría">
+    <form #FormGrupo="ngForm">
+      <mat-form-field class="col-12 px-0 pb-0" appearance="outline">
+        <mat-label>Nombre de categoría</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Ingresa el nombre"
+          name="name"
+          ngModel
+          id="grupo"
+          required
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <hr />
+      <ng-container *ngIf="Lista_Grupos_Inventario.length; else notData">
+        <h4 class="text-start text-primary">Categorías</h4>
+        <app-table [loading]="loading" [arrayData]="Lista_Grupos_Inventario">
+          <ng-container titles>
+            <th>Nombre</th>
+            <th class="col-1"><i class="mdi mdi-chevron-down"></i></th>
+          </ng-container>
+          <tbody content>
+            @for (Grupo of Lista_Grupos_Inventario; track $index) {
+              <tr class="text-center">
+                <td>
+                  {{ Grupo?.name || 'N/A' }}
+                </td>
+                <td>
+                  <app-dropdown-actions>
+                    <app-action-deactivate (action)="removeCategory(Grupo.id, Grupo.name)" />
+                  </app-dropdown-actions>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </app-table>
+      </ng-container>
+    </form>
+    <button
+      buttons
+      type="button"
+      class="btn btn-primary"
+      [disabled]="FormGrupo.invalid"
+      (click)="GuardarGrupo(FormGrupo)"
+    >
+      Guardar
+    </button>
+  </app-modal>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

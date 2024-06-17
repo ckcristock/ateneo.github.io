@@ -1,0 +1,42 @@
+<div *ngIf="mostrarCalculo; else notData">
+  <app-resumen-provisiones [provisionesDatos]="provisionesDatos"></app-resumen-provisiones>
+
+  <p *ngIf="funcionario.contractultimate.transport_subsidy">
+    <small
+      ><b>
+        Se incluye el Subsidio de transporte en la Base para cesantías y prima, ya que el empleado
+        tiene configurado este auxilio y su salario es menor de 2MMLV.
+      </b></small
+    >
+  </p>
+
+  <app-base-calculo
+    [funcionario]="funcionario"
+    [base]="provisionesDatos.base_cesantias"
+    [title]="'Cálculo Base cesantías,intereses a las cesantías'"
+    [icon]="'fas fa-coins'"
+  >
+  </app-base-calculo>
+
+  <app-base-calculo
+    [funcionario]="funcionario"
+    [base]="provisionesDatos.base_prima"
+    [title]="'Cálculo Base prima'"
+    [icon]="'fas fa-coins'"
+  >
+  </app-base-calculo>
+
+  <app-base-calculo
+    [funcionario]="funcionario"
+    [base]="provisionesDatos.base_vacaciones"
+    [title]="'Cálculo Base vacaciones'"
+    [icon]="'fas fa-coins'"
+  >
+  </app-base-calculo>
+
+  <app-dias-vacaciones [diasVacaciones]="provisionesDatos.dias_vacaciones"></app-dias-vacaciones>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="!mostrarCalculo" [text]="'Sin Datos'"></app-not-data>
+</ng-template>

@@ -1,0 +1,9 @@
+<app-reason
+  titleReason="motivo"
+  [pagination]="pagination"
+  [data]="types"
+  [loading]="loading"
+  (saveReason)="saveReason($event)"
+  (newRequest)="getTypeMemorandum($event)"
+  (changeStatus)="onChangeStateReason($event)"
+></app-reason>

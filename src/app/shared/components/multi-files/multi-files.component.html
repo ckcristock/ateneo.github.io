@@ -1,0 +1,55 @@
+@if (typeUse === 'modal') {
+  <app-modal titleModal="Agregar documentos">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+    <ng-container ngProjectAs="[buttons]" *ngTemplateOutlet="save"></ng-container>
+  </app-modal>
+} @else if (typeUse === 'view') {
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+  <ng-container *ngTemplateOutlet="save"></ng-container>
+} @else {
+  <button
+    type="button"
+    class="border-0 custom-input-file col-md-12"
+    (click)="openMultiFiles(contentModal)"
+  >
+    {{ listFiles.length ? 'Ver documentos' : 'Cargar documentos' }}
+  </button>
+  @if (listFiles.length) {
+    <div class="text-center">
+      <small class="text-success"> Cantidad de documentos cargados: {{ listFiles.length }} </small>
+    </div>
+  }
+}
+<ng-template #contentModal let-modal>
+  <app-modal titleModal="Agregar documentos" [hideClose]="true" (closed)="modal.dismiss()">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+    <ng-container
+      ngProjectAs="[buttons]"
+      *ngTemplateOutlet="save; context: { $implicit: modal }"
+    ></ng-container>
+  </app-modal>
+</ng-template>
+
+<ng-template #content>
+  <input
+    id="fileSelector"
+    type="file"
+    multiple
+    hidden
+    [accept]="typeFile"
+    (change)="onSelectFiles($event)"
+  />
+  <label
+    for="fileSelector"
+    class="col-12 d-flex align-items-center justify-content-center multi-files"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+  >
+    <i class="fas fa-upload"></i> &nbsp; Arrastre y suelte el archivo aquí o haga click
+  </label>
+  <br />
+  <app-list-files [listFiles]="listFiles" [isModal]="false" (removeFile)="onRemoveFile($event)" />
+</ng-template>
+<ng-template #save let-modalRef>
+  <button type="button" class="btn btn-primary" (click)="onSendFiles(modalRef)">Guardar</button>
+</ng-template>

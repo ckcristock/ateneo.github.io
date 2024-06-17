@@ -1,0 +1,278 @@
+<div class="col-md-12 px-0">
+  <div class="card-body">
+    <div class="mt-4">
+      <app-table [loading]="Cargando" [arrayData]="Lista_Productos">
+        <ng-container titles>
+          <th></th>
+          <th>Producto</th>
+          <th>Emb. / Cat.</th>
+          <th>Presentación</th>
+          <th
+            [ngClass]="{
+              'display-table-cell': Display_Rotacion,
+              'no-display': !Display_Rotacion
+            }"
+          >
+            Rotacion/Stock
+          </th>
+          @for (item of dynamicColumns; track $index) {
+            <th>{{ item }}</th>
+          }
+          <th>Cantidad Disponible</th>
+          <th
+            [ngClass]="{
+              'display-table-cell': Display_Interna,
+              'no-display': !Display_Interna
+            }"
+          >
+            Cantidad Requerida
+          </th>
+          @if (Tipo_Remision !== 'Interna') {
+            <th>Cantidad</th>
+          }
+          <th
+            [ngClass]="{
+              'display-table-cell': Display_Cliente,
+              'no-display': !Display_Cliente
+            }"
+          >
+            Precio
+          </th>
+          <th
+            [ngClass]="{
+              'display-table-cell': Display_Cliente,
+              'no-display': !Display_Cliente
+            }"
+          >
+            Descuento
+          </th>
+          <th
+            [ngClass]="{
+              'display-table-cell': Display_Cliente,
+              'no-display': !Display_Cliente
+            }"
+          >
+            IVA
+          </th>
+          <th
+            [ngClass]="{
+              'display-table-cell': Display_Cliente,
+              'no-display': !Display_Cliente
+            }"
+          >
+            Subtotal
+          </th>
+          <th></th>
+        </ng-container>
+        <tbody content>
+          <tr class="text-center" *ngFor="let item of Lista_Productos; let i = index">
+            <td>
+              <strong>{{ i + 1 }}</strong>
+            </td>
+            <td>
+              <strong>{{ item.Nombre_Comercial }}</strong>
+              <span class="text-muted">
+                {{ item.Nombre }}
+              </span>
+            </td>
+            <td>
+              <!-- Embalaje -->
+              <strong>{{ item.Categoria }} / </strong><br />
+              <!-- <span *ngIf="item.Id_Producto != ''" class="mytooltip tooltip-effect-2"> -->
+              <span class="tooltip-item2">
+                <app-view-more [text]="item.Embalaje" [length]="12"></app-view-more>
+              </span>
+              <span class="tooltip-content4 clearfix">
+                <span class="tooltip-text2">{{ item.Embalaje }}</span>
+              </span>
+              <!-- </span> -->
+            </td>
+            <td>
+              <!-- Presentación -->
+              <label>{{ item.Cantidad_Presentacion }}</label>
+            </td>
+            @for (vars of dynamicColumns; track $index) {
+              <td>{{ item.variables[vars] }}</td>
+            }
+            <td
+              [ngClass]="{
+                'display-table-cell': Display_Rotacion,
+                'no-display': !Display_Rotacion
+              }"
+            >
+              <!-- Rotativo -->
+              {{ item.Rotativo }}
+            </td>
+            <td>
+              <!-- Rotativo -->
+              <label>{{ item.Cantidad_Disponible }}</label>
+            </td>
+            <td
+              [ngClass]="{
+                'display-table-cell': Display_Interna,
+                'no-display': !Display_Interna
+              }"
+            >
+              <!-- Cantidad Requerida-->
+              <input
+                id="CantidadRequerida{{ i }}"
+                name="Cantidad_Requerida{{ i }}"
+                type="number"
+                [(ngModel)]="item.Cantidad_Requerida"
+                min="0"
+                class="form-control form-control-sm text-end f-9 tabla"
+                pattern="[0-9]"
+                (change)="ComprobarCantidades(i)"
+                onkeypress="return event.charCode >= 48  && event.charCode <= 57 "
+              />
+            </td>
+            @if (Tipo_Remision !== 'Interna') {
+              <td>
+                <!-- Cantidad Ingresada-->
+                <input
+                  id="CantidadIngresada{{ i }}"
+                  name="Cantidad_Total{{ i }}"
+                  type="number"
+                  [(ngModel)]="item.Cantidad"
+                  min="0"
+                  class="form-control form-control-sm text-end f-9 tabla"
+                  [readonly]="Tipo_Remision == 'Interna'"
+                  (change)="ComprobarCantidades(i); CalcularSubtotalProducto(i)"
+                  onkeypress="return event.charCode >= 48  && event.charCode <= 57 "
+                />
+              </td>
+            }
+            <!-- <td> -->
+            <!--   <ul *ngIf="item.Lotes_Visuales.length > 0"> -->
+            <!--     <li *ngFor="let lote_visual of item.Lotes_Visuales" class="lista-lotes"> -->
+            <!--       <i class="fa fa-check-circle text-success"></i>{{ lote_visual || 'N/A' }} -->
+            <!--     </li> -->
+            <!--   </ul> -->
+            <!--   <a -->
+            <!--     *ngIf="item.Similares.length > 0" -->
+            <!--     style="cursor: pointer" -->
+            <!--     (click)="VerSimilares(i)" -->
+            <!--   > -->
+            <!--     Ver Similares -->
+            <!--     <i class="ti-plus text-success f-14"></i> -->
+            <!--   </a> -->
+            <!-- </td> -->
+            <td
+              [ngClass]="{
+                'display-table-cell': Display_Cliente,
+                'no-display': !Display_Cliente
+              }"
+            >
+              <!-- Precio -->
+              <input
+                id="precioVenta{{ i }}"
+                name="precioVenta{{ i }}"
+                type="number"
+                [(ngModel)]="item.Precio"
+                class="form-control form-control-sm text-end f-9"
+                (change)="VerificarPrecioRegulacion(i)"
+              />
+            </td>
+            <td
+              [ngClass]="{
+                'display-table-cell': Display_Cliente,
+                'no-display': !Display_Cliente
+              }"
+            >
+              <!-- Descuento -->
+              <div class="form-group input-group input-group-button">
+                <input
+                  style="text-align: center"
+                  id="descuento{{ i }}"
+                  name="Descuento{{ i }}"
+                  [(ngModel)]="item.Descuento"
+                  type="number"
+                  min="0"
+                  class="form-control form-control-sm text-end f-9"
+                  (change)="CalcularSubtotalProducto(i)"
+                  onkeypress="return event.charCode >= 48  && event.charCode <= 57 "
+                />
+                <div class="input-group-append">
+                  <span>&nbsp;&nbsp;%</span>
+                </div>
+              </div>
+            </td>
+            <td
+              [ngClass]="{
+                'display-table-cell': Display_Cliente,
+                'no-display': !Display_Cliente
+              }"
+            >
+              <!-- IVA -->
+              <label>{{ item.Impuesto }}</label>
+            </td>
+            <td
+              [ngClass]="{
+                'display-table-cell': Display_Cliente,
+                'no-display': !Display_Cliente
+              }"
+            >
+              <!-- Subtotal -->
+              <label>{{ item.Subtotal | currency }}</label>
+            </td>
+            <td class="text-center">
+              <!-- Boton -->
+              <i
+                class="fas fa-trash text-danger f-14"
+                style="cursor: pointer"
+                (click)="EliminarProducto(i)"
+              ></i>
+            </td>
+          </tr>
+        </tbody>
+      </app-table>
+      @if (_remisionModel.Tipo == 'Cliente') {
+        <app-list-items
+          class="d-block mb-4"
+          title1="SUBTOTAL"
+          [var1]="_remisionModel.Subtotal_Remision"
+          type1="cop"
+          title2="DESCUENTO"
+          [var2]="_remisionModel.Descuento_Remision"
+          type2="cop"
+          title3="Total"
+          [var3]="_remisionModel.Costo_Remision"
+          type3="cop"
+          mt="mt-2"
+        >
+        </app-list-items>
+      }
+      <div class="btn-group btn-block" role="group" aria-label="Button group">
+        <button type="button" class="btn btn-info" (click)="AbrirModalAgregarProductos()">
+          <i class="fa fa-search-plus"></i>
+          Agregar productos
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="onSaveRemision()"
+          [disabled]="Lista_Productos.length == 0 || loadingQuan"
+        >
+          <i class="fas fa-save"></i>
+          {{ loadingQuan ? 'Cargando...' : 'Guardar remision' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <app-modalproductoremisionnuevo
+    [AbrirModal]="AbrirModalProductos.asObservable()"
+    (AgregarProductos)="RecibirProductos($event)"
+  >
+  </app-modalproductoremisionnuevo>
+
+  <app-modalcambiarproductossimilarnuevo
+    [AbrirModal]="AbrirModalProductoCambiar.asObservable()"
+    (AgregarProductos)="RealizarCambioProducto($event)"
+  >
+  </app-modalcambiarproductossimilarnuevo>
+
+  <ng-template #notData>
+    <app-not-data [loading]="Cargando"></app-not-data>
+  </ng-template>
+</div>

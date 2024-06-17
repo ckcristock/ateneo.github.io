@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col-md-12 mt-2" *ngIf="calendarEvents.length == 0">
+    <div class="alert alert-warning" role="alert">
+      <i class="fa fa-exclamation-triangle"></i> No se encontraron espacios disponibles con esas
+      características
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="app-calendar">
+      <full-calendar [events]="calendarEvents" [options]="calendarOptions"> </full-calendar>
+    </div>
+  </div>
+</div>

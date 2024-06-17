@@ -1,0 +1,175 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-10 px-0">
+        <h6 class="text-dark"><i class="fas fa-business-time"></i> Datos básicos</h6>
+      </div>
+      <div class="col-md-2 px-0 text-end">
+        <button class="btn btn-link" (click)="openModal(modal)">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    @if (!loading && company) {
+      <div class="row">
+        <div class="col-12 my-3 text-center">
+          <img
+            class="img-fluid company-logo"
+            [src]="company.logo | image: 'companies'"
+            onerror="this.src='../../../../../../../assets/images/not-available.png'"
+          />
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Razón social</div>
+        <div class="col-lg-6 text-lg-start text-center">{{ company.name }}</div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">NIT</div>
+        <div class="col-lg-6 text-lg-start text-center">{{ company.tin }}</div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Fecha de constitución</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ company.creation_date }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Correo electrónico</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ company.email_contact }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Teléfono</div>
+        <div class="col-lg-6 text-lg-start text-center">{{ company.phone }}</div>
+      </div>
+    } @else {
+      <app-not-data [loading]="loading"></app-not-data>
+    }
+  </div>
+</div>
+
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Editar datos básicos</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    @if (!loadingModal) {
+      <form [formGroup]="form">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group text-center">
+              <img
+                [src]="fileString"
+                id="imageOutput"
+                class="img-fluid company-logo"
+                onerror="this.src='../../../../../../../assets/images/not-available.png'"
+              />
+              <div class="custom-input-file col-md-12 mt-3">
+                <input
+                  type="file"
+                  #fileInput
+                  class="input-file"
+                  (change)="onFileChanged($event)"
+                  accept="image/*"
+                />
+                Cargar imagen
+              </div>
+              <div class="col-md-12 text-center">
+                @if (fileString) {
+                  <small class="text-success">Imagen cargada</small>
+                }
+              </div>
+            </div>
+          </div>
+          <mat-form-field class="col-md-6" appearance="outline">
+            <mat-label>Razón social</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Ingresa la razón social"
+              formControlName="name"
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Tipo de documento</mat-label>
+            <mat-select formControlName="document_type" required>
+              @for (item of documents_types; track item) {
+                <mat-option [value]="item.value">{{ item.text }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Número de documento</mat-label>
+            <input
+              matInput
+              type="number"
+              placeholder="Ingresa el número de documento"
+              formControlName="tin"
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Dígito de verificación</mat-label>
+            <input
+              matInput
+              type="number"
+              placeholder="Ingresa el dígito de verificación"
+              formControlName="dv"
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha de constitución</mat-label>
+            <input
+              matInput
+              type="date"
+              formControlName="creation_date"
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Correo elctrónico</mat-label>
+            <input
+              matInput
+              placeholder="Ingresa el correo electrónico"
+              type="email"
+              formControlName="email_contact"
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Teléfono de contacto</mat-label>
+            <input
+              matInput
+              placeholder="Ingresa el teléfono de contacto"
+              type="number"
+              formControlName="phone"
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+        </div>
+      </form>
+    } @else {
+      <app-not-data [loading]="loadingModal"></app-not-data>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+    <button
+      type="button"
+      [disabled]="!form.valid"
+      (click)="saveBasicData()"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>

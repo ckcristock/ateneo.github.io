@@ -1,0 +1,9 @@
+<app-modal titleModal="Llamado a descargos">
+  <ckeditor
+    [editor]="texteditor.Editor"
+    [config]="texteditor.configEditor"
+    [formControl]="editorControl"
+    (ready)="texteditor.onReady($event)"
+  ></ckeditor>
+  <button buttons type="button" class="btn btn-primary" (click)="onDownload()">Descargar</button>
+</app-modal>

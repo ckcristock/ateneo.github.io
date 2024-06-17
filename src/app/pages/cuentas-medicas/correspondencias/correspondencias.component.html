@@ -1,0 +1,354 @@
+<div class="row">
+  <!-- reportes -->
+  <div class="col-md-12">
+    <div class="card">
+      <!-- titulo reportes -->
+      <div class="card-body">
+        <app-header title="Reportes" />
+        <!-- inputs reportes -->
+        <div class="row">
+          <!-- rango de fechas -->
+          <mat-form-field appearance="outline" class="col">
+            <mat-label>Fechas envío</mat-label>
+            <mat-date-range-input [formGroup]="rangeReportes" [rangePicker]="rangePickerReportes">
+              <input
+                matStartDate
+                [readonly]="true"
+                placeholder="Fecha de inicio"
+                formControlName="start"
+                name="date_start"
+              />
+              <input
+                matEndDate
+                [readonly]="true"
+                placeholder="Fecha de fin"
+                formControlName="end"
+                name="date_end"
+              />
+            </mat-date-range-input>
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="rangePickerReportes"
+            ></mat-datepicker-toggle>
+            <mat-datepicker-toggle
+              matIconSuffix
+              (click)="borrarFechas(rangeReportes, ReporteModel)"
+            >
+              <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+            </mat-datepicker-toggle>
+
+            <mat-date-range-picker #rangePickerReportes>
+              <mat-date-range-picker-actions>
+                <button mat-button matDateRangePickerCancel>Cancelar</button>
+                <button mat-raised-button color="primary" matDateRangePickerApply>Filtrar</button>
+              </mat-date-range-picker-actions>
+            </mat-date-range-picker>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col">
+            <mat-label>Punto dispensación</mat-label>
+            <mat-select
+              placeholder="Filtrar por Punto Dispensacion"
+              [(ngModel)]="ReporteModel.Punto_Dispensacion"
+            >
+              <mat-option
+                *ngFor="let puntoDispensacion of listaPuntoDispensacion"
+                [value]="puntoDispensacion.value"
+              >
+                {{ puntoDispensacion.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col">
+            <mat-label>Tipo de servicio</mat-label>
+            <mat-select
+              name="tipo_servicio"
+              id="tipo_servicio"
+              [(ngModel)]="ReporteModel.Tipo_Servicio"
+            >
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let item of tiposServicios" [value]="item.Id_Tipo_Servicio">
+                {{ item.Nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col">
+            <mat-label>Departamento</mat-label>
+            <mat-select
+              name="departamento"
+              id="departamento"
+              [(ngModel)]="ReporteModel.Departamento"
+            >
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let item of Departamentos" [value]="item.Id_Departamento">
+                {{ item.Nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col">
+            <mat-label>Estado</mat-label>
+            <mat-select name="estado" id="estado" [(ngModel)]="ReporteModel.Estado">
+              <mat-option value="">Todas</mat-option>
+              <mat-option value="Enviada">Enviadas</mat-option>
+              <mat-option value="Recibida">Recibidas</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="col-md-12">
+            <button
+              class="btn btn-block btn-success"
+              [attr.disabled]="ReporteModel.fecha == '' ? true : null"
+              (click)="downloadReporte()"
+            >
+              <i class="fa fa-table"></i> Descargar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- correspondencias -->
+  <div class="col-12">
+    <app-card
+      viewTitle="Correspondencias"
+      [filterTemplate]="filterTemplate"
+      [activeFilters]="UrlFiltersService.activeFilters"
+    >
+      <ng-container ngProjectAs="[filters]"> </ng-container>
+      <app-table
+        [loading]="Cargando"
+        [arrayData]="correspondencias"
+        [pagination]="pagination"
+        (pageChange)="onPagination($event)"
+      >
+        <ng-container titles>
+          <th>Foto</th>
+          <th>Fecha Envío</th>
+          <th>Código</th>
+          <th>Empresa Envío</th>
+          <th>Folios</th>
+          <th>Fecha Recibido</th>
+          <th>Dispensación</th>
+          <th>Guía</th>
+          <th>Estado</th>
+          <th><i class="mdi mdi-chevron-down"></i></th>
+        </ng-container>
+        <tbody content>
+          @for (correspondencia of correspondencias; track $index) {
+            <tr class="text-center align-middle text-uppercase">
+              <td>
+                <app-load-image
+                  [src]="environment?.ruta + 'IMAGENES/FUNCIONARIOS/' + correspondencia?.Imagen"
+                  classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                  style="object-fit: cover; min-height: 11rem"
+                ></app-load-image>
+              </td>
+              <td>
+                {{ correspondencia?.Fecha_Envio | date: 'dd/MM/yyyy' || 'N/A' }}
+              </td>
+              <td>CO000{{ correspondencia?.Id_Correspondencia || 'N/A' }}</td>
+
+              <td>
+                <i class="fa fa-truck m-r-10"></i>{{ correspondencia?.Empresa_Envio || 'N/A'
+                }}<i class="fa fa-barcode m-r-10"></i>{{ correspondencia?.Numero_Guia || 'N/A' }}
+              </td>
+              <td>
+                {{ correspondencia?.Cantidad_Folios || 'N/A' }}
+              </td>
+              <td>
+                {{ correspondencia?.Fecha_Entrega_Real | date: 'dd/MM/yyyy' || 'N/A' }}
+              </td>
+              <td>
+                {{ correspondencia?.Codigo_Dispensacion || 'N/A' }}
+              </td>
+              <td>
+                {{ correspondencia?.Numero_Guia || 'N/A' }}
+              </td>
+              <td>
+                <span
+                  class="badge"
+                  [class]="correspondencia?.Estado == 'Recibida' ? 'bg-success' : 'bg-danger'"
+                  >{{ correspondencia?.Estado || 'N/A' }}
+                </span>
+              </td>
+              <td>
+                <div
+                  class="btn-group"
+                  role="group"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title=""
+                  data-original-title=".btn-mini"
+                >
+                  <div ngbDropdown container="body" class="dropdown-primary">
+                    <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                      <i class="mdi mdi-chevron-down"></i>
+                    </button>
+
+                    <div ngbDropdownMenu>
+                      <a
+                        class="dropdown-item text-info"
+                        style="cursor: pointer"
+                        (click)="
+                          modalDisEnviadas.show();
+                          DispensacionesEnviadas(
+                            correspondencia?.Id_Correspondencia,
+                            correspondencia?.Estado
+                          )
+                        "
+                        ><i class="fa fa-eye"></i>&nbsp;Ver</a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #modalDisEnviadas>
+  <div class="app-modal-header">
+    <h4 class="text-primary">Dispensaciones enviadas</h4>
+    <button type="button" class="btn-close basic-close" (click)="modalDisEnviadas.hide()"></button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-md-12 m-t-10">
+        <div *ngIf="!CargandoDispenEnv && DisEnviadas.length > 0; else notDataDisEnv">
+          <app-table [loading]="Cargando" [arrayData]="DisEnviadas">
+            <ng-container titles>
+              <th>Código Aud</th>
+              <th>Fecha Aud</th>
+              <th>Código Disp</th>
+              <th>Tipo</th>
+              <th>Paciente</th>
+            </ng-container>
+            <tbody content>
+              @for (item of DisEnviadas; track $index) {
+                <tr class="text-center align-middle text-uppercase">
+                  <td>AUD{{ item?.Id_Auditoria || 'N/A' }}</td>
+                  <td>
+                    {{ item?.Fecha_Preauditoria | date: 'dd/MM/yyyy' || 'N/A' }}
+                  </td>
+                  <td>{{ item?.Codigo || 'N/A' }}</td>
+                  <td>{{ item?.Tipo || 'N/A' }}</td>
+                  <td>{{ item?.Nombre_Paciente || 'N/A' }}</td>
+                </tr>
+              }
+            </tbody>
+          </app-table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button type="button" class="btn btn-danger" (click)="modalDisEnviadas.hide()">Cerrar</button>
+    </div>
+  </div>
+</app-modal-basic>
+
+<ng-template #filterTemplate>
+  <!-- Filtro Disp. -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Dispensación</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtros.disp"
+      (input)="ListaCorrespondencias()"
+      placeholder="Filtro dispensación."
+    />
+  </mat-form-field>
+  <!-- rango de fechas -->
+  <mat-form-field class="col" appearance="outline">
+    <!-- <my-date-range-picker
+              name="mydaterange"
+              [options]="myDateRangePickerOptions"
+              [(ngModel)]="filtros.fecha"
+              (dateRangeChanged)="dateRangeChanged($event)"
+              placeholder="Filtro Fechas"
+            ></my-date-range-picker> -->
+
+    <mat-label>Fecha envío</mat-label>
+    <mat-date-range-input [formGroup]="rangeFiltroFechasCorrespo" [rangePicker]="rangePicker">
+      <input
+        matStartDate
+        [readonly]="true"
+        placeholder="Fecha de inicio"
+        formControlName="start"
+        name="date_start"
+      />
+      <input
+        matEndDate
+        [readonly]="true"
+        placeholder="Fecha de fin"
+        formControlName="end"
+        name="date_end"
+      />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+    <mat-datepicker-toggle
+      matIconSuffix
+      (click)="borrarFechas(rangeFiltroFechasCorrespo, filtros, true)"
+    >
+      <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+    </mat-datepicker-toggle>
+
+    <mat-date-range-picker #rangePicker>
+      <mat-date-range-picker-actions>
+        <button mat-button matDateRangePickerCancel>Cancelar</button>
+        <button mat-raised-button color="primary" matDateRangePickerApply>Filtrar</button>
+      </mat-date-range-picker-actions>
+    </mat-date-range-picker>
+  </mat-form-field>
+  <!-- Código. -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código.</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtros.cod"
+      (input)="ListaCorrespondencias()"
+      placeholder="Filtro Código"
+    />
+  </mat-form-field>
+  <!-- Guía -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Guía</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtros.guia"
+      (input)="ListaCorrespondencias()"
+      placeholder="Filtro Guía"
+    />
+  </mat-form-field>
+  <!-- Estado -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select
+      (selectionChange)="ListaCorrespondencias()"
+      [(ngModel)]="filtros.est"
+      placeholder="Estado"
+    >
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Recibida">Recibida</mat-option>
+      <mat-option value="Enviada">Enviada</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+<ng-template #Message>No existe precompras en este momento </ng-template>
+<ng-template #notDataDisEnv>
+  <app-not-data-sa [loading]="CargandoDispenEnv"></app-not-data-sa>
+</ng-template>
+<ng-template #Message>No existe precompras en este momento </ng-template>
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>
+<ng-template #notDataDisEnv>
+  <app-not-data [loading]="CargandoDispenEnv"></app-not-data>
+</ng-template>

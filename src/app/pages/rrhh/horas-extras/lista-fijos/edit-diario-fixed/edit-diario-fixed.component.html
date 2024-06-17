@@ -1,0 +1,45 @@
+<app-modal-basic #modal [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4>Turno Rotativo</h4>
+  </div>
+  <div class="app-modal-body">
+    <form [formGroup]="forma">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label class="custom-label" for="dia">Hora de entrada 1</label>
+          <input type="time" class="form-control" formControlName="entry_time_one" />
+        </div>
+        <div class="form-group col-md-6">
+          <label class="custom-label" for="dia">Hora Salida 1 </label>
+          <input type="time" class="form-control" formControlName="leave_time_one" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label class="custom-label" for="dia">Hora Entrada 2</label>
+          <input type="time" class="form-control" formControlName="entry_time_two" />
+        </div>
+        <div class="form-group col-md-6">
+          <label class="custom-label" for="dia">Hora de salida 2</label>
+          <input type="time" class="form-control" formControlName="leave_time_two" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="app-modal-footer">
+    <div class="text-end">
+      <button type="button" (click)="modal.hide()" class="btn btn-danger btn-sm me-2">
+        Cerrar
+      </button>
+      <button
+        type="submit"
+        [disabled]="forma.pristine"
+        class="btn btn-success btn-sm"
+        (click)="update()"
+      >
+        Generar Horario
+      </button>
+    </div>
+  </div>
+</app-modal-basic>

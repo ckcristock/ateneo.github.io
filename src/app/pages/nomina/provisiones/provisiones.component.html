@@ -1,0 +1,29 @@
+<article class="provisiones">
+  <section class="row m-0 justify-content-center column-gap-3">
+    <div
+      *ngFor="let provision of provisions"
+      class="provisiones__card card col p-4 text-center shadow"
+    >
+      <i class="fas {{ provision.icon }} provisiones__icon pb-3 text-secondary"></i>
+      <h6 class="fw-bold">{{ provision.title | uppercase }}</h6>
+      <div>
+        <span class="badge text-bg-success text-white rounded-pill fs-6">
+          ${{ provision.price | currency: 'COP' : 'code' : '1.2-2' }}
+        </span>
+      </div>
+    </div>
+  </section>
+  <app-card viewTitle="Provisiones">
+    @if (!loading && this.chartOptions.series.length) {
+      <apx-chart
+        class="provisiones__chart"
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [labels]="chartOptions.labels"
+        [responsive]="chartOptions.responsive"
+      ></apx-chart>
+    } @else {
+      <app-not-data [loading]="loading"></app-not-data>
+    }
+  </app-card>
+</article>

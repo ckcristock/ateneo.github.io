@@ -1,0 +1,151 @@
+<article class="row">
+  <section class="col-12 col-md-3 d-flex flex-column h-100">
+    <div class="card flex-grow-1">
+      <app-activity class="flex-grow-1" [activities]="historyData" titleActivity="Historial">
+        <app-not-data loading [loading]="loading"></app-not-data>
+      </app-activity>
+    </div>
+  </section>
+  <section class="col d-flex flex-column h-100">
+    <div class="card flex-grow-1">
+      <div class="card-body">
+        <app-cabecera [datosCabecera]="headerData"></app-cabecera>
+        <hr class="line" />
+        <app-table [loading]="loading" [arrayData]="[process?.person]">
+          <ng-container titles>
+            <th>Funcionario responsable</th>
+            <th>Fecha de inicio</th>
+            @if (isClosed) {
+              <th>Fecha final</th>
+            }
+            <th>Descripción</th>
+            @if (isClosed) {
+              <th>Observación del cierre</th>
+            }
+            <th>Estado</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </ng-container>
+          <tbody content>
+            @if (process) {
+              <tr class="text-center">
+                <td class="align-middle">{{ process.person.full_names }}</td>
+                <td class="align-middle">
+                  {{ process.date_of_admission | date: 'shortDate' }}
+                </td>
+                @if (isClosed) {
+                  <td class="align-middle">
+                    {{ process.closure.created_at | date: 'shortDate' }}
+                  </td>
+                }
+                <td class="align-middle">
+                  <app-view-more [text]="process.process_description" [length]="40"></app-view-more>
+                </td>
+                @if (isClosed) {
+                  <th>
+                    <app-view-more
+                      [text]="process.closure.description"
+                      [length]="40"
+                    ></app-view-more>
+                  </th>
+                }
+                <td class="align-middle">
+                  <span
+                    [ngClass]="
+                      process.status == 'Abierto'
+                        ? 'badge bg-info'
+                        : process.status == 'Aprobado'
+                          ? 'badge bg-success'
+                          : 'badge bg-danger'
+                    "
+                  >
+                    {{ process.status | uppercase }}
+                  </span>
+                </td>
+                <td>
+                  <app-dropdown-actions>
+                    <app-action-button
+                      icon="file-download"
+                      text="Llamado a descargos"
+                      type="primary"
+                      (click)="openCallReleases(process.id)"
+                    ></app-action-button>
+                  </app-dropdown-actions>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </app-table>
+        @if (!isClosed && !loading) {
+          <button class="btn btn-danger btn-block" (click)="openProcessClosed()">
+            Cerrar proceso
+          </button>
+        }
+      </div>
+    </div>
+    @if (process) {
+      <app-table-involved
+        [isClosed]="isClosed"
+        [id]="id"
+        [involedList]="process.person_involved"
+        (refresh)="getDisciplinaryProcess()"
+      >
+        <app-not-data loading [loading]="loading"></app-not-data>
+      </app-table-involved>
+      <app-card viewTitle="Documentos">
+        <app-add-button filters (click)="openMultiFiles()" />
+        <app-list-files
+          [listFiles]="process?.legal_documents"
+          [loading]="loading"
+          [isModal]="false"
+          (removeFile)="deleteDocument($event)"
+        ></app-list-files>
+      </app-card>
+      <app-card viewTitle="Actuaciones">
+        <app-add-button filters (click)="openDisciplinaryActions()" />
+        <app-table [loading]="loading" [arrayData]="process.actions">
+          <ng-container titles>
+            <th>Funcionario responsable</th>
+            <th>Descripción</th>
+            <th>Actuación</th>
+            <th>Fecha</th>
+            <th>Archivo</th>
+          </ng-container>
+          <tbody content>
+            @for (action of process.actions; track $index) {
+              <tr class="text-center">
+                <td class="align-middle">{{ action.user.person_image_name.full_names }}</td>
+                <td class="align-middle">
+                  <app-view-more [text]="action.description" [length]="40"></app-view-more>
+                </td>
+                <td>{{ action.action_type.name || 'N/A' }}</td>
+                <td>{{ (action.date | date: 'shortDate') || 'N/A' }}</td>
+                <td class="align-middle">
+                  @if (action.file) {
+                    <a class="btn btn-success btn-sm" target="_blank" [href]="action.file">
+                      Descargar
+                    </a>
+                  } @else {
+                    N/A
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </app-table>
+      </app-card>
+      @if (process?.closure) {
+        <app-card viewTitle="Cierre de proceso">
+          <a filters class="btn btn-success btn-sm" target="_blank" [href]="process.closure.file">
+            Descargar
+          </a>
+          <h5>Funcionario responsable</h5>
+          <p>{{ process.closure.user.person_image_name.full_names }}</p>
+          <h5>Causal</h5>
+          <p>{{ process.closure.closure_reason.name }}</p>
+          <h5>Descripción</h5>
+          <p>{{ process.closure.description }}</p>
+        </app-card>
+      }
+    }
+  </section>
+</article>

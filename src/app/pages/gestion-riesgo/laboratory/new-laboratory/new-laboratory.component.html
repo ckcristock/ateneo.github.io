@@ -1,0 +1,219 @@
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title d-flex justify-content-between">
+          <h4 class="text-primary">Nuevo laboratorio</h4>
+        </div>
+        <hr class="line" />
+        <form [formGroup]="form">
+          <div class="row">
+            <!-- <mat-form-field class="col-lg-6" appearance="outline">
+              <mat-label>Paciente</mat-label>
+              <input
+                matInput
+                placeholder="Busca por documento"
+                autocomplete="off"
+                id="typeahead-prevent-manual-entry"
+                type="text"
+                formControlName="patient"
+                [ngbTypeahead]="search"
+                [inputFormatter]="formatter"
+                [resultFormatter]="formatter"
+                [editable]="false"
+              />
+              <mat-hint *ngIf="searchingPatient">Buscando</mat-hint>
+              <mat-hint *ngIf="searchFailedPatient"
+                >No hemos encontrado resultados</mat-hint
+              >
+            </mat-form-field> -->
+            <mat-form-field class="col-lg-12" appearance="outline">
+              <mat-label>Diagnóstico</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="cie10_id"
+                placeholder="Busca diagnóstico"
+                [ngbTypeahead]="searchCie10"
+                [inputFormatter]="formatterCie10"
+                [resultFormatter]="formatterCie10"
+                autocomplete="off"
+              />
+              <mat-hint *ngIf="searchingCie10">Buscando</mat-hint>
+              <mat-hint *ngIf="searchFailedCie10">No hemos encontrado resultados</mat-hint>
+            </mat-form-field>
+            <mat-form-field class="col-lg-6" appearance="outline">
+              <mat-label>Profesional toma de muestras</mat-label>
+              <mat-select formControlName="professional_id" required>
+                <mat-option *ngFor="let option of profesionales" [value]="option.value">
+                  {{ option.text }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Fecha</mat-label>
+              <input
+                matInput
+                type="date"
+                formControlName="date"
+                readonly
+                required
+                autocomplete="off"
+              />
+            </mat-form-field>
+
+            <mat-form-field class="col-8" appearance="outline">
+              <mat-label>Contrato</mat-label>
+              <mat-select formControlName="contract_id" required>
+                <mat-option *ngFor="let option of contratos" [value]="option.value">
+                  {{ option.text }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Laboratorio</mat-label>
+              <mat-select formControlName="laboratory_id" required>
+                <mat-option *ngFor="let option of laboratoriosLugar" [value]="option.value">
+                  {{ option.text }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group text-center">
+                <div class="custom-input-file col-md-12">
+                  <input
+                    type="file"
+                    #ordenFile
+                    class="input-file"
+                    (change)="onFileChanged($event, 'orden')"
+                    accept=".pdf"
+                  />
+                  Cargar orden médica
+                </div>
+                <div class="col-md-12 text-center">
+                  <small *ngIf="file" class="text-success">Orden médica cargada</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group text-center">
+                <div class="custom-input-file col-md-12">
+                  <input
+                    type="file"
+                    #documentFile
+                    class="input-file"
+                    (change)="onFileChanged2($event, 'documento')"
+                    accept=".pdf"
+                  />
+                  Cargar documento
+                </div>
+                <div class="col-md-12 text-center">
+                  <small *ngIf="fileDocument" class="text-success">Documento cargado</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group text-center">
+                <div class="custom-input-file col-md-12">
+                  <input
+                    type="file"
+                    #consentimientoFile
+                    class="input-file"
+                    (change)="onFileChanged3($event, 'consentimiento')"
+                    accept=".pdf"
+                  />
+                  Cargar consentimiento
+                </div>
+                <div class="col-md-12 text-center">
+                  <small *ngIf="fileConsentimiento" class="text-success"
+                    >Consentimiento cargado</small
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <h4 class="text-center">Lista de procedimientos</h4>
+          <div class="row">
+            <mat-form-field class="col-12" appearance="outline">
+              <mat-label>Procedimiento</mat-label>
+              <input
+                matInput
+                #inputProcedimiento
+                type="text"
+                id="typeahead-http"
+                [class.is-invalid]="searchFailedCups"
+                [ngbTypeahead]="searchCups"
+                [inputFormatter]="formatterCups"
+                [resultFormatter]="formatterCups"
+                (selectItem)="addCup($event.item, $event, inputProcedimiento)"
+                placeholder="Busca procedimiento"
+                required
+                autocomplete="off"
+              />
+              <mat-hint *ngIf="searchingCups">Buscando</mat-hint>
+              <mat-hint *ngIf="searchFailedCups">No hemos encontrado resultados</mat-hint>
+            </mat-form-field>
+          </div>
+          <div
+            class="rounded-top table-responsive"
+            *ngIf="!loadingCups && cups.length > 0; else notDataCups"
+          >
+            <table class="table table-bordered table-striped table-sm">
+              <thead class="bg-light">
+                <tr class="text-center text-uppercase">
+                  <th>#</th>
+                  <th>CUPS</th>
+                  <th class="col-8">Descripción</th>
+                  <th>Cantidad</th>
+                  <th><i class="fas fa-trash-alt"></i></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="text-center" *ngFor="let item of cups; let i = index">
+                  <th class="align-middle">{{ i + 1 }}</th>
+                  <td class="align-middle">{{ item.code }}</td>
+                  <td class="align-middle">{{ item.description }}</td>
+                  <td class="align-middle">1</td>
+                  <td class="align-middle">
+                    <button type="button" (click)="deleteCup(i)" class="btn btn-danger btn-sm">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-end" colspan="4">TOTAL</th>
+                  <th class="text-center">{{ cups.length }}</th>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+        <div *ngIf="faltanDatos" class="alert alert-warning text-center" role="alert">
+          Agrega procedimientos
+        </div>
+        <button
+          type="button"
+          (click)="createNewLaboratory()"
+          [disabled]="!form.valid"
+          class="btn btn-primary btn-block"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title text-center">Información del paciente</h5>
+        <app-set-paciente></app-set-paciente>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #notDataCups>
+  <app-not-data [loading]="loadingCups"></app-not-data>
+</ng-template>

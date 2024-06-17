@@ -1,0 +1,23 @@
+.img-product {
+  height: auto;
+  width: 3rem;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+input:focus {
+  outline: none;
+}
+
+.color-transparent {
+  background-color: transparent;
+}
+
+::ng-deep .mat-checkbox-layout {
+  margin-bottom: 0;
+}
+
+.h-24px {
+  height: 28px;
+}

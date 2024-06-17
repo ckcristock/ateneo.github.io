@@ -1,0 +1,11 @@
+.search-select {
+  &__input {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 100;
+  }
+  &__option {
+    z-index: 99;
+  }
+}

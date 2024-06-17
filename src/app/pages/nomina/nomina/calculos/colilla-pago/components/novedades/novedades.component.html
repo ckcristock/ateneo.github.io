@@ -1,0 +1,54 @@
+<hr />
+<div class="text-center text-uppercase card-title"><i class="fas fa-bell"></i> Novedades</div>
+<div class="rounded-top table-responsive">
+  <table class="table table-bordered table-striped table-sm">
+    <thead class="bg-light">
+      <tr class="text-uppercase">
+        <th>Concepto</th>
+        <th class="text-center">Días</th>
+        <th class="text-center">Salario Promedio</th>
+        <th class="text-center">Fórmula = Salario promedio * días / 30 días</th>
+        <th class="text-center">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!--   <pre>
+                  {{ arrayNovedades | json }}
+                  {{ datosEmpresa | json }}
+
+              </pre> -->
+      <tr class="text-center" *ngFor="let novedad of arrayNovedades">
+        <td class="text-start">{{ novedad.concepto }}</td>
+        <td>{{ novedad.dias }}</td>
+        <td>
+          {{ funcionario.contractultimate.salary | currency: '' : '' }}
+        </td>
+        <td>
+          {{ funcionario.contractultimate.salary | currency: '' : '' }} * {{ novedad.dias }}/ 30
+          días
+        </td>
+        <td>{{ novedad.valor | currency: '' : '' }}</td>
+      </tr>
+      <tr class="text-center">
+        <th class="text-start">Total novedades</th>
+        <th>{{ novedades.total_dias }}</th>
+        <td></td>
+        <td></td>
+        <th>
+          {{ novedades.valor_total | currency: '' : '' }}
+        </th>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p *ngIf="existeIncapacidad">
+  <small
+    ><b>
+      Tenga en cuenta que el auxilio por incapacidad no puede ser inferior al salario mínimo. Cuando
+      el valor diario del pago de la incapacidad sea inferior al salario mínimo diario legal vigente
+      {{ datosEmpresa.base_salary | currency: '' : '' }} / 30 =
+      {{ salaryProm | currency: '' : '' }}, se aproximará automáticamente a ese valor.
+    </b></small
+  >
+</p>

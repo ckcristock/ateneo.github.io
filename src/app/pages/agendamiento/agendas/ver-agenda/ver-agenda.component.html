@@ -1,0 +1,222 @@
+<div class="row">
+  <app-time-line class="col-md-4" [data]="agenda.history"></app-time-line>
+  <app-card class="col-md-8" viewTitle="Ver agenda">
+    <ngb-alert class="mb-2" #alert *ngIf="notOverride" [dismissible]="false" [type]="'warning'">
+      No se pueden <strong>cancelar</strong> agendas con citas asignadas
+    </ngb-alert>
+    <div class="row">
+      <div class="col-6">
+        <div class="form-group row">
+          <label for="person" class="col-sm-6 col-form-label">Profesional:</label>
+          <input
+            type="text"
+            readonly
+            class="col-sm-6 form-control-plaintext"
+            id="person"
+            [value]="agenda?.person?.full_name"
+          />
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="form-group row">
+          <label for="speciality" class="col-sm-6 col-form-label">Especialidad:</label>
+          <input
+            type="text"
+            readonly
+            class="col-sm-6 form-control-plaintext"
+            id="speciality"
+            [ngModel]="agenda?.speciality?.name"
+          />
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="form-group row">
+          <label for="type_appointment" class="col-sm-6 col-form-label">Tipo de Agenda:</label>
+          <input
+            type="text"
+            readonly
+            class="col-sm-6 form-control-plaintext"
+            id="type_appointment"
+            [ngModel]="agenda?.type_appointment?.name"
+          />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group row">
+          <label for="sub_type_appointment" class="col-sm-6 col-form-label"
+            >Tipo de Consulta:</label
+          >
+          <input
+            type="text"
+            readonly
+            class="col-sm-6 form-control-plaintext"
+            id="sub_type_appointment"
+            [ngModel]="agenda?.sub_type_appointment?.name"
+          />
+        </div>
+      </div>
+
+      <!-- FOR ALL-->
+
+      <ng-container *ngIf="agenda?.type_appointment?.face_to_face">
+        <div class="col-6">
+          <div class="form-group row">
+            <label for="company" class="col-sm-6 col-form-label">IPS:</label>
+            <input
+              type="text"
+              readonly
+              class="col-sm-6 form-control-plaintext"
+              id="company"
+              [ngModel]="agenda?.company?.name"
+            />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group row">
+            <label for="location" class="col-sm-6 col-form-label">Sede:</label>
+            <input
+              type="text"
+              readonly
+              class="col-sm-6 form-control-plaintext"
+              id="location"
+              [ngModel]="agenda?.location?.name"
+            />
+          </div>
+        </div>
+      </ng-container>
+
+      <hr />
+      <div class="col-6">
+        <div class="form-group row">
+          <label for="date_start" class="col-sm-6 col-form-label">Inicio :</label>
+          <input
+            type="date"
+            readonly
+            class="col-sm-6 form-control-plaintext"
+            id="date_start"
+            [ngModel]="agenda?.date_start"
+          />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group row">
+          <label for="date_end" class="col-sm-6 col-form-label">Fin:</label>
+          <input
+            type="date"
+            readonly
+            class="col-sm-6 form-control-plaintext"
+            id="date_end"
+            [ngModel]="agenda?.date_end"
+          />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group row">
+          <label for="hour_start" class="col-sm-6 col-form-label">Hora Inicio :</label>
+          <input
+            type="time"
+            readonly
+            class="col-sm-6 form-control-plaintext"
+            id="hour_start"
+            [ngModel]="agenda?.hour_start"
+          />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group row">
+          <label for="hour_end" class="col-sm-6 col-form-label">Hora Fin:</label>
+          <input
+            type="time"
+            readonly
+            class="col-sm-6 form-control-plaintext"
+            id="hour_end"
+            [ngModel]="agenda?.hour_end"
+          />
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="form-group row">
+          <label for="usuario" class="col-sm-3 col-form-label">Func. Agendó:</label>
+          <input
+            type="text"
+            readonly
+            class="col-sm-9 form-control-plaintext"
+            id="usuario"
+            [value]="agenda?.usuario?.person?.full_name"
+          />
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="col-12">
+        <div class="row p-3">
+          <div class="col-md-6 my-2">
+            <label>Fecha Inicio para cancelación</label>
+            <input
+              class="form-control"
+              type="date"
+              name="date_start"
+              value="2018-01-01"
+              [(ngModel)]="fechaInicio"
+              required
+              #date_start="ngModel"
+            />
+          </div>
+
+          <div class="col-md-6 my-2">
+            <label>Fecha Fin para cancelación</label>
+            <input
+              class="form-control"
+              required
+              type="date"
+              name="date_end"
+              [(ngModel)]="fechaFin"
+            />
+          </div>
+
+          <div class="col-md-12 my-2">
+            <button type="button" required class="btn btn-info btn-block" (click)="cancellAgenda()">
+              Cancelar agendamiento
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <full-calendar [events]="agenda.spaces" [options]="calendarOptions"> </full-calendar>
+  </app-card>
+</div>
+<app-modal-basic #actions [dialogClass]="'modal-sm modal-full'">
+  <div class="app-modal-header">
+    <div class="row">
+      <h4 class="text text-center justify-content-center modal-title px-3">
+        <!--  Detalles de la cita para {{findCita.call_in.patient.Nombres}} -->
+      </h4>
+      <button type="button" class="close basic-close" (click)="actions.hide()"></button>
+    </div>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-12">
+        <select name="" id="">
+          <!--     <option value="" *ngFor="let item of items" ></option> -->
+        </select>
+      </div>
+      <div class="col-12">
+        <input
+          type="text"
+          placeholder="observaciones"
+          name="observaciones"
+          [ngModel]="selected.id"
+        />
+      </div>
+      <div class="col-12">
+        <input type="text" placeholder="observaciones" name="date" [ngModel]="selected.date" />
+      </div>
+    </div>
+  </div>
+</app-modal-basic>

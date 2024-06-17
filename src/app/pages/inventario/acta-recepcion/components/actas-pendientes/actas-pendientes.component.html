@@ -1,0 +1,108 @@
+<app-card class="col-lg-6 mb-4" viewTitle="Actas pendientes">
+  <app-table
+    class="d-block mt-3"
+    [loading]="Cargando3"
+    [arrayData]="actas_pendientes"
+    [pagination]="pagination"
+    (pageChange)="getActasPendientes()"
+  >
+    <ng-container titles>
+      <th>Funcionario</th>
+      <th>Código</th>
+      <th>Fecha</th>
+      <th>Orden</th>
+      <th>Facturas</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of actas_pendientes; track $index) {
+        <tr class="text-center">
+          <td>
+            <app-load-image
+              classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+              [src]="item.person?.image"
+            ></app-load-image>
+          </td>
+          <td>{{ item.Codigo }}</td>
+          <td>
+            {{ item.Fecha_Creacion | date }}
+          </td>
+          <td>
+            <a
+              [routerLink]="['/compras/ver-nacional', item?.orden?.Id_Orden_Compra_Nacional]"
+              target="_blank"
+            >
+              {{ item.orden?.Codigo }}
+            </a>
+          </td>
+          <td>{{ item.Facturas | uppercase }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view
+                [link]="{
+                  url: '/inventario/acta-recepcion/ver/' + item.Id_Acta_Recepcion
+                }"
+              />
+              @if (item.Estado != 'Anulada') {
+                <app-action-deactivate
+                  (action)="AsignarDatos(item.Id_Acta_Recepcion, modalAnularActa)"
+                />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #modalAnularActa let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Anular acta de recepción</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form #FormAnularFactura="ngForm">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Causa</mat-label>
+          <mat-select name="Causal" [(ngModel)]="Model.Id_Causal_Anulacion" required>
+            <mat-option *ngFor="let item of Causales" [value]="item.Id_Causal_Anulacion">
+              {{ item.Nombre | uppercase }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+          <mat-label>Observaciones</mat-label>
+          <textarea
+            matInput
+            placeholder="Ingresa las observaciones"
+            rows="5"
+            [(ngModel)]="Model.Observaciones"
+            name="Observaciones"
+            required
+            [cdkTextareaAutosize]="true"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onCancelAlert()"
+      [disabled]="!FormAnularFactura.valid"
+    >
+      Anular
+    </button>
+  </div>
+</ng-template>

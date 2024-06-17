@@ -1,0 +1,8 @@
+<!--<app-grafical-module></app-grafical-module>-->
+<ng-container *ngIf="validarTablero() == 1">
+  <app-grafical-module></app-grafical-module>
+</ng-container>
+
+<ng-container *ngIf="validarTablero() == 0">
+  <app-building></app-building>
+</ng-container>

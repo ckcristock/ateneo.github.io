@@ -1,0 +1,24 @@
+<hr />
+<h6>Alimentación</h6>
+<app-table>
+  <ng-container titles>
+    <th>Estadía</th>
+    <th>Tipo</th>
+    <th>¿incluye desayuno?</th>
+    <th>Tarifa</th>
+    <th>N° días Estadía</th>
+    <th>Total</th>
+  </ng-container>
+  <tbody content>
+    @for (item of feedings; track item.id; let i = $index) {
+      <tr class="text-center">
+        <td>{{ item.type }}</td>
+        <td>{{ item.personType }}</td>
+        <td>{{ item.breakfast }}</td>
+        <td class="text-end">${{ item.rate | number: '1.2-2' }}</td>
+        <td>{{ item.stay }}</td>
+        <td class="text-end">${{ item.total | number: '1.2-2' }}</td>
+      </tr>
+    }
+  </tbody>
+</app-table>

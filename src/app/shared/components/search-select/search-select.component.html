@@ -1,0 +1,28 @@
+<mat-form-field class="w-100" appearance="outline">
+  <mat-label>{{ label }}</mat-label>
+  <mat-select [formControl]="control" [multiple]="multiSelect">
+    <mat-form-field class="w-100 pb-0 search-select__input border-0" appearance="outline">
+      <input matInput type="text" [placeholder]="placeholder" [formControl]="search" />
+      <button
+        *ngIf="search.value"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="resetSearchPerson()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <mat-option *ngIf="showAll" #allSelected (click)="toggleAllSelection(allSelected)" [value]="0"
+      >Todos</mat-option
+    >
+    <mat-option
+      *ngFor="let person of list | search: search.value"
+      class="search-select__option"
+      [value]="person.value"
+      (click)="onSelectPerson(allSelected)"
+    >
+      {{ person.text }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>

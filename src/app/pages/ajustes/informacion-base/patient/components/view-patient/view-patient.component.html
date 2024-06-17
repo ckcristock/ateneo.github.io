@@ -1,0 +1,63 @@
+<app-modal titleModal="Ver paciente">
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered text-uppercase">
+      <tbody>
+        <tr>
+          <th>Tipo ident.</th>
+          <td class="table-active w-75">{{ data?.typedocument?.code ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Identificación</th>
+          <td class="table-active w-75">{{ data?.identifier ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Departamento</th>
+          <td class="table-active w-75">{{ data?.department?.name ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Municipio</th>
+          <td class="table-active w-75">{{ data?.municipality?.name ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Nombre completo</th>
+          <td class="table-active w-75">
+            {{ data.firstname }} {{ data.middlename }} {{ data.surname }}
+            {{ data.secondsurname }}
+          </td>
+        </tr>
+        <tr>
+          <th>Fecha de nacimiento</th>
+          <td class="table-active w-75">{{ data?.date_of_birth ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Genero</th>
+          <td class="table-active w-75">{{ data?.gener ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Telefono</th>
+          <td class="table-active w-75">{{ data?.phone ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Correo</th>
+          <td class="table-active w-75">{{ data?.email ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Dirección</th>
+          <td class="table-active w-75">{{ data?.address ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>EPS</th>
+          <td class="table-active w-75">{{ data?.eps?.name ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Nivel</th>
+          <td class="table-active w-75">{{ data?.level?.name ?? 'No hay dato' }}</td>
+        </tr>
+        <tr>
+          <th>Régimen</th>
+          <td class="table-active w-75">{{ data?.regimentype?.name ?? 'No hay dato' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</app-modal>

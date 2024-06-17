@@ -1,0 +1,62 @@
+<ng-template #addEntregas let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Entregas</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <!-- <strong class="text-title"> {{ material.name | titlecase }} </strong> -->
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!loading && Lista_Entrega_Dotacion.length > 0; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Código</th>
+            <th>Fun.Entrega</th>
+            <th>Fecha Recibe</th>
+            <th>Articulo</th>
+            <th>Cantidad</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of Lista_Entrega_Dotacion">
+            <td>{{ item.delivery_code }}</td>
+            <td>{{ item.entrega }}</td>
+            <td>{{ item.recibe }}</td>
+            <td>{{ item.product_name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.created_at }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ngb-pagination
+      size="sm"
+      maxSize="5"
+      [collectionSize]="pagination.collectionSize"
+      (pageChange)="getDotationsProduct($event)"
+      [pageSize]="pagination.pageSize"
+      [(page)]="pagination.page"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      aria-label="Default pagination "
+    >
+    </ngb-pagination>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cerrar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

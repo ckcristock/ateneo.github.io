@@ -1,0 +1,23 @@
+<div class="row">
+  <app-person-config class="col" [personId]="person_id" />
+  <hr />
+  <div class="col-12">
+    @if (!loading && menues.length > 0) {
+      <app-menu-child [navItems]="menues"></app-menu-child>
+    } @else {
+      <app-not-data [loading]="loading"></app-not-data>
+    }
+  </div>
+  @if (menues.length > 0) {
+    <div class="col-12 mt-2">
+      <button [disabled]="saving" class="btn-block btn btn-primary" (click)="save()">
+        @if (!saving) {
+          <span>Guardar</span>
+        } @else {
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Guardando permisos...
+        }
+      </button>
+    </div>
+  }
+</div>

@@ -1,0 +1,389 @@
+<!-- <div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <app-sharedform [formControls]="formControls" [Cliente]="Cliente" [Centro_Costo]="Centros">
+      <form [formGroup]="form" formaPago>
+        <mat-form-field class="col-12 h-100" appearance="outline">
+          <mat-label>Forma de pago</mat-label>
+          <mat-select
+            name="Forma_Pago"
+            id="forma_pago"
+            formControlName="Forma_Pago"
+            (selectionChange)="formaPagoChange($event)"
+          >
+            <mat-option value="Cheque">Cheque</mat-option>
+            <mat-option value="Transferencia">Transferencia</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </app-sharedform>
+
+    <ng-container *ngIf="Mostrar_Facturas">
+      <h6 class="text-center">Facturas</h6>
+      <ng-container *ngIf="Lista_Facturas.length > 0 && !Cargando; else notData">
+        <div class="rounded-top table-responsive">
+          <table class="table table-bordered table-striped table-sm">
+            <thead class="bg-light">
+              <tr class="text-center text-uppercase">
+                <th></th>
+                <th>Cuenta</th>
+                <th>Fecha</th>
+                <th>Documento</th>
+                <th>Vlr. Factura</th>
+                <th>Vlr. Abono</th>
+                <th>Vlr. Saldo</th>
+                <th>Abono</th>
+                <th>Nat</th>
+                <th>Movimiento Debito</th>
+                <th>Movimiento_Credito</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of Lista_Facturas; let i = index" id="fila{{ i }}">
+                <td class="text-center">
+                  <input
+                    type="checkbox"
+                    name="Factura{{ i }}"
+                    id="Factura{{ i }}"
+                    (change)="addListInvoice(item, i)"
+                  />
+                </td>
+                <td>{{ item.Codigo }}</td>
+                <td>{{ item.Fecha }}</td>
+                <td>{{ item.Factura }}</td>
+                <td class="text-end">${{ item.Valor_Factura | number: '1.2-2' }}</td>
+                <td class="text-end">${{ item.Valor_Abono | number: '1.2-2' }}</td>
+                <td class="text-end">${{ item.Valor_Saldo | number: '1.2-2' }}</td>
+                <td class="text-end">
+                  <input
+                    type="number"
+                    name="abono{{ i }}"
+                    id="abono{{ i }}"
+                    [(ngModel)]="item.Abono"
+                    (blur)="validarSaldoFactura(i, $event)"
+                  />
+                </td>
+                <td>{{ item.Nat }}</td>
+                <td class="text-end">${{ item.Movimiento_Debito | number: '1.2-2' }}</td>
+                <td class="text-end">${{ item.Movimiento_Credito | number: '1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="Lista_Facturas.length > 0">
+                <td colspan="7"></td>
+                <td class="text-end">
+                  <b>Total: ${{ Total_Abono | number: '1.2-2' }}</b>
+                </td>
+                <td colspan="3"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+      <button class="btn btn-primary btn-block btn-sm" (click)="addInvoicesToAccount()">
+        Confirmar
+      </button>
+    </ng-container>
+
+    <hr />
+    <app-table [loading]="Cargando">
+      <ng-container titles>
+        <th>Cuenta</th>
+        <th>Nit</th>
+        <th>Centro Costo</th>
+        <th>Documento</th>
+        <th></th>
+        <th>Concepto</th>
+        <th>Base</th>
+        <th>Débito</th>
+        <th>Crédito</th>
+        <th class="p-0"></th>
+      </ng-container>
+      <tbody content>
+        <form [formGroup]="form">
+          <ng-container formArrayName="Cuentas_Contables">
+            @for (item of getCuentasContables.controls; track item; let i = $index) {
+              <ng-container [formGroupName]="i">
+                <tr class="text-center text-uppercase">
+                  <td>
+                    <input
+                      formControlName="Cuenta"
+                      type="text"
+                      class="form-control form-control-sm"
+                      [ngbTypeahead]="search1"
+                      [resultTemplate]="rt3"
+                      [inputFormatter]="formatter1"
+                      placeholder="Busca cuenta"
+                      (keyup)="tab($event, 'Nit' + i)"
+                      (ngModelChange)="BuscarCuenta(item.Cuenta, i)"
+                      [required]="Cuentas_Contables.length - 1 != i"
+                      (blur)="validarCampo(item.Cuenta, $event, 'Cuenta')"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      formControlName="Nit"
+                      type="text"
+                      (keyup)="tab($event, 'Centro_Costo' + i)"
+                      class="form-control form-control-sm f-9"
+                      [ngbTypeahead]="search"
+                      [resultTemplate]="rt"
+                      placeholder="Busca NIT"
+                      [inputFormatter]="formatter"
+                      (ngModelChange)="BuscarDatosCliente(item.Nit, i)"
+                      (blur)="validarCampo(item.Nit, $event, 'Nit')"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      formControlName="Centro_Costo"
+                      type="text"
+                      class="form-control form-control-sm f-9"
+                      [ngbTypeahead]="search2"
+                      [resultTemplate]="rt2"
+                      placeholder="Busca centro costo"
+                      [inputFormatter]="formatter2"
+                      (ngModelChange)="BuscarDatosCentro(item.Centro_Costo, i)"
+                      (keyup)="tab($event, 'Documento' + i)"
+                      (blur)="validarCampo(item.Centro_Costo, $event, 'Centro de Costo')"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      (keyup)="tab($event, 'Concepto' + i)"
+                      formControlName="Documento"
+                      placeholder="Ingresa documento"
+                      class="form-control form-control-sm text-end input-document"
+                      type="text"
+                    />
+                  </td>
+                  <td>
+                    <a href="javascript:;" (click)="showFacturas(item.Nit_Cuenta, i)">
+                      <i style="font-weight: bold" class="fa fa-search"></i>
+                    </a>
+                  </td>
+                  <td>
+                    <input
+                      placeholder="Ingresa concepto"
+                      (keyup)="tab($event, 'Base' + i)"
+                      formControlName="Concepto"
+                      class="form-control form-control-sm"
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      (keyup)="tab($event, 'Debito' + i)"
+                      (change)="calcularBase(i, $event.target.value)"
+                      formControlName="Base"
+                      currencyMask
+                      [options]="masks.maskCOP"
+                      class="form-control form-control-sm text-end"
+                      readonly
+                      style="border: 0"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      (keyup)="tab($event, 'Cred_Niif' + i)"
+                      (change)="validarDebCred(i, 'Debito')"
+                      formControlName="Deb_Niif"
+                      currencyMask
+                      [options]="masks.maskCOP"
+                      appInputPosition
+                      class="form-control form-control-sm text-end"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      (keyup)="tab($event, 'Cuenta' + (i + 1))"
+                      (change)="validarDebCred(i, 'Credito')"
+                      formControlName="Cred_Niif"
+                      class="form-control form-control-sm text-end"
+                      currencyMask
+                      [options]="masks.maskCOP"
+                      appInputPosition
+                    />
+                  </td>
+                  <td class="text-center p-0">
+                    <a
+                      *ngIf="Cuentas_Contables.length - 1 != i"
+                      href="javascript:;"
+                      (click)="EliminarCuenta(i)"
+                    >
+                      <span>
+                        <i class="fa fa-trash-o text-danger"></i>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+              </ng-container>
+            }
+          </ng-container>
+        </form>
+      </tbody>
+    </app-table>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Total Debito</th>
+            <th>Total Credito</th>
+            <th>Diferencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            <td>${{ Total_Debito | number: '1.2-2' }}</td>
+            <td>${{ Total_Credito | number: '1.2-2' }}</td>
+            <td>${{ Total_Debito - Total_Credito | number: '1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button type="button" class="btn btn-primary btn-block" (click)="onSaveVoucher()">
+      Guardar
+    </button>
+
+    <form [formGroup]="form">
+      <ng-container formArrayName="Cuentas_Contables">
+        <div *ngFor="let item of getCuentasContables.controls; let i = index" [formGroupName]="i">
+          <tr class="text-center text-uppercase">
+            <td>
+              <input
+                formControlName="Cuenta"
+                type="text"
+                class="form-control form-control-sm"
+                [ngbTypeahead]="search1"
+                [resultTemplate]="rt3"
+                [inputFormatter]="formatter1"
+                placeholder="Busca cuenta"
+                (keyup)="tab($event, 'Nit' + i)"
+                (ngModelChange)="BuscarCuenta(item.Cuenta, i)"
+                [required]="Cuentas_Contables.length - 1 != i"
+                (blur)="validarCampo(item.Cuenta, $event, 'Cuenta')"
+              />
+            </td>
+            <td>
+              <input
+                formControlName="Nit"
+                type="text"
+                (keyup)="tab($event, 'Centro_Costo' + i)"
+                class="form-control form-control-sm f-9"
+                [ngbTypeahead]="search"
+                [resultTemplate]="rt"
+                placeholder="Busca NIT"
+                [inputFormatter]="formatter"
+                (ngModelChange)="BuscarDatosCliente(item.Nit, i)"
+                (blur)="validarCampo(item.Nit, $event, 'Nit')"
+              />
+            </td>
+            <td>
+              <input
+                formControlName="Centro_Costo"
+                type="text"
+                class="form-control form-control-sm f-9"
+                [ngbTypeahead]="search2"
+                [resultTemplate]="rt2"
+                placeholder="Busca centro costo"
+                [inputFormatter]="formatter2"
+                (ngModelChange)="BuscarDatosCentro(item.Centro_Costo, i)"
+                (keyup)="tab($event, 'Documento' + i)"
+                (blur)="validarCampo(item.Centro_Costo, $event, 'Centro de Costo')"
+              />
+            </td>
+            <td>
+              <input
+                (keyup)="tab($event, 'Concepto' + i)"
+                formControlName="Documento"
+                placeholder="Ingresa documento"
+                class="form-control form-control-sm text-end input-document"
+                type="text"
+              />
+            </td>
+            <td>
+              <a href="javascript:;" (click)="showFacturas(item.Nit_Cuenta, i)">
+                <i style="font-weight: bold" class="fa fa-search"></i>
+              </a>
+            </td>
+            <td>
+              <input
+                placeholder="Ingresa concepto"
+                (keyup)="tab($event, 'Base' + i)"
+                formControlName="Concepto"
+                class="form-control form-control-sm"
+              />
+            </td>
+
+            <td>
+              <input
+                (keyup)="tab($event, 'Debito' + i)"
+                (change)="calcularBase(i, $event.target.value)"
+                formControlName="Base"
+                currencyMask
+                [options]="masks.maskCOP"
+                class="form-control form-control-sm text-end"
+                readonly
+                style="border: 0"
+              />
+            </td>
+            <td>
+              <input
+                (keyup)="tab($event, 'Cred_Niif' + i)"
+                (change)="validarDebCred(i, 'Debito')"
+                formControlName="Deb_Niif"
+                currencyMask
+                [options]="masks.maskCOP"
+                appInputPosition
+                class="form-control form-control-sm text-end"
+              />
+            </td>
+            <td>
+              <input
+                (keyup)="tab($event, 'Cuenta' + (i + 1))"
+                (change)="validarDebCred(i, 'Credito')"
+                formControlName="Cred_Niif"
+                class="form-control form-control-sm text-end"
+                currencyMask
+                [options]="masks.maskCOP"
+                appInputPosition
+              />
+            </td>
+            <td class="text-center p-0">
+              <a
+                *ngIf="Cuentas_Contables.length - 1 != i"
+                href="javascript:;"
+                (click)="EliminarCuenta(i)"
+              >
+                <span>
+                  <i class="fa fa-trash-o text-danger"></i>
+                </span>
+              </a>
+            </td>
+          </tr>
+        </div>
+      </ng-container>
+    </form>
+  </div>
+</div>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9"
+    ><strong>{{ r.Nombre }}</strong>
+  </span>
+</ng-template>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>
+
+<ng-template #rt2 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombre }} </span>
+</ng-template>
+<ng-template #rt3 let-r="result" let-t="term">
+  <span class="f-9">{{ r.label }} </span>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>
+ -->

@@ -1,0 +1,81 @@
+<div *ngIf="show">
+  <div class="card">
+    <div class="card-body">
+      <div class="card-title d-flex justify-content-between align-items-center">
+        <div class="col-md-4">
+          <img
+            [src]="funcionario.image | image: 'users'"
+            class="d-block img-thumbnail rounded-circle img-fluid imgnomina"
+            onerror="this.src='../../../../assets/images/noprofile.png'"
+          />
+        </div>
+        <div class="col-md-4 text-center">
+          <h4 class="text-primary">{{ funcionario.first_name }} {{ funcionario.first_surname }}</h4>
+          <strong class="text-uppercase" style="text-decoration: underline">
+            {{ funcionario.contractultimate?.position?.name }}
+          </strong>
+          <p>
+            <strong>C.C</strong>
+            {{ funcionario.identifier }}
+          </p>
+        </div>
+        <div class="col-md-4 text-end">
+          <h6><i class="fas fa-calendar-week"></i> Periodo de pago</h6>
+          <small>{{ inicioFormato }} - {{ finFormato }}</small
+          ><br />
+          <small class="text-muted">
+            Frecuencia de pago:
+            <span class="custom-label">{{ datosEmpresa.payment_frequency }}</span>
+          </small>
+        </div>
+        <!--  <div class="col-md-3">
+            <h4>
+              Compañia
+              <i class="fas fa-building"></i>
+            </h4>
+            <p>{{datosEmpresa.social_reason}}</p>
+            <p>
+              <strong>NIT</strong>
+              : {{datosEmpresa.document_number}}
+            </p>
+          </div> -->
+      </div>
+      <ul
+        ngbNav
+        #nav="ngbNav"
+        [(activeId)]="active"
+        class="nav nav-pills nav-justified border border-primary rounded mt-3"
+      >
+        <li *ngFor="let tab of tabs; let i = index" [ngbNavItem]="i + 1">
+          <a ngbNavLink (click)="tabActual = tab">{{ tab }}</a>
+          <ng-template ngbNavContent>
+            <app-colilla-pago
+              *ngIf="tabActual === 'Colilla Pago'"
+              [funcionario]="funcionario"
+              [datosEmpresa]="datosEmpresa"
+              [fechaInicio]="inicio"
+              [fechaFin]="fin"
+            ></app-colilla-pago>
+
+            <app-seguridad-parafiscales
+              [funcionarioProp]="funcionario"
+              [datosEmpresaProp]="datosEmpresa"
+              [fechaInicio]="inicio"
+              [fechaFin]="fin"
+              *ngIf="tabActual === 'Seguridad y Parafiscales'"
+            ></app-seguridad-parafiscales>
+
+            <app-provisiones
+              [funcionarioProp]="funcionario"
+              [datosEmpresaProp]="datosEmpresa"
+              [fechaInicio]="inicio"
+              [fechaFin]="fin"
+              *ngIf="tabActual === 'Provisiones'"
+            ></app-provisiones>
+          </ng-template>
+        </li>
+      </ul>
+      <div [ngbNavOutlet]="nav" class="mx-0"></div>
+    </div>
+  </div>
+</div>

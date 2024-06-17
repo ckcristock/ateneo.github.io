@@ -1,0 +1,19 @@
+<app-card viewTitle="Tipos de agenda">
+  <app-table
+    [loading]="loading"
+    [arrayData]="tiposAgenda"
+    [pagination]="pagination"
+    (pageChange)="getTiposAgenda()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+    </ng-container>
+    <tbody content>
+      @for (item of tiposAgenda; track $index) {
+        <tr class="text-center">
+          <td>{{ item.name }}</td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>

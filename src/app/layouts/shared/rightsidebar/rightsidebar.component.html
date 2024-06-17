@@ -1,0 +1,48 @@
+<div data-simplebar class="h-100">
+  <div class="px-2 py-2">
+    <div class="d-flex justify-content-between">
+      <div>
+        <a (click)="hide()" class="btn btn-sm btn-flash-border-primary" routerLink="task"
+          >Ver todas</a
+        >
+        <a (click)="getPersonTaskPendiente()" class="btn btn-sm btn-flash-border-primary"
+          >Actualizar</a
+        >
+      </div>
+      <a
+        href="javascript:void(0);"
+        class="d-flex justify-content-end text-secondary"
+        (click)="hide()"
+      >
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+  </div>
+  <div class="container">
+    <button
+      (click)="newTask.openInit(); hide()"
+      type="button"
+      class="btn btn-primary btn btn-block mb-2"
+    >
+      Agregar nueva tarea
+    </button>
+    <h6 class="text-center">Tareas pendientes</h6>
+    <ng-container *ngIf="!loading && pendientes.length > 0; else notData">
+      <div
+        class="card bg-light"
+        *ngFor="let item of pendientes"
+        (click)="hide()"
+        role="button"
+        [routerLink]="['/task', item.id]"
+      >
+        <app-card-task [list]="item"></app-card-task>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>
+
+<app-new-task #newTask></app-new-task>

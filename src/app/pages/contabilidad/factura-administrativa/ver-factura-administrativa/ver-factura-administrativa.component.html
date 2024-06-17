@@ -1,0 +1,319 @@
+<div class="page-body">
+  <div class="row d-flex justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div
+          class="row invoice-contact"
+          style="align-items: flex-start !important; margin-bottom: 0"
+        >
+          <div class="col-md-6">
+            <div class="invoice-box row">
+              <div class="col-sm-12">
+                <table
+                  class="table table-responsive invoice-table table-borderless"
+                  style="font-size: 14px; margin: 0"
+                >
+                  <tbody>
+                    <tr>
+                      <td style="width: 100px">
+                        <img
+                          src="{{ enviromen.urlLogoColor }}"
+                          class="m-b-10 img-60"
+                          alt="Pro-H Software"
+                        />
+                      </td>
+                      <td style="font-size: 14px">
+                        {{ enviromen.Nombre }}
+                        <br />{{ enviromen.Nit }} <br />{{ enviromen.Direccion }} <br />{{
+                          enviromen.Telefono
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-sm-12">
+                <p style="padding-left: 20px; font-size: 11px">
+                  <br />NO SOMOS GRANDES CONTRIBUYENTES <br />NO SOMOS AUTORETENEDORES DE RENTA
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4" style="padding-right: 0">
+            <div class="row text-end" style="margin: 0">
+              <div class="col-sm-12">
+                <h6 style="font-weight: normal">
+                  Factura
+                  {{ Resolucion.Tipo_Resolucion == 'Resolucion_Electronica' ? 'Electrónica' : '' }}
+                  Administrativa
+                </h6>
+                <h5>{{ Factura.Codigo }}</h5>
+                <h6 style="font-weight: normal; font-size: 14px">
+                  F. Exp.: {{ Factura.Fecha | date: 'dd/MM/yyyy' }}
+                </h6>
+                <h6 style="font-weight: normal; font-size: 14px">
+                  F. Venc.: {{ Factura.Fecha_Pago | date: 'dd/MM/yyyy' }}
+                </h6>
+                <div class="clearfix"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2" style="padding-left: 0">
+            <img
+              *ngIf="
+                Resolucion.Tipo_Resolucion != 'Resolucion_Electronica' && Factura.Codigo_Qr != ''
+              "
+              src="{{ enviromen.ruta }}IMAGENES/QR/{{ Factura.Codigo_Qr }}"
+              class="img-fluid"
+              style="margin-top: -20px"
+            />
+            <img
+              *ngIf="
+                Resolucion.Tipo_Resolucion == 'Resolucion_Electronica' && Factura.Codigo_Qr != ''
+              "
+              src="{{ enviromen.ruta }}ARCHIVOS/FACTURACION_ELECTRONICA/{{ Factura.Codigo_Qr }}"
+              class="img-fluid"
+              style="margin-top: -20px"
+            />
+
+            <img
+              *ngIf="Factura.Codigo_Qr == ''"
+              src="assets/images/sinqr.png"
+              class="img-fluid"
+              style="margin-top: -20px"
+            />
+          </div>
+        </div>
+
+        <div class="card-body" style="padding-top: 0">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="table-responsive">
+                <table class="table invoice-detail-table space">
+                  <tbody>
+                    <tr>
+                      <td style="width: 140px; padding: 5px">
+                        <strong>Cliente</strong>
+                      </td>
+                      <td class="text-start" style="padding: 5px">{{ Cliente.Nombre_Cliente }}</td>
+                      <td class="text-start" style="width: 150px; padding: 5px">
+                        <strong>N.I.T o C.C.</strong>
+                      </td>
+                      <td class="text-start" style="width: 150px; padding: 5px">
+                        {{ Cliente.Id_Cliente }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-start" style="width: 140px; padding: 5px">
+                        <strong> Dirección</strong>
+                      </td>
+                      <td class="text-start" style="padding: 5px">
+                        {{ Cliente.Direccion_Cliente }}
+                      </td>
+                      <td class="text-start" style="width: 150px; padding: 5px">
+                        <strong>Telefóno </strong>
+                      </td>
+                      <td class="text-start" style="width: 150px; padding: 5px">
+                        {{ Cliente.Telefono }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-start" style="width: 140px; padding: 5px">
+                        <strong>Ciudad</strong>
+                      </td>
+                      <td class="text-start" style="padding: 5px">{{ Cliente.Ciudad_Cliente }}</td>
+                      <td class="text-start" style="width: 150px; padding: 5px">
+                        <strong>Cond. de pago</strong>
+                      </td>
+                      <td class="text-start" style="width: 150px; padding: 5px">
+                        {{
+                          Cliente.Condicion_Pago == '1'
+                            ? Cliente.Condicion_Pago
+                            : Cliente.Condicion_Pago + ' días'
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 10px">
+            <div class="col-sm-12">
+              <table class="table invoice-detail-table space" style="table-layout: auto !important">
+                <thead>
+                  <tr class="thead-default">
+                    <th>Descripción</th>
+                    <th style="width: 50px">Cant</th>
+                    <th style="width: 50px">Descuento</th>
+                    <th style="width: 50px">Iva</th>
+                    <th style="width: 100px">Precio</th>
+                    <th style="width: 100px">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of Descripciones; let i = index" id="fila{{ i }}">
+                    <td>{{ item.Descripcion }}</td>
+
+                    <td class="text-end">{{ item.Cantidad }}</td>
+
+                    <td class="text-end">{{ item.Descuento }}</td>
+                    <td class="text-end">{{ item.Impuesto }}</td>
+                    <td class="text-end">{{ item.Precio | currency }}</td>
+                    <td class="text-end">{{ item.Subtotal | currency }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 10px">
+            <div class="col-md-8">
+              <div class="row" style="margin-left: 0">
+                <div class="col-md-12 claro">
+                  <!--  <p><strong>Valor en Letras: </strong>{{valorLetra}}</p> -->
+                </div>
+              </div>
+              <div class="row" style="margin-left: 0">
+                <div class="col-md-6 claro">
+                  <h6>Observaciones:</h6>
+                  <p>{{ Factura.Observaciones }}</p>
+                </div>
+                <div class="col-md-6 claro">
+                  <h6>Resolución:</h6>
+                  <p>
+                    {{ Resolucion.Descripcion }} {{ Resolucion.Resolucion }} desde
+                    {{ Resolucion.Fecha_Inicio | date: 'dd/MM/yyyy' }} hasta
+                    {{ Resolucion.Fecha_Fin | date: 'dd/MM/yyyy' }} habilita del Nº
+                    {{ Resolucion.Numero_Inicial }} al Nº {{ Resolucion.Numero_Final }} Actividad
+                    Economica Principal 4645
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <table class="table table-responsive invoice-table invoice-total space">
+                <tbody>
+                  <tr>
+                    <td style="font-weight: bold">( = ) Subtotal :</td>
+                    <td>{{ Subtotal | currency }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold">( - ) Descuento:</td>
+                    <td>{{ Descuento | currency }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold">( + ) Iva 19% :</td>
+                    <td>{{ Impuesto | currency }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold">( = ) Total :</td>
+                    <td>{{ Total | currency }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div
+            *ngIf="Resolucion.Tipo_Resolucion == 'Resolucion_Electronica'"
+            class="row"
+            style="margin: 0; margin-top: 10px"
+          >
+            <div class="col-md-12 oscuro">
+              <p style="font-size: 11px !important">Cufe: {{ Factura.Cufe }}</p>
+            </div>
+          </div>
+          <div class="row" style="margin: 0">
+            <div class="col-md-12 oscuro">
+              <p style="margin-bottom: 0">{{ enviromen.Nota_1 }}</p>
+            </div>
+          </div>
+          <div class="row" style="margin: 0">
+            <div class="col-md-12 claro">
+              <p style="margin-bottom: 0"><strong>Nota:</strong> {{ enviromen.Nota_2 }}</p>
+            </div>
+            <div class="col-md-12 claro">
+              <p style="margin-bottom: 0">
+                <strong>Cuentas Bancarias: </strong> {{ enviromen.Cuenta_Bancaria }}
+              </p>
+            </div>
+          </div>
+          <div class="row" style="margin-top: 40px">
+            <div class="col-sm-12">
+              <table class="table invoice-detail-table">
+                <tbody>
+                  <tr>
+                    <td style="width: 10%; border-top: 2px solid #fff"></td>
+                    <td style="width: 35%; border-top: 2px solid #000">
+                      Elaborado por: {{ firmaUsuario }}
+                    </td>
+                    <td style="width: 10%; border-top: 2px solid #fff"></td>
+                    <td style="width: 35%; border-top: 2px solid #000">
+                      Recibí conforme:
+                      <br />
+                      CC:
+                    </td>
+                    <td style="width: 10%; border-top: 2px solid #fff"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 10px"></div>
+
+          <div
+            *ngIf="perfilUsuario == '27' || perfilUsuario == '50' || perfilUsuario == '16'"
+            class="row mb-2"
+          >
+            <div class="col-md-6">
+              <a
+                href="{{
+                  enviromen.ruta
+                }}php/contabilidad/movimientoscontables/movimientos_factura_administrativa_pdf.php?id_registro={{
+                  Factura.Id_Factura_Administrativa
+                }}&id_funcionario_elabora={{ funcionario.Identificacion_Funcionario }}"
+                target="_blank"
+                class="btn btn-info btn-block"
+              >
+                <i class="fa fa-book"></i> Ver Contabilización PCGA</a
+              >
+            </div>
+            <div class="col-md-6">
+              <a
+                href="{{
+                  enviromen.ruta
+                }}php/contabilidad/movimientoscontables/movimientos_factura_administrativa_pdf.php?id_registro={{
+                  Factura.Id_Factura_Administrativa
+                }}&id_funcionario_elabora={{
+                  funcionario.Identificacion_Funcionario
+                }}&tipo_valor=Niif"
+                target="_blank"
+                class="btn btn-info btn-block"
+              >
+                <i class="fa fa-book"></i> Ver Contabilización NIIF</a
+              >
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <a
+                href="{{ enviromen.ruta }}php/factura_administrativa/descarga_pdf.php?id={{
+                  Factura.Id_Factura_Administrativa
+                }}"
+                target="_blank"
+                class="btn btn-success btn-block"
+                ><i class="fa fa-print"></i> Imprimir Factura</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <app-notascreditoverdefacturas [idFactura]="idFactura" [tipoFactura]="'Factura_Administrativa'"></app-notascreditoverdefacturas> -->
+    </div>
+  </div>
+</div>

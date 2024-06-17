@@ -1,0 +1,84 @@
+<div class="row">
+  <app-card
+    class="col-md-9"
+    viewTitle="Lista de espera"
+    [activeFilters]="urlFiltersService.activeFilters"
+    [filterTemplate]="filterTemplate"
+  >
+    <app-table
+      [loading]="loading"
+      [arrayData]="waitingList"
+      [pagination]="pagination"
+      (pageChange)="getWaitingList()"
+    >
+      <ng-container titles>
+        <th>Fecha</th>
+        <th>Paciente</th>
+        <th>Contacto</th>
+        <th>Especialidad</th>
+        <th class="col-1"><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (item of waitingList; track $index) {
+          <tr class="text-center">
+            <td>{{ item.created_at | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ item.patient_name }}<br />{{ item.patient_identifier | number }}</td>
+            <td>{{ item.patient_phone }}</td>
+            <td>{{ item.speciality }}</td>
+            <td>
+              <app-dropdown-actions>
+                <app-action-button
+                  icon="check"
+                  text="Asignar cita"
+                  type="success"
+                  [link]="{
+                    url: '/agendamiento/asignacion-citas/' + item.id
+                  }"
+                />
+                <app-action-button
+                  icon="ban"
+                  text="Anular lista espera"
+                  type="danger"
+                  (click)="AnularEspera(item.id)"
+                />
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <div class="col-md-3 col-sm-12">
+    <app-top-waiting></app-top-waiting>
+  </div>
+</div>
+
+<ng-template #filterTemplate>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Fecha</mat-label>
+    <input matInput type="date" [(ngModel)]="filters.date" (change)="getWaitingList()" required />
+  </mat-form-field>
+  <app-autocomplete-mdl
+    class="col"
+    label="Institución"
+    placeholder="Buscar institución"
+    [model]="filters.institution"
+    [list]="companies"
+    (optionSelectedEvent)="filters.institution = $event; getWaitingList()"
+  ></app-autocomplete-mdl>
+  <app-automatic-search
+    class="col"
+    label="Paciente"
+    placeholder="Nombre / Identificación"
+    [value]="filters.patient"
+    (searching)="filters.patient = $event; getWaitingList()"
+  ></app-automatic-search>
+  <app-autocomplete-mdl
+    class="col"
+    label="Especialidad"
+    placeholder="Buscar especialidad"
+    [model]="filters.speciality"
+    [list]="specialties"
+    (optionSelectedEvent)="filters.speciality = $event; getWaitingList()"
+  ></app-autocomplete-mdl>
+</ng-template>

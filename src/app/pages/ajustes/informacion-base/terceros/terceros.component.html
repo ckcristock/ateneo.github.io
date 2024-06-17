@@ -1,0 +1,194 @@
+<app-card
+  viewTitle="Terceros"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]">
+    <app-add-button filters routerLink="crear-tercero" />
+    <app-header-button
+      icon="user-edit"
+      text="Campos"
+      type="warning"
+      routerLink="/ajustes/configuracion/campos-terceros"
+    ></app-header-button>
+    <app-header-button
+      icon="user-tag"
+      text="Personas"
+      type="secondary"
+      routerLink="personas"
+    ></app-header-button>
+  </ng-container>
+  <app-table
+    [loading]="loading"
+    [arrayData]="thirdParties"
+    [pagination]="pagination"
+    (pageChange)="handlePageEvent()"
+  >
+    <ng-container titles>
+      @for (item of listaCampos; track $index) {
+        @if (item?.selected) {
+          <th>{{ item?.text }}</th>
+        }
+      }
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (third of thirdParties; track $index) {
+        <tr class="text-center">
+          @if (listaCampos[0]?.selected) {
+            <td class="p-0">
+              <app-load-image
+                classImg="rounded-circle mx-auto img-fluid header-profile-user"
+                [src]="third?.image"
+              ></app-load-image>
+            </td>
+          }
+          @if (listaCampos[1]?.selected) {
+            <td>
+              {{ third?.name | uppercase }}
+            </td>
+          }
+          @if (listaCampos[2]?.selected) {
+            <td>{{ third?.nit }}{{ third?.dv ? '-' + third?.dv : '' }}</td>
+          }
+          @if (listaCampos[3]?.selected) {
+            <td>
+              {{ third?.cod_dian_address | titlecase }}
+            </td>
+          }
+          @if (listaCampos[4]?.selected) {
+            <td>
+              {{ third?.municipality?.name | uppercase }}
+            </td>
+          }
+          @if (listaCampos[5]?.selected) {
+            <td>
+              {{ third?.landline }}
+              {{ third?.landline && third?.cell_phone ? '-' : '' }}
+              {{ third?.cell_phone }}
+            </td>
+          }
+          @if (listaCampos[6]?.selected) {
+            <td>
+              {{ third?.is_client ? 'Cliente. ' : ('' | capitalLetter) }}
+              {{ third?.is_supplier ? 'Proveedor' : ('' | capitalLetter) }}
+            </td>
+          }
+          @if (listaCampos[7]?.selected) {
+            <td>
+              {{ third?.email | lowercase }}
+            </td>
+          }
+          @if (listaCampos[8]?.selected) {
+            <td>
+              <span [ngClass]="third?.state == 'Inactivo' ? 'badge bg-danger' : 'badge bg-success'">
+                {{ third?.state | uppercase }}
+              </span>
+            </td>
+          }
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="eye"
+                text="Ver"
+                type="success"
+                [link]="{
+                  url: 'ver/' + third?.id
+                }"
+              ></app-action-button>
+              <app-action-edit
+                [routerLink]="['/ajustes/informacion-base/terceros/editar-tercero/', third?.id]"
+              />
+              @if (third?.state == 'activo') {
+                <app-action-deactivate (action)="changeState(third, 'Inactivo')" />
+              } @else {
+                <app-action-activate (action)="changeState(third, 'Activo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container [formGroup]="form_filters">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Razón social o nombre</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="name"
+        autocomplete="off"
+        placeholder="Busca por razón social o nombre"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Documento</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="nit"
+        autocomplete="off"
+        placeholder="Busca por documento"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Dirección</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="cod_dian_address"
+        autocomplete="off"
+        placeholder="Busca por dirección"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Ciudad</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="municipio"
+        autocomplete="off"
+        placeholder="Busca por ciudad"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Teléfono</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="phone"
+        autocomplete="off"
+        placeholder="Busca por teléfono"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Tipo de tercero</mat-label>
+      <mat-select formControlName="third_party_type">
+        <mat-option value="">Todos</mat-option>
+        <mat-option value="Cliente">Cliente</mat-option>
+        <mat-option value="Proveedor">Proveedor</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Email</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="email"
+        autocomplete="off"
+        placeholder="Busca por email"
+      />
+    </mat-form-field>
+  </ng-container>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Campos</mat-label>
+    <mat-select [formControl]="camposForm" multiple (selectionChange)="cambiarCampo($event)">
+      @for (item of listaCampos; track item) {
+        <mat-option [value]="item?.value">{{ item?.text }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</ng-template>

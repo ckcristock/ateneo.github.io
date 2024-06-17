@@ -1,0 +1,369 @@
+<div class="row gap-2">
+  @for (auditor of auditores; track $index) {
+    <app-data-sheet class="col col-md-4">
+      <div>
+        <h5>{{ auditor.Funcionario }}</h5>
+        <span>{{ auditor.Cargo }} ({{ auditor.Dependencia }})</span> <br />
+        <span>Facturas asignadas: {{ auditor.asignados }}</span>
+        <br />
+        <span>Facturas realizadas: {{ auditor.facturadas }}</span>
+      </div>
+    </app-data-sheet>
+  }
+</div>
+
+<app-card viewTitle="Dispensación" [filterTemplate]="filterTemplate">
+  @if (seleccionados) {
+    <button type="button" class="btn btn-success mb-3" (click)="AsignarFuncionarios()">
+      <i class="fas fa-plus"></i>
+      Asignar facturador
+    </button>
+  }
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Dispensaciones"
+    [pagination]="pagination"
+    (pageChange)="paginacion()"
+  >
+    <ng-container titles>
+      <th>
+        <input type="checkbox" [value]="0" (change)="onSelectAll($event.target.checked)" />
+      </th>
+      <th>Código</th>
+      <th>Departamento</th>
+      <th>Fecha</th>
+      <th>Tipo</th>
+      <th>Facturador</th>
+      <th>Cliente</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (dispensacion of Dispensaciones; track $index) {
+        <tr class="text-center">
+          <td class="text-center">
+            <input
+              type="checkbox"
+              [checked]="dispensacion.checked"
+              [value]="dispensacion.Id_Dispensacion"
+              (change)="onSelect($event)"
+            />
+          </td>
+          <td class="text-center">
+            <strong>{{ dispensacion.Codigo }}</strong>
+          </td>
+          <td>{{ dispensacion.Departamento }}</td>
+          <td class="text-center">
+            {{ dispensacion.Fecha_Dis }}
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="label {{ dispensacion.Tipo == 'NoPos' ? 'label-primary' : 'label-inverse' }}"
+                >{{ dispensacion.Servicio }}</span
+              >
+            </div>
+          </td>
+          <td class="text-center">
+            {{ dispensacion.Funcionario }}
+          </td>
+          <td class="text-center">
+            {{ dispensacion.EPS || 'N/A' }}
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="label {{
+                  dispensacion.Estado_Facturacion == 'Sin Facturar'
+                    ? 'label-danger'
+                    : 'label-success'
+                }}"
+                >{{ dispensacion.Estado_Facturacion }}</span
+              >
+            </div>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view
+                [link]="{
+                  url: '/cuentas-medicas/dispensacion/' + dispensacion.Id_Dispensacion
+                }"
+              />
+              <app-action-button
+                icon="file-invoice"
+                text="Facturar"
+                type="info"
+                [link]="{
+                  url: '/cuentas-medicas/facturacrear/' + dispensacion.Id_Dispensacion
+                }"
+              />
+              <app-action-button
+                icon="user"
+                text="Facturador"
+                type="primary"
+                (click)="EditarDispensacion(dispensacion.Id_Dispensacion)"
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtro_cod"
+      (input)="filtros()"
+      placeholder="Filtro Codigo"
+    />
+  </mat-form-field>
+  <!-- rango de fechas -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Rango de fechas</mat-label>
+    <mat-date-range-input [formGroup]="range" [rangePicker]="rangePicker">
+      <input
+        matStartDate
+        [readonly]="true"
+        placeholder="Fecha de inicio"
+        formControlName="start"
+        name="date_start"
+      />
+      <input
+        matEndDate
+        [readonly]="true"
+        placeholder="Fecha de fin"
+        formControlName="end"
+        name="date_end"
+      />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+    <mat-datepicker-toggle matIconSuffix (click)="borrarFechas()">
+      <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+    </mat-datepicker-toggle>
+
+    <mat-date-range-picker #rangePicker>
+      <mat-date-range-picker-actions>
+        <button mat-button matDateRangePickerCancel>Cancelar</button>
+        <button mat-raised-button color="primary" matDateRangePickerApply>Filtrar</button>
+      </mat-date-range-picker-actions>
+    </mat-date-range-picker>
+  </mat-form-field>
+  <!-- tipo de servicio -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo Serv.</mat-label>
+    <mat-select (selectionChange)="filtros()" [(ngModel)]="filtro_tipo">
+      <mat-option value="">Todos</mat-option>
+      <mat-option *ngFor="let t of Servicios" [value]="t.Id_Tipo_Servicio">
+        {{ t.Nombre }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- facturador -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>facturador</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtro_facturador"
+      (input)="filtros()"
+      placeholder="Filtro Cargos"
+    />
+  </mat-form-field>
+  <!-- cliente -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Cliente</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtro_cliente"
+      (input)="filtros()"
+      placeholder="Filtro Cliente"
+    />
+  </mat-form-field>
+</ng-template>
+
+<app-tablafacturacion></app-tablafacturacion>
+
+<app-modal-basic #modalAsignarFacturador>
+  <div class="app-modal-header d-flex justify-content-between w-100">
+    <h4 class="text-primary modal-title">Asignar Facturador</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modalAsignarFacturador.hide()"
+    ></button>
+  </div>
+  <div class="app-modal-body">
+    <form
+      #FormAsignarFacturador="ngForm"
+      (ngSubmit)="AsignarFacturador(FormAsignarFacturador, modalAsignarFacturador)"
+    >
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <input type="hidden" name="id" ngModel="{{ IdDispensacion }}" required />
+            <mat-form-field class="col-12" appearance="outline">
+              <mat-label>Asignar a:</mat-label>
+              <mat-select name="idFacturador" ngModel>
+                @for (auditor of auditores; track $index) {
+                  <mat-option [value]="auditor.Identificacion_Funcionario">
+                    {{ auditor.Funcionario }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button type="button" class="btn btn-danger" (click)="modalAsignarFacturador.hide()">
+        Cancelar
+      </button>
+      &nbsp;
+      <button
+        type="button"
+        (click)="confirmarAsignarFacturador(FormAsignarFacturador, modalAsignarFacturador)"
+        [disabled]="!FormAsignarFacturador.valid"
+        class="btn btn-primary"
+      >
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <input type="hidden" name="id" ngModel="{{ IdDispensacion }}" required />
+              <label>Asignar a:</label>
+              <select
+                class="form-control form-control-sm"
+                name="Facturador_Asignado"
+                ngModel="{{ idFacturador }}"
+              >
+                <option value="">Seleccione Facturador</option>
+                <option
+                  *ngFor="let auditor of auditores"
+                  [value]="auditor.Identificacion_Funcionario"
+                >
+                  {{ auditor.Funcionario }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </button>
+    </div>
+    <div class="app-modal-footer">
+      <div class="text-right">
+        <button
+          type="button"
+          class="btn btn-default btn-sm"
+          (click)="modalAsignarFacturador.hide()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="confirmarAsignarFacturador(FormAsignarFacturador, modalAsignarFacturador)"
+          [disabled]="!FormAsignarFacturador.valid"
+          class="btn btn-primary btn-sm"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+<app-modal-basic #modalAsignarFacturadorTodos>
+  <div class="app-modal-header">
+    <h4>Asignar Facturador</h4>
+    <button type="button" class="close basic-close" (click)="modalAsignarFacturadorTodos.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+</app-modal-basic>
+<app-modal-basic #modalAsignarFacturadorTodos>
+  <div class="app-modal-header d-flex justify-content-between w-100">
+    <h4 class="text-primary modal-title">Asignar Facturador</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modalAsignarFacturadorTodos.hide()"
+    ></button>
+  </div>
+  <div class="app-modal-body">
+    <form
+      #FormAsignarFacturadorTodos="ngForm"
+      (ngSubmit)="AsignarFacturador(FormAsignarFacturador, modalAsignarFacturador)"
+    >
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <mat-form-field class="col-12" appearance="outline">
+              <mat-label>Asignar a:</mat-label>
+              <mat-select name="Facturador_Asignado" ngModel>
+                @for (auditor of auditores; track $index) {
+                  <mat-option [value]="auditor.Identificacion_Funcionario">
+                    {{ auditor.Funcionario }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button
+        type="button"
+        class="btn btn-default btn-sm"
+        (click)="modalAsignarFacturadorTodos.hide()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="
+          confirmarGuardarAsignaciones(FormAsignarFacturadorTodos, modalAsignarFacturadorTodos)
+        "
+        [disabled]="!FormAsignarFacturadorTodos.valid"
+        class="btn btn-primary btn-sm"
+      >
+        Guardar
+      </button>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button type="button" class="btn btn-danger" (click)="modalAsignarFacturadorTodos.hide()">
+        Cancelar
+      </button>
+      &nbsp;
+      <button
+        type="button"
+        (click)="
+          confirmarGuardarAsignaciones(FormAsignarFacturadorTodos, modalAsignarFacturadorTodos)
+        "
+        [disabled]="!FormAsignarFacturadorTodos.valid"
+        class="btn btn-primary"
+      >
+        Guardar
+      </button>
+    </div>
+  </div>
+</app-modal-basic>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>

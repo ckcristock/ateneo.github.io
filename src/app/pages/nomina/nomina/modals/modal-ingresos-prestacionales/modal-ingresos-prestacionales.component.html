@@ -1,0 +1,8 @@
+<app-modal titleModal="Ingresos prestacionales">
+  <app-ingreso-prestacional
+    [person]="data.officer"
+    [periodo]="data.paymentFreq"
+    [nominaPaga]="data.payrollPay"
+    (updated)="onUpdate()"
+  ></app-ingreso-prestacional>
+</app-modal>

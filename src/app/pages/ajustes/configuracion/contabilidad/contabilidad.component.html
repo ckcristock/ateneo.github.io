@@ -1,0 +1,55 @@
+<div class="card">
+  <div class="card-body">
+    <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" destroyOnHide="true" class="nav-tabs">
+      <!-- <li [ngbNavItem]="1">
+            <a ngbNavLink>Modulo</a>
+            <ng-template ngbNavContent> </ng-template>
+          </li> -->
+
+      <li [ngbNavItem]="1">
+        <a ngbNavLink (click)="changeRoute('category')">Categorías</a>
+        <ng-template ngbNavContent>
+          @if (activeTab === 1) {
+            <app-accounting-table
+              [value]="value"
+              [activeTab]="activeTab"
+              [configurable_entity_type]="'category'"
+              [retentionTypes]="retentionTypes"
+              [accounts]="accounts"
+            />
+          }
+        </ng-template>
+      </li>
+
+      <li [ngbNavItem]="2">
+        <a ngbNavLink (click)="changeRoute('subcategory')">Subcategorias</a>
+        <ng-template ngbNavContent>
+          @if (activeTab === 2) {
+            <app-accounting-table
+              [value]="value"
+              [activeTab]="activeTab"
+              [configurable_entity_type]="'subcategory'"
+              [retentionTypes]="retentionTypes"
+              [accounts]="accounts"
+            />
+          }
+        </ng-template>
+      </li>
+
+      <li [ngbNavItem]="3">
+        <a ngbNavLink (click)="changeRoute('product')">Productos</a>
+        <ng-template ngbNavContent>
+          @if (activeTab === 3) {
+            <app-accounting-table
+              [value]="value"
+              [activeTab]="activeTab"
+              [configurable_entity_type]="'product'"
+              [accounts]="accounts"
+            />
+          }
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-3"></div>
+  </div>
+</div>

@@ -1,0 +1,97 @@
+.space {
+  th,
+  td {
+    word-wrap: break-word;
+    font-size: 10px;
+  }
+}
+
+.texto {
+  float: right;
+  width: 240px;
+  height: auto !important;
+  font-size: 10px;
+  line-height: 12px;
+  padding: 3px 3px 3px 10px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.btn-sm {
+  padding: 5px 10px 5px 10px !important;
+  line-height: 14px !important;
+  font-size: 10px !important;
+}
+
+.table {
+  thead {
+    th {
+      padding: 2px;
+
+      .input-sm,
+      .input-sm:focus {
+        font-size: 10px;
+        height: auto !important;
+        padding: 2px 5px;
+        line-height: 1 !important;
+        border: 0 !important;
+        outline: none !important;
+      }
+    }
+
+    .tabla-filtro {
+      padding: 0 !important;
+      text-align: center;
+    }
+  }
+
+  font-size: 10px;
+
+  td {
+    padding: 0.5rem;
+    vertical-align: middle;
+    word-wrap: break-word;
+    white-space: normal;
+  }
+}
+
+.input-barras {
+  width: 40%;
+  margin-left: 30%;
+  font-size: 60px;
+  line-height: 60px;
+  text-align: center;
+}
+
+.form-control-xs {
+  font-size: 10px;
+  padding: 2px;
+  line-height: 11px;
+}
+
+.tabla-lotes {
+  td {
+    padding: 2px !important;
+  }
+}
+
+.table-mini {
+  td {
+    padding: 1px !important;
+    font-size: 8px !important;
+    font-weight: bold;
+  }
+}
+
+.imagen {
+  width: 170px !important;
+  height: 170px !important;
+}
+
+.table td {
+  word-break: normal !important;
+}
+
+* {
+  word-break: normal !important;
+}

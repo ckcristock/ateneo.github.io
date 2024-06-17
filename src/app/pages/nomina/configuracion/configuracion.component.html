@@ -1,0 +1,117 @@
+<app-card viewTitle="Configuración de nómina">
+  <div class="alert alert-warning text-center" role="alert">
+    Recuerda que los cambios de estos valores modificáran los cálculos correspondientes al momento
+    del pago de la nómina.
+  </div>
+  <ng-container *ngIf="!loading && data.length; else notData">
+    <ng-container *ngFor="let item of data">
+      <div class="row card-title d-flex justify-content-between">
+        <div class="col-md-6 px-0">
+          <h6 class="fw-bold">{{ rowName[item[0]]?.name ?? 'No hay dato' }}</h6>
+        </div>
+        <div *ngIf="rowName[item[0]]?.add" class="col-md-6 px-0 text-end">
+          <div class="btn-group rounded w-sm-100">
+            <button class="btn btn-primary btn-sm" (click)="openModal(modal, item[0])">
+              <i class="fa fa-plus"></i> Agregar
+            </button>
+          </div>
+        </div>
+      </div>
+      <app-configuracion-tabla
+        *ngIf="item[1].length; else notData"
+        [data]="item[1]"
+        [type]="item[0]"
+        [people]="people"
+        [account]="account"
+        [updates]="{
+          people: rowName[item[0]].updates.people,
+          account: rowName[item[0]].updates.account,
+          counterpart: rowName[item[0]].updates.counterpart,
+          percent: rowName[item[0]].updates.percent,
+          modality: rowName[item[0]].updates.modality,
+          check: rowName[item[0]].updates.check
+        }"
+      ></app-configuracion-tabla>
+    </ng-container>
+  </ng-container>
+</app-card>
+
+<ng-template #modal>
+  <app-modal
+    [titleModal]="
+      typeModal === 'responsables' ? 'Nuevo responsable' : 'Nuevo ' + (typeModal | lowercase)
+    "
+  >
+    <form *ngIf="typeModal === 'responsables'" [formGroup]="peopleForm">
+      <mat-form-field class="col-md-12" appearance="outline">
+        <mat-label>Área</mat-label>
+        <input
+          matInput
+          type="text"
+          name="area"
+          autocomplete="off"
+          formControlName="area"
+          placeholder="Ingrese el Área"
+        />
+      </mat-form-field>
+      <app-autocomplete-fc
+        class="col"
+        label="Funcionario"
+        placeholder="Seleccionar"
+        [control]="peopleForm.controls['person_id']"
+        [list]="people"
+      ></app-autocomplete-fc>
+    </form>
+    <button
+      *ngIf="typeModal === 'responsables'"
+      buttons
+      class="btn btn-primary"
+      type="button"
+      [disabled]="peopleForm.invalid"
+      (click)="createManager()"
+    >
+      Guardar
+    </button>
+    <form *ngIf="typeModal !== 'responsables'" [formGroup]="incomeExpenses">
+      <mat-form-field class="col-md-12" appearance="outline">
+        <mat-label>Concepto</mat-label>
+        <input
+          matInput
+          type="text"
+          name="concept"
+          autocomplete="off"
+          formControlName="concept"
+          placeholder="Ingresa el concepto"
+        />
+      </mat-form-field>
+      <mat-form-field *ngIf="typeModal === 'ingresos'" class="col-md-12" appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="type">
+          <mat-option value="Constitutivo">Constitutivo</mat-option>
+          <mat-option value="No Constitutivo">No constitutivo</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <app-autocomplete-fc
+        class="col"
+        label="Cuenta contable"
+        placeholder="Seleccionar"
+        [control]="incomeExpenses.controls['account_plan_id']"
+        [list]="account"
+      ></app-autocomplete-fc>
+    </form>
+    <button
+      *ngIf="typeModal !== 'responsables'"
+      buttons
+      class="btn btn-primary"
+      type="button"
+      [disabled]="incomeExpenses.invalid"
+      (click)="createIncomeExpenses()"
+    >
+      Guardar
+    </button>
+  </app-modal>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

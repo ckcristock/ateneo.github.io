@@ -1,0 +1,16 @@
+<app-modal titleModal="Horas extras/recargos">
+  <app-table>
+    <ng-container titles>
+      <th>Tipo</th>
+      <th>Cantidad</th>
+    </ng-container>
+    <tbody content>
+      @for (item of overtime | keyvalue; track $index) {
+        <tr class="text-center">
+          <td>{{ item.key }}</td>
+          <td>{{ item.value }} h</td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-modal>

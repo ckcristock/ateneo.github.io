@@ -1,0 +1,56 @@
+<div class="row" *ngIf="show">
+  <div class="col-12 mt-2">
+    <div class="alert alert-warning" role="alert">
+      <i class="fa fa-exclamation-triangle"></i> Recuerde actualizar los datos del paciente
+    </div>
+  </div>
+
+  <div class="col-12 text-center">
+    <h4 class="text-success">
+      <i class="fa fa-clipboard-check"></i> ¡Cita
+      {{ space ? 'creada' : ' añadida a lista de espera' }} con éxito!
+    </h4>
+  </div>
+
+  <div class="col-12">
+    <div class="my-4" style="font-size: 15px">
+      Se ha {{ space ? ' agendado una Cita ' : ' añadido a lista de espera' }} en la modalidad
+      <strong class="fw-bold">{{ anotheData.appointment.text }}</strong> para el paciente
+      <strong class="text-uppercase">{{ patient.firstname }} {{ patient.surname }} </strong>
+
+      <span *ngIf="space">
+        con el profesional
+
+        <strong class="text-uppercase">
+          {{ space.person.first_name }} {{ space.person.first_surname }}
+        </strong>
+        el día <strong class="fw-bold"> {{ info.startDate }} </strong>
+
+        <span *ngIf="!anotheData.appointment.face_to_face; else presential">
+          EN LA SALA VIRTUAL DE LA CENTRAL DE ESPECIALISTAS
+        </span>
+
+        <ng-template #presential>
+          en la sede <strong class="fw-bold">{{ info.location.name }}</strong> en la Dirección
+          <strong class="fw-bold"> {{ info.location.address }} </strong>
+        </ng-template>
+      </span>
+    </div>
+  </div>
+
+  <div class="col-12 text-center" *ngIf="space">
+    <h5>Recuerde que su cuota moderadora es de:</h5>
+    <h3 class="text-danger fw-bold display-4">${{ appointment.price }}</h3>
+  </div>
+
+  <div class="col-12 text-center">
+    <h5>Otras citas creadas:</h5>
+    <h3 class="text-danger fw-bold display-4" *ngFor="let app of appointmentsGenerated">
+      {{ app.space.hour_start }}
+    </h3>
+  </div>
+
+  <div class="col-12 mt-4">
+    <button class="btn btn-primary btn-sm btn-block" (click)="cleanAll()">Finalizar llamada</button>
+  </div>
+</div>

@@ -1,0 +1,505 @@
+<div class="card">
+  <div class="card-body">
+    <div class="card-title">
+      <h4 class="text-primary">Ciudades</h4>
+    </div>
+    <hr class="line" />
+    <div class="row">
+      <div [ngClass]="{ 'col-lg-4 mb-3': true }">
+        <ul class="list-group list-group-flush">
+          <li
+            class="rounded-top list-group-item list-group-item-primary d-flex justify-content-between"
+          >
+            <b>Paises</b>
+            <span>
+              <button class="btn btn-primary btn-sm" (click)="openModal('paises', add)">
+                <i class="fa fa-plus"></i>
+              </button>
+            </span>
+          </li>
+
+          <div class="row">
+            <mat-form-field appearance="outline" class="col-12 pt-2">
+              <mat-label>Filtro</mat-label>
+              <input
+                matInput
+                type="text"
+                name="name_country"
+                autocomplete="off"
+                [(ngModel)]="filtro_pais.name"
+                (input)="getCountries()"
+                placeholder="Busca por país"
+              />
+            </mat-form-field>
+          </div>
+
+          @if (!loadingCountry && countries.length != 0) {
+            @for (country of countries; track country) {
+              <li
+                role="button"
+                [ngClass]="{ 'shadow-inset-primary': country.selected }"
+                class="list-group-item d-flex justify-content-between align-items-center rounded"
+                (click)="
+                  getStates(country.id);
+                  selected(countries, country.id);
+                  countrySelected = country.id
+                "
+              >
+                {{ country.name | uppercase }}
+                <span ngbDropdown container="body" class="dropdown-primary">
+                  <button
+                    ngbDropdownToggle
+                    class="btn btn-primary btn-sm"
+                    type="button"
+                    (click)="stop($event)"
+                  >
+                    <i class="mdi mdi-chevron-down"></i>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a
+                      role="button"
+                      class="dropdown-item text-info"
+                      (click)="editar('paises', country, add)"
+                    >
+                      <i class="fas fa-edit color-info"></i> Editar</a
+                    >
+                  </div>
+                </span>
+              </li>
+            }
+          } @else {
+            <app-not-data [loading]="loadingCountry"></app-not-data>
+          }
+          <ngb-pagination
+            size="sm"
+            class="d-flex justify-content-center pagination-rounded pagination-sm mt-2"
+            [collectionSize]="pagination_pais.collectionSize"
+            [pageSize]="pagination_pais.pageSize"
+            [(page)]="pagination_pais.page"
+            (pageChange)="getCountries($event)"
+            aria-label="Default pagination"
+            maxSize="5"
+            rotate="true"
+            ellipses="false"
+            boundaryLinks="true"
+          >
+          </ngb-pagination>
+        </ul>
+      </div>
+
+      <div [ngClass]="{ 'col-lg-4 mb-3': true }">
+        <ul class="list-group list-group-flush">
+          <li
+            class="rounded-top list-group-item list-group-item-primary d-flex justify-content-between"
+          >
+            <b>Departamentos</b>
+            <span>
+              <button class="btn btn-primary btn-sm" (click)="openModal('departamentos', add)">
+                <i class="fa fa-plus"></i>
+              </button>
+            </span>
+          </li>
+
+          <div class="row">
+            <mat-form-field appearance="outline" class="col pt-2">
+              <mat-label>Filtro</mat-label>
+              <input
+                matInput
+                type="text"
+                name="name_country"
+                autocomplete="off"
+                [(ngModel)]="filtro_depto.name"
+                (input)="getStates(countrySelected)"
+                placeholder="Busca por país"
+              />
+            </mat-form-field>
+          </div>
+
+          @if (!loadingState && states.length != 0) {
+            @for (state of states; track state) {
+              <li
+                role="button"
+                [ngClass]="{ 'shadow-inset-primary': state.selected }"
+                class="list-group-item d-flex justify-content-between align-items-center rounded"
+                (click)="
+                  getMunicipalities(state.id);
+                  selected(states, state.id);
+                  departmentSelected = state.id
+                "
+              >
+                {{ state.name | uppercase }}
+                <span ngbDropdown container="body" class="dropdown-primary">
+                  <button
+                    ngbDropdownToggle
+                    class="btn btn-primary btn-sm"
+                    (click)="stop($event)"
+                    type="button"
+                  >
+                    <i class="mdi mdi-chevron-down"></i>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a
+                      role="button"
+                      class="dropdown-item text-info"
+                      (click)="editar('departamentos', state, add)"
+                    >
+                      <i class="fas fa-edit color-info"></i> Editar</a
+                    >
+                  </div>
+                </span>
+              </li>
+            }
+          } @else {
+            <app-not-data [loading]="loadingState"></app-not-data>
+          }
+          <ngb-pagination
+            size="sm"
+            class="d-flex justify-content-center pagination-rounded pagination-sm mt-2"
+            [collectionSize]="pagination_depto.collectionSize"
+            [pageSize]="pagination_depto.pageSize"
+            [(page)]="pagination_depto.page"
+            (pageChange)="getStates(countrySelected, $event)"
+            aria-label="Default pagination"
+            maxSize="5"
+            rotate="true"
+            ellipses="false"
+            boundaryLinks="true"
+          >
+          </ngb-pagination>
+        </ul>
+      </div>
+
+      <div class="col-lg-4 mb-3">
+        <ul class="list-group list-group-flush">
+          <li
+            class="rounded-top list-group-item list-group-item-primary d-flex justify-content-between"
+          >
+            <b>Municipios</b>
+            <span>
+              <button class="btn btn-primary btn-sm" (click)="openModal('municipios', add)">
+                <i class="fa fa-plus"></i>
+              </button>
+            </span>
+          </li>
+          <div class="row">
+            <mat-form-field appearance="outline" class="col pt-2">
+              <mat-label>Filtro</mat-label>
+              <input
+                matInput
+                type="text"
+                name="name_country"
+                autocomplete="off"
+                [(ngModel)]="filtro_muni.name"
+                (input)="getMunicipalities(departmentSelected)"
+                placeholder="Busca por municipios"
+              />
+            </mat-form-field>
+          </div>
+
+          @if (!loadingMunicipality && municipalities.length != 0) {
+            @for (municipality of municipalities; track municipality) {
+              <li
+                role="button"
+                [ngClass]="{ 'shadow-inset-primary': municipality.selected }"
+                class="list-group-item d-flex justify-content-between align-items-center rounded"
+                (click)="selected(municipalities, municipality.id)"
+              >
+                {{ municipality.name | uppercase }}
+                <span ngbDropdown container="body" class="dropdown-primary">
+                  <button
+                    ngbDropdownToggle
+                    class="btn btn-primary btn-sm"
+                    (click)="stop($event)"
+                    type="button"
+                  >
+                    <i class="mdi mdi-chevron-down"></i>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a
+                      role="button"
+                      class="dropdown-item text-info"
+                      (click)="editar('municipios', municipality, add)"
+                    >
+                      <i class="fas fa-edit color-info"></i> Editar</a
+                    >
+                  </div>
+                </span>
+              </li>
+            }
+          } @else {
+            <app-not-data [loading]="loadingMunicipality"></app-not-data>
+          }
+          <ngb-pagination
+            size="sm"
+            class="d-flex justify-content-center pagination-rounded pagination-sm mt-2"
+            [collectionSize]="pagination_muni.collectionSize"
+            [pageSize]="pagination_muni.pageSize"
+            [(page)]="pagination_muni.page"
+            (pageChange)="getMunicipalities(departmentSelected, $event)"
+            aria-label="Default pagination"
+            maxSize="5"
+            rotate="true"
+            ellipses="false"
+            boundaryLinks="true"
+          >
+          </ngb-pagination>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">
+      {{ operation | titlecase }}
+      {{
+        tipo == 'municipios'
+          ? 'municipio'
+          : tipo == 'departamentos'
+            ? 'departamento'
+            : tipo == 'paises'
+              ? 'país'
+              : ''
+      }}
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <ng-container [formGroup]="form">
+      <div class="row">
+        @if (tipo != 'paises') {
+          @if (tipo == 'departamentos') {
+            <mat-form-field appearance="outline" class="col">
+              <mat-label>Pais</mat-label>
+              <mat-select
+                (selectionChange)="getStates($event.value)"
+                formControlName="country_id"
+                required
+              >
+                @for (item of countries; track item) {
+                  <mat-option [value]="item.id" (click)="selected(countries, item.id)">{{
+                    item.name | uppercase
+                  }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+
+          @if (tipo == 'municipios') {
+            <mat-form-field appearance="outline" class="col">
+              <mat-label>Departamentos</mat-label>
+              <mat-select formControlName="department_id" required>
+                @for (item of states; track item) {
+                  <mat-option [(value)]="item.id">{{ item.name | uppercase }} </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Abreviatura</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="Ingresa la abreviatura"
+                formControlName="abbreviation"
+                class="text-uppercase"
+                autocomplete="off"
+                required
+              />
+            </mat-form-field>
+          }
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Codigo DANE</mat-label>
+            <input
+              matInput
+              type="text"
+              autocomplete="off"
+              class="text-uppercase"
+              formControlName="dane_code"
+              placeholder="Ingrese el codigo DANE"
+              required
+            />
+          </mat-form-field>
+        }
+
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Codigo DIAN</mat-label>
+          <input
+            matInput
+            type="text"
+            autocomplete="off"
+            formControlName="dian_code"
+            class="text-uppercase"
+            placeholder="Ingrese el codigo DIAN"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            autocomplete="off"
+            class="text-uppercase"
+            formControlName="name"
+            placeholder="Ingrese el nombre"
+            required
+          />
+        </mat-form-field>
+      </div>
+    </ng-container>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button type="button" (click)="save()" class="btn btn-primary">Guardar</button>
+  </div>
+</ng-template>
+
+<!-- <div *ngIf="tipo == 'ciudades' && countrySelected != 1">
+            <mat-form-field appearance="outline" class="col-md-12">
+              <mat-label>Departamentos</mat-label>
+              <mat-select
+                (selectionChange)="getStates($event.value)"
+                [(value)]="stateSelected"
+              >
+                <mat-option
+                  *ngFor="let item of states"
+                  [(value)]="item.id"
+                  (click)="selected(states, item.id)"
+                  >{{ item.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div> -->
+<!--     <button
+      *ngIf="tipo == 'ciudades'"
+      [disabled]="name == '' || states.length == 0 || countries.length == 0"
+      type="button"
+      (click)="save()"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button> -->
+<!-- <ng-template #notDataCity>
+  <app-not-data [loading]="loadingCity"></app-not-data>
+</ng-template> -->
+
+<!-- <div *ngIf="tipo == 'ciudades' && countrySelected == 1">
+            <mat-form-field appearance="outline" class="col-md-12">
+              <mat-label>Departamentos</mat-label>
+              <mat-select
+                (selectionChange)="getStates($event.value)"
+                [(value)]="stateSelected"
+              >
+                <mat-option
+                  *ngFor="let item of states"
+                  [(value)]="item.id"
+                  (click)="
+                    selected(states, item.id); stateSelected = item.id
+                  "
+                  >{{ item.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="col-md-12">
+              <mat-label>Municipios</mat-label>
+              <mat-select
+                (selectionChange)="getMunicipalities($event.value)"
+                [(value)]="municipalitySelected"
+              >
+                <mat-option
+                  *ngFor="let item of municipalities"
+                  [(value)]="item.id"
+                  (click)="selected(municipalities, item.id)"
+                  >{{ item.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div> -->
+
+<!-- <div
+        [ngClass]="{
+          'col-lg-3': countrySelected == 1,
+          'col-lg-4 mb-3': countrySelected != 1
+        }"
+      >
+        <ul class="list-group list-group-flush">
+          <li
+            class="rounded-top list-group-item list-group-item-primary d-flex justify-content-between"
+          >
+            <b>Ciudades</b>
+            <span>
+              <button
+                class="btn btn-primary btn-sm"
+                (click)="openModal('ciudades', add)"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </span>
+          </li>
+
+          <ng-container>
+            <mat-form-field appearance="outline" class="col-12 pt-2">
+              <mat-label>Filtro</mat-label>
+              <input
+                matInput
+                type="text"
+                name="name"
+                autocomplete="off"
+                [(ngModel)]="filtro_ciud.name"
+                (input)="countrySelected==1 ? getCitiesByMunicipality(municipalitySelected) : getCities(stateSelected)"
+                placeholder="Busca por país"
+              />
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngIf="!loadingCity && cities.length != 0; else notDataCity">
+            <li
+              role="button"
+              *ngFor="let city of cities"
+              [ngClass]="{ 'shadow-inset-primary': city.selected }"
+              class="list-group-item d-flex justify-content-between align-items-center rounded"
+              (click)="selected(cities, city.id)"
+            >
+              {{ city.name }}
+              <span ngbDropdown container="body" class="dropdown-primary">
+                <button
+                  ngbDropdownToggle
+                  class="btn btn-primary btn-sm "
+                  type="button"
+                >
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a
+                    role="button"
+                    class="dropdown-item text-info "
+                    (click)="editar('ciudades', city, add)"
+                  >
+                    <i class="fas fa-edit color-info"></i> Editar</a
+                  >
+                </div>
+              </span>
+            </li>
+          </ng-container>
+          <ngb-pagination size="sm"
+            class="d-flex justify-content-center pagination-rounded pagination-sm"
+            [collectionSize]="pagination_ciud.collectionSize"
+            [pageSize]="pagination_ciud.pageSize"
+            [(page)]="pagination_ciud.page"
+            (pageChange)="countrySelected==1 ? getCitiesByMunicipality(municipalitySelected, $event) : getCities(stateSelected, $event)"
+            aria-label="Default pagination"
+            maxSize="5"
+            rotate="true"
+            ellipses="false"
+            boundaryLinks="true"
+          >
+          </ngb-pagination>
+        </ul>
+      </div> -->

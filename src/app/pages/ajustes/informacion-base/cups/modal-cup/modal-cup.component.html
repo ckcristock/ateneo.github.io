@@ -1,0 +1,101 @@
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Nueva CUPS</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click'); form.reset()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <div class="col-12 mb-4">
+          <ng-select
+            id="specialties"
+            [items]="specialities"
+            bindLabel="text"
+            bindValue="value"
+            multiple="true"
+            placeholder="Especialidades"
+            appearance="outline"
+            [appendTo]="'body'"
+            formControlName="specialities"
+            loadingText="loading"
+          >
+          </ng-select>
+          <small>
+            <app-show-errors
+              class="text-danger position-absolute"
+              [ctrl]="form.get('specialities')"
+            ></app-show-errors>
+          </small>
+        </div>
+        <mat-form-field class="col-12" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            formControlName="description"
+            required
+            autocomplete="off"
+          />
+          <mat-error>
+            <app-show-errors class="text-danger" [ctrl]="form.get('description')"></app-show-errors>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Código</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el código"
+            formControlName="code"
+            required
+            autocomplete="off"
+          />
+          <mat-hint>El código debe tener 6 dígitos</mat-hint>
+          <!-- <mat-error>
+            <app-show-errors
+              class="text-danger"
+              [ctrl]="form.get('code')"
+            ></app-show-errors>
+          </mat-error> -->
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo</mat-label>
+          <mat-select multiple="true" formControlName="type_service_id">
+            @for (item of cups_type; track item) {
+              <mat-option [value]="item.value">{{ item.text }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        @if (form.get('type_service_id').value == 8) {
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Color del tubo</mat-label>
+            <mat-select formControlName="color_id">
+              @for (item of colors; track item) {
+                <mat-option [value]="item.value">{{ item.text }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+    <button
+      type="button"
+      (click)="createNewCups()"
+      [disabled]="!form.valid"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>

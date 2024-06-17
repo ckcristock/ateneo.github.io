@@ -1,0 +1,13 @@
+<mat-form-field [class]="class" appearance="outline">
+  <mat-label>{{ label }}</mat-label>
+  <input
+    [type]="type"
+    matInput
+    aria-hidden="true"
+    [formControl]="control"
+    [errorStateMatcher]="matcher"
+    [placeholder]="placeholder"
+    [required]="required"
+  />
+  <mat-error>Campo requerido</mat-error>
+</mat-form-field>

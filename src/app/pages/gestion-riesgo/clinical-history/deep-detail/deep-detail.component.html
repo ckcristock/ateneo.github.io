@@ -1,0 +1,133 @@
+<div class="row">
+  <div class="col-12">
+    <!-- <ngb-alert class="mb-2" #alert *ngIf="notOverride" [dismissible]="false" [type]="'warning'">
+          No se pueden <strong>cancelar</strong> agendas con citas asignadas
+        </ngb-alert> -->
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-3">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label">Fecha:</label>
+              <span type="text" class="col-sm-8 form-control-plaintext">
+                {{ data?.date }}
+                -
+                {{ data?.hour }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-3">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label">Tipo:</label>
+              <span type="text" class="col-sm-8 form-control-plaintext">
+                {{ data?.type?.name }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label">Profesional:</label>
+              <span type="text" class="col-sm-8 form-control-plaintext">
+                {{ data?.doctor?.name }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- /*************************************************************************************************************** -->
+
+        <div class="row">
+          <div class="col-3">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label">IPS:</label>
+              <span type="text" class="col-sm-8 form-control-plaintext">
+                {{ data?.location?.company }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-3">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label">Sede:</label>
+              <span type="text" class="col-sm-8 form-control-plaintext">
+                {{ data?.location?.name }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-3">
+            <div class="form-group row">
+              <label class="col-sm-5 col-form-label">Servicio:</label>
+              <span type="text" class="col-sm-7 form-control-plaintext">
+                {{ data?.service?.name }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-3">
+            <div class="form-group row">
+              <label class="col-sm-5 col-form-label">Diagnostico:</label>
+              <span type="text" class="col-sm-7 form-control-plaintext">
+                {{ data?.diagnostic?.name }}
+              </span>
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- /*************************************************************************************************************** -->
+          <div class="row">
+            <div class="col-12">
+              <div class="form-group row">
+                <label class="col-sm-12 col-form-label">Ordenes:</label>
+              </div>
+            </div>
+          </div>
+          <!-- /*************************************************************************************************************** -->
+        </div>
+
+        <div class="row" *ngFor="let item of data?.orders">
+          <div class="col-3">
+            <div class="form-group row">
+              <label class="col-sm-6 col-form-label">Fecha:</label>
+              <span type="text" class="col-sm-6 form-control-plaintext">
+                {{ item.date }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-3">
+            <div class="form-group row">
+              <label class="col-sm-6 col-form-label">Servicio:</label>
+              <span type="text" class="col-sm-6 form-control-plaintext">
+                {{ item.service.name }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-2">
+            <div class="form-group row">
+              <label class="col-sm-6 col-form-label">Duracion:</label>
+              <span type="text" class="col-sm-6 form-control-plaintext">
+                {{ item.duration }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <div class="form-group row">
+              <label class="col-sm-6 col-form-label">Observaciones:</label>
+              <span type="text" class="col-sm-6 form-control-plaintext">
+                {{ item.observations }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- /*************************************************************************************************************** -->
+      </div>
+    </div>
+  </div>
+</div>

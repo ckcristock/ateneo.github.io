@@ -1,0 +1,63 @@
+<app-card
+  viewTitle="Contratos clientes"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters [routerLink]="['create-contract']" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="contracts"
+    [pagination]="pagination"
+    (pageChange)="getAllContratos()"
+  >
+    <ng-container titles>
+      <th scope="col">Nombre</th>
+      <th scope="col">Código</th>
+      <th scope="col">Ips</th>
+      <th scope="col">Aseguradora</th>
+      <th scope="col">Vigencia</th>
+      <th scope="col">Estado</th>
+      <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (contract of contracts; track $index) {
+        <tr class="text-center">
+          <td scope="row">{{ contract.name }}</td>
+          <td>{{ contract.code }}</td>
+          <td>{{ contract?.company?.name }}</td>
+          <td>{{ contract?.administrator?.name }}</td>
+          <td>{{ contract.start_date }} - {{ contract.end_date }}</td>
+          <td><app-status-badge [status]="contract.state" /></td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit [routerLink]="['edit-contract', contract.id]" />
+              @if (contract.status) {
+                <app-action-deactivate (action)="anularOActivar(contract, 0, 'Inactivo')" />
+              }
+              @if (!contract.status) {
+                <app-action-activate (action)="anularOActivar(contract, 1, 'Activo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtros.name"
+    (searching)="filtros.name = $event; getAllContratos()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtros.code"
+    (searching)="filtros.code = $event; getAllContratos()"
+  ></app-automatic-search>
+</ng-template>

@@ -1,0 +1,181 @@
+<app-card viewTitle="Facturación" [filterTemplate]="filterTemplate">
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Facturas"
+    [pagination]="pagination"
+    (pageChange)="paginacion()"
+  >
+    <ng-container titles>
+      <th>Codigo</th>
+      <th>Fecha</th>
+      <th>Facturador</th>
+      <th>Cliente</th>
+      <th>Tipo</th>
+      <th>Modalidad</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (factura of Facturas; track $index) {
+        <tr class="text-center">
+          <td class="text-center">
+            <strong>{{ factura.Codigo }} </strong>
+          </td>
+          <td class="text-center">
+            {{ factura.Fecha_Documento | date: 'dd/MM/yyyy' }}
+          </td>
+          <td class="text-center">
+            {{ factura.Funcionario }}
+          </td>
+          <td class="text-center">{{ factura.Cliente }}</td>
+          <td>
+            <div class="text-center">
+              <span class="label label-inverse">{{ factura.Tipo }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="label"
+                [ngClass]="{
+                  'label-primary': factura.Modalidad == 'Homologo',
+                  'label-success': factura.Modalidad == 'Factura'
+                }"
+                >{{ factura.Modalidad }}</span
+              >
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="label {{
+                  factura.Estado_Factura == 'Sin Cancelar' ? 'label-danger' : 'label-success'
+                }}"
+                >{{ factura.Estado_Factura }}</span
+              >
+            </div>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              @if (factura.Tipo != 'Pos-Capita') {
+                <app-action-view
+                  [link]="{
+                    url:
+                      '/cuentas-medicas/cmfacturaver/' +
+                      (factura.Tipo_Fact == 'Factura'
+                        ? factura.Id_Factura
+                        : factura.Id_Factura_Asociada)
+                  }"
+                />
+              }
+              <app-action-button
+                icon="print"
+                text="Imprimir Factura"
+                type="info"
+                [link]="{
+                  url:
+                    environment.ruta +
+                    (factura.Tipo == 'Pos-Capita'
+                      ? 'php/factura_capita/factura_capita_pdf.php?id='
+                      : 'php/facturasventas/factura_dis_pdf.php?id=') +
+                    factura.Id_Factura,
+                  target: '_blank'
+                }"
+              />
+              <app-action-button
+                icon="download"
+                text="Descargar XML"
+                type="success"
+                [link]="{
+                  url:
+                    environment.ruta +
+                    'php/facturacion_electronica/descargar_xml.php?Tipo_Factura=' +
+                    (factura.Tipo != 'Pos-Capita' ? 'Factura' : 'Factura_Capita') +
+                    '&Id_Factura=' +
+                    factura.Id_Factura,
+                  target: '_blank'
+                }"
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtro_cod_fact"
+      (input)="filtros1()"
+      placeholder="Filtro Codigo"
+    />
+  </mat-form-field>
+  <!-- rango de fechas -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Rango de fechas</mat-label>
+    <mat-date-range-input [formGroup]="range" [rangePicker]="rangePicker">
+      <input
+        matStartDate
+        [readonly]="true"
+        placeholder="Fecha de inicio"
+        formControlName="start"
+        name="date_start"
+      />
+      <input
+        matEndDate
+        [readonly]="true"
+        placeholder="Fecha de fin"
+        formControlName="end"
+        name="date_end"
+      />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+    <mat-datepicker-toggle matIconSuffix (click)="borrarFechas()">
+      <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+    </mat-datepicker-toggle>
+
+    <mat-date-range-picker #rangePicker>
+      <mat-date-range-picker-actions>
+        <button mat-button matDateRangePickerCancel>Cancelar</button>
+        <button mat-raised-button color="primary" matDateRangePickerApply>Filtrar</button>
+      </mat-date-range-picker-actions>
+    </mat-date-range-picker>
+  </mat-form-field>
+  <!-- facturador -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>facturador</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtro_facturador"
+      (input)="filtros1()"
+      placeholder="Filtro Facturador"
+    />
+  </mat-form-field>
+  <!-- cliente -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Cliente</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtro_cliente"
+      (input)="filtros1()"
+      placeholder="Filtro Cliente"
+    />
+  </mat-form-field>
+  <!-- tipo de servicio -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo Serv.</mat-label>
+    <mat-select (selectionChange)="filtros1()" [(ngModel)]="filtro_tipo_fact">
+      <mat-option value="">Todos</mat-option>
+      <mat-option *ngFor="let t of Servicios" [value]="t.Id_Tipo_Servicio">
+        {{ t.Nombre }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

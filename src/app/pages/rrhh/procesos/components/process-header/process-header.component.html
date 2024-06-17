@@ -1,0 +1,37 @@
+<app-card
+  [viewTitle]="titlePage"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]">
+    <app-add-button filters (click)="onClickAdd()" />
+    <ng-content select="[actions]"></ng-content>
+  </ng-container>
+  <ng-content></ng-content>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-autocomplete-mdl
+    class="col"
+    label="Funcionario"
+    placeholder="Buscar funcionario"
+    [model]="filters.person_id"
+    [list]="people$ | async"
+    classList="pb-0"
+    (optionSelectedEvent)="filters.person_id = $event; onRequest()"
+  ></app-autocomplete-mdl>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Fecha</mat-label>
+    <input matInput type="date" [(ngModel)]="filters.date" (change)="onRequest()" />
+  </mat-form-field>
+  @if (filters.state) {
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="filters.state" (selectionChange)="onRequest()">
+        @for (state of states; track state.clave) {
+          <mat-option [value]="state.clave"> {{ state.clave }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+</ng-template>

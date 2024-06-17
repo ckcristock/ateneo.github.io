@@ -1,0 +1,119 @@
+.not-visible {
+  display: none;
+}
+.strok {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+/* .smer{
+  object-fit: cover;
+  position: relative;
+} */
+.card-border-asistencia {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  padding: 5% 5% 0 5%;
+  width: 100%;
+  height: 90%;
+}
+.logo-border-asistencia {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+  word-wrap: break-word;
+  padding: 0 5% 0 5%;
+  width: 100%;
+  height: 10%;
+}
+.logo-asistencia {
+  float: left;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  /* height:100%; */
+  background-image: url('/assets/images/logo-dark');
+  background-size: 50%;
+  background-repeat: no-repeat;
+  background-position: center left;
+}
+.indicadores-asistencia {
+  /*  float:left;
+  position: relative;
+  display: flex; */
+  width: 50%;
+  height: 100%;
+}
+.temperatura-asistencia {
+  float: left;
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hora-asistencia {
+  /* float: left; */
+  /* width: 50%; */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.detalle-temperatura {
+  font-weight: bold;
+  font-size: 4vw;
+  color: #de2121;
+  line-height: 1;
+  vertical-align: middle;
+  padding: 0;
+  margin: 0;
+}
+.boton-captura {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+  border: 0;
+}
+.detalle-hora {
+  font-weight: bold;
+  font-size: 4vw;
+  color: #6fb0b2;
+  line-height: 1;
+  vertical-align: middle;
+  padding: 0;
+  margin: 0;
+}
+#video-asistencia {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+  background-color: #000000;
+}
+#canvas {
+  display: none;
+}
+.reconocimiento {
+  height: 100%;
+  width: 100%;
+  background-color: #000000;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-reconocimiento {
+  max-width: 100%;
+}
+@media (max-width: 767px) {
+  .logo-asistencia {
+    background-size: 80%;
+  }
+}

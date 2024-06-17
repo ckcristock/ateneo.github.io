@@ -1,0 +1,87 @@
+<app-card [viewTitle]="'Nuevo modelo de historia clínica'">
+  @if (loading()) {
+    <app-not-data [loading]="loading()" />
+  } @else {
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col-md" appearance="outline">
+          <mat-label>Nombre de la sección</mat-label>
+          <input
+            type="text"
+            matInput
+            formControlName="name"
+            aria-hidden="true"
+            placeholder="Ingresa el nombre de la sección"
+            [required]="true"
+          />
+          <mat-error>Campo requerido</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col-md" appearance="outline">
+          <mat-label>Especialidades habilitadas</mat-label>
+          <mat-select formControlName="speciality" multiple>
+            @for (speciality of specialities; track speciality.value) {
+              <mat-option [value]="speciality.value">{{ speciality.text }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div ngbDropdown container="body" class="d-inline-block mb-3">
+        <button type="button" class="btn btn-sm btn-primary" ngbDropdownToggle>
+          <i class="fas fa-list"></i> Nueva sección
+        </button>
+        <div ngbDropdownMenu>
+          <button type="button" ngbDropdownItem (click)="addTab()">Empezar de cero</button>
+          <button type="button" ngbDropdownItem (click)="openBottomSheet()">
+            Sección existente
+          </button>
+        </div>
+      </div>
+      @if (sections && sections.value.length > 0) {
+        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="w-100">
+          <ng-container *ngFor="let section of sections.controls; let i = index">
+            <mat-tab [label]="section.get('name')?.value">
+              <ng-template mat-tab-label>
+                @if (!section.get('editable')?.value) {
+                  <span
+                    (dblclick)="onDoubleClick(section)"
+                    [cdkContextMenuTriggerFor]="context_menu"
+                    [cdkContextMenuTriggerData]="{ sectionIndex: i }"
+                  >
+                    {{ section.get('name')?.value }}
+                  </span>
+                } @else {
+                  <input
+                    aria-label="tab"
+                    type="text"
+                    [(ngModel)]="section.get('name').value"
+                    [ngModelOptions]="{ standalone: true }"
+                    (blur)="onBlur(section)"
+                    class="input-edit"
+                  />
+                }
+              </ng-template>
+              <app-history-tab [section]="section" [types]="types" />
+            </mat-tab>
+          </ng-container>
+        </mat-tab-group>
+      }
+      <div class="d-flex mt-4">
+        <button type="submit" class="btn btn-primary w-100" (click)="save()">Guardar</button>
+      </div>
+    </form>
+  }
+</app-card>
+<ng-template #context_menu let-sectionIndex="sectionIndex" cdkContextMenu>
+  <div class="menu shadow-lg rounded" cdkMenu>
+    <button
+      type="button"
+      class="menu-item text-danger"
+      cdkMenuItem
+      (click)="deleteSection(sectionIndex)"
+    >
+      <i class="fas fa-trash me-1"></i> Eliminar
+    </button>
+  </div>
+</ng-template>
+

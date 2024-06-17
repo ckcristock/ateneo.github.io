@@ -1,0 +1,104 @@
+<!-- PARAAAAAAA -->
+<ng-template #titleTemplate let-navItems2>
+  @for (item of navItems; track item; let x = $index) {
+    <div>
+      <ul class="list-group list-group-flush" aria-hidden="true">
+        @if (item.child && item.child.length > 0) {
+          <li class="list-group-item p-0">
+            <mat-accordion class="accordion-custom" multi>
+              <mat-expansion-panel class="mat-elevation-z0">
+                <mat-expansion-panel-header #panel1>
+                  <mat-panel-title>
+                    <mat-slide-toggle
+                      [color]="color"
+                      [checked]="item.checked"
+                      [disabled]="disabled"
+                      class="fw-bold"
+                      (change)="changeAll(item, $event); panel1._toggle()"
+                    >
+                      <span>
+                        {{ item.name }}
+                      </span>
+                    </mat-slide-toggle>
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    <span></span>
+                    <i [class]="item.icon"></i>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <ul class="list-group list-group-flush tree">
+                  @if (item.child.length > 0) {
+                    @for (subitem of item.child; track subitem) {
+                      <ng-container
+                        *ngTemplateOutlet="sectionTemplate; context: { $implicit: subitem }"
+                      >
+                      </ng-container>
+                    }
+                  }
+                </ul>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</ng-template>
+
+<ng-template #sectionTemplate let-subitem>
+  @if (subitem.parent_id && subitem.child.length == 0) {
+    <li class="d-flex justify-content-between mt-2 mx-5 item-permission" aria-hidden="true">
+      <div class="d-flex justify-content-between w-100" (click)="activateAll(subitem.permissions)">
+        <div class="text-nowrap title-permission">
+          <i class="fas fa-dot-circle"></i> {{ subitem.name }}
+        </div>
+        <div class="line-separator mx-1"></div>
+      </div>
+      @for (permit of subitem.permissions; track permit; let i = $index) {
+        <div class="text-nowrap d-inline">
+          <mat-slide-toggle
+            [color]="color"
+            [checked]="permit.Activo == 1"
+            class="me-1"
+            [disabled]="disabled"
+            data-toggle="tooltip"
+            data-placement="top"
+            [matTooltip]="permit.description"
+            (change)="permit.Activo = !permit.Activo; isChecked(navItems)"
+            id="{{ permit.menu_id + '-' + permit.permission_id }}"
+          >
+            {{ permit.public_name }}
+          </mat-slide-toggle>
+        </div>
+      }
+    </li>
+  }
+  @if (subitem.parent_id && subitem.child && subitem.child.length > 0) {
+    <li class="list-group-item p-0 ms-4" aria-hidden="true">
+      <mat-accordion class="accordion-custom" multi>
+        <mat-expansion-panel class="mat-elevation-z0">
+          <mat-expansion-panel-header #panel2>
+            <mat-panel-title>
+              <mat-slide-toggle
+                [color]="color"
+                [checked]="subitem.checked"
+                [disabled]="disabled"
+                (change)="changeAll(subitem, $event); panel2._toggle()"
+              >
+                {{ subitem.name }}
+              </mat-slide-toggle>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul class="list-group list-group-flush">
+            @for (subitem_ of subitem.child; track subitem_) {
+              <ng-container *ngTemplateOutlet="sectionTemplate; context: { $implicit: subitem_ }">
+              </ng-container>
+            }
+          </ul>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </li>
+  }
+</ng-template>
+
+<ng-container *ngTemplateOutlet="titleTemplate"> </ng-container>

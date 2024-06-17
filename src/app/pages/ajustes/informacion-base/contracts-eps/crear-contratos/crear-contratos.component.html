@@ -1,0 +1,591 @@
+<div class="card">
+  <form
+    #FormContrato="ngForm"
+    ng-submit=""
+    style="padding-bottom: 0px"
+    [formGroup]="dataForm"
+    novalidate
+  >
+    <div class="card-body">
+      <div class="row card-title d-flex justify-content-between">
+        <div class="col-md-12 px-0">
+          <h4 class="text-primary">Agregar o editar contrato</h4>
+        </div>
+      </div>
+      <hr class="line" />
+      <input type="hidden" id="id" name="id" formControlName="id" />
+      <div class="row">
+        <mat-form-field class="col-md-6" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            formControlName="name"
+            id="name"
+            name="name"
+            required
+            autocomplete="off"
+          />
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Código</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el código"
+            formControlName="code"
+            name="code"
+            id="code"
+            required
+            autocomplete="off"
+          />
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Número</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el número"
+            formControlName="number"
+            name="number"
+            id="number"
+            required
+            autocomplete="off"
+          />
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de contrato</mat-label>
+          <mat-select formControlName="payment_method_id" required>
+            <mat-option [value]="1">Capita</mat-option>
+            <mat-option [value]="2">Evento</mat-option>
+            <mat-option [value]="3">PGP</mat-option>
+          </mat-select>
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Aseguradora</mat-label>
+          <mat-select
+            name="administrator_id"
+            id="administrator_id"
+            formControlName="administrator_id"
+          >
+            <mat-option *ngFor="let item of administrators" [value]="item.value">{{
+              item.text
+            }}</mat-option>
+          </mat-select>
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Regimen</mat-label>
+          <mat-select
+            name="regimen_id"
+            id="regimen_id"
+            multiple="true"
+            formControlName="regimen_id"
+          >
+            <mat-option *ngFor="let item of regimes" [value]="item.value">{{
+              item.text
+            }}</mat-option>
+          </mat-select>
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Precio global</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el precio global"
+            formControlName="price"
+            name="price"
+            id="price"
+            required
+            autocomplete="off"
+          />
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fecha inicial</mat-label>
+          <input
+            matInput
+            type="date"
+            formControlName="start_date"
+            name="start_date"
+            id="start_date"
+            required
+            autocomplete="off"
+          />
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fecha final</mat-label>
+          <input
+            matInput
+            type="date"
+            formControlName="end_date"
+            name="end_date"
+            id="end_date"
+            required
+            autocomplete="off"
+          />
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Plan de beneficios</mat-label>
+          <mat-select formControlName="benefits_plans_id">
+            <mat-option *ngFor="let item of benefitsPlan" [value]="item.value">{{
+              item.text
+            }}</mat-option>
+          </mat-select>
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Modalidad de pago</mat-label>
+          <mat-select formControlName="payment_methods_contracts_id">
+            <mat-option *ngFor="let item of payment_methods_contracts" [value]="item.value">{{
+              item.text
+            }}</mat-option>
+          </mat-select>
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de servicio</mat-label>
+          <mat-select multiple="true" formControlName="type_service_id">
+            <mat-option *ngFor="let item of typeService" [value]="item.value">{{
+              item.text
+            }}</mat-option>
+          </mat-select>
+          <mat-error> Campo obligatorio </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <ng-select
+            [items]="departments"
+            multiple="true"
+            required
+            bindLabel="text"
+            bindValue="value"
+            appearance="outline"
+            [appendTo]="'body'"
+            placeholder="Departamentos"
+            name="department_id"
+            loadingText="loading"
+            formControlName="department_id"
+            [closeOnSelect]="false"
+          >
+          </ng-select>
+          <small>
+            <app-show-errors
+              class="text-danger position-absolute"
+              [ctrl]="dataForm.get('department_id')"
+            >
+            </app-show-errors>
+          </small>
+        </div>
+        <div class="col-md-6 mb-4">
+          <ng-select
+            [items]="municipalities"
+            multiple="true"
+            required
+            bindLabel="text"
+            bindValue="value"
+            appearance="outline"
+            [appendTo]="'body'"
+            placeholder="Municipios"
+            name="municipality_id"
+            loadingText="loading"
+            formControlName="municipality_id"
+            [closeOnSelect]="false"
+          >
+          </ng-select>
+          <small>
+            <app-show-errors
+              class="text-danger position-absolute"
+              [ctrl]="dataForm.get('municipality_id')"
+            >
+            </app-show-errors>
+          </small>
+        </div>
+        <div class="col-md-6 mb-4">
+          <ng-select
+            [items]="companys"
+            required
+            bindLabel="text"
+            bindValue="value"
+            appearance="outline"
+            [appendTo]="'body'"
+            placeholder="Empresas"
+            name="company_id"
+            (change)="dataForm.get('location_id')?.reset()"
+            loadingText="loading"
+            formControlName="company_id"
+            [closeOnSelect]="false"
+          >
+          </ng-select>
+          <small>
+            <app-show-errors
+              class="text-danger position-absolute"
+              [ctrl]="dataForm.get('company_id')"
+            >
+            </app-show-errors>
+          </small>
+        </div>
+        <div class="col-md-6 mb-4">
+          <ng-select
+            [items]="locations"
+            multiple="true"
+            required
+            bindLabel="text"
+            bindValue="value"
+            appearance="outline"
+            [appendTo]="'body'"
+            placeholder="Sedes"
+            name="location_id"
+            loadingText="loading"
+            formControlName="location_id"
+            [closeOnSelect]="false"
+          >
+          </ng-select>
+          <small>
+            <app-show-errors
+              class="text-danger position-absolute"
+              [ctrl]="dataForm.get('location_id')"
+            >
+            </app-show-errors>
+          </small>
+        </div>
+      </div>
+      <hr />
+      <div class="row card-title d-flex justify-content-between">
+        <div class="col-md-6 px-0">
+          <h4>Pólizas</h4>
+        </div>
+        <div class="col-md-6 px-0 text-end">
+          <div class="btn-group rounded w-sm-100">
+            <button class="btn btn-info btn-sm" type="button" (click)="newPoliza()">
+              <i class="fas fa-plus"></i> Agregar póliza
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngIf="polizaList.controls.length; else notData">
+        <ng-container *ngFor="let poliz of polizaList.controls; let c = index">
+          <div class="row my-2">
+            <div class="col-md-6">
+              <h6>Póliza {{ c + 1 }}</h6>
+            </div>
+            <div class="col-md-6 text-end">
+              <div class="btn-group rounded w-sm-100">
+                <button
+                  class="btn btn-danger btn-sm"
+                  type="button"
+                  (click)="deletePoliza($event.target.value)"
+                >
+                  <i class="fas fa-trash-alt"></i> Elimina póliza
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div formArrayName="poliza">
+            <div class="row" [formGroupName]="c">
+              <mat-form-field class="col-md-6" appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Ingresa el nombre de la póliza"
+                  formControlName="nombrepoliza"
+                  required
+                  autocomplete="off"
+                />
+                <mat-error> Campo obligatorio </mat-error>
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Código</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Ingresa el código de la póliza"
+                  formControlName="codigopoliza"
+                  required
+                  autocomplete="off"
+                />
+                <mat-error> Campo obligatorio </mat-error>
+              </mat-form-field>
+
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Cobertura</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Ingresa la cobertura"
+                  formControlName="coberturapoliza"
+                  required
+                  autocomplete="off"
+                />
+                <mat-error> Campo obligatorio </mat-error>
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Fecha inicio</mat-label>
+                <input
+                  matInput
+                  type="date"
+                  formControlName="iniciopoliza"
+                  required
+                  autocomplete="off"
+                />
+                <mat-error> Campo obligatorio </mat-error>
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Fecha fin</mat-label>
+                <input
+                  matInput
+                  type="date"
+                  formControlName="finpoliza"
+                  required
+                  autocomplete="off"
+                />
+                <mat-error> Campo obligatorio </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <hr />
+
+      <div class="row card-title d-flex justify-content-between">
+        <div class="col-md-6 px-0">
+          <h4>Notas técnicas</h4>
+        </div>
+        <div class="col-md-6 px-0 text-end">
+          <div class="btn-group rounded w-sm-100">
+            <button class="btn btn-success btn-sm" type="button" (click)="newtechnicalNote()">
+              <i class="fas fa-plus"></i> Agregar nota técnica
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="technicalNoteList.controls.length; else notData">
+        <ng-container *ngFor="let item of technicalNoteList.controls; let i = index">
+          <hr class="text-primary" />
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Nota técnica {{ i + 1 }}</h6>
+            </div>
+            <div class="col-md-6 text-end">
+              <div class="btn-group rounded w-sm-100">
+                <button
+                  class="btn btn-danger btn-sm"
+                  type="button"
+                  (click)="deleteTaxi($event.target.value)"
+                >
+                  <i class="fas fa-trash-alt"></i> Eliminar nota técnica
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div formArrayName="technicalNote">
+            <div class="row" [formGroupName]="i">
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Fecha inicio</mat-label>
+                <input
+                  matInput
+                  type="date"
+                  id="techn_note_date_init"
+                  name="techn_note_date_init"
+                  formControlName="techn_note_date_init"
+                  required
+                  autocomplete="off"
+                />
+                <mat-error> Campo obligatorio </mat-error>
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Fecha fin</mat-label>
+                <input
+                  matInput
+                  type="date"
+                  id="techn_note_date_end"
+                  name="techn_note_date_end"
+                  formControlName="techn_note_date_end"
+                  required
+                  autocomplete="off"
+                />
+                <mat-error> Campo obligatorio </mat-error>
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Año versión</mat-label>
+                <mat-select formControlName="techn_note_year_cups" required>
+                  <mat-option *ngFor="let item of years" [value]="item">{{ item }}</mat-option>
+                </mat-select>
+                <mat-error> Campo obligatorio </mat-error>
+              </mat-form-field>
+              <div class="col-md-12 col-12">
+                <div class="form-group">
+                  <label>¿Nota tecnica activa?</label>
+                  <input class="mx-3" type="checkbox" formControlName="is_default" />
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="row card-title d-flex justify-content-between">
+                  <div class="col-md-6 px-0">
+                    <h5 class="font-italic"><u>Servicios asociados</u></h5>
+                  </div>
+                  <div class="col-md-6 px-0 text-end">
+                    <div class="btn-group rounded w-sm-100">
+                      <button class="btn btn-info btn-sm" (click)="newCups(item)" type="button">
+                        <i class="fas fa-plus"></i> Agregar servicio asociado (NT{{ i + 1 }})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <ng-container *ngIf="item.controls['cups'].controls.length; else notData">
+                  <div class="rounded-top">
+                    <table class="table table-bordered table-striped table-sm table-services">
+                      <thead class="bg-light">
+                        <tr class="text-center text-uppercase">
+                          <th>#</th>
+                          <th>Servicio</th>
+                          <th>Especialidad</th>
+                          <th>Centro de costo</th>
+                          <th>Ruta</th>
+                          <th>Frecuencia</th>
+                          <th>Costo</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container
+                          *ngFor="let cup of item.controls['cups'].controls; let c = index"
+                        >
+                          <ng-container formArrayName="cups">
+                            <ng-container [formGroupName]="c">
+                              <tr>
+                                <td class="align-middle text-center">{{ c + 1 }}</td>
+                                <td>
+                                  <mat-form-field class="pb-0 mat-sm" appearance="outline">
+                                    <input
+                                      matInput
+                                      type="text"
+                                      placeholder="Busca código CUPS asignado"
+                                      required
+                                      [ngbTypeahead]="search"
+                                      formControlName="namec"
+                                      name="namec"
+                                      [resultTemplate]="namecup"
+                                      [inputFormatter]="InputProcedure"
+                                      autocomplete="off"
+                                    />
+                                  </mat-form-field>
+                                </td>
+                                <td>
+                                  <mat-form-field class="pb-0 mat-sm" appearance="outline">
+                                    <mat-select formControlName="speciality_id" required>
+                                      <mat-option
+                                        *ngFor="let item of cup.controls.specialityList.value"
+                                        [value]="item.value"
+                                        >{{ item.text }}</mat-option
+                                      >
+                                    </mat-select>
+                                  </mat-form-field>
+                                </td>
+                                <td>
+                                  <mat-form-field class="pb-0 mat-sm" appearance="outline">
+                                    <mat-select formControlName="centro_costo_id" required>
+                                      <mat-option
+                                        *ngFor="let item of centrosDeCosto"
+                                        [value]="item.value"
+                                        >{{ item.text }}</mat-option
+                                      >
+                                    </mat-select>
+                                  </mat-form-field>
+                                </td>
+                                <td>
+                                  <mat-form-field class="pb-0 mat-sm" appearance="outline">
+                                    <mat-select formControlName="route_id">
+                                      <mat-option
+                                        *ngFor="let item of attention_routes"
+                                        [value]="item.value"
+                                        >{{ item.text }}</mat-option
+                                      >
+                                    </mat-select>
+                                  </mat-form-field>
+                                </td>
+                                <td>
+                                  <mat-form-field class="pb-0 mat-sm" appearance="outline">
+                                    <input
+                                      matInput
+                                      type="text"
+                                      placeholder="Ingresa la frecuencia"
+                                      id="code"
+                                      formControlName="frequency"
+                                      required
+                                      autocomplete="off"
+                                    />
+                                  </mat-form-field>
+                                </td>
+                                <td>
+                                  <mat-form-field class="pb-0 mat-sm" appearance="outline">
+                                    <input
+                                      matInput
+                                      type="text"
+                                      placeholder="Ingresa el costo"
+                                      id="code"
+                                      formControlName="valor"
+                                      required
+                                      autocomplete="off"
+                                    />
+                                  </mat-form-field>
+                                </td>
+                                <td class="align-middle text-center">
+                                  <button
+                                    class="btn btn-danger btn-sm"
+                                    type="button"
+                                    (click)="deleteCups(item, c)"
+                                  >
+                                    <i class="fas fa-trash-alt"></i>
+                                  </button>
+                                </td>
+                              </tr>
+                            </ng-container>
+                          </ng-container>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+      <button
+        type="submit"
+        class="btn btn-primary btn-block mt-4"
+        [disabled]="dataForm.pristine || dataForm.invalid"
+        (click)="GuardarContrato(FormContrato)"
+      >
+        Guardar
+      </button>
+    </div>
+  </form>
+</div>
+
+<ng-template #notData>
+  <div class="alert alert-warning text-center" role="alert">No hay datos aquí.</div>
+</ng-template>
+
+<ng-template #namecup let-r="result" let-t="term">
+  <span class="f-9">
+    <strong>{{ r.text }}</strong>
+  </span>
+</ng-template>

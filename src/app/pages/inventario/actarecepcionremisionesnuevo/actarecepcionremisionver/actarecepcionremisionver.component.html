@@ -1,0 +1,98 @@
+<article class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="headerData"></app-cabecera>
+    <hr class="line" />
+    @if (!loading) {
+      <div class="rounded-top table-responsive mt-3">
+        <table class="table table-bordered table-striped table-sm">
+          <thead class="bg-light">
+            <tr class="text-center text-uppercase">
+              <th>Código Remision</th>
+              <th>Bodega Origen</th>
+              <th>Punto Destino</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="text-center">
+              <td>
+                {{ Datos.Codigo_Remision ?? 'No hay dato' }}
+              </td>
+              <td>
+                {{ Datos.Nombre_Origen ?? 'No hay dato' }}
+              </td>
+              <td>
+                {{ Datos.Nombre_Punto ?? 'No hay dato' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-12 ver p-2">
+        <h6>Observaciones</h6>
+        <p>{{ Datos.Observaciones ?? 'No hay dato' }}</p>
+      </div>
+      <div class="rounded-top table-responsive mt-3">
+        <table class="table table-bordered table-striped table-sm">
+          <thead class="bg-light">
+            <tr class="text-center text-uppercase">
+              <th>Producto</th>
+              <th>Presentacion</th>
+              <th>Laboratorios</th>
+              <th>Invima</th>
+              <th>
+                {{ Datos.Entrega_Pendientes == 'Si' ? 'Cant. Inv.' : 'Cant.' }}
+              </th>
+              <th [ngStyle]="{ display: Pendientes }">Cant. Pend.</th>
+              <th>Lote</th>
+              <th>Fecha Venc.</th>
+              <th>Temp.</th>
+              <th>Cumple</th>
+              <th>Revisado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of Productos; let i = index" id="fila{{ i }}" class="text-center">
+              <td>
+                <strong>{{ item.Nombre_Comercial }}</strong>
+                <p>{{ item.Nombre_Producto ?? 'No hay dato' }}</p>
+              </td>
+              <td>
+                <span class="mytooltip tooltip-effect-2"
+                  ><span class="tooltip-item2"> Embalaje </span
+                  ><span class="tooltip-content4 clearfix"
+                    ><span class="tooltip-text2">{{ item.Embalaje ?? 'No hay dato' }}</span></span
+                  >
+                </span>
+              </td>
+              <td>
+                <p>{{ item.Laboratorios ?? 'No hay dato' }}</p>
+              </td>
+              <td>{{ item.Invima ?? 'No hay dato' }}</td>
+              <td>{{ item.Cantidad ?? 'No hay dato' }}</td>
+              <td [ngStyle]="{ display: Pendientes }">
+                {{ item.Cantidad_Disp ?? 'No hay dato' }}
+              </td>
+              <td>{{ item.Lote ?? 'No hay dato' }}</td>
+              <td>{{ item.Fecha_Vencimiento ?? 'No hay dato' }}</td>
+              <td>{{ item.Temperatura ?? 'No hay dato' }}</td>
+              <td>{{ item.Cumple ?? 'No hay dato' }}</td>
+              <td>{{ item.Revisado ?? 'No hay dato' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <app-not-data-sa [loading]="loading"></app-not-data-sa>
+    }
+    <div class="text-end">
+      <button
+        type="button"
+        class="btn btn-success"
+        [disabled]="downloading"
+        (click)="onFileDownload()"
+      >
+        <i class="fa fa-print"></i> {{ downloading ? 'Cargando...' : 'Imprimir' }}
+      </button>
+    </div>
+  </div>
+</article>

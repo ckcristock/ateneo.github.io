@@ -1,0 +1,63 @@
+<h3 class="text-center mt-4">
+  Total neto a pagar:
+  <br />
+  <span class="text-success">${{ netoApagar | number: '1.2-2' }}</span>
+</h3>
+<hr />
+<div class="text-center text-uppercase card-title mt-3">Resumen del pago</div>
+<div class="row icon-cards-row d-flex">
+  <div class="col mb-4">
+    <div class="text-center">
+      <i class="fas fa-money-bill"></i>
+      <p class="card-text font-weight-semibold mb-1 no-word-break">Salario</p>
+      <p class="lead text-center no-word-break">${{ salarioDatos.salary | number: '1.2-2' }}</p>
+    </div>
+  </div>
+  <div class="col mb-4">
+    <div>
+      <div class="text-center">
+        <i class="far fa-clock"></i>
+        <p class="card-text font-weight-semibold mb-1 no-word-break">Extras y recargos</p>
+        <p class="lead text-center no-word-break">
+          ${{ horasExtrasDatos.valor_total | number: '1.2-2' }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col mb-4">
+    <div class="text-center">
+      <i class="far fa-bell"></i>
+      <p class="card-text font-weight-semibold mb-1 no-word-break">Novedades</p>
+      <p class="lead text-center no-word-break">
+        ${{ novedadesDatos.valor_total | number: '1.2-2' }}
+      </p>
+    </div>
+  </div>
+  <div class="col mb-4">
+    <div class="text-center">
+      <i class="fas fa-coins"></i>
+      <p class="card-text font-weight-semibold mb-1 no-word-break">Ingresos adicionales</p>
+      <p class="lead text-center no-word-break">
+        ${{ ingresosDatos.valor_total | number: '1.2-2' }}
+      </p>
+    </div>
+  </div>
+  <div class="col mb-4">
+    <div class="text-center">
+      <i class="fab fa-get-pocket"></i>
+      <p class="card-text font-weight-semibold mb-1 no-word-break">Retenciones</p>
+      <p class="lead text-center no-word-break">
+        ${{ retencionesDatos.valor_total | number: '1.2-2' }}
+      </p>
+    </div>
+  </div>
+  <div class="col mb-4">
+    <div class="text-center">
+      <i class="fas fa-user-minus"></i>
+      <p class="card-text font-weight-semibold mb-1 no-word-break">Deducciones</p>
+      <p class="lead text-center no-word-break">
+        ${{ deduccionesDatos.valor_total | number: '1.2-2' }}
+      </p>
+    </div>
+  </div>
+</div>

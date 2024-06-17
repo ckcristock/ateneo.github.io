@@ -1,0 +1,51 @@
+<app-card viewTitle="Reporte SISMED - {{ reportType }}">
+  <form class="row" [formGroup]="formQuarterly">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Seleccione el año</mat-label>
+      <mat-select formControlName="Ano">
+        @for (year of years; track $index) {
+          <mat-option [value]="year">
+            {{ year }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    @if (reportType === 'Ventas') {
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="Tipo_Consulta">
+          <mat-option value=""> Tipo </mat-option>
+          <mat-option value="Cliente"> Clientes </mat-option>
+          <mat-option value="Dispensacion"> Dispensaciones </mat-option>
+        </mat-select>
+      </mat-form-field>
+    }
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Seleccione el trimestre</mat-label>
+      <mat-select formControlName="Trimestre">
+        <mat-option value="1-2-3"> Enero-Febrero-Marzo </mat-option>
+        <mat-option value="4-5-6"> Abril-Mayo-Junio </mat-option>
+        <mat-option value="7-8-9"> Julio-Agosto-Septiembre </mat-option>
+        <mat-option value="10-11-12"> Octubre-Noviembre-Diciembre </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+  <div class="btn-group rounded col-12">
+    <button
+      type="button"
+      class="btn btn-success col-md-6"
+      [disabled]="formQuarterly.invalid"
+      (click)="onDownloadExcel()"
+    >
+      <i class="fas fa-file-excel"></i> Descargar excel
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary col-md-6"
+      [disabled]="formQuarterly.invalid"
+      (click)="onDownloadFlat()"
+    >
+      <i class="fas fa-file-download"></i> Descargar plano
+    </button>
+  </div>
+</app-card>

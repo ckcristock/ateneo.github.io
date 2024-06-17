@@ -1,0 +1,110 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">
+          Medios magnéticos {{ formatoEspecial ? 'especiales' : 'básicos' }}
+        </h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button
+            *ngIf="!formatoEspecial"
+            type="button"
+            class="btn btn-primary btn-sm"
+            [routerLink]="['/contabilidad/informesdian/medios-magneticos/crear']"
+          >
+            <i class="fa fa-plus"></i>
+            Agregar
+          </button>
+          <button
+            *ngIf="formatoEspecial"
+            type="button"
+            class="btn btn-primary btn-sm"
+            [routerLink]="['/contabilidad/informesdian/medios-magneticosespeciales/crear']"
+          >
+            <i class="fa fa-plus"></i>
+            Agregar
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!Cargando && listaMediosMag.length > 0; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Formato</th>
+            <th>Nombre</th>
+            <th>Tipo Exp</th>
+            <th>Periodo</th>
+            <th *ngIf="formatoEspecial">Columna</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of listaMediosMag" class="text-center">
+            <td class="align-middle">{{ item.Codigo_Formato }}</td>
+            <td class="align-middle">{{ item.Nombre_Formato }}</td>
+            <td class="align-middle">{{ item.Tipo_Exportacion }}</td>
+            <td class="align-middle">{{ item.Periodo }}</td>
+            <td class="align-middle" *ngIf="formatoEspecial">
+              {{ item.Tipo_Columna }}
+            </td>
+            <td class="align-middle">
+              <div ngbDropdown container="body" class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a
+                    class="dropdown-item text-success"
+                    href="{{ enviromen.ruta }}php/contabilidad/mediosmagneticos/reporte.php?id={{
+                      item.Id
+                    }}"
+                    target="_blank"
+                  >
+                    <i class="fa fa-table"></i> Reporte</a
+                  >
+                  <a
+                    *ngIf="!formatoEspecial"
+                    class="dropdown-item text-info"
+                    [routerLink]="['/contabilidad/informesdian/medios-magneticos/editar', item.Id]"
+                  >
+                    <i class="fas fa-edit"></i> Editar</a
+                  >
+                  <a
+                    *ngIf="formatoEspecial"
+                    class="dropdown-item text-info"
+                    [routerLink]="[
+                      '/contabilidad/informesdian/medios-magneticosespeciales/editar',
+                      item.Id
+                    ]"
+                  >
+                    <i class="fas fa-edit"></i> Editar</a
+                  >
+                  <a
+                    class="dropdown-item text-danger"
+                    (click)="onRemoveFormat(); IdMedioMag = item.Id"
+                  >
+                    <i class="fa fa-trash"></i> Eliminar</a
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- {{(page*maxSize)-maxSize+1}} al {{((page*maxSize) > TotalItems ? TotalItems : (page*maxSize))}} de {{ TotalItems }} -->
+    <!-- <ngb-pagination class="pull-right" [(collectionSize)]="TotalItems" [(page)]="page" [maxSize]="10" [pageSize]="20"  size="sm" (pageChange)="filtrar(true)" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>  -->
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>

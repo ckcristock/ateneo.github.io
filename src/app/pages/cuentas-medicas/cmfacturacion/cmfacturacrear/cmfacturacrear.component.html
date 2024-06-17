@@ -1,0 +1,862 @@
+<div class="page-body">
+  <form #FormFactura="ngForm">
+    <div class="row">
+      <!--Factura-->
+      <div [ngClass]="{ 'col-md-12': !Mostrar_Homologo, 'col-md-6': Mostrar_Homologo }">
+        <div class="card" *ngIf="divFactura">
+          <div class="card-body">
+            <app-cabecera [datosCabecera]="headerData"></app-cabecera>
+            <div class="row">
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Cliente</mat-label>
+                <input
+                  matInput
+                  readonly
+                  type="text"
+                  name="NombreClienteFactura"
+                  id="NombreClienteFactura"
+                  ngModel="{{ ClienteFac }}"
+                />
+                <input
+                  matInput
+                  hidden
+                  readonly
+                  ngModel="{{ IdClienteFactura }}"
+                  type="text"
+                  id="Id_Cliente_Factura"
+                  name="Id_Cliente_Factura"
+                  class="form-control form-control-sm f-9"
+                />
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Cond. Pago</mat-label>
+                <input
+                  matInput
+                  ngModel="{{ CondicionPago }}"
+                  readonly
+                  (change)="caluclarFechaPago($event.target.value, 'Factura')"
+                  type="number"
+                  name="Condicion_Pago_Factura"
+                  id="Condicion_Pago_Factura"
+                />
+              </mat-form-field>
+              <mat-form-field [formGroup]="diaPAgo" class="col" appearance="outline">
+                <mat-label>Fecha Pago</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  formControlName="dia"
+                  readonly
+                  type="date"
+                  name="Fecha_Pago_Factura"
+                  id="Fecha_Pago_Factura"
+                />
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+
+              <!-- <mat-form-field>
+                <mat-label>Fecha Pago</mat-label>
+                <input matInput [matDatepicker]="picker">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field> -->
+
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Paciente</mat-label>
+                <input
+                  matInput
+                  ngModel="{{ encabezado.Paciente }}"
+                  readonly
+                  type="text"
+                  name="Paciente_Factura"
+                  id="Paciente_Factura"
+                />
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Dis</mat-label>
+                <input
+                  matInput
+                  ngModel="{{ encabezado.Codigo }}"
+                  readonly
+                  type="text"
+                  name="Dispensacion_Factura"
+                  id="Dispensacion_Factura"
+                />
+              </mat-form-field>
+            </div>
+            <div class="row">
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Observaciones</mat-label>
+                <textarea
+                  matInput
+                  id="Observacion_Factura"
+                  name="Observacion_Factura"
+                  ngModel
+                  style="width: 100%"
+                ></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="row" style="margin-top: 30px">
+              <div class="col-sm-12">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped table-sm">
+                    <thead class="bg-light">
+                      <tr class="text-center text-uppercase">
+                        <th class="f-9">Producto</th>
+                        <th class="f-9" style="width: 100px">Precio</th>
+                        <th class="f-9" style="width: 100px">Desc.</th>
+                        <th class="f-9" style="width: 100px">Imp.</th>
+                        <th class="f-9" style="width: 100px">Cant.</th>
+                        <th class="f-9" style="width: 100px">Total</th>
+                        <th style="width: 20px"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="let item of Lista_Productos_Factura; let i = index"
+                        id="fila{{ i }}"
+                      >
+                        <input
+                          type="hidden"
+                          name="Id_Producto_Dispensacion{{ i }}"
+                          [(ngModel)]="item.Id_Producto_Dispensacion"
+                        />
+                        <input
+                          type="hidden"
+                          name="Id_Producto{{ i }}"
+                          [(ngModel)]="item.Id_Producto"
+                        />
+                        <input type="hidden" name="Registrar{{ i }}" [(ngModel)]="item.Registrar" />
+                        <!--  TODOS LOS INPUTS SE CONVIRTIERON DISABLED 23-06-2020 -->
+                        <td *ngIf="item.Cum != ''" style="font-size: 8px">
+                          <div>
+                            <span class="pull-left">Nom:</span>
+                            <input
+                              type="text"
+                              disabled
+                              name="productoFactura{{ i }}"
+                              id="ProductoFactura{{ i }}"
+                              class="form-control form-control-sm2"
+                              [(ngModel)]="item.Nombre"
+                              style="width: 90%"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Inv:</span>
+                            <input
+                              disabled
+                              style="width: 60%"
+                              name="invimaFactura{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Invima"
+                              class="form-control form-control-sm2"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Cum:</span>
+                            <input
+                              disabled
+                              style="width: 39%"
+                              name="CumFactura{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Cum"
+                              class="form-control form-control-sm2"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Lab:</span>
+                            <input
+                              disabled
+                              name="LaboratorioFactura{{ i }}"
+                              type="text"
+                              style="width: 70%"
+                              [(ngModel)]="item.Laboratorio_Comercial"
+                              class="form-control form-control-sm2"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Pres:</span>
+                            <input
+                              disabled
+                              style="width: 33%"
+                              name="PresentacionFactura{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Presentacion"
+                              class="form-control form-control-sm2"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Lote:</span>
+                            <input
+                              style="width: 33%"
+                              disabled
+                              name="loteFactura{{ i }}"
+                              disabled
+                              type="text"
+                              [(ngModel)]="item.Lote"
+                              class="form-control form-control-sm2"
+                              [readonly]="item.Registrar != 1"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">F.V:</span>
+                            <input
+                              style="width: 40%"
+                              disabled
+                              name="fechaVencimintoFactura{{ i }}"
+                              type="date"
+                              [(ngModel)]="item.Fecha_Vencimiento"
+                              class="form-control form-control-sm2"
+                              [readonly]="item.Registrar != 1"
+                            />
+                          </div>
+                        </td>
+
+                        <!--
+                                                SE DESACTIVÓ LA FUNCIONALIDAD DE BUSCAR FACTURA, PARA ACTIVAR -> DESCOMENTAR
+                                                <td *ngIf="item.Cum == ''" class="text-center">
+                                                    <button class="btn btn-primary btn-block form-control-sm" placement="bottom" ngbTooltip="Buscar Producto" (click)="searchProduct(i,true,'Factura');modalProductos.show()">
+                                                        <i class="fa fa-search fa-lg"></i>
+                                                      </button>
+                                                </td> -->
+
+                        <!-- ¡¡¡ PARA ACTIVAR LOS IMPUTS PARA UN PRODUCTO NUEVO : QUITAR EL : (*ngIf="item.Cum != ''") DE LOS INPUTS !!! -->
+
+                        <td *ngIf="item.Cum != ''">
+                          <input
+                            id="PrecioVentaFactura{{ i }}"
+                            name="PrecioVentaFactura{{ i }}"
+                            [(ngModel)]="item.Precio_Venta_Factura"
+                            type="number"
+                            min="1"
+                            class="form-control form-control-sm text-right f-9"
+                            (change)="CalculoTotal(i, 'Factura')"
+                            [readonly]="item.Regulado == 'Si'"
+                            [title]="item.Regulado == 'Si' ? 'Precio Regulado' : ''"
+                          />
+                          <!--  <label for="">{{item.Precio_Venta_Factura | currency}}</label>-->
+                        </td>
+                        <td *ngIf="item.Cum != ''">
+                          <input
+                            id="descuentoFactura{{ i }}"
+                            name="descuentoFactura{{ i }}"
+                            [(ngModel)]="item.Descuento"
+                            type="number"
+                            min="1"
+                            class="form-control form-control-sm text-right f-9"
+                            (change)="CalculoTotal(i, 'Factura')"
+                          />
+                        </td>
+                        <td *ngIf="item.Cum != ''">
+                          <select
+                            class="form-control form-control-sm"
+                            id="impuestoFactura{{ i }}"
+                            name="impuestoFactura{{ i }}"
+                            (change)="CalculoTotal(i, 'Factura')"
+                            [(ngModel)]="item.Impuesto"
+                          >
+                            <option value="0" [selected]="item.Gravado == 'No' ? 'selected' : ''">
+                              Sin IVA
+                            </option>
+                            <option
+                              *ngFor="let impuesto of ImpuestoFactura"
+                              [selected]="item.Gravado == 'Si' ? 'selected' : ''"
+                              [value]="impuesto.Valor / 100"
+                            >
+                              {{ impuesto.Valor }}
+                            </option>
+                          </select>
+                        </td>
+                        <td *ngIf="item.Cum != ''">
+                          <input
+                            [readonly]="item.Registrar != 1"
+                            id="CantidadFactura{{ i }}"
+                            name="CantidadFactura{{ i }}"
+                            [(ngModel)]="item.Cantidad"
+                            type="number"
+                            min="1"
+                            class="form-control form-control-sm text-right f-9"
+                            (change)="CalculoTotal(i, 'Factura')"
+                          />
+                        </td>
+                        <td *ngIf="item.Cum != ''">
+                          <input
+                            name="SubtotalFactura{{ i }}"
+                            [(ngModel)]="item.Subtotal"
+                            type="number"
+                            min="1"
+                            class="form-control form-control-sm text-right f-9"
+                            readonly
+                          />
+                        </td>
+                        <td>
+                          <button
+                            class="btn btn-danger btn-mini btn-eliminar"
+                            (click)="deleteProductFactura(i)"
+                            *ngIf="Lista_Productos_Factura.length > 1 && item.Cum != ''"
+                          >
+                            <i class="fa fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-responsive invoice-table invoice-total">
+                  <tbody>
+                    <tr>
+                      <th>( = ) Subtotal :</th>
+                      <td>{{ SubtotalFactura | currency }}</td>
+                    </tr>
+                    <tr>
+                      <th>( - ) Descuento :</th>
+                      <td>{{ DescuentoFactura | currency }}</td>
+                    </tr>
+                    <tr>
+                      <th>( + ) Iva :</th>
+                      <td>{{ IvaFactura | currency }}</td>
+                    </tr>
+                    <tr>
+                      <th>
+                        ( - )
+                        {{
+                          encabezado.Tipo_Servicio == 'EVENTO'
+                            ? 'Cuotas Moderadoras'
+                            : 'Cuotas Recuperación'
+                        }}
+                        :
+                      </th>
+                      <td>
+                        <select
+                          name="Cuota"
+                          id="Cuota"
+                          class="form-control form-control-sm"
+                          (change)="reCalcular('Factura')"
+                        >
+                          <option value="0">0</option>
+                          <option *ngIf="Cuota != '0' || Cuota != 0" selected>{{ Cuota }}</option>
+                        </select>
+                      </td>
+                      <!-- <td>{{ Cuota | currency }}</td> -->
+                    </tr>
+                    <tr>
+                      <th>( = ) Total :</th>
+                      <td>{{ TotalFactura | currency }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!Fact_Switch" class="solapa">
+            <img src="assets/images/anulado.png" />
+          </div>
+        </div>
+      </div>
+      <!--homologo-->
+      <div class="col-sm-12 col-md-6" *ngIf="Mostrar_Homologo">
+        <div class="card">
+          <div class="card-body">
+            <app-cabecera [datosCabecera]="headerData"></app-cabecera>
+            <div class="row" style="margin-bottom: 0">
+              <div class="col-md-6 col-sm-6">
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Cliente</mat-label>
+                  <input
+                    matInput
+                    readonly
+                    type="text"
+                    name="NombreClienteHomologo"
+                    ngModel="{{ NombreClienteHomologo }}"
+                    id="NombreClienteHomologo"
+                  />
+                  <input
+                    hidden
+                    matInput
+                    readonly
+                    type="text"
+                    name="NombreClienteHomologo"
+                    ngModel="{{ IdClienteHomologo }}"
+                    id="Id_Cliente_Homologo"
+                    name="Id_Cliente_Homologo"
+                  />
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Cond. Pago</mat-label>
+                  <input
+                    matInput
+                    ngModel="{{ CondicionPagoHomologo }}"
+                    readonly
+                    (change)="caluclarFechaPago($event.target.value, 'Homologo')"
+                    type="number"
+                    name="Condicion_Pago_Homologo"
+                    id="Condicion_Pago_Homologo"
+                    class="form-control form-control-sm f-9"
+                  />
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Fecha Pago</mat-label>
+                  <input
+                    matInput
+                    ngModel="{{ diaPagoClienteHomologo }}"
+                    readonly
+                    type="date"
+                    name="Fecha_Pago_Homologo"
+                    id="Fecha_Pago_Homologo"
+                    class="form-control form-control-sm f-9"
+                  />
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Paciente</mat-label>
+                  <input
+                    matInput
+                    ngModel="{{ encabezado.Paciente }}"
+                    readonly
+                    type="text"
+                    name="Paciente_Homologo"
+                    id="Paciente_Homologo"
+                    class="form-control form-control-sm f-9"
+                  />
+                </mat-form-field>
+                <mat-form-field class="col" appearance="outline">
+                  <mat-label>Dis</mat-label>
+                  <input
+                    matInput
+                    ngModel="{{ encabezado.Codigo }}"
+                    readonly
+                    type="text"
+                    name="Dispensacion_Homologo"
+                    id="Dispensacion_Homologo"
+                    class="form-control form-control-sm f-9"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="row">
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Observaciones</mat-label>
+                <textarea
+                  matInput
+                  id="Observacion_Homologo"
+                  name="Observacion_Homologo"
+                  ngModel
+                  style="width: 100%"
+                ></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="row" style="margin-top: 30px">
+              <div class="col-sm-12">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped table-sm">
+                    <thead class="bg-light">
+                      <tr class="text-center text-uppercase">
+                        <th class="f-9">Producto</th>
+                        <th class="f-9" style="width: 100px">Precio</th>
+                        <th class="f-9" style="width: 100px">Imp.</th>
+                        <th class="f-9" style="width: 100px">Cant.</th>
+                        <th class="f-9" style="width: 100px">Total</th>
+                        <th class="f-9" style="width: 10px"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="let item of Lista_Productos_Homologo; let i = index"
+                        id="fila{{ i }}"
+                      >
+                        <input
+                          type="hidden"
+                          name="Id_Producto_Dispensacion{{ i }}"
+                          [(ngModel)]="item.Id_Producto_Dispensacion"
+                        />
+                        <input
+                          type="hidden"
+                          name="Id_Producto{{ i }}"
+                          [(ngModel)]="item.Id_Producto"
+                        />
+                        <input
+                          type="hidden"
+                          name="RegistrarHom{{ i }}"
+                          [(ngModel)]="item.Registrar"
+                        />
+                        <td *ngIf="item.Cum_Homologo != ''" style="font-size: 8px">
+                          <div>
+                            <span class="pull-left">Nom:</span>
+                            <input
+                              type="text"
+                              name="productoHomologo{{ i }}"
+                              id="ProductoHomologo{{ i }}"
+                              class="form-control form-control-sm2"
+                              [(ngModel)]="item.Detalle_Homologo"
+                              style="width: 90%"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Inv:</span>
+                            <input
+                              style="width: 60%"
+                              name="invimaHomologo{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Invima_Homologo"
+                              class="form-control form-control-sm2"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Cum:</span>
+                            <input
+                              style="width: 39%"
+                              name="CumHomologo{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Cum_Homologo"
+                              class="form-control form-control-sm2"
+                              (blur)="getDetalleCum($event.target.value, i)"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Lab:</span>
+                            <input
+                              name="LaboratorioHomologo{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Lab_Homologo"
+                              class="form-control form-control-sm2"
+                              style="width: 70%"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Pres:</span>
+                            <input
+                              style="width: 33%"
+                              name="PresentacionHomologo{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Presentacion_Homologo"
+                              class="form-control form-control-sm2"
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">Lote:</span>
+                            <input
+                              style="width: 33%"
+                              name="loteFactura{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Lote"
+                              class="form-control form-control-sm2"
+                              readonly
+                            />
+                          </div>
+                          <div>
+                            <span class="pull-left">F.V:</span>
+                            <input
+                              style="width: 32%"
+                              name="fechaVencimintoFactura{{ i }}"
+                              type="text"
+                              [(ngModel)]="item.Fecha_Vencimiento"
+                              class="form-control form-control-sm2"
+                              readonly
+                            />
+                          </div>
+                        </td>
+
+                        <td *ngIf="item.Cum_Homologo == ''" class="text-center">
+                          <button
+                            class="btn btn-primary btn-block form-control-sm"
+                            placement="bottom"
+                            ngbTooltip="Buscar Producto"
+                            (click)="searchProduct(i, true); modalProductos.show()"
+                          >
+                            <i class="fa fa-search fa-lg"></i>
+                          </button>
+                        </td>
+                        <td>
+                          <input
+                            id="PrecioVentaHomologo{{ i }}"
+                            name="PrecioVentaHomologo{{ i }}"
+                            [(ngModel)]="item.Precio"
+                            class="form-control form-control-sm text-right f-9"
+                            (change)="CalculoTotal(i, 'Homologo')"
+                          />
+                        </td>
+                        <input
+                          id="descuentoHomologo{{ i }}"
+                          name="descuentoHomologo{{ i }}"
+                          [ngModel]="0"
+                          type="hidden"
+                          min="1"
+                          class="form-control form-control-sm text-right f-9"
+                          (change)="CalculoTotal(i, 'Homologo')"
+                        />
+                        <td>
+                          <select
+                            class="form-control form-control-sm"
+                            id="impuestoHomologo{{ i }}"
+                            name="impuestoHomologo{{ i }}"
+                            (change)="CalculoTotal(i, 'Homologo')"
+                            [(ngModel)]="item.Impuesto"
+                          >
+                            <option value="0" [selected]="item.Gravado == 'No' ? 'selected' : ''">
+                              Sin IVA
+                            </option>
+                            <option
+                              *ngFor="let impuesto of ImpuestoFactura"
+                              [selected]="item.Gravado == 'Si' ? 'selected' : ''"
+                              [value]="impuesto.Valor / 100"
+                            >
+                              {{ impuesto.Valor }}
+                            </option>
+                          </select>
+                        </td>
+                        <td>
+                          <input
+                            id="CantidadHomologo{{ i }}"
+                            name="CantidadHomologo{{ i }}"
+                            [(ngModel)]="item.Cantidad"
+                            type="number"
+                            min="1"
+                            class="form-control form-control-sm text-right f-9"
+                            (change)="CalculoTotal(i, 'Homologo')"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            name="SubtotalHomologo{{ i }}"
+                            [(ngModel)]="item.Subtotal"
+                            type="number"
+                            min="1"
+                            class="form-control form-control-sm text-right f-9"
+                            readonly
+                          />
+                        </td>
+                        <td>
+                          <button
+                            class="btn btn-danger btn-mini btn-eliminar"
+                            (click)="deleteProduct(i)"
+                            *ngIf="i != 0 && i != Lista_Productos_Homologo.length - 1"
+                          >
+                            <i class="fa fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12">
+                <table class="table table-responsive invoice-table invoice-total">
+                  <tbody>
+                    <tr>
+                      <th>( = ) Subtotal :</th>
+                      <td>{{ SubtotalHomologo | currency }}</td>
+                    </tr>
+                    <tr>
+                      <th>( + ) Iva :</th>
+                      <td>{{ IvaHomologo | currency }}</td>
+                    </tr>
+                    <tr>
+                      <th>( - ) Cuota Recuperación :</th>
+                      <td>
+                        <select
+                          name="Cuota"
+                          id="Cuota_Hom"
+                          class="form-control form-control-sm"
+                          (change)="reCalcular('Homologo')"
+                        >
+                          <option value="0" selected>0</option>
+                        </select>
+                      </td>
+                      <!-- <td>{{ Cuota | currency }}</td> -->
+                    </tr>
+                    <tr>
+                      <th>( = ) Total :</th>
+                      <td>{{ TotalHomologo | currency }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!Hom_Switch" class="solapa">
+            <img src="assets/images/anulado.png" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-8"></div>
+          <div class="col-md-2 botonFlotante1">
+            <button (click)="volver()" type="button" class="btn btn-success btn-block btn-enviar">
+              Volver
+            </button>
+          </div>
+          <div class="col-md-2 botonFlotante">
+            <button
+              (click)="confirmarCrearFactura()"
+              type="button"
+              class="btn btn-success btn-block btn-enviar"
+            >
+              Realizar Factura
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<app-modal-basic #modalProductos [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Busqueda Productos</h4>
+    <button type="button" class="close basic-close" (click)="modalProductos.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-md-12" style="max-height: 450px; overflow-y: scroll">
+        <input type="hidden" name="pos" [(ngModel)]="posicion" />
+        <table class="table table-bordered table-striped table-sm">
+          <thead class="bg-light">
+            <tr class="text-center text-uppercase">
+              <th style="width: 40px"></th>
+              <td></td>
+              <th>Nombre</th>
+              <th style="width: 120px">Lab. Comercial</th>
+              <th style="width: 120px">Lab. Generico</th>
+              <th style="width: 100px">Cum</th>
+              <th>Embalaje</th>
+            </tr>
+            <tr>
+              <th style="width: 40px" class="tabla-filtro"></th>
+              <th class="tabla-filtro"></th>
+              <th class="tabla-filtro">
+                <input
+                  type="text"
+                  [(ngModel)]="filtro_nombre"
+                  (blur)="filtros()"
+                  class="form-control input-sm"
+                  placeholder="Filtro Nombre"
+                />
+              </th>
+              <th style="width: 150px" class="tabla-filtro">
+                <input
+                  type="text"
+                  [(ngModel)]="filtro_lab_com"
+                  (blur)="filtros()"
+                  class="form-control input-sm"
+                  placeholder="Filtro Lab. Comercial"
+                />
+              </th>
+              <th style="width: 150px" class="tabla-filtro">
+                <input
+                  type="text"
+                  [(ngModel)]="filtro_lab_gen"
+                  (blur)="filtros()"
+                  class="form-control input-sm"
+                  placeholder="Filtro Lab. Generico"
+                />
+              </th>
+              <th style="width: 100px" class="tabla-filtro">
+                <input
+                  type="text"
+                  [(ngModel)]="filtro_cum"
+                  (blur)="filtros()"
+                  class="form-control input-sm"
+                  placeholder="Filtro Cum"
+                />
+              </th>
+              <th class="tabla-filtro"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="Cargando">
+              <td colspan="7" class="text-center">
+                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+                <span class="sr-only">Cargando...</span>
+                <h4>Buscando producto...</h4>
+              </td>
+            </tr>
+            <tr *ngIf="ListaProducto.length == 0 && !Cargando">
+              <td colspan="7" class="text-center">
+                <i class="fa fa-exclamation-circle fa-5x"></i>
+                <h4>No se encontró el producto.</h4>
+              </td>
+            </tr>
+            <tr *ngFor="let producto of ListaProducto; let i = index">
+              <td class="text-center">
+                <input
+                  type="radio"
+                  id="check{{ i }}"
+                  name="producto"
+                  [value]="producto.Producto"
+                  (change)="addProduct(i)"
+                />
+              </td>
+
+              <td style="width: 50px !important; max-width: 50px !important">
+                <div class="text-center">
+                  <img
+                    *ngIf="producto.Imagen == ''"
+                    class="img-radius imagen"
+                    src="assets/images/producto.png"
+                    alt=""
+                  />
+                  <a
+                    *ngIf="producto.Imagen != ''"
+                    href="{{ globales.ruta }}IMAGENES/PRODUCTOS/{{ producto.Imagen }}"
+                    target="_blank"
+                  >
+                    <img
+                      class="img-radius imagen"
+                      src="{{ globales.ruta }}IMAGENES/PRODUCTOS/{{ producto.Imagen }}"
+                      alt=""
+                    />
+                  </a>
+                </div>
+              </td>
+
+              <td>
+                <strong>{{ producto.Nombre_Comercial }}</strong>
+                <p class="text-muted" style="font-size: 9px">{{ producto.Nombre }}</p>
+              </td>
+              <td>
+                {{ producto.Laboratorio_Comercial }}
+              </td>
+              <td>
+                {{ producto.Laboratorio_Generico }}
+              </td>
+              <td>
+                {{ producto.Codigo_Cum }}
+              </td>
+              <td>
+                {{ producto.Embalaje }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button type="button" class="btn btn-default" (click)="modalProductos.hide()">
+        Cancelar
+      </button>
+      <button type="button" (click)="AgregarProducto()" class="btn btn-primary">Agregar</button>
+    </div>
+  </div>
+</app-modal-basic>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombre }} </span>
+</ng-template>

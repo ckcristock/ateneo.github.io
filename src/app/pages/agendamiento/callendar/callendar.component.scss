@@ -1,0 +1,25 @@
+.item-calendar,
+.fc-event {
+  width: 80%;
+  display: inline-flex;
+  margin: 2px;
+  ::before {
+    margin-right: 5px !important;
+  }
+  .fc-content {
+    font-family: 'Nunito';
+  }
+}
+
+.fa,
+.fas,
+.far,
+.fal,
+.fad,
+.fab {
+  display: block !important;
+}
+
+.display-none {
+  display: none;
+}

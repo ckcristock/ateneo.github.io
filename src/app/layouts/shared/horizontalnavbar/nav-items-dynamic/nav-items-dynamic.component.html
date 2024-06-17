@@ -1,0 +1,146 @@
+<!-- <li [ngClass]="{'nav-item dropdown': item.child.length>0}" *ngFor="let item of navItems">
+
+
+    <a
+        [ngClass]="{'nav-link dropdown-toggle arrow-none' : item.child.length>0 ,
+                    'dropdown-menu row' : item.parent_id
+                  }
+        " href="javascript: void(0);" id="topnav-components" role="button">
+
+    </a>
+    {{item.link}}
+    <div class="dropdown-menu" *ngIf="item.link">
+        <ng-container>
+            <a class="  dropdown-item side-nav-link-ref" [routerLink]="item.link" routerLinkActive="active">{{ item.name}}</a>
+        </ng-container>
+    </div>
+
+    <app-nav-items-dynamic *ngIf="item.child.length>0" [navItems]="item.child"></app-nav-items-dynamic>
+</li>
+
+ -->
+
+<!-- V2 -->
+
+<div *ngFor="let item of navItems" [ngClass]="{ 'nav-item dropdown': item.child.length > 0 }">
+  <div class="nav-item active" *ngIf="!item.parent_id">
+    <a class="nav-link" href="#">
+      {{ item.name }}
+    </a>
+  </div>
+  <!--     <div class="nav-item " *ngIf="item.parent_id && item.link">
+        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle" data-display="static">Dropdown</a>
+    </div>
+ -->
+  <app-nav-items-dynamic
+    *ngIf="item.child"
+    [navItems]="item.child"
+    [first]="'false'"
+  ></app-nav-items-dynamic>
+</div>
+
+<!--
+    LASSSSSSSTV1
+    <ul role="menubar">
+    <li *ngFor="let item of navItems " [ngClass]="{'nav-item dropdown': item.child.length>0}">
+
+        <ng-container *ngIf="!item.parent_id">
+            <a class=" nav-link dropdown-toggle arrow-none">
+
+                <i class="ri-dashboard-line me-2 me-2"></i>{{ item.name }}
+                <div class="arrow-down"> </div>
+            </a>
+        </ng-container>
+
+        <ng-container *ngIf="item.parent_id ">
+
+            <ng-container *ngIf="item.parent_id && item.child.length>0"> <a>->{{ item.name }}</a> </ng-container>
+            <ng-container *ngIf="item.link"> <a>{{ item.name }}</a> </ng-container>
+        </ng-container >
+        <app-nav-items-dynamic *ngIf="item.child" [navItems]="item.child"></app-nav-items-dynamic>
+    </li>
+</ul> -->
+
+<!--
+
+<ul class="navbar-nav">
+    <li class="nav-item active">
+        <a class="nav-link" href="#">Link</a>
+    </li>
+    <li class="nav-item dropdown">
+        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle" data-display="static">Dropdown</a>
+        <ul class="dropdown-menu">
+            <li class="dropdown-item dropdown-submenu">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Submenu-1</a>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-item">
+                        <a href="#">Item-1</a>
+                    </li>
+                    <li class="dropdown-item">
+                        <a href="#">Item-2</a>
+                    </li>
+                    <li class="dropdown-item">
+                        <a href="#">Item-3</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown-item dropdown-submenu">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Submenu-2</a>
+                <ul class="dropdown-menu show">
+                    <li class="dropdown-item">
+                        <a href="#">Item-1</a>
+                    </li>
+                    <li class="dropdown-item">
+                        <a href="#">Item-2</a>
+                    </li>
+                    <li class="dropdown-item">
+                        <a href="#">Item-3</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+    </li>
+</ul> -->
+<!--
+
+<ul class="navbar-nav me-auto" role="dropdown-menu">
+    <li *ngFor="let item of navItems " [ngClass]="{'dropdown': item.child}">
+
+        <a *ngIf="item.child && !item.link" class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Dropdown   {{item.name}}
+        </a>
+
+        <div *ngIf="item.parent_id" class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">child {{item.name}}</a>
+
+        </div>
+
+
+        <app-nav-items-dynamic *ngIf="item.child" [navItems]="item.child"></app-nav-items-dynamic>
+    </li>
+
+</ul> -->
+<!-- <li [ngClass]="{'nav-item dropdown': item.child.length>0}" *ngFor="let item of navItems">
+
+    <a [ngClass]="{'nav-link dropdown-toggle arrow-none' : item.child.length>0 ,
+                    'dropdown-menu row' : item.parent_id
+                  }
+        " href="javascript: void(0);" id="topnav-components" role="button">
+        <i *ngIf="!item.parent_id" class="ri-dashboard-line me-2"></i> {{ item.name }}
+        <div *ngIf="item.child.length>0" class="arrow-down">
+        </div>
+    </a>
+    {{item.link}}
+    <div class="dropdown-menu" *ngIf="item.link">
+        <ng-container>
+            <a class="  dropdown-item side-nav-link-ref" [routerLink]="item.link" routerLinkActive="active">{{ item.name}}</a>
+        </ng-container>
+    </div>
+
+    <app-nav-items-dynamic *ngIf="item.child.length>0" [navItems]="item.child"></app-nav-items-dynamic>
+</li>
+
+ -->

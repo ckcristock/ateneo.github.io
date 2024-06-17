@@ -1,0 +1,243 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-md-8">
+              <h5>Inventarios Valorizados</h5>
+              <span>Costo de Nuestros Inventarios de Bodegas y Puntos de Dispensacion</span>
+            </div>
+            <div class="col-md-4 d-flex justify-content-around">
+              <div class="col-md-10">
+                <!-- <select name="" [(ngModel)]="Mes_Descarga" class="form-control form-control-sm  me-3" id="">
+                                    <option *ngFor="let mes of Meses; index as i; " [value]="i+1"> {{mes}}</option>
+                                </select> -->
+
+                <input
+                  class="form-control form-control-sm me-3"
+                  [(ngModel)]="Mes_Descarga"
+                  type="month"
+                />
+              </div>
+              <div class="col-md-2">
+                <button
+                  (click)="Descargar()"
+                  class="btn btn-sm btn-success notmargin"
+                  style="margin: 0px"
+                >
+                  Descargar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body" style="margin-right: 0px; margin-left: 0px">
+          <div class="row">
+            <div class="col-md-6 col-sm-12">
+              <div class="card bg-inverse notification-card">
+                <div class="card-block">
+                  <div class="row align-items-center">
+                    <div class="col-4 notify-icon">
+                      <i class="fa fa-dollar"></i>
+                    </div>
+                    <div class="col-8 notify-cont">
+                      <h4>{{ totalBodega | currency }}</h4>
+                      <p>Total Inventario Bodegas</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div ngbDropdown class="dropdown-primary m-b-10 pull-right">
+                  <button
+                    ngbDropdownToggle
+                    class="btn btn-secondary btn-mini waves-effect waves-light"
+                    type="button"
+                  >
+                    <i class="ti-printer"></i> Imprimir
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href="{{
+                        envirom.ruta
+                      }}php/contabilidad/inventariovalorizado/inventario_bodega.php"
+                      target="_blank"
+                    >
+                      <i class="fa fa-file-excel-o"></i> Excel</a
+                    >
+                    <a
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href="{{
+                        envirom.ruta
+                      }}php/contabilidad/inventariovalorizado/inventario_bodega_pdf.php"
+                      target="_blank"
+                    >
+                      <i class="fa fa-file-pdf-o"></i> PDF</a
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- <a href="{{globales.ruta}}php/contabilidad/inventariovalorizado/inventario_bodega.php" target="_blank" class="btn btn-success btn-sm pull-right m-b-10"><i class="fa fa-download"></i> Descargar</a> -->
+
+              <table class="table table-striped m-t-20">
+                <thead>
+                  <tr>
+                    <th>Bodega</th>
+                    <th class="text-end">Productos</th>
+                    <th class="text-end">Cantidades totales</th>
+                    <th class="text-end">Costo Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of Bodegas">
+                    <td>{{ item.Bodega }}</td>
+                    <td class="text-end">{{ item.Cant_Producto | number | puntos }}</td>
+                    <td class="text-end">{{ item.Cantidad | number | puntos }}</td>
+                    <td class="text-end">{{ item.Costo | currency }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6 col-sm-12">
+              <div class="card bg-info notification-card">
+                <div class="card-block">
+                  <div class="row align-items-center">
+                    <div class="col-4 notify-icon">
+                      <i class="fa fa-dollar"></i>
+                    </div>
+                    <div class="col-8 notify-cont">
+                      <h4>{{ totalDep | currency }}</h4>
+                      <p>Total Inventario Puntos</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div ngbDropdown class="dropdown-primary m-b-10 pull-right">
+                  <button
+                    ngbDropdownToggle
+                    class="btn btn-secondary btn-mini waves-effect waves-light"
+                    type="button"
+                  >
+                    <i class="ti-printer"></i> Imprimir
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href="{{
+                        envirom.ruta
+                      }}php/contabilidad/inventariovalorizado/inventario_puntos.php"
+                      target="_blank"
+                    >
+                      <i class="fa fa-file-excel-o"></i> Excel</a
+                    >
+                    <a
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href="{{
+                        envirom.ruta
+                      }}php/contabilidad/inventariovalorizado/inventario_puntos_pdf.php"
+                      target="_blank"
+                    >
+                      <i class="fa fa-file-pdf-o"></i> PDF</a
+                    >
+                  </div>
+                </div>
+              </div>
+              <!-- <a href="{{globales.ruta}}php/contabilidad/inventariovalorizado/inventario_puntos.php" target="_blank" class="btn btn-success btn-sm pull-right m-b-10"><i class="fa fa-download"></i> Descargar</a> -->
+
+              <table class="table table-striped m-t-20">
+                <thead>
+                  <tr>
+                    <th>Departamento</th>
+                    <th class="text-end">Productos</th>
+                    <th class="text-end">Cantidades totales</th>
+                    <th class="text-end">Costo Total</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody *ngFor="let item of Departamentos; let i = index">
+                  <tr>
+                    <td>{{ item.Departamento }}</td>
+                    <td class="text-end">{{ item.Cant_Producto | number | puntos }}</td>
+                    <td class="text-end">{{ item.Cantidad | number | puntos }}</td>
+                    <td class="text-end">{{ item.Costo | currency }}</td>
+                    <td class="text-center">
+                      <button
+                        class="btn btn-primary btn-detalle"
+                        (click)="showDetail(i)"
+                        title="Ver detalles"
+                      >
+                        <i class="fa fa-bars"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr style="display: none" id="detalle{{ i }}">
+                    <td colspan="5">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>Punto Dispensación</th>
+                            <th class="text-end">Productos</th>
+                            <th class="text-end">Cantidades totales</th>
+                            <th class="text-end">Costo Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let item of item.Puntos">
+                            <td>{{ item.Punto }}</td>
+                            <td class="text-end">{{ item.Cant_Producto | number | puntos }}</td>
+                            <td class="text-end">{{ item.Cantidad | number | puntos }}</td>
+                            <td class="text-end">{{ item.Costo | currency }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- <div class="row" *ngFor="let item of Departamentos">
+                  <div class="col-md-12">
+
+                      <ngb-accordion style="font-size: 4px !important" [closeOthers]="true" #acc="ngbAccordion" class="ngb-accordion">
+                          <ngb-panel id="ngb-close-p1" title="{{item.Departamento | uppercase }} | Productos: {{item.Cant_Producto | number | puntos }} | Cantidades totales: {{ item.Cantidad | number | puntos }} | Costo Total: {{ item.Costo | currency }}">
+                            <ng-template ngbPanelContent>
+                              <table class="table table-striped m-t-20">
+                                <thead>
+                                  <tr>
+                                    <th>Punto Dispensación</th>
+                                    <th class="text-end">Productos</th>
+                                    <th class="text-end">Cantidades totales</th>
+                                    <th class="text-end">Costo Total</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr *ngFor="let item of item.Puntos">
+                                    <td>{{ item.Punto }}</td>
+                                    <td class="text-end">{{ item.Cant_Producto | number | puntos}}</td>
+                                    <td class="text-end">{{ item.Cantidad | number | puntos }}</td>
+                                    <td class="text-end">{{ item.Costo | currency }}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </ng-template>
+                          </ngb-panel>
+                        </ngb-accordion>
+                  </div>
+                </div> -->
+            </div>
+            <div class="col-md-12 text-center" *ngIf="cargando">
+              <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+              <span class="sr-only">Cargando...</span>
+              <h4>Cargando Inventario Valorizado...</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

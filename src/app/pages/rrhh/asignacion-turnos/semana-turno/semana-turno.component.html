@@ -1,0 +1,83 @@
+<div class="form-group d-flex justify-content-end">
+  <app-turno
+    (changed)="turnAllChanged($event); asignarHorariosMasivo()"
+    [turnos]="turnos"
+  ></app-turno>
+</div>
+<div class="rounded-top table-responsive" *ngIf="!loading && diasSemana.length > 0; else notData">
+  <table class="table table-bordered table-striped table-sm">
+    <thead class="bg-light">
+      <tr class="text-center text-uppercase">
+        <th class="align-middle">
+          <input
+            type="checkbox"
+            aria-label="Select all"
+            [checked]="isAllChecked()"
+            (change)="checkAll($event)"
+            name=""
+            id=""
+          />
+        </th>
+        <th class="align-middle">Foto</th>
+        <th class="align-middle col-2">Nombre</th>
+        <th class="align-middle" *ngFor="let dia of diasSemana">
+          {{ dia.dia }}
+          <br />
+          {{ formatFecha(dia.fecha) }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let person of people" class="text-center">
+        <td class="align-middle">
+          <input
+            type="checkbox"
+            aria-label="Select all"
+            [checked]="person.selected"
+            (change)="person.selected = !person.selected"
+            name=""
+            id=""
+          />
+        </td>
+        <td class="align-middle">
+          <app-load-image
+            [src]="person?.image"
+            classImg="d-block img-thumbnail rounded-circle mx-auto img-fluid header-profile-user"
+          ></app-load-image>
+        </td>
+        <td class="align-middle">
+          {{ person.first_name | titlecase }}
+          {{ person.first_surname | titlecase }}
+        </td>
+        <td class="align-middle p-0" *ngFor="let dia of person.diasSemana; let i = index">
+          <select
+            class="form-control form-control-sm select-turno"
+            aria-hidden="true"
+            [(ngModel)]="dia.turno"
+            [disabled]="getFecha(dia.fecha) <= ayer"
+            [ngStyle]="{ 'background-color': dia.color, color: '#FFF' }"
+            (change)="getColorByDay(dia)"
+          >
+            <option value="seleccione">Seleccione</option>
+            <option value="0" [ngStyle]="{ 'background-color': '#000', color: '#FFF' }">
+              Descanso
+            </option>
+            <option
+              *ngFor="let turn of turnos"
+              [value]="turn.id"
+              [ngStyle]="{ 'background-color': turn.color, color: '#FFF' }"
+            >
+              {{ turn.name }} ({{ turn.entry_time }} {{ turn.leave_time }})
+            </option>
+          </select>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<button class="btn btn-primary btn-block mb-3" (click)="makeHorario()">Guardar</button>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

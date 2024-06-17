@@ -1,0 +1,68 @@
+<div class="rounded-top table-responsive">
+  <table class="table table-bordered table-striped table-sm">
+    <thead class="bg-light">
+      <tr class="text-center text-uppercase">
+        <th>Nombre Activo</th>
+        <th>Tipo Activo</th>
+        <th>Proveedor</th>
+        <th>Centro Costo</th>
+        <th>Cuenta Contrapartida</th>
+        <th>Documento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="text-center">
+        <td>{{ Activo_Fijo.Nombre | uppercase }}</td>
+        <td>{{ Activo_Fijo.Tipo_Activo | uppercase }}</td>
+        <td>{{ Activo_Fijo.Proveedor | uppercase }}</td>
+        <td>{{ Activo_Fijo.Centro_Costo | uppercase }}</td>
+        <td>{{ Activo_Fijo.Contrapartida | uppercase }}</td>
+        <td>{{ Activo_Fijo.Documento | uppercase }}</td>
+      </tr>
+    </tbody>
+    <thead class="bg-light">
+      <tr class="text-center text-uppercase">
+        <th>Concepto</th>
+        <th>Referencia</th>
+        <th>Base</th>
+        <th>Iva</th>
+        <th>Costo PCGA</th>
+        <th>Costo NIIF</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="text-center">
+        <td>{{ Activo_Fijo.Concepto | uppercase }}</td>
+        <td>{{ Activo_Fijo.Referencia }}</td>
+        <td>${{ Activo_Fijo.Base | currency: '' : '' }}</td>
+        <td>${{ Activo_Fijo.Iva | currency: '' : '' }}</td>
+        <td>${{ Activo_Fijo.Costo_PCGA | currency: '' : '' }}</td>
+        <td>${{ Activo_Fijo.Costo_NIIF | currency: '' : '' }}</td>
+      </tr>
+    </tbody>
+    <thead class="bg-light">
+      <tr class="text-center text-uppercase">
+        <th>Cuenta Rete Iva</th>
+        <th>Cuenta Rete Ica</th>
+        <th>Costo Rete Iva</th>
+        <th>Costo Rete Ica</th>
+        <th>Funcionario Creacion</th>
+        <th>Fecha Creacion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="text-center">
+        <td>{{ Activo_Fijo.Cuenta_Rete_Iva | uppercase }}</td>
+        <td>{{ Activo_Fijo.Cuenta_Rete_Ica | uppercase }}</td>
+        <td>
+          {{ Activo_Fijo.Costo_Rete_Iva == '' ? 0 : Activo_Fijo.Costo_Rete_Iva }}
+        </td>
+        <td>
+          {{ Activo_Fijo.Costo_Rete_Fuente == '' ? 0 : Activo_Fijo.Costo_Rete_Fuente }}
+        </td>
+        <td>{{ Activo_Fijo.Funcionario | uppercase }}</td>
+        <td>{{ Activo_Fijo.Fecha | date: 'dd/MM/yyyy' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

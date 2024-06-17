@@ -1,0 +1,167 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Cajas</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button (click)="newPrettyCash.emit(true)" class="btn btn-sm btn-primary">
+            <i class="fa fa-plus"></i> Agregar
+          </button>
+          <button class="btn btn-info btn-sm" (click)="matPanel.toggle()">
+            <i class="fas fa-sliders-h"></i> Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel #matPanel class="mat-elevation-z0">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              type="text"
+              autocomplete="off"
+              [(ngModel)]="filtros.name"
+              (input)="getPrettyCash()"
+            />
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!loading && prettyCashList.length; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Caja</th>
+            <th>Plan Cuenta</th>
+            <th>Responsable</th>
+            <th>Fun. Creó</th>
+            <th>Saldo Inicial</th>
+            <th>Saldo Actual</th>
+            <th>Estado</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of prettyCashList" class="text-center">
+            <td class="align-middle">{{ item.description }}</td>
+            <td class="align-middle">
+              {{ item.account_plan?.Nombre_Niif }} -
+              {{ item.account_plan?.Codigo_Niif }}
+            </td>
+            <td class="align-middle">
+              {{
+                item.person
+                  ? item.person?.first_name + ' ' + item.person?.first_surname
+                  : 'Sin asignar'
+              }}
+            </td>
+            <td class="align-middle">
+              {{ item.user?.person?.first_name }}
+              {{ item.user?.person?.first_surname }}
+            </td>
+            <td class="align-middle">${{ item.initial_balance | number: '1.2-2' }}</td>
+            <td class="align-middle">
+              ${{ item.account_plan?.balance?.balance || 0 | number: '1.2-2' }}
+            </td>
+            <td>
+              <span class="badge" [class]="item.status == 'Activa' ? 'bg-success' : 'bg-danger'">
+                {{ item.status }}
+              </span>
+            </td>
+            <td class="align-middle">
+              <div ngbDropdown container="body" class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a
+                    href="javascript: void(0);"
+                    class="dropdown-item text-info"
+                    (click)="openModal(edit, item)"
+                  >
+                    <i class="fas fa-edit"></i> Editar
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      [collectionSize]="pagination.collectionSize"
+      [pageSize]="pagination.pageSize"
+      [(page)]="pagination.page"
+      (pageChange)="getPrettyCash($event)"
+      maxSize="5"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+    >
+    </ngb-pagination>
+  </div>
+  <app-crear-caja (saved)="getPrettyCash()" [openModal]="newPrettyCash"></app-crear-caja>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>
+
+<ng-template #edit let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Editar caja</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <ng-container [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            formControlName="description"
+            type="text"
+            required
+            autocomplete="off"
+            placeholder="Ingresa el nombre"
+          />
+        </mat-form-field>
+        <div class="col mat-form-field-wrapper">
+          <ng-select
+            [items]="people"
+            [class.is-invalid]="form.get('person_id').invalid"
+            formControlName="person_id"
+            bindLabel="text"
+            appearance="outline"
+            [appendTo]="'body'"
+            placeholder="Responsable *"
+            bindValue="value"
+            [clearable]="false"
+          >
+          </ng-select>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button type="button" (click)="save()" class="btn btn-primary">Guardar</button>
+  </div>
+</ng-template>

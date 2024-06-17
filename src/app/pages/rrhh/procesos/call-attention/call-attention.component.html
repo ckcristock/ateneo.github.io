@@ -1,0 +1,58 @@
+<app-process-header
+  titlePage="Llamados de atención"
+  [filters]="filters"
+  (request)="getCallAttention()"
+  (onAdd)="openAddCallAttention()"
+>
+  <app-table
+    [loading]="loading"
+    [arrayData]="callAttentions"
+    [pagination]="pagination"
+    (pageChange)="getCallAttention()"
+  >
+    <ng-container titles>
+      <th scope="col">Foto</th>
+      <th scope="col">Funcionario</th>
+      <th scope="col">Detalles</th>
+      <th scope="col">Fecha</th>
+      <th scope="col">
+        <i class="mdi mdi-chevron-down"></i>
+      </th>
+    </ng-container>
+    <tbody content>
+      @for (callAttention of callAttentions; track $index) {
+        <tr class="text-center">
+          <td class="align-middle p-0" scope="row">
+            <app-load-image
+              classImg="d-block img-thumbnail rounded-circle mx-auto img-fluid header-profile-user"
+              [src]="callAttention.person.image"
+            ></app-load-image>
+          </td>
+          <td class="align-middle">{{ callAttention.person.full_name }}</td>
+          <td class="align-middle">
+            <app-view-more [text]="callAttention.details"></app-view-more>
+          </td>
+          <td class="align-middle">
+            {{ callAttention.created_at | date: 'longDate' }}
+          </td>
+          <td>
+            @if (loadingDownload === callAttention.id) {
+              <button class="btn btn-primary btn-sm" type="button">
+                <i _ngcontent-ng-c2830628797="" class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+              </button>
+            } @else {
+              <app-dropdown-actions>
+                <app-action-button
+                  icon="file-download"
+                  text="Descargar"
+                  type="danger"
+                  (click)="downloadCallAttention(callAttention.id)"
+                ></app-action-button>
+              </app-dropdown-actions>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-process-header>

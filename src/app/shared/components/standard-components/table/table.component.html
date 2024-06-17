@@ -1,0 +1,30 @@
+@if (!arrayData) {
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+} @else if (!loading && arrayData?.length) {
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+  @if (pagination) {
+    <app-pagination
+      [pagination]="pagination"
+      (pageChange)="handlePageEvent($event)"
+    ></app-pagination>
+  }
+} @else {
+  <app-not-data-sa [loading]="loading"></app-not-data-sa>
+}
+
+<ng-template #content>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <ng-container *ngTemplateOutlet="theadTemplate"></ng-container>
+      <ng-content select="[content]"></ng-content>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #theadTemplate>
+  <thead class="bg-light">
+    <tr class="text-center text-uppercase">
+      <ng-content select="[titles]"></ng-content>
+    </tr>
+  </thead>
+</ng-template>

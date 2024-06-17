@@ -1,0 +1,47 @@
+<app-card
+  [viewTitle]="
+    type == 'pago' ? 'Pago de cesantías año ' + year : 'Pago de interes de cesantías ' + year
+  "
+>
+  @if (!loadingValid && payValid) {
+    <app-table [loading]="loading" [arrayData]="severanceList">
+      <ng-container titles>
+        <td>Foto</td>
+        <td>Nombre</td>
+        <td>Salario</td>
+        <td>Monto a pagar</td>
+      </ng-container>
+      <tbody content>
+        @for (item of severanceList; track $index) {
+          <tr class="text-center">
+            <td class="p-0">
+              <app-load-image
+                classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                [src]="item.image"
+              ></app-load-image>
+            </td>
+            <td>{{ item.full_names }}</td>
+            <td>${{ item.contractultimate.salary | number: '1.2-2' }}</td>
+            <td class="text-end">
+              ${{
+                (type == 'pago'
+                  ? item.total_cesantias.total_severance
+                  : item.total_cesantias.total_severance_interest
+                ) | number: '1.2-2'
+              }}
+            </td>
+          </tr>
+        }
+        <tr>
+          <th class="text-end" colspan="3">TOTAL A PAGAR</th>
+          <th class="text-end">
+            ${{ (type == 'pago' ? total_severance : total_severance_interest) | number: '1.2-2' }}
+          </th>
+        </tr>
+      </tbody>
+    </app-table>
+    <button type="button" (click)="pay()" class="btn btn-primary btn-block">Pagar</button>
+  } @else {
+    <app-not-data [loading]="loadingValid" [text]="'Ya se ha pagado este periodo'"></app-not-data>
+  }
+</app-card>

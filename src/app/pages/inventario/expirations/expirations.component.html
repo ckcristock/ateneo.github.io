@@ -1,0 +1,93 @@
+<app-card viewTitle="Vencimientos de medicamentos">
+  <form class="row" [formGroup]="formFilter">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <mat-select formControlName="tipo" (selectionChange)="getWinery()">
+        <mat-option value="" selected hidden> Seleccione tipo </mat-option>
+        <mat-option value="Bodega"> Bodega </mat-option>
+        <mat-option value="Puntos"> Puntos dispensación </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Bodega</mat-label>
+      <mat-select formControlName="id_bodega_punto" (selectionChange)="onGetExpirations()">
+        @for (winery of wineries; track $index) {
+          <mat-option [value]="winery.Id">{{ winery.Nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Seleccionar el año</mat-label>
+      <mat-select formControlName="year">
+        @for (year of years; track $index) {
+          <mat-option [value]="year">{{ year }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <div class="col">
+      <button
+        type="button"
+        class="btn btn-success w-100"
+        [disabled]="formFilter.invalid"
+        (click)="onDownloadExpiration()"
+      >
+        <i class="fas fa-file-download"></i>
+        Descargar
+      </button>
+    </div>
+  </form>
+  @if (months.length && isExpirationData) {
+    <mat-accordion>
+      @for (item of months; track $index) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{ item.Mes }} {{ formFilter.controls['year'].value }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <app-table [loading]="loading" [arrayData]="item.Productos">
+            <ng-container titles>
+              <th>Nombre Comercial</th>
+              <th>Embalaje</th>
+              <th>Laboratorio Comercial</th>
+              <th>Lote</th>
+              <th>Fecha Vencimiento</th>
+              <th>Cantidad</th>
+              <th>Ubicación</th>
+            </ng-container>
+            <tbody content>
+              @for (product of item.Productos; track $index) {
+                <tr class="text-center">
+                  <td>
+                    <strong>{{ product.Nombre_Comercial }}</strong>
+                  </td>
+                  <td>{{ product.Embalaje }}</td>
+                  <td>{{ product.Laboratorio_Comercial }}</td>
+                  <td>{{ product.Lote }}</td>
+                  <td>{{ product.Fecha_Vencimiento }}</td>
+                  <td>
+                    <strong>{{ product.Cantidad }}</strong>
+                  </td>
+                  <td>
+                    @if (product.Bodega) {
+                      <span class="text-danger font-weight-bold">
+                        {{ product.Bodega }}
+                      </span>
+                    }
+                    @if (product.Punto) {
+                      <span class="text-warning font-weight-bold">
+                        {{ product.Punto }}
+                      </span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </app-table>
+        </mat-expansion-panel>
+      }
+    </mat-accordion>
+  } @else {
+    <app-not-data [loading]="loading"></app-not-data>
+  }
+</app-card>

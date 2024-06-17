@@ -1,0 +1,124 @@
+<app-card
+  viewTitle="Horas extra reportadas"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="activeFilters"
+>
+  <ng-container *ngIf="horasExtras.length > 0 && !loading; else notData">
+    <div *ngFor="let company of horasExtras">
+      <h4 *ngIf="horasExtras.length > 1">{{ company.name }}</h4>
+      <div *ngFor="let group of company.groups">
+        <h5 class="text-uppercase fw-bold text-primary">
+          Grupo:
+          <span class="text-secondary">{{ group.name }}</span>
+        </h5>
+        <div *ngFor="let dependency of group.dependencies">
+          <h6 class="fw-bold text-center text-uppercase">
+            {{ dependency.name }}
+          </h6>
+          <div class="row" *ngIf="dependency.people.length > 0; else alertNoData">
+            <div class="rounded-top table-responsive">
+              <table class="table table-sm">
+                <tbody>
+                  <ng-container *ngFor="let person of dependency.people">
+                    <tr
+                      class="text-center hover"
+                      (click)="person.show = !person.show"
+                      role="button"
+                    >
+                      <td class="col-1">
+                        <app-load-image
+                          [src]="person?.image"
+                          classImg="rounded-circle mx-auto header-profile-user"
+                        ></app-load-image>
+                      </td>
+                      <td>
+                        {{ person.first_name | titlecase }}
+                        {{ person.first_surname | titlecase }}
+                      </td>
+                      <td class="col-1">
+                        <i
+                          [ngClass]="person.show ? 'fa-angle-up' : 'fa-angle-down'"
+                          class="fas text-primary"
+                          role="button"
+                          (click)="person.show = !person.show"
+                        ></i>
+                      </td>
+                    </tr>
+                    <ng-container *ngIf="person.show == true">
+                      <tr>
+                        <td colspan="100%">
+                          <app-lista-fijos
+                            *ngIf="person.show == true"
+                            [turnType]="turnType"
+                            [person]="person"
+                            [primerDia]="primerDiaSemana"
+                            [ultimodiaDia]="ultimoDiaSemana"
+                          ></app-lista-fijos>
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</app-card>
+
+<ng-template #filterTemplate>
+  <form [formGroup]="formFilters">
+    <div class="row">
+      <mat-form-field class="col-md-4" appearance="outline">
+        <mat-label>Tipo de turno actual</mat-label>
+        <mat-select name="turn_type" formControlName="turn_type">
+          <mat-option value="Rotativo">Rotativo</mat-option>
+          <mat-option value="Fijo">Fijo</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <app-autocomplete-fc
+        class="col"
+        label="Funcionario"
+        placeholder="Seleccionar"
+        [control]="formFilters.controls['person_id']"
+        [class.is-invalid]="formFilters.get('person_id').invalid"
+        [list]="people$ | async"
+      ></app-autocomplete-fc>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Rango de fechas</mat-label>
+        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+          <input
+            matStartDate
+            placeholder="Fecha de inicio"
+            required
+            formControlName="start"
+            name="date_start"
+          />
+          <input
+            matEndDate
+            placeholder="Fecha de fin"
+            required
+            formControlName="end"
+            name="date_end"
+          />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker>
+          <mat-date-range-picker-actions>
+            <button mat-button matDateRangePickerCancel>Cancelar</button>
+            <button mat-raised-button color="primary" matDateRangePickerApply>Aplicar</button>
+          </mat-date-range-picker-actions>
+        </mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #alertNoData>
+  <div class="alert alert-info" role="alert">No hemos encontrado nada aquí.</div>
+</ng-template>
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

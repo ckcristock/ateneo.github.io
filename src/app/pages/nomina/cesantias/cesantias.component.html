@@ -1,0 +1,89 @@
+<app-card
+  viewTitle="Cesantías"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <ng-container filters>
+    <app-header-button
+      icon="money-bill"
+      text="Pagar cesantías"
+      [class.disabled]="!severancePaymentValid"
+      type="warning"
+      (click)="redirect('pago')"
+    />
+    <app-header-button
+      icon="money-bill"
+      text="Pagar intereses"
+      [class.disabled]="!severanceInterestPaymentValid"
+      type="success"
+      (click)="redirect('pago-intereses')"
+    />
+  </ng-container>
+  @if (!severancePaymentValid) {
+    <div class="alert alert-danger text-center" role="alert">
+      El pago de cesantías solo podrá ser realizado entre el 1 de enero y el 14 de febrero del
+      presente año.
+    </div>
+  }
+  @if (!severanceInterestPaymentValid) {
+    <div class="alert alert-danger text-center" role="alert">
+      El pago de intereses de cesantías solo podrá ser realizado entre el 1 y 31 de enero.
+    </div>
+  }
+  <app-table
+    [loading]="loading"
+    [arrayData]="severancePayments"
+    [pagination]="pagination"
+    (pageChange)="getSeverancePayments()"
+  >
+    <ng-container titles>
+      <th>Año</th>
+      <th>Fecha de pago</th>
+      <th>Responsable</th>
+      <th>Total pagado</th>
+      <th>Total de empleados</th>
+      <th>Tipo</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of severancePayments; track $index) {
+        <tr class="text-center">
+          <td>{{ item.year }}</td>
+          <td>{{ item.created_at | date }}</td>
+          <td>{{ item.user.person_name.complete_name }}</td>
+          <td>${{ item.total | number: '1.2-2' }}</td>
+          <td>{{ item.total_employees }}</td>
+          <td>{{ item.type }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view (click)="severanceView(item)" />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container [formGroup]="formFilters">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Año</mat-label>
+      <input
+        matInput
+        type="text"
+        formControlName="year"
+        autocomplete="off"
+        placeholder="Busca por año"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <mat-select formControlName="type">
+        <mat-option value="">Todos</mat-option>
+        <mat-option value="Pago a fondo de cesantías">Pago a fondo de cesantías</mat-option>
+        <mat-option value="Pago de intereses">Pago de intereses</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+</ng-template>

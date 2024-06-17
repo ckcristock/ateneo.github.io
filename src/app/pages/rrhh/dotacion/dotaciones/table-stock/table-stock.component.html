@@ -1,0 +1,118 @@
+<form #FormDotacion="ngForm">
+  <div *ngIf="entrega">
+    <div class="row">
+      <div class="col-md-6">
+        <app-autocomplete-mdl
+          class="col"
+          label="Empleado que recibe *"
+          placeholder="Buscar funcionario"
+          [model]="Entrega.person_id"
+          [list]="Empleados"
+          (optionSelectedEvent)="Entrega.person_id = $event"
+        ></app-autocomplete-mdl>
+      </div>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Fecha de entrega</mat-label>
+        <input
+          matInput
+          type="date"
+          [(ngModel)]="Entrega.dispatched_at"
+          [ngModelOptions]="{ standalone: true }"
+          name="dispatched_at"
+          required
+          autocomplete="off"
+        />
+      </mat-form-field>
+    </div>
+
+    <h6 class="text-center">Elementos disponibles</h6>
+  </div>
+  <app-table
+    [loading]="loading"
+    [arrayData]="Lista_Grupos_Inventario1"
+    [pagination]="pagination"
+    (pageChange)="getData()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Talla</th>
+      @if (!entrega) {
+        <th>Tipo</th>
+        <th>Costo</th>
+        <th>Total</th>
+        <th>Apartada</th>
+      }
+      <th>Disponible</th>
+      @if (entrega) {
+        <th>Cantidad</th>
+      }
+    </ng-container>
+    <tbody content>
+      @for (l of Lista_Grupos_Inventario1; track l.id; let i = $index) {
+        <tr class="text-center">
+          <td class="align-middle">{{ l.name }}</td>
+          <td class="align-middle">{{ l.size }}</td>
+          @if (!entrega) {
+            <td class="align-middle">{{ l.type }}</td>
+            <td class="align-middle">{{ l.cost }}</td>
+            <td class="align-middle">{{ l.stock }}</td>
+            <td class="align-middle">{{ l.cantidadA }}</td>
+          }
+          <td class="align-middle">{{ l.stock - l.cantidadA }}</td>
+          @if (entrega) {
+            <td class="col-2 text-start">
+              <input
+                (onChange)="maxLengthCheck(l)"
+                type="text"
+                name="producto{{ i }}"
+                class="form-control form-control-sm"
+                [class.is-invalid]="l.quantity > l.stock - l.cantidadA"
+                min="0"
+                max="{{ l.stock }}"
+                currencyMask
+                [options]="masks.maskNumbers"
+                appInputPositionInitial
+                (blur)="cambio(l)"
+                [(ngModel)]="l.quantity"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="0"
+                required
+              />
+              <div
+                [ngClass]="{
+                  'text-danger fw-bold': l.quantity > l.stock - l.cantidadA
+                }"
+              >
+                <small *ngIf="l.quantity > l.stock - l.cantidadA">Cantidad incorrecta</small>
+              </div>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </app-table>
+  <ng-container *ngIf="entrega">
+    <div class="row mt-2">
+      <div class="col-md-12">
+        <mat-form-field
+          class="col-md-12 px-0 mat-form-field-no-padding textarea"
+          appearance="outline"
+        >
+          <mat-label>Detalles</mat-label>
+          <textarea
+            matInput
+            placeholder="Ingrese los detalles"
+            rows="5"
+            [(ngModel)]="Entrega.description"
+            [ngModelOptions]="{ standalone: true }"
+            required
+            [cdkTextareaAutosize]="true"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+  </ng-container>
+</form>
+
+<app-dotacion-entradas [open]="openModal"></app-dotacion-entradas>
+<app-dotacion-salidas [openSalida]="openModalSalidas"></app-dotacion-salidas>

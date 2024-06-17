@@ -1,0 +1,128 @@
+<div class="row">
+  <div class="col-lg-5">
+    <app-card viewTitle="Postulados">
+      <app-table [loading]="loading" [arrayData]="applicants">
+        <ng-container titles>
+          <th>Nombre</th>
+          <th>Experiencia</th>
+          <th>Fecha</th>
+          <th><i class="mdi mdi-chevron-down"></i></th>
+        </ng-container>
+        <tbody content>
+          @for (applicant of applicants; track $index) {
+            <tr class="text-center">
+              <td>{{ applicant.name }} {{ applicant.surname }}</td>
+              <td>{{ applicant.experience_year }} / Años</td>
+              <td>{{ applicant.created_at | date: 'dd/M/yyyy' }}</td>
+              <td>
+                <a
+                  (click)="applicantModal.show(applicant)"
+                  class="text-primary"
+                  role="button"
+                  aria-label="Ver"
+                >
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    </app-card>
+  </div>
+  <app-card class="col" [viewTitle]="job?.title">
+    @if (job && !loadingJob) {
+      <h6>Descripción</h6>
+      <div>{{ job.description }}</div>
+      <hr />
+      <h6 class="">Información general</h6>
+      <app-table>
+        <ng-container titles>
+          <th>Departamento</th>
+          <th>Municipio</th>
+          <th>Publicación</th>
+          <th>Finalización</th>
+        </ng-container>
+        <tbody content>
+          <tr class="text-center">
+            <td>{{ job.municipality?.department?.name | uppercase }}</td>
+            <td>{{ job.municipality?.name | uppercase }}</td>
+            <td>{{ job.date_start | date: 'dd/M/yyyy' }}</td>
+            <td>{{ job.date_end | date: 'dd/M/yyyy' }}</td>
+          </tr>
+        </tbody>
+      </app-table>
+      <app-table>
+        <ng-container titles>
+          <th>Género</th>
+          <th>Idioma</th>
+          <th>Medio de transporte</th>
+        </ng-container>
+        <tbody content>
+          <tr class="text-center">
+            <td>{{ job.gener }}</td>
+            <td>{{ job.languages }}</td>
+            <td>{{ job.conveyance }}</td>
+          </tr>
+        </tbody>
+      </app-table>
+      <h6 class="">Información empresarial</h6>
+      <app-table>
+        <ng-container titles>
+          <th>Depedencia</th>
+          <th>Cargo</th>
+          <th>Salario</th>
+          <th>Turno</th>
+        </ng-container>
+        <tbody content>
+          <tr class="text-center">
+            <td>{{ job.position.dependency.name }}</td>
+            <td>{{ job.position.name }}</td>
+            <td *ngIf="job.min_salary || job.max_salary">
+              ${{ job.min_salary | number: '1.2-2' }} - ${{ job.max_salary | number: '1.2-2' }}
+              <br />
+              {{ job?.salary_type?.name }}
+            </td>
+            <td>{{ job.turn_type }}</td>
+          </tr>
+        </tbody>
+      </app-table>
+      <h6 class="">Requisitos</h6>
+      <ul class="list-group">
+        <li class="list-group-item"><b>EDUCACIÓN MÍNIMA: </b> {{ job.education }}</li>
+        <li class="list-group-item"><b>AÑOS DE EXPERIENCIA: </b> {{ job.experience_year || 0 }}</li>
+        <li class="list-group-item">
+          <b>MESES DE EXPERIENCIA: </b> {{ job.months_experience || 0 }}
+        </li>
+        <li class="list-group-item"><b>EDAD: </b> {{ job.min_age }} - {{ job.max_age }}</li>
+        <li class="list-group-item">
+          <b>DISPONIBILIDAD PARA VIAJAR: </b>
+          {{ job.can_trip == 1 ? 'Sí' : 'No' }}
+        </li>
+        <li class="list-group-item">
+          <b>CAMBIO DE RESIDENCIA: </b>
+          {{ job.change_residence == 1 ? 'Sí' : 'No' }}
+        </li>
+        <li class="list-group-item">
+          <b>LICENCIA DE CONDUCCIÓN: </b>
+          {{ job.driving_licence_name?.type || 'No aplica' }}
+        </li>
+        <li class="list-group-item">
+          <b>DOCUMENTOS LEGALES NECESARIOS: </b>
+          {{ job.document_type?.name }}
+        </li>
+        <li class="list-group-item">
+          <b>PASAPORTE: </b>
+          {{ job.passport }}
+        </li>
+        <li class="list-group-item">
+          <b>VISA: </b>
+          {{ job.visa_type?.name || 'No' }}
+        </li>
+      </ul>
+    } @else {
+      <app-not-data [loading]="loadingJob"></app-not-data>
+    }
+  </app-card>
+  <app-applicant #applicantModal></app-applicant>
+</div>

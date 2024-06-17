@@ -1,0 +1,156 @@
+<app-card
+  viewTitle="Cuentas bancarias"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters (click)="openModal()" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="bankAccounts"
+    [pagination]="pagination"
+    (pageChange)="getBankAccounts()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Cuenta Asociada</th>
+      <th>Número de Cuenta</th>
+      <th>Saldo</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (bankAccount of bankAccounts; track $index) {
+        <tr class="text-center">
+          <td class="text-start">{{ bankAccount.name }}</td>
+          <td>{{ bankAccount.associated_account }}</td>
+          <td>{{ bankAccount.account_number }}</td>
+          <td>{{ bankAccount.balance }}</td>
+          <td>
+            <app-status-badge [status]="bankAccount.status" />
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="getBankAccount(bankAccount)" />
+              @if (bankAccount.status == 'activo') {
+                <app-action-deactivate (action)="activateOrInactivate(bankAccount, 'inactivo')" />
+              } @else {
+                <app-action-activate (action)="activateOrInactivate(bankAccount, 'activo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-expansion-panel class="mat-elevation-z0">
+    <div class="row">
+      <app-automatic-search
+        class="col"
+        label="Nombre"
+        placeholder="Busca por nombre"
+        [value]="filtro.name"
+        (searching)="filtro.name = $event; getBankAccounts()"
+      ></app-automatic-search>
+    </div> </mat-expansion-panel
+></ng-template>
+
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ selected }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo</mat-label>
+          <mat-select formControlName="type" required>
+            @for (type of types; track type) {
+              <mat-option [value]="type.valor"> {{ type.clave }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            formControlName="name"
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Número de cuenta</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el número de cuenta"
+            formControlName="account_number"
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Cuenta asociada</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa la cuenta asociada"
+            formControlName="associated_account"
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Saldo</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el saldo"
+            formControlName="balance"
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <textarea
+            matInput
+            placeholder="Ingresa la descripción"
+            rows="5"
+            formControlName="description"
+            required
+            [cdkTextareaAutosize]="true"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+    <button
+      type="button"
+      [disabled]="!form.valid"
+      (click)="createBankAccount()"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

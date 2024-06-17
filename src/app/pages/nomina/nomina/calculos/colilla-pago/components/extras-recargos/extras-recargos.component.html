@@ -1,0 +1,113 @@
+<div *ngIf="horasExtrasDatos.valor_total > 0">
+  <hr />
+  <div class="text-center text-uppercase card-title">
+    <i class="fas fa-clock"></i>
+    Horas extra y recargos
+  </div>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-uppercase">
+          <th>Concepto</th>
+          <th class="text-center">Valor sobre hora</th>
+          <th class="text-center">Cantidad de horas</th>
+          <th class="text-center">
+            x = Salario Promedio * Valor sobre hora * horas / (30 días * 8 horas)
+          </th>
+          <th class="text-center">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="text-center" *ngIf="horasExtrasDatos.horas_reportadas.hed > 0">
+          <td class="text-start">Hora extra diurna</td>
+          <td>{{ porcentajesExtrasDatos.hed }}</td>
+          <td>{{ horasExtrasDatos.horas_reportadas.hed }}</td>
+          <td>
+            {{ funcionario.contractultimate.salary | currency: '' : '' }} *
+            {{ porcentajesExtrasDatos.hed }} * {{ horasExtrasDatos.horas_reportadas.hed }} / (30 *
+            8)
+          </td>
+          <td>
+            {{ horasExtrasDatos.horas_extras_totales.hed | currency: '' : '' }}
+          </td>
+        </tr>
+        <tr class="text-center" *ngIf="horasExtrasDatos.horas_reportadas.hen > 0">
+          <td class="text-start">Hora extra nocturna</td>
+          <td>{{ porcentajesExtrasDatos.hen }}</td>
+          <td>{{ horasExtrasDatos.horas_reportadas.hen }}</td>
+          <td>
+            {{ funcionario.contractultimate.salary | currency: '' : '' }} *
+            {{ porcentajesExtrasDatos.hen }} * {{ horasExtrasDatos.horas_reportadas.hen }} / (30 *
+            8)
+          </td>
+          <td>
+            {{ horasExtrasDatos.horas_extras_totales.hen | currency: '' : '' }}
+          </td>
+        </tr>
+        <tr class="text-center" *ngIf="horasExtrasDatos.horas_reportadas.hedfd > 0">
+          <td class="text-start">Hora extra diurna dom/fest</td>
+          <td>{{ porcentajesExtrasDatos.hedfd }}</td>
+          <td>
+            {{ horasExtrasDatos.horas_reportadas.hedfd }}
+          </td>
+          <td>
+            {{ funcionario.contractultimate.salary | currency: '' : '' }} *
+            {{ porcentajesExtrasDatos.hedfd }} * {{ horasExtrasDatos.horas_reportadas.hedfd }} / (30
+            * 8)
+          </td>
+          <td>
+            {{ horasExtrasDatos.horas_extras_totales.hedfd | currency: '' : '' }}
+          </td>
+        </tr>
+        <tr class="text-center" *ngIf="horasExtrasDatos.horas_reportadas.hedfn > 0">
+          <td class="text-start">Hora extra nocturna dom/fest</td>
+          <td>{{ porcentajesExtrasDatos.hedfn }}</td>
+          <td>
+            {{ horasExtrasDatos.horas_reportadas.hedfn }}
+          </td>
+          <td>
+            {{ funcionario.contractultimate.salary | currency: '' : '' }} *
+            {{ porcentajesExtrasDatos.hedfn }} * {{ horasExtrasDatos.horas_reportadas.hedfn }} / (30
+            * 8)
+          </td>
+          <td>
+            {{ horasExtrasDatos.horas_extras_totales.hedfn | currency: '' : '' }}
+          </td>
+        </tr>
+        <tr class="text-center" *ngIf="horasExtrasDatos.horas_reportadas.rn > 0">
+          <td class="text-start">Recargo nocturno</td>
+          <td>{{ porcentajesExtrasDatos.rn }}</td>
+          <td>{{ horasExtrasDatos.horas_reportadas.rn }}</td>
+          <td>
+            {{ funcionario.contractultimate.salary | currency: '' : '' }} *
+            {{ porcentajesExtrasDatos.rn }} * {{ horasExtrasDatos.horas_reportadas.rn }} / (30 * 8)
+          </td>
+          <td>
+            {{ horasExtrasDatos.horas_extras_totales.rn | currency: '' : '' }}
+          </td>
+        </tr>
+        <tr class="text-center" *ngIf="horasExtrasDatos.horas_reportadas.rf > 0">
+          <td class="text-start">Recargo dom/fest</td>
+          <td>{{ porcentajesExtrasDatos.rf }}</td>
+          <td>{{ horasExtrasDatos.horas_reportadas.rf }}</td>
+          <td>
+            {{ funcionario.contractultimate.salary | currency: '' : '' }} *
+            {{ porcentajesExtrasDatos.rf }} * {{ horasExtrasDatos.horas_reportadas.rf }} / (30 * 8)
+          </td>
+          <td>
+            {{ horasExtrasDatos.horas_extras_totales.rf | currency: '' : '' }}
+          </td>
+        </tr>
+        <tr class="text-center fila-total">
+          <td class="text-start">Total pago por horas</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>
+            {{ horasExtrasDatos.valor_total | currency: '' : '' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

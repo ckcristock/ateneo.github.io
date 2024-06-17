@@ -1,0 +1,97 @@
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+::ng-deep .mat-form-field-infix {
+  height: 50px !important;
+  font-size: 14px !important;
+}
+
+::ng-deep .mat-mdc-form-field {
+  min-width: auto !important;
+}
+
+::ng-deep .mdc-notched-outline > * {
+  border-color: #ebebeb !important;
+}
+
+::ng-deep .mdc-text-field--focused .mdc-notched-outline > * {
+  border-color: #5664d2 !important;
+}
+
+::ng-deep .mdc-text-field--invalid .mdc-notched-outline > * {
+  border-color: #f55a4f !important;
+}
+
+//?border-0
+::ng-deep .mat-mdc-form-field.border-0 .mdc-notched-outline > * {
+  border-color: transparent !important;
+}
+
+::ng-deep .mat-mdc-form-field.border-0 .mdc-text-field--focused .mdc-notched-outline > * {
+  border-color: transparent !important;
+}
+
+::ng-deep .mat-mdc-form-field.border-0 .mdc-text-field--invalid .mdc-notched-outline > * {
+  border-color: transparent !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+::ng-deep .mat-sm .mat-form-field-infix {
+  height: 1.8rem !important;
+  font-size: 10px !important;
+  width: 9.2rem;
+  padding: 0.2em 0 1em 0;
+}
+
+::ng-deep .mat-expansion-panel-body {
+  padding: 5px 1px !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+::ng-deep .mat-mdc-form-field.pb-0 .mat-form-field-wrapper {
+  padding-bottom: 0;
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+::ng-deep .mat-mdc-form-field.pb-0 {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+::ng-deep .mdc-form-field label.mdc-label {
+  font-weight: 400 !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+::ng-deep
+  .mat-mdc-form-field.textarea
+  .mat-mdc-form-field-wrapper
+  .mat-mdc-form-field-flex
+  .mat-mdc-form-field-infix {
+  height: auto;
+  textarea {
+    margin-bottom: 1rem;
+    overflow-y: hidden;
+  }
+}
+
+::ng-deep .ck-editor__editable {
+  min-height: 50px !important;
+}
+
+::ng-deep input.mat-mdc-input-element::-webkit-calendar-picker-indicator {
+  display: block;
+}
+
+::ng-deep .mdc-list-item__primary-text {
+  white-space: nowrap !important;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+::ng-deep .cdk-overlay-pane {
+  width: auto !important;
+  min-width: 15rem;
+  max-width: 25rem;
+}

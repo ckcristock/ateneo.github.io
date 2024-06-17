@@ -1,0 +1,122 @@
+<div class="card">
+  <div class="card-body">
+    <div class="card-title">
+      <h5 class="text-primary">Reporte Horario</h5>
+      <div class="form-row mt-4">
+        <div class="form-group col-md-3">
+          <label class="custom-label" for="empresa">Empresa</label>
+          <select class="form-control form-control-sm" id="empresa">
+            <option selected>Seleccione</option>
+            <option *ngFor="let company of companies" [value]="company.value">
+              {{ company.text }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-md-3">
+          <label class="custom-label" for="fecha_inicio">Fecha Inicio</label>
+          <input type="date" class="form-control form-control-sm" id="fecha_inicio" />
+        </div>
+        <div class="form-group col-md-3">
+          <label class="custom-label" for="fecha_fin">Fecha Fin</label>
+          <input type="date" class="form-control form-control-sm" id="fecha_fin" />
+        </div>
+        <div class="form-group col-md-3">
+          <label class="custom-label" for="funcionario">Funcionario</label>
+          <input type="text" class="form-control form-control-sm" id="funcionario" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4 mb-4">
+  <!-- Poner nombre de empresa según el filtro -->
+  <h5 class="text-primary text-center">MaqMo</h5>
+</div>
+
+<div class="card" *ngFor="let reporte of reportes">
+  <div class="card-body">
+    <div class="card-title">
+      <h5>{{ reporte.dependency }}</h5>
+    </div>
+    <div class="row mt-2">
+      <div class="col-12" *ngFor="let funcionario of reporte.funcionarios">
+        <div
+          class="align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center mt-3 mb-3"
+        >
+          <p class="w-40 w-xs-100 mb-0 d-flex align-items-center">
+            <img
+              src="../../../../assets/images/users/no-image.png"
+              class="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+              alt=""
+            />
+            <span class="fw-bold ms-2" style="height: 17px">
+              {{ funcionario.name }}
+              <label for="" class="text-danger">( {{ funcionario.llegadas_tardes }} )</label>
+            </span>
+          </p>
+          <div class="w-xs-100">
+            <button
+              style="float: right"
+              class="btn btn-info btn-sm"
+              (click)="funcionario.selected = !funcionario.selected"
+              ngbTooltip="Ver detalles de Horario"
+              [attr.aria-expanded]="!isCollapsed"
+              aria-controls="collapseExample"
+            >
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mt-3" [ngbCollapse]="funcionario.selected">
+          <div class="text-center" colspan="6">
+            <table class="table table-hover table-bordered table-sm">
+              <thead class="bg-light">
+                <tr>
+                  <th class="text-center"><strong>Fecha</strong></th>
+                  <th class="text-center"><strong>Entrada 1</strong></th>
+                  <th class="text-center"><strong>Salida 1</strong></th>
+                  <th class="text-center"><strong>Entrada 2</strong></th>
+                  <th class="text-center"><strong>Salida 2</strong></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let historial of funcionario.historial">
+                  <td>{{ historial.fecha }}</td>
+                  <td>{{ historial.entrada1 }}</td>
+                  <td>{{ historial.salida1 }}</td>
+                  <td>{{ historial.entrada2 }}</td>
+                  <td>{{ historial.salida2 }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--         <table class="table table-striped mt-4">
+            <tr *ngFor="let funcionario of reporte.funcionarios">
+                <td scope="row" style="width: 50px;">
+                    <img src="../../../../assets/images/users/no-image.png" class="p-0 m-0" alt="">
+                </td>
+                <td style="vertical-align: middle;">{{ funcionario.name }}
+                    <label class="text-danger">
+                        ( {{funcionario.llegadas_tardes}} )
+                    </label>
+                </td>
+                <td>
+                    <p>
+                        <button style="float: right;" class="btn btn-info btn-sm" (click)="isCollapsed = !isCollapsed" ngbTooltip="Ver detalles de Horario" [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td [ngbCollapse]="isCollapsed">
+                    asdsaas
+                </td>
+            </tr>
+        </table> -->
+  </div>
+</div>

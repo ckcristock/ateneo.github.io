@@ -1,0 +1,32 @@
+%flexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-files {
+  &__cardFile {
+    @extend %flexCenter;
+    position: relative;
+    width: 10rem;
+    max-width: 10rem;
+    height: 3rem;
+    background-color: rgba(128, 128, 128, 0.185);
+    border-radius: 0.5rem;
+    > a {
+      display: block;
+      width: 6rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  &__closeFile {
+    position: absolute;
+    @extend %flexCenter;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.2rem;
+    border-radius: 50%;
+  }
+}

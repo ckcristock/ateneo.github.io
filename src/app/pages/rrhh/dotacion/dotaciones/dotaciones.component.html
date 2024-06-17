@@ -1,0 +1,184 @@
+<app-table-inventary></app-table-inventary>
+
+<app-modal-basic #modalDevolver [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Devolución de dotación</h4>
+    <button type="button" class="close basic-close" (click)="modalDevolver.hide()"></button>
+  </div>
+  <div class="app-modal-body">
+    <div
+      class="row invoice-contact"
+      style="align-items: flex-start !important; margin: 0; padding: 0"
+    >
+      <div class="col-md-8">
+        <div class="invoice-box row">
+          <div class="col-sm-12">
+            <div class="rounded-top table-responsive">
+              <table
+                class="table invoice-table table-borderless"
+                style="padding-left: 0 !important"
+              >
+                <tbody>
+                  <tr>
+                    <td style="width: 100px; padding: 0 !important"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="row text-end" style="margin-right: 5px">
+          <div class="col-sm-12">
+            <h4>Devolución de Dotación</h4>
+            <h6>{{ fecha | date: 'dd/MM/yyyy' }}</h6>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <label>Funcionario Recibe</label><br />
+        <strong>{{ Devolucion.Recibe }}</strong>
+      </div>
+      <div class="col-md-4">
+        <label>Funcionario Entrega</label><br />
+        <strong>{{ Devolucion.Entrega }}</strong>
+      </div>
+      <div class="col-md-4">
+        <label>Fecha Entrega Dotación</label><br />
+        <strong>{{ Devolucion.dispatched_at }}</strong>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 25px">
+      <div class="col-md-12">
+        <h4>Elementos por Devolver</h4>
+        <div class="row">
+          <div *ngFor="let prod of Productos_Devolver" class="col-md-6" style="margin-top: 15px">
+            <div class="row">
+              <div class="col-md-3">
+                <input
+                  type="number"
+                  class="form-control form-control-sm contador_min"
+                  min="0"
+                  max="{{ prod.Cantidad }}"
+                  [(ngModel)]="prod.Cantidad"
+                  placeholder="0"
+                />
+              </div>
+              <div class="col-md-5">
+                <span class="f-9">
+                  {{ prod.Nombre }}
+                </span>
+              </div>
+              <div class="col-md-4">
+                <input type="checkbox" [(ngModel)]="prod.Baja" placeholder="0" />
+                <span class="f-9">Dar de Baja</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label>Detalles de la Devolución</label>
+          <textarea
+            placeholder="Ingrese Detalles Importantes"
+            class="form-control f-9"
+            rows="7"
+            [(ngModel)]="Devolucion.Detalles"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer" style="width: 100%">
+    <div class="text-end">
+      <button type="button" class="btn btn-primary btn-sm" (click)="showAlert5($event)">
+        Reportar Devolución de Dotación
+      </button>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalEntrega [dialogClass]="'modal-lg'">
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="col-md-12 text-center">
+          <app-table-stock
+            [type]="flagDotacionApp"
+            #tablestock
+            [entrega]="true"
+            [find]="false"
+            (closeModal)="closeModal()"
+          ></app-table-stock>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+<!-- fin modal entrega dotacion -->
+
+<!-- modal salidas-->
+<app-modal-basic #modalSalidas [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Salidas</h4>
+    <button type="button" class="close basic-close" (click)="modalSalidas.hide()"></button>
+  </div>
+  <div class="app-modal-body">
+    <div class="card-body">
+      <table class="table table-striped" style="font-size: 10px">
+        <thead>
+          <tr>
+            <th style="width: 80px">Código</th>
+            <th style="width: 100px">Tipo</th>
+            <th style="width: 120px">Fecha</th>
+            <th style="width: 135px">Funcionario Entrega</th>
+            <th style="width: 135px">Funcionario Recibe</th>
+            <th style="width: 135px">Detalles</th>
+            <th>Artículos</th>
+            <th style="width: 90px">Valor</th>
+            <th style="width: 70px">Estado</th>
+            <th style="width: 90px">Estado Entrega</th>
+            <th style="width: 30px">-</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</app-modal-basic>
+<!-- fin modal salidas -->
+
+<ng-template #rt3 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombres }} {{ r.Apellidos }}</span>
+</ng-template>
+
+<script>
+  function Seta(cantidad, Totales) {
+    alert('prohibido');
+    cantidad = parseInt(cantidad);
+    Totales = parseInt(Totales);
+    if (cantidad > 0 || cantidad < Totales) {
+      alert('prohibido 2');
+      return false;
+    } //CANTIDAD
+  }
+</script>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>
+
+<ng-template #notDataTable>
+  <tr>
+    <td colspan="10">
+      <app-not-data [loading]="loading"></app-not-data>
+    </td>
+  </tr>
+</ng-template>

@@ -1,0 +1,509 @@
+<div class="row">
+  <app-card class="col-md-4" viewTitle="Categorías">
+    @if (categories.length) {
+      @for (category of categories; track category) {
+        <mat-expansion-panel
+          class="mat-elevation-z0 my-0"
+          [expanded]="selectedCategory.categoria.id == category.Id_Categoria_Nueva"
+        >
+          <mat-expansion-panel-header class="px-1">
+            {{ category.Nombre }}
+          </mat-expansion-panel-header>
+          @if (category.subcategory?.length > 0) {
+            <mat-action-list dense class="small my-0 rounded">
+              @for (subcategoria of category.subcategory; track subcategoria) {
+                <button
+                  mat-list-item
+                  [ngClass]="{
+                    'bg-soft-primary':
+                      selectedCategory.categoria.id == subcategoria.Id_Categoria_Nueva &&
+                      selectedCategory.subcategoria.id == subcategoria.Id_Subcategoria
+                  }"
+                >
+                  {{ subcategoria.Nombre }}
+                </button>
+              }
+            </mat-action-list>
+          } @else {
+            <ul class="list-group">
+              <li class="list-group-item">No tiene subcategorias asignadas</li>
+            </ul>
+          }
+        </mat-expansion-panel>
+      }
+    } @else {
+      <app-not-data [loading]="loadingCategories"></app-not-data>
+    }
+  </app-card>
+  <app-card class="col-md-8" viewTitle="Inventario" [filterTemplate]="filterTemplate">
+    <app-header-download filters (click)="DescargaExcel()" />
+    <app-table
+      [loading]="Cargando_Tabla"
+      [arrayData]="Inventarios"
+      [pagination]="pagination"
+      (pageChange)="paginacion()"
+    >
+      <ng-container titles>
+        <th class="align-middle">Producto</th>
+        <th class="align-middle">Estiba</th>
+        <th class="align-middle">Costo</th>
+        <th class="align-middle" *ngIf="lista_informe != 0">Precio Venta</th>
+        <th class="align-middle">Cant. Disp</th>
+        <th class="align-middle">Cant. Apar</th>
+        <th class="align-middle">Cant. Selecc</th>
+        <th class="align-middle">Cant. Contra</th>
+        <th class="align-middle"><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (inventario of Inventarios; track inventario.id; let i = $index) {
+          <tr class="text-center">
+            <input type="hidden" id="NombreProducto{{ i }}" [value]="inventario.Nombre_Comercial" />
+            <td>
+              <app-product-name
+                [data]="{
+                  Nombre_Comercial: inventario.Nombre_Comercial,
+                  Nombre_General: inventario.Nombre_General
+                }"
+              />
+            </td>
+            <td class="align-middle">
+              <span
+                placement="top"
+                [ngbPopover]="popContentEstibas"
+                aria-hidden="true"
+                popoverTitle="Estibas"
+                triggers="mouseenter:mouseleave"
+                container="body"
+              >
+                <i class="fas fa-info-circle"></i>
+              </span>
+              <ng-template #popContentEstibas>
+                <div class="d-flex flex-column">
+                  {{ inventario.Nombre_Estiba }}
+                </div>
+              </ng-template>
+            </td>
+            <td class="text-end align-middle td-edit">
+              <span
+                *ngIf="inventario.Costo"
+                class="text-danger"
+                role="button"
+                (click)="verCompras(inventario.Id_Producto, i, addCompras)"
+                >{{ inventario.Costo | currency: 'COP' }}
+                <br />
+              </span>
+              <span class="text-primary">{{ inventario.Precio_Lista | currency: 'COP' }}</span>
+            </td>
+            <td class="text-end align-middle td-edit" *ngIf="lista_informe != 0">
+              <span class="text-primary">{{ inventario.Precio_Lista | currency: 'COP' }}</span>
+            </td>
+            <td class="align-middle td-edit">
+              {{ inventario.Cantidad_Disponible - inventario.cantidadContrato | number: '1.0-0' }}
+            </td>
+            <td class="align-middle td-edit">
+              {{ inventario.Cantidad_Apartada | number: '1.0-0' }}
+            </td>
+            <td class="align-middle td-edit">
+              {{ inventario.Cantidad_Seleccionada | number: '1.0-0' }}
+            </td>
+            <td
+              class="align-middle td-edit"
+              [ngClass]="{
+                'text-danger': inventario.cantidadContrato > 0,
+                'text-dark': inventario.cantidadContrato <= 0
+              }"
+            >
+              {{ inventario.cantidadContrato }}
+            </td>
+            <td>
+              <app-dropdown-actions>
+                <app-action-button
+                  icon="print"
+                  text="Imprimir etiqueta"
+                  type="success"
+                  [link]="{
+                    url:
+                      baseUrl +
+                      '/php/archivos/descarga_etiqueta_controlado.php?id=' +
+                      inventario.Id_Inventario_Nuevo,
+                    target: '_blank'
+                  }"
+                />
+                @if (inventario.Cantidad_Apartada) {
+                  <app-action-button
+                    icon="cart-arrow-down"
+                    text="Ver apartadas"
+                    type="info"
+                    (click)="verApartadas(inventario.Id_Inventario_Nuevo, i, addApartadas)"
+                  />
+                }
+                @if (inventario.Cantidad_Seleccionada) {
+                  <app-action-button
+                    icon="cart-arrow-down"
+                    text="Ver seleccionadas"
+                    type="info"
+                    (click)="verSeleccionadas(inventario, i, addSeleccionadas)"
+                  />
+                }
+                @if (inventario.cantidadContrato) {
+                  <app-action-button
+                    icon="eye"
+                    text="Ver contrato"
+                    type="info"
+                    (click)="verContrato(inventario.Id_Inventario_Nuevo, i, addContrato)"
+                  />
+                }
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+</div>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-4"
+    label="Nombre del producto"
+    placeholder="Busca por nombre del producto"
+    [value]="filtro_nom"
+    (searching)="filtro_nom = $event; filtro()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Grupo estiba"
+    placeholder="Busca por grupo estiba"
+    [value]="filtro_grupo"
+    (searching)="filtro_grupo = $event; filtro()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Cantidad disponisble"
+    placeholder="Busca por cantidad disponible"
+    type="number"
+    [value]="filtro_cant"
+    (searching)="filtro_cant = $event; filtro()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Cantidad apartada"
+    placeholder="Busca por cantidad apartada"
+    type="number"
+    [value]="filtro_cant_apar"
+    (searching)="filtro_cant_apar = $event; filtro()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Cantidad seleccionada"
+    placeholder="Busca por cantidad seleccionada"
+    type="number"
+    [value]="filtro_cant_sel"
+    (searching)="filtro_cant_sel = $event; filtro()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>IVA</mat-label>
+    <mat-select name="Iva" id="Iva" [(ngModel)]="filtro_iva" (selectionChange)="filtro()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Si">Sí</mat-option>
+      <mat-option value="No">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Bodega</mat-label>
+    <mat-select [(ngModel)]="bodega_selected" (selectionChange)="buscar_categorias($event.value)">
+      <mat-option value="">Todas</mat-option>
+      <mat-option *ngFor="let item of bodegas_nuevo" [value]="item.Id_Bodega_Nuevo">{{
+        item.Nombre
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Lista de informe</mat-label>
+    <mat-select [(ngModel)]="lista_informe" (selectionChange)="filtro()">
+      <mat-option value="">Productos sin lista</mat-option>
+      <mat-option *ngFor="let item of listas" [value]="item.Id_Lista_Ganancia">{{
+        item.Nombre
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div class="col mt-3">
+    <input
+      type="checkbox"
+      aria-hidden="true"
+      checked
+      color="primary"
+      name="sin-inventario"
+      id="sin-inventario"
+      (change)="filtro()"
+    />
+    Sin inventario
+  </div>
+</ng-template>
+
+<ng-template #addContrato let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Cantidad contrato</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!CargandoDetalleContrato && DetalleContrato.length > 0; else notDataContrato"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Nombre Contrato</th>
+            <th>Tipo Contrato</th>
+            <th>Cantidad</th>
+            <th>Cantidad Apartada</th>
+            <th>Cantidad Selccionada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of DetalleContrato" class="text-center">
+            <td>{{ item.Nombre_Contrato }}</td>
+            <td>{{ item.Tipo_Contrato }}</td>
+            <td>{{ item.cantidadContrato }}</td>
+            <td>{{ item.Cantidad_Apartada }}</td>
+            <td>{{ item.Cantidad_Seleccionada }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cerrar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #notDataContrato>
+  <app-not-data [loading]="CargandoDetalleContrato"></app-not-data>
+</ng-template>
+
+<ng-template #addApartadas let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Remisiones que apartaron el producto</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <app-table>
+      <ng-container titles>
+        <th>Nombre</th>
+        <th>Lote</th>
+        <th>Fecha de vencimiento</th>
+      </ng-container>
+      <tbody content>
+        <tr class="text-center">
+          <td>{{ nombre_producto }}</td>
+          <td>{{ lote_producto }}</td>
+          <td>{{ fecha_venc_producto | date: 'dd/MM/yyyy' }}</td>
+        </tr>
+      </tbody>
+    </app-table>
+    <hr />
+    @if (Cargando_Apartadas && Apartadas.length) {
+      <app-table>
+        <ng-container titles>
+          <th>Código</th>
+          <th>Fecha</th>
+          <th>Identificación Funcionario</th>
+          <th>Destino</th>
+          <th>Cantidad</th>
+          <th>Fase</th>
+        </ng-container>
+        <tbody content>
+          @for (item of Apartadas; track $index) {
+            <tr class="text-center">
+              <td>
+                <a
+                  [routerLink]="['/inventario/remisiones/remision/', item.Id_Remision]"
+                  (click)="modal.dismiss('Cross click')"
+                  >{{ item.Codigo }}</a
+                >
+              </td>
+              <td>{{ item.Fecha | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ item.Identificacion_Funcionario }}</td>
+              <td>{{ item.Destino }}</td>
+              <td>{{ item.Cantidad }}</td>
+              <td>{{ item.Fase }}</td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    } @else {
+      <app-not-data [loading]="Cargando_Apartadas"></app-not-data>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cerrar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #addSeleccionadas let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Borradores que seleccionaron el producto</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <app-table>
+      <ng-container titles>
+        <th>Nombre</th>
+        <th>Lote</th>
+        <th>Fecha de vencimiento</th>
+      </ng-container>
+      <tbody content>
+        <tr class="text-center">
+          <td>{{ nombre_producto }}</td>
+          <td>{{ lote_producto }}</td>
+          <td>{{ fecha_venc_producto | date: 'dd/MM/yyyy' }}</td>
+        </tr>
+      </tbody>
+    </app-table>
+    <hr />
+    @if (!Cargando_Seleccionados && Seleccionados.length) {
+      <app-table>
+        <ng-container titles>
+          <th>Código</th>
+          <th>Fecha</th>
+          <th>Identificación Funcionario</th>
+          <th>Origen</th>
+          <th>Destino</th>
+          <th>Cantidad</th>
+          <th>Lote</th>
+          <th>Tipo</th>
+        </ng-container>
+        <tbody content>
+          @for (item of Seleccionados; track $index) {
+            <tr class="text-center">
+              <td>
+                {{ item.Codigo }}
+              </td>
+              <td>{{ item.Fecha | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ item.Identificacion_Funcionario }}</td>
+              <td>{{ item.Nombre_Origen }}</td>
+              <td>{{ item.Nombre_Destino }}</td>
+              <td>{{ item.Cantidad_Seleccionada }}</td>
+              <td>{{ item.Lote }}</td>
+              <td>{{ item.Tipo }}</td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    } @else {
+      <app-not-data [loading]="Cargando_Seleccionados"></app-not-data>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cerrar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #addCompras let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Compras realizadas del producto</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Nombre</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            <td>{{ nombre_producto }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <hr />
+    @if (!Cargando_Compras && Compras.length) {
+      <app-table>
+        <ng-container titles>
+          <th>Compra</th>
+          <th>Acta Recepcion</th>
+          <th>Fecha</th>
+          <th>Funcionario Recibió</th>
+          <th>Proveedor</th>
+          <th>Cantidad</th>
+          <th>Costo</th>
+        </ng-container>
+        <tbody content>
+          @for (item of Compras; track $index) {
+            <tr class="text-center">
+              <td>
+                <a
+                  *ngIf="item.Id_Compra_N != ''"
+                  (click)="modal.dismiss('Cross click')"
+                  [routerLink]="['/compras/ver-nacional', item.Id_Compra_N]"
+                  >{{ item.Codigo_Compra_N }}</a
+                >
+                <a
+                  *ngIf="item.Id_Compra_I != ''"
+                  (click)="modal.dismiss('Cross click')"
+                  [routerLink]="['/comprainternacional', item.Id_Compra_I]"
+                  >{{ item.Codigo_Compra_I }}</a
+                >
+              </td>
+              <td>
+                <a
+                  (click)="modal.dismiss('Cross click')"
+                  [routerLink]="['/inventario/acta-recepcion/ver', item.Id_Acta]"
+                  >{{ item.Codigo_Acta }}</a
+                >
+              </td>
+              <td>{{ item.Fecha | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ item.Funcionario }}</td>
+              <td>{{ item.Proveedor }}</td>
+              <td>{{ item.Cantidad }}</td>
+              <td class="text-end">{{ item.Precio | currency: 'COP' }}</td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    } @else {
+      <app-not-data [loading]="Cargando_Compras"></app-not-data>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cerrar
+    </button>
+  </div>
+</ng-template>

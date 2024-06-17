@@ -1,0 +1,43 @@
+<ng-template #addSalidas let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Salidas</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Orden</th>
+            <th>Proveedor</th>
+            <th>Fun.Ingresa</th>
+            <th>Fecha Ingreso</th>
+            <th>Tipo</th>
+            <th>Valor</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <!-- <tbody>
+          <tr *ngFor="let item of material.cut_laser_material_value">
+            <td>{{ item.thickness }}</td>
+            <td>{{ item.unit_value }}</td>
+            <td>{{ item.actual_speed }}</td>
+            <td>{{ item.seconds_percing }}</td>
+          </tr>
+        </tbody> -->
+      </table>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cerrar
+    </button>
+  </div>
+</ng-template>

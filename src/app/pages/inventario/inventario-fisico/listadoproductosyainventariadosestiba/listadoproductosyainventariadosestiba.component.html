@@ -1,0 +1,137 @@
+<div class="row">
+  <div class="col-md-12 col-sm-12">
+    <h5 class="text-center text-primary">Listado de productos ya inventariados</h5>
+    <div *ngFor="let producto of Productos; let i = index" id="fila{{ i }}">
+      <app-table>
+        <ng-container titles>
+          <th>Nombre</th>
+          <th *ngFor="let key of getVariableKeys(producto)">{{ key }}</th>
+          <th *ngIf="!producto?.Lotes">Cantidad Encontrada</th>
+          <td *ngIf="!producto?.Lotes"></td>
+          <th *ngIf="producto?.Lotes">Lotes</th>
+        </ng-container>
+        <tbody content>
+          <tr class="text-center">
+            <td>{{ producto?.Nombre_Comercial || 'N/A' }}</td>
+            <td *ngFor="let key of getVariableKeys(producto)">
+              {{ producto?.Variables[key] }}
+            </td>
+            <td *ngIf="!producto?.Lotes">
+              <span *ngIf="!editQuantity">{{ producto?.Cantidad_Encontrada || 'N/A' }}</span>
+              <input
+                *ngIf="editQuantity"
+                type="text"
+                class="form-control form-control-xs"
+                [(ngModel)]="producto.Cantidad_Encontrada"
+              />
+            </td>
+            <!-- Editar cantidad de no Lotes -->
+            <td *ngIf="!producto?.Lotes">
+              <button
+                style="padding: 0px !important"
+                *ngIf="!producto?.Lotes"
+                class="btn btn-sm"
+                [ngClass]="{ 'btn-secondary': !editQuantity, 'btn-success': editQuantity }"
+                (click)="editNonLoteQuantity(producto)"
+              >
+                <i *ngIf="!editQuantity" style="padding: 5px" class="fas fa-edit"></i>
+                <i *ngIf="editQuantity" style="padding: 5px" class="fa fa-check-circle"></i>
+              </button>
+            </td>
+            <td *ngIf="producto?.Lotes && producto?.Lotes.length > 0">
+              <app-table>
+                <ng-container titles>
+                  <td>Lote</td>
+                  <td>Vencimiento</td>
+                  <td>Cantidad</td>
+                  <td></td>
+                </ng-container>
+                <tbody content>
+                  <tr *ngFor="let lote of producto?.Lotes; let j = index" class="text-center">
+                    <td>
+                      <span *ngIf="lote.AgregarLote == 'none' || lote.AgregarLote == undefined">{{
+                        lote.Lote
+                      }}</span>
+                      <input
+                        *ngIf="lote.AgregarLote == 'block'"
+                        type="text"
+                        class="form-control form-control-xs"
+                        [(ngModel)]="lote.Lote"
+                        (change)="reValidarLote(i, j)"
+                      />
+                    </td>
+                    <td>
+                      <span *ngIf="lote.AgregarLote == 'none' || lote.AgregarLote == undefined">{{
+                        lote.Fecha_Vencimiento
+                      }}</span>
+                      <input
+                        *ngIf="lote.AgregarLote == 'block'"
+                        type="date"
+                        class="form-control form-control-xs"
+                        [(ngModel)]="lote.Fecha_Vencimiento"
+                        (blur)="reValidarFecha(i, j)"
+                      />
+                    </td>
+                    <td>
+                      <span *ngIf="lote.AgregarLote == 'none' || lote.AgregarLote == undefined">{{
+                        lote.Cantidad_Encontrada
+                      }}</span>
+                      <input
+                        *ngIf="lote.AgregarLote == 'block'"
+                        type="number"
+                        min="0"
+                        class="form-control form-control-xs"
+                        [(ngModel)]="lote.Cantidad_Encontrada"
+                        min="0"
+                        onkeypress="return event.charCode >= 48  && event.charCode <= 57 "
+                        (blur)="reValidarCantidad(i, j)"
+                      />
+                    </td>
+                    <td>
+                      <!-- Agregar nuevo lote -->
+                      <button
+                        style="padding: 0px !important"
+                        *ngIf="
+                          producto?.Lotes &&
+                          producto?.Lotes.length - 1 == j &&
+                          lote.AgregarLote != 'block'
+                        "
+                        class="btn btn-primary btn-sm"
+                        (click)="mostrarUltimo(i, j)"
+                      >
+                        <i style="padding: 5px" class="fa fa-plus"></i>
+                      </button>
+
+                      <!-- Editar Lote -->
+                      <button
+                        style="padding: 0px !important"
+                        *ngIf="
+                          producto?.Lotes &&
+                          producto?.Lotes.length - 1 != j &&
+                          lote.AgregarLote != 'block'
+                        "
+                        class="btn btn-secondary btn-sm"
+                        (click)="editLote(i, j)"
+                      >
+                        <i style="padding: 5px" class="fas fa-edit"></i>
+                      </button>
+                      <!-- Guardar Lote -->
+                      <button
+                        style="padding: 0px !important; margin: 0"
+                        *ngIf="lote.AgregarLote == 'block'"
+                        class="btn btn-success btn-sm"
+                        (click)="reValidarCantidad(i, j)"
+                      >
+                        <i style="padding: 5px" class="fa fa-check-circle"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </app-table>
+            </td>
+          </tr>
+        </tbody>
+      </app-table>
+    </div>
+  </div>
+</div>

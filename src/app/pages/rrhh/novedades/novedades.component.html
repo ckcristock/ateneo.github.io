@@ -1,0 +1,195 @@
+<app-crear-novedad [open]="openModal" (saving)="cargarNovedades()"></app-crear-novedad>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="row">
+      <div class="col">
+        <div class="card border border-light border-3 mx-0">
+          <div class="card-body text-center incapacidades">
+            <i class="ri-suitcase-3-fill"></i>
+            <p class="card-text mb-0">Vacaciones</p>
+            <span class="lead text-center">{{ totalVacaciones }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card border border-light border-3 mx-0">
+          <div class="card-body text-center incapacidades">
+            <i class="fas fa-heartbeat"></i>
+            <p class="card-text mb-0">Incapacidades</p>
+            <span class="lead text-center">{{ totalIncapacidades }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card border border-light border-3 mx-0">
+          <div class="card-body text-center incapacidades">
+            <i class="fas fa-baby"></i>
+            <p class="card-text mb-0">Licencias</p>
+            <span class="lead text-center">{{ totalLicencias }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card border border-light border-3 mx-0">
+          <div class="card-body text-center incapacidades">
+            <i class="ri-calendar-check-line"></i>
+            <p class="card-text mb-0">Permisos</p>
+            <span class="lead text-center">{{ totalPermisos }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card border border-light border-3 mx-0">
+          <div class="card-body text-center incapacidades">
+            <i class="fas fa-door-open"></i>
+            <p class="card-text mb-0">Abandonos</p>
+            <span class="lead text-center">{{ totalAbandonos }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card border border-light border-3 mx-0">
+          <div class="card-body text-center incapacidades">
+            <i class="ri-user-unfollow-line"></i>
+            <p class="card-text mb-0">Suspensiones</p>
+            <span class="lead text-center">{{ totalSuspensiones }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-card viewTitle="Novedades" [filterTemplate]="filterTemplate" [activeFilters]="activeFilters">
+  <ng-container ngProjectAs="[filters]">
+    <app-add-button (click)="openModal.emit()" />
+    <app-header-button
+      icon="file-download"
+      [text]="downloading ? 'Cargando...' : 'Descargar'"
+      type="success"
+      [class.disabled]="downloading"
+      (click)="download()"
+    ></app-header-button>
+  </ng-container>
+  <app-table
+    [loading]="loading"
+    [arrayData]="people"
+    [pagination]="pagination"
+    (pageChange)="cargarNovedades()"
+  >
+    <ng-container titles>
+      <th>Foto</th>
+      <th>Funcionarios</th>
+      <th>Dependencia</th>
+      <th>Fecha</th>
+      <th>Novedad</th>
+      <th>Descripción</th>
+      <th>Inicio</th>
+      <th>Fin</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (person of people; track person.id) {
+        <tr class="text-center">
+          <td class="align-middle p-0">
+            <app-load-image
+              classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+              [src]="person?.person?.image"
+            ></app-load-image>
+          </td>
+          <td class="align-middle">
+            {{ person?.person?.first_name }}
+            {{ person?.person?.first_surname }}
+          </td>
+          <td class="align-middle">
+            {{ person?.person?.contractultimate?.position?.dependency?.name }}
+          </td>
+          <td class="align-middle">
+            {{ person?.created_at | date }}
+          </td>
+          <td class="align-middle">
+            {{ person?.disability_leave?.concept }}
+          </td>
+          <td class="align-middle">
+            <app-view-more [text]="person?.observation" [length]="20" />
+          </td>
+          <td class="align-middle">
+            {{ person?.date_start | date }}
+          </td>
+          <td class="align-middle">
+            {{ person?.date_end | date }}
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="editarNovedad(person)" />
+              @if (person?.documents?.length) {
+                <app-action-button
+                  icon="file"
+                  text="Ver documentos"
+                  type="info"
+                  (click)="openListFiles(person.documents)"
+                />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container [formGroup]="form">
+    <div class="col">
+      <app-autocomplete-fc
+        class="col"
+        label="Funcionario"
+        placeholder="Seleccionar"
+        [control]="form.controls['personfill']"
+        [class.is-invalid]="form.get('personfill').invalid"
+        [list]="people$ | async"
+        (optionSelectedEvent)="cargarNovedades()"
+      ></app-autocomplete-fc>
+    </div>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Rango de fechas</mat-label>
+      <mat-date-range-input [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          required
+          formControlName="date_start"
+          name="date_start"
+        />
+        <input
+          matEndDate
+          placeholder="Fecha de fin"
+          required
+          formControlName="date_end"
+          name="date_end"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button
+            mat-raised-button
+            color="primary"
+            matDateRangePickerApply
+            (click)="onChangeDate()"
+          >
+            Aplicar
+          </button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <mat-select formControlName="type" (selectionChange)="cargarNovedades()">
+        <mat-option value="">Todos</mat-option>
+        <mat-option *ngFor="let item of types" [value]="item.value">{{ item.text }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+</ng-template>

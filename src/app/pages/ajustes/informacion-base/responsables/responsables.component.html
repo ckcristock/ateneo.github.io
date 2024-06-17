@@ -1,0 +1,29 @@
+<div class="card">
+  <div class="card-body">
+    <h4 class="text-primary">Responsables</h4>
+    <hr class="line" />
+    @if (!loading && responsibles.length > 0) {
+      <ul class="list-group list-group-flush overflow-x-auto">
+        @for (responsible of responsibles; track responsible) {
+          <li
+            class="list-group-item d-flex column-gap-3 justify-content-between align-items-center pb-0"
+          >
+            <span class="col">
+              {{ responsible.name }}
+            </span>
+            <app-search-select
+              class="d-block col-lg-6"
+              label="Funcionarios"
+              [showAll]="false"
+              [list]="people"
+              [defaultValue]="responsible.person_id"
+              (selected)="changeResponsible($event, responsible.id)"
+            ></app-search-select>
+          </li>
+        }
+      </ul>
+    } @else {
+      <app-not-data [loading]="loading"></app-not-data>
+    }
+  </div>
+</div>

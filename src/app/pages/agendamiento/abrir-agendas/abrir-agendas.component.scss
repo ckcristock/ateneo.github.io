@@ -1,0 +1,13 @@
+// input[type=range] {
+//   /*Damos unos estilos básicos*/
+//   width: 100%;
+//   /*Eliminamos la apariencia por defecto: -webkit-appearance: slider-horizontal;*/
+//   -webkit-appearance: none;
+//   /*Eliminamos el borde que seguramente heredaría de los input*/
+//   border: none;
+//   /*Eliminamos el outline que por defecto suele aparecer al activarse*/
+//   outline: none;
+
+//   /*Aquí añadiremos todos los pseudo-selectores*/
+//   &::pseudo-selector {@include mixin-name}
+// }

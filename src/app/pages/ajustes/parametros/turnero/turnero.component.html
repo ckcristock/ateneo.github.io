@@ -1,0 +1,231 @@
+<article class="row gap-3">
+  <app-card class="col-md-8" viewTitle="Turneros">
+    <app-add-button filters (click)="openAddTurner(modalCreateTurnero)" />
+    <app-table
+      [loading]="Cargando"
+      [arrayData]="Lista_Servicios"
+      [pagination]="pagination"
+      (pageChange)="onPagination()"
+    >
+      <ng-container titles>
+        <th scope="col">Nombre</th>
+        <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (item of Lista_Servicios; track item.id) {
+          <tr class="text-center">
+            <td>
+              {{ item.Nombre }}
+            </td>
+            <td>
+              <app-dropdown-actions>
+                <app-action-edit (action)="getDetalleTurnero(item.Id_Turneros, modalEditTurnero)" />
+                <app-action-deactivate (action)="onRemoveTurner(item.Id_Turneros)" />
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <div class="card col">
+    <div class="card-body">
+      <div class="col px-0">
+        <h5 class="text-info">Reporte de atención</h5>
+      </div>
+      <hr class="line" />
+      <mat-form-field class="col-12" appearance="outline">
+        <mat-label>Rango de fechas</mat-label>
+        <mat-date-range-input [formGroup]="formRange" [rangePicker]="picker">
+          <input
+            matStartDate
+            placeholder="Fecha de inicio"
+            formControlName="start"
+            name="date_start"
+          />
+          <input matEndDate placeholder="Fecha de fin" formControlName="end" name="date_end" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker>
+          <mat-date-range-picker-actions>
+            <button mat-button matDateRangePickerCancel>Cancelar</button>
+            <button
+              mat-raised-button
+              color="primary"
+              matDateRangePickerApply
+              (click)="onFilterDate()"
+            >
+              Aplicar
+            </button>
+          </mat-date-range-picker-actions>
+        </mat-date-range-picker>
+      </mat-form-field>
+      <app-autocomplete-mdl
+        class="col"
+        label="Turnero"
+        placeholder="Seleccione el turnero"
+        [model]="turnero"
+        [list]="Turneros"
+      ></app-autocomplete-mdl>
+      @if (formRange.valid) {
+        <button class="btn btn-info btn-block" (click)="DescargarReporte()">
+          <i class="fas fa-download"></i> Descargar
+        </button>
+      }
+    </div>
+  </div>
+</article>
+
+<ng-template #modalEditTurnero>
+  <app-modal titleModal="Editar turnero">
+    <form #FormEditarTurnero="ngForm" class="row">
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder=""
+          name="Nombre"
+          [(ngModel)]="ModelEditar.Nombre"
+          required
+        />
+      </mat-form-field>
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label>Capita</mat-label>
+        <mat-select name="Capita" [(ngModel)]="ModelEditar.Capita" required>
+          <mat-option value="Si"> Si </mat-option>
+          <mat-option value="No"> No </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label>No POS</mat-label>
+        <mat-select name="No_Pos" [(ngModel)]="ModelEditar.No_Pos" required>
+          <mat-option value="Si"> Si </mat-option>
+          <mat-option value="No"> No </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label>Autorización servicios</mat-label>
+        <mat-select
+          name="Autorizacion_Servicios"
+          [(ngModel)]="ModelEditar.Autorizacion_Servicios"
+          required
+        >
+          <mat-option value="Si"> Si </mat-option>
+          <mat-option value="No"> No </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Dirección</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Direcion"
+          name="Direccion"
+          [(ngModel)]="ModelEditar.Direccion"
+          required
+        />
+      </mat-form-field>
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label># Maximo turnos</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Maximo Turno"
+          name="Maximo_Turnos"
+          [(ngModel)]="ModelEditar.Maximo_Turnos"
+          required
+        />
+      </mat-form-field>
+      <app-search-select
+        class="d-block col-lg-6"
+        label="Punto"
+        placeholder="Seleccione el punto"
+        [showAll]="false"
+        [multiSelect]="true"
+        [list]="Puntos"
+        (selected)="PuntosSeleccionados = $event"
+      ></app-search-select>
+      <app-search-select
+        class="d-block col-lg-6"
+        label="Servicios"
+        placeholder="Seleccione el servicio"
+        [showAll]="false"
+        [multiSelect]="true"
+        [list]="Servicios"
+        (selected)="ServiciosEscogidos = $event"
+      ></app-search-select>
+    </form>
+    <button
+      buttons
+      type="submit"
+      [disabled]="!FormEditarTurnero.valid"
+      class="btn btn-primary"
+      (click)="EditarTurnero()"
+    >
+      Editar
+    </button>
+  </app-modal>
+</ng-template>
+<ng-template #modalCreateTurnero>
+  <app-modal titleModal="Nuevo turnero">
+    <form #FormNuevoTurnero="ngForm" class="row">
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput type="text" placeholder="" name="Nombre" ngModel />
+      </mat-form-field>
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label>Capita</mat-label>
+        <mat-select name="Capita" ngModel>
+          <mat-option value="Si"> Si </mat-option>
+          <mat-option value="No"> No </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label>No POS</mat-label>
+        <mat-select name="No_Pos" ngModel>
+          <mat-option value="Si"> Si </mat-option>
+          <mat-option value="No"> No </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label>Autorización servicios</mat-label>
+        <mat-select name="Autorizacion_Servicios" ngModel>
+          <mat-option value="Si"> Si </mat-option>
+          <mat-option value="No"> No </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Dirección</mat-label>
+        <input matInput type="text" placeholder="Direcion" name="Direccion" ngModel />
+      </mat-form-field>
+      <mat-form-field class="col-md-3" appearance="outline">
+        <mat-label># Maximo turnos</mat-label>
+        <input matInput type="text" placeholder="Maximo Turno" name="Maximo_Turnos" ngModel />
+      </mat-form-field>
+      <app-search-select
+        class="d-block col-lg-6"
+        label="Punto"
+        placeholder="Seleccione el punto"
+        [showAll]="false"
+        [list]="Puntos"
+      ></app-search-select>
+      <app-search-select
+        class="d-block col-lg-6"
+        label="Servicios"
+        placeholder="Seleccione el servicio"
+        [showAll]="false"
+        [list]="Servicios"
+      ></app-search-select>
+    </form>
+    <button
+      buttons
+      type="submit"
+      [disabled]="FormNuevoTurnero.invalid"
+      class="btn btn-primary"
+      (click)="GuardarTurnero(FormNuevoTurnero, modalNuevoTurnero)"
+    >
+      Guardar
+    </button>
+  </app-modal>
+</ng-template>

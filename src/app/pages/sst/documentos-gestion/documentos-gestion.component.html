@@ -1,0 +1,17 @@
+<!-- <ejs-filemanager id='file-manager' [ajaxSettings]='ajaxSettings' [view]='view'>
+</ejs-filemanager> -->
+
+<!--   <div class="alert alert-danger" role="alert">
+    Si no fuiste redirigido correctamente, has click <a [href]="ruta3" target="_blank" class="alert-link">aquí.</a>
+  </div> -->
+
+<!--   <object [data]="ruta3 | safe" width="1000" height="1000">
+    <embed [src]="ruta3 | safe" width="1000" height="1000">
+
+  </object> -->
+<iframe
+  [src]="ruta3 | safe"
+  scrolling="yes"
+  aria-hidden="true"
+  class="w-100 vh-100 border-0"
+></iframe>

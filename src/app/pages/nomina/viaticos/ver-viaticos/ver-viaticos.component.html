@@ -1,0 +1,37 @@
+@if (!loading && data) {
+  <app-card viewTitle="Ver viático">
+    <ng-container filters>
+      <app-header-download [downloading]="downloading" (click)="download()" />
+      <app-header-button
+        text="Editar"
+        type="info"
+        icon="edit"
+        [routerLink]="['/nomina/editar-viatico', data.id]"
+      />
+    </ng-container>
+    @if (!loading) {
+      <app-viaticos-viaje [data]="data"></app-viaticos-viaje>
+      @if (data.hotels.length) {
+        <app-hospedaje />
+      }
+      @if (data.transports.length) {
+        <app-transporte-terrestre type="ground"></app-transporte-terrestre>
+      }
+      @if (data.air_transports.length) {
+        <app-transporte-terrestre
+          type="air"
+          [transports]="data.air_transports"
+        ></app-transporte-terrestre>
+      }
+      @if (data.expense_taxi_cities.length) {
+        <app-viaticos-taxis></app-viaticos-taxis>
+      }
+      @if (data.feedings.length) {
+        <app-viaticos-alimentacion [feedings]="data.feedings"></app-viaticos-alimentacion>
+      }
+      <app-viaticos-totales [data]="data"></app-viaticos-totales>
+    }
+  </app-card>
+} @else {
+  <app-placeholder-form></app-placeholder-form>
+}

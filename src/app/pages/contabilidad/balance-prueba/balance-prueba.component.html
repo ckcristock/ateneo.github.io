@@ -1,0 +1,380 @@
+<div class="card col-md-9 mx-auto">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <form #FormFiltros="ngForm">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fecha inicial</mat-label>
+          <input
+            matInput
+            type="date"
+            [(ngModel)]="Parametros.Fecha_Inicial"
+            name="Fecha_Inicial"
+            id="Fecha_Inicial"
+            (change)="getQueryParams()"
+            required
+          />
+        </mat-form-field>
+
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fecha cortee</mat-label>
+          <input
+            matInput
+            type="date"
+            [(ngModel)]="Parametros.Fecha_Corte"
+            name="Fecha_Corte"
+            id="Fecha_Corte"
+            (change)="getQueryParams()"
+            required
+          />
+        </mat-form-field>
+
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Discriminado</mat-label>
+          <mat-select
+            [(ngModel)]="Parametros.Discriminado"
+            name="Discriminado"
+            id="Discriminado"
+            required
+            (selectionChange)="getQueryParams()"
+          >
+            <mat-option value="">Seleccione</mat-option>
+            <mat-option value="General">General</mat-option>
+            <mat-option value="Nits">Nits</mat-option>
+            <mat-option value="Tipo">Tipo</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Centro costo</mat-label>
+          <mat-select
+            [(ngModel)]="Parametros.Centro_Costo"
+            name="Centro_Costo"
+            id="Centro_Costo"
+            required
+            (selectionChange)="getQueryParams()"
+          >
+            <mat-option *ngFor="let Centro_Costo of Centro_Costos" [value]="Centro_Costo.value">{{
+              Centro_Costo.label
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <app-autocomplete-mdl
+          class="col"
+          label="Cuenta inicial"
+          placeholder="Buscar"
+          [model]="Cuenta.Inicial"
+          [list]="Cuentas"
+          [classList]="'pb-0'"
+          (optionSelectedEvent)="BuscarCuenta($event, 'Inicial')"
+        ></app-autocomplete-mdl>
+
+        <app-autocomplete-mdl
+          class="col"
+          label="Cuenta final"
+          placeholder="Buscar"
+          [model]="Cuenta.Final"
+          [list]="Cuentas"
+          [classList]="'pb-0'"
+          (optionSelectedEvent)="BuscarCuenta($event, 'Final')"
+        ></app-autocomplete-mdl>
+
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de reporte</mat-label>
+          <mat-select
+            [(ngModel)]="Parametros.Tipo_Reporte"
+            name="Tipo_Reporte"
+            id="Tipo_Reporte"
+            required
+            (selectionChange)="getQueryParams()"
+          >
+            <mat-option value="Pcga">Pcga</mat-option>
+            <mat-option value="Niif">Niif</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nivel</mat-label>
+          <mat-select
+            [(ngModel)]="Parametros.Nivel"
+            name="Nivel"
+            id="Nivel"
+            required
+            (selectionChange)="getQueryParams()"
+          >
+            <mat-option value="">Seleccione</mat-option>
+            <mat-option *ngFor="let Nivel of Niveles" [value]="Nivel">{{ Nivel }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="col-md-12 text-center">
+          <button
+            class="btn btn-primary btn-block mb-3"
+            [disabled]="!FormFiltros.valid"
+            (click)="verBalance(FormFiltros)"
+          >
+            <i class="fa fa-eye"></i> Ver balance
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div
+      *ngIf="Parametros.Discriminado != '' && Parametros.Centro_Costo != 'Todos'"
+      class="btn-group btn-block mt-1"
+      role="group"
+      aria-label="Vertical button group"
+    >
+      <a
+        class="btn btn-danger"
+        href="{{ globales.base_url }}/php/contabilidad/balanceprueba/descarga_pdf.php?{{
+          queryParams
+        }}"
+        target="_blank"
+        ><i class="fas fa-file-pdf"></i> PDF</a
+      >
+      <a
+        href="{{ globales.ruta }}php/contabilidad/balanceprueba/descargar_excel.php?{{
+          queryParams
+        }}"
+        target="_blank"
+        class="btn btn-success"
+        ><i class="fas fa-file-excel"></i> EXCEL</a
+      >
+      <ng-container *ngIf="Parametros.Discriminado != '' && Parametros.Centro_Costo == 'Todos'">
+        <a
+          href="{{ globales.ruta }}php/contabilidad/balanceprueba/descarga_centros_costos.php?{{
+            queryParams
+          }}"
+          target="_blank"
+          class="btn btn-danger"
+          ><i class="fas fa-file-pdf"></i> PDF</a
+        >
+        <a
+          href="{{
+            globales.ruta
+          }}php/contabilidad/balanceprueba/descargar_excel_centros_costos.php?{{ queryParams }}"
+          target="_blank"
+          class="btn btn-success"
+          ><i class="fas fa-file-excel"></i> EXCEL</a
+        >
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- <div style="max-height: 400px; overflow: auto">
+    <table *ngIf="Tipo == 'General'" class="table table-striped">
+    <thead>
+        <tr>
+        <th>Cuenta</th>
+        <th>Nombre Cuenta</th>
+        <th class="text-right">Saldo Anterior</th>
+        <th class="text-right">Debitos</th>
+        <th class="text-right">Creditos</th>
+        <th class="text-right">Nuevo Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td>1</td>
+        <td>ACTIVO</td>
+        <td class="text-right">$ 32.617.123.444,76</td>
+        <td class="text-right">$ 10.506.277.098,08</td>
+        <td class="text-right">$ 6.646.409.257,98</td>
+        <td class="text-right">$ 36.476.991.284,86</td>
+        </tr>
+        <tr>
+        <td>11</td>
+        <td>DISPONIBLE</td>
+        <td class="text-right">$ -513.146.823,78</td>
+        <td class="text-right">$ 3.518.156.565,81</td>
+        <td class="text-right">$ 4.000.394.520,02</td>
+        <td class="text-right">$ -995.384.777,99</td>
+        </tr>
+    </tbody>
+    </table>
+
+    <table *ngIf="Tipo == 'Nits'" class="table table-striped">
+    <thead>
+        <tr>
+        <th>Cuenta</th>
+        <th>Nombre Cuenta</th>
+        <th>Saldo Anterior</th>
+        <th>Debitos</th>
+        <th>Creditos</th>
+        <th>Nuevo Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td>1</td>
+        <td>ACTIVO</td>
+        <td class="text-right">$ 32.617.123.444,76</td>
+        <td class="text-right">$ 10.506.277.098,08</td>
+        <td class="text-right">$ 6.646.409.257,98</td>
+        <td class="text-right">$ 36.476.991.284,86</td>
+        </tr>
+        <tr>
+        <td>11</td>
+        <td>DISPONIBLE</td>
+        <td class="text-right">$ -513.146.823,78</td>
+        <td class="text-right">$ 3.518.156.565,81</td>
+        <td class="text-right">$ 4.000.394.520,02</td>
+        <td class="text-right">$ -995.384.777,99</td>
+        </tr>
+        <tr>
+        <td>1105</td>
+        <td>CAJA</td>
+        <td class="text-right">$ 622.459.558,76</td>
+        <td class="text-right">$ 472.327.689,88</td>
+        <td class="text-right">$ 93.657.303,12</td>
+        <td class="text-right">$ 1.001.129.945,52</td>
+        </tr>
+        <tr>
+        <td>110505</td>
+        <td>CAJA GENERAL</td>
+        <td class="text-right">$ 620.056.551,76</td>
+        <td class="text-right">$ 472.327.689,88</td>
+        <td class="text-right">$ 93.657.303,12</td>
+        <td class="text-right">$ 998.726.938,52</td>
+        </tr>
+        <tr>
+        <td>11050501</td>
+        <td>CAJA GENERAL</td>
+        <td class="text-right">$ 620.056.551,76</td>
+        <td class="text-right">$ 472.327.689,88</td>
+        <td class="text-right">$ 93.657.303,12</td>
+        <td class="text-right">$ 998.726.938,52</td>
+        </tr>
+        <tr>
+        <td class="text-muted">800250382</td>
+        <td class="text-muted">AMAREY NOVA MEDICAL S.A.</td>
+        <td class="text-right text-muted">$ -30.000.000,00</td>
+        <td class="text-right text-muted">$ 0,00</td>
+        <td class="text-right text-muted">$ 0,00</td>
+        <td class="text-right text-muted">$ -30.000.000,00</td>
+        </tr>
+        <tr>
+        <td class="text-muted">900151590</td>
+        <td class="text-muted">COTRASCAL S.A.S.</td>
+        <td class="text-right text-muted">$ -5.000.772,00</td>
+        <td class="text-right text-muted">$ 0,00</td>
+        <td class="text-right text-muted">$ 0,00</td>
+        <td class="text-right text-muted">$ -5.000.772,00</td>
+        </tr>
+        <tr>
+        <td class="text-muted">900151590</td>
+        <td class="text-muted">COTRASCAL S.A.S.</td>
+        <td class="text-right text-muted">$ -5.000.772,00</td>
+        <td class="text-right text-muted">$ 0,00</td>
+        <td class="text-right text-muted">$ 0,00</td>
+        <td class="text-right text-muted">$ -5.000.772,00</td>
+        </tr>
+    </tbody>
+    </table>
+
+    <table *ngIf="Tipo == 'Tipo'" class="table table-striped">
+    <thead>
+        <tr>
+        <th>Cuenta</th>
+        <th style="width: 200px">Nombre Cuenta</th>
+        <th class="text-right">Saldo Anterior</th>
+        <th class="text-right">Debitos</th>
+        <th class="text-right">Creditos</th>
+        <th class="text-right">Nuevo Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td>1</td>
+        <td>ACTIVO</td>
+        <td class="text-right">$ 32.617.123.444,76</td>
+        <td class="text-right">$ 10.506.277.098,08</td>
+        <td class="text-right">$ 6.646.409.257,98</td>
+        <td class="text-right">$ 36.476.991.284,86</td>
+        </tr>
+        <tr>
+        <td>11</td>
+        <td>DISPONIBLE</td>
+        <td class="text-right">$ -513.146.823,78</td>
+        <td class="text-right">$ 3.518.156.565,81</td>
+        <td class="text-right">$ 4.000.394.520,02</td>
+        <td class="text-right">$ -995.384.777,99</td>
+        </tr>
+        <tr>
+        <td>1105</td>
+        <td>CAJA</td>
+        <td class="text-right">$ 622.459.558,76</td>
+        <td class="text-right">$ 472.327.689,88</td>
+        <td class="text-right">$ 93.657.303,12</td>
+        <td class="text-right">$ 1.001.129.945,52</td>
+        </tr>
+        <tr>
+        <td>110505</td>
+        <td>CAJA GENERAL</td>
+        <td class="text-right">$ 620.056.551,76</td>
+        <td class="text-right">$ 472.327.689,88</td>
+        <td class="text-right">$ 93.657.303,12</td>
+        <td class="text-right">$ 998.726.938,52</td>
+        </tr>
+        <tr>
+        <td>11050501</td>
+        <td>CAJA GENERAL</td>
+        <td class="text-right">$ 620.056.551,76</td>
+        <td class="text-right">$ 472.327.689,88</td>
+        <td class="text-right">$ 93.657.303,12</td>
+        <td class="text-right">$ 998.726.938,52</td>
+        </tr>
+        <tr>
+        <td tyle="padding: 0;"></td>
+        <td colspan="5" style="padding: 0">
+            <table class="table">
+            <tr>
+                <td style="width: 70px" class="text-muted">EG1</td>
+                <td style="width: 130px" class="text-muted">EGRESOS</td>
+                <td style="width: 180px" class="text-muted text-right">
+                $ -6.074.818.898,93
+                </td>
+                <td style="width: 180px" class="text-muted text-right">$ 0,00</td>
+                <td style="width: 170px" class="text-muted text-right">$ 0,00</td>
+                <td style="width: 180px" class="text-muted text-right">
+                $ -6.074.818.898,93
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 70px" class="text-muted">FC1</td>
+                <td style="width: 130px" class="text-muted">FACTURAS DE COMPRAS</td>
+                <td style="width: 180px" class="text-muted text-right">$ -0,23</td>
+                <td style="width: 180px" class="text-muted text-right">$ 0,00</td>
+                <td style="width: 170px" class="text-muted text-right">$ 0,00</td>
+                <td style="width: 180px" class="text-muted text-right">$ -0,23</td>
+            </tr>
+            <tr>
+                <td style="width: 70px" class="text-muted">N02</td>
+                <td style="width: 130px" class="text-muted">NOTAS DE CONTABILIDAD</td>
+                <td style="width: 180px" class="text-muted text-right">
+                $ -18.682.024.603,96
+                </td>
+                <td style="width: 180px" class="text-muted text-right">$ 0,00</td>
+                <td style="width: 170px" class="text-muted text-right">$ 93.657.303,12</td>
+                <td style="width: 180px" class="text-muted text-right">
+                $ -18.775.681.907,08
+                </td>
+            </tr>
+            </table>
+        </td>
+        </tr>
+        <tr>
+        <td>110510</td>
+        <td>CAJA MENORES</td>
+        <td class="text-right">$ 2.403.007,00</td>
+        <td class="text-right">$ 0,00</td>
+        <td class="text-right">$ 0,00</td>
+        <td class="text-right">$ 2.403.007,00</td>
+        </tr>
+    </tbody>
+    </table>
+</div> -->

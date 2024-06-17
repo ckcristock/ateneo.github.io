@@ -1,0 +1,108 @@
+<div>
+  <div class="text-center text-uppercase card-title mt-4">
+    <i class="fas fa-coins"></i>
+    Resumen del pago
+  </div>
+  <h3 class="text-center">
+    Total pago seguridad social y parafiscales
+    <br />
+    <span class="text-success">${{ seguridadDatos.valor_total | currency: '' : '' }}</span>
+  </h3>
+  <hr />
+  <div class="text-center card-title text-uppercase mt-2">Seguridad social</div>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-uppercase">
+          <th>Concepto</th>
+          <th class="text-center">% Empresa</th>
+          <th class="text-center">IBC</th>
+          <th class="text-center">x = IBC * % Empresa</th>
+          <th class="text-center">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of seguridad">
+          <td>{{ item.concepto }}</td>
+          <td class="text-center">{{ item.porcentaje * 100 }}%</td>
+          <td class="text-center">{{ item.ibc | currency: '' : '' }}</td>
+          <td class="text-center">
+            {{ item.ibc | currency: '' : '' }} * {{ item.porcentaje * 100 }}%
+          </td>
+          <td class="text-center" *ngIf="item.valor > 0; else notValue1">
+            {{ item.valor | currency: '' : '' }}
+          </td>
+          <ng-template>
+            <td class="text-center" #notValue1>
+              {{ item.valor | currency: '' : '' }}
+            </td>
+          </ng-template>
+        </tr>
+        <tr>
+          <td class="fw-bold">Seguridad social</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td class="text-center fw-bold">
+            {{ seguridadDatos.valor_total_seguridad | currency: '' : '' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <small
+    ><b>
+      Tenga en cuenta que la empresa podría estar exenta de pago de Aportes a Salud si en la
+      configuración general de la compañía "aplica para Ley 1607 de 2012".
+    </b></small
+  >
+  <hr />
+  <div class="text-center text-uppercase card-title mt-2">Parafiscales</div>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-center text-uppercase">
+          <th>Concepto</th>
+          <th class="text-center">% Empresa</th>
+          <th class="text-center">IBC</th>
+          <th class="text-center">x = IBC * % Empresa</th>
+          <th class="text-center">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of parafiscales">
+          <td>{{ item.concepto }}</td>
+          <td class="text-center">{{ item.porcentaje * 100 }}%</td>
+          <td class="text-center">{{ item.ibc | currency: '' : '' }}</td>
+          <td class="text-center">
+            {{ item.ibc | currency: '' : '' }} * {{ item.porcentaje * 100 }}%
+          </td>
+          <td class="text-center" *ngIf="item.valor > 0; else notValue">
+            {{ item.valor | currency: '' : '' }}
+          </td>
+          <ng-template>
+            <td class="text-center" #notValue>
+              {{ item.valor | currency: '' : '' }}
+            </td>
+          </ng-template>
+        </tr>
+        <tr>
+          <td class="fw-bold">Parafiscales</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td class="text-center fw-bold">
+            {{ seguridadDatos.valor_total_parafiscales | currency: '' : '' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <small
+    ><b>
+      Tenga en cuenta que la empresa podría estar exenta de pago de Aportes a Sena e ICBF si en la
+      configuración general de la compañía "aplica para Ley 1607 de 2012".
+    </b></small
+  >
+</div>

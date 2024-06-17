@@ -1,0 +1,21 @@
+<div *ngIf="mostrarCalculo; else notData">
+  <app-seguridad-social-resumen
+    [seguridadDatos]="seguridadDatos"
+    [ibcSeguridad]="retencionesDatos.IBC_seguridad"
+    [porcentajesDatos]="porcentajesDatos"
+  >
+  </app-seguridad-social-resumen>
+
+  <app-ibc-salud-pension [retencionesDatos]="retencionesDatos"></app-ibc-salud-pension>
+
+  <app-ibc-riesgos
+    [ibcRiesgos]="seguridadDatos.ibc_riesgos"
+    [datosEmpresa]="datosEmpresa"
+  ></app-ibc-riesgos>
+
+  <app-ibc-parafiscales [ibcParafiscales]="seguridadDatos.ibc_parafiscales"></app-ibc-parafiscales>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="!mostrarCalculo" [text]="'Sin Datos'"></app-not-data>
+</ng-template>

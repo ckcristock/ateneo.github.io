@@ -1,0 +1,173 @@
+<article class="row gap-3">
+  <app-card class="col-md-4" viewTitle="Remisiones pendientes">
+    <app-automatic-search
+      class="col"
+      label="Código de la remisión"
+      placeholder="Ingrese el código de la remisión"
+      [value]="Codigo"
+      (searching)="Codigo = $event; ListarRemisionesPendientes()"
+    ></app-automatic-search>
+    <app-table [loading]="Cargando" [arrayData]="ListaRemisones">
+      <ng-container titles>
+        <th>Remision</th>
+        <th>Creada</th>
+        <th>Tipo</th>
+        <th>Items</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (item of ListaRemisones; track item.id; let i = $index) {
+          <tr class="text-center">
+            <td>
+              <app-load-image
+                classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                [src]="item.Imagen"
+              ></app-load-image>
+              <span>
+                {{ item.Codigo }}
+              </span>
+            </td>
+            <td>{{ item.Fecha | date: 'dd/MM/yyyy' }}</td>
+            <td>
+              <i
+                *ngIf="item.Tipo_Bodega == 'MEDICAMENTOS' && item.Id_Origen == 1"
+                class="fa fa-medkit fa-2x"
+                style="color: green"
+              ></i>
+              <i
+                *ngIf="item.Tipo_Bodega == 'MATERIALES' && item.Id_Origen == 2"
+                class="fa fa-th-large fa-2x"
+                style="color: rgb(87, 87, 67)"
+              ></i>
+              <i
+                *ngIf="item.Tipo_Bodega == 'REFRIGERADOS' && item.Id_Origen == 1"
+                class="fas fa-snowflake fa-2x"
+                style="color: #2569e8"
+              ></i>
+              <i
+                *ngIf="item.Id_Origen == 5"
+                class="fa fa-copyright fa-2x"
+                style="color: #f17b4f"
+              ></i>
+            </td>
+            <td>{{ item.Items }}</td>
+            <td>
+              <app-dropdown-actions>
+                <app-action-view
+                  [link]="{
+                    url: item.Codigo + '/' + item.Id_Remision
+                  }"
+                />
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <app-card
+    class="col"
+    viewTitle="Acta de recepción de remisiones"
+    [filterTemplate]="filterTemplate"
+  >
+    <app-table
+      [loading]="loadingReferrals"
+      [arrayData]="actarecepciones"
+      [pagination]="pagination"
+      (pageChange)="paginacion()"
+    >
+      <ng-container titles>
+        <th>Código</th>
+        <th>Fecha de Recepción</th>
+        <th>Remisión</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (
+          actarecepcion of actarecepciones;
+          track actarecepcion.Id_Acta_Recepcion_Remision;
+          let i = $index
+        ) {
+          <tr class="text-center">
+            <td>
+              <app-load-image
+                classImg="rounded-circle mx-auto img-fluid header-profile-user"
+                [src]="actarecepcion.Imagen"
+              ></app-load-image>
+              <span>
+                {{ actarecepcion.Codigo }}
+              </span>
+            </td>
+            <td>{{ actarecepcion.Fecha | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ actarecepcion.Codigo_Remision ?? 'No hay dato' }}</td>
+            <td>
+              <app-dropdown-actions [loading]="downloading === i">
+                <app-action-view
+                  [link]="{
+                    url: actarecepcion.Id_Acta_Recepcion_Remision
+                  }"
+                />
+                <app-action-button
+                  icon="print"
+                  text="Imprimir"
+                  type="secondary"
+                  (click)="onFileDownload(i, actarecepcion.Id_Acta_Recepcion_Remision)"
+                />
+              </app-dropdown-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+
+  <ng-template #filterTemplate>
+    <app-automatic-search
+      class="col"
+      label="Filtro código"
+      placeholder="Ingrese el código"
+      [value]="filtro_cod"
+      (searching)="filtro_cod = $event; filtros()"
+    ></app-automatic-search>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Rango de fechas</mat-label>
+      <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          required
+          formControlName="start"
+          name="date_start"
+        />
+        <input
+          matEndDate
+          placeholder="Fecha de fin"
+          required
+          formControlName="end"
+          name="date_end"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button
+            mat-raised-button
+            color="primary"
+            matDateRangePickerApply
+            (click)="onFilterDate()"
+          >
+            Aplicar
+          </button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+    <app-automatic-search
+      class="col mb-3"
+      label="Filtro código remisión"
+      placeholder="Ingrese el código de la remisión"
+      [value]="filtro_cod_r"
+      (searching)="filtro_cod_r = $event; filtros()"
+    ></app-automatic-search>
+  </ng-template>
+</article>

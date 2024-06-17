@@ -1,0 +1,202 @@
+<div class="card">
+  <div class="card-body">
+    <div class="card-title d-flex justify-content-between">
+      <h4 class="text-primary">Nueva acta de aplicación</h4>
+    </div>
+    <hr class="line" />
+    <form [formGroup]="form" class="row">
+      <mat-form-field class="col-md-4" appearance="outline">
+        <mat-label>Paciente</mat-label>
+        <mat-select formControlName="patient_id">
+          <mat-option *ngFor="let item of people" [value]="item.value">{{ item.text }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-4" appearance="outline">
+        <mat-label>Fecha</mat-label>
+        <input matInput type="date" formControlName="date" name="date" />
+      </mat-form-field>
+      <mat-form-field class="col-md-4" appearance="outline">
+        <mat-label>CUPs</mat-label>
+        <mat-select formControlName="cups_id">
+          <mat-option *ngFor="let item of cups" [value]="item.value">{{ item.text }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Diagnóstico principal</mat-label>
+        <mat-select formControlName="diagnostic">
+          <mat-option *ngFor="let item of diagnostics" [value]="item.value">{{
+            item.text
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Diagnóstico secundario</mat-label>
+        <mat-select formControlName="diagnosticS">
+          <mat-option *ngFor="let item of diagnostics" [value]="item.value">{{
+            item.text
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+        <mat-label>Notas de enfermería</mat-label>
+        <textarea
+          matInput
+          placeholder="Ingrese las observaciones"
+          formControlName="observation"
+          [cdkTextareaAutosize]="true"
+          rows="5"
+          class="mb-3"
+        ></textarea>
+      </mat-form-field>
+      <div class="row mb-2 d-flex justify-content-between">
+        <div class="col-md-3">
+          <input class="d-none" type="file" id="importFile" (change)="fileActa($event)" />
+          <label for="importFile" role="button" class="btn btn-primary btn-block"
+            >Subir acta de aplicación</label
+          >
+          <div class="card bg-light" *ngIf="nombreFile">
+            <div class="card-body">
+              <h5 class="card-title">{{ nombreFile }}</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-9">
+          <button type="button" class="btn btn-primary mt-0" (click)="listarProducto()">
+            <i class="fa fa-plus"></i>
+            Agregar Producto
+          </button>
+        </div>
+      </div>
+
+      <!-- <table class="table table-borderless table-striped" *ngIf="!loading && thirdParties.length > 0; else notData">-->
+      <table
+        class="table table-borderless table-striped"
+        *ngIf="getProductList.controls.length && !loading; else notData"
+      >
+        <thead class="bg-light">
+          <tr>
+            <th></th>
+            <th>Producto</th>
+            <th>Lote</th>
+            <th>Vence</th>
+            <th>Cum</th>
+            <th>Cantidad</th>
+
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <ng-container formArrayName="productSelected">
+            <ng-container>
+              <ng-container *ngFor="let pl of getProductList['controls']; let i = index">
+                <tr [formGroupName]="i">
+                  <td></td>
+                  <td>{{ pl.value.Nombre_Comercial }}</td>
+                  <td>{{ pl.value.Lote }}</td>
+                  <td>{{ pl.value.Codigo_Cum }}</td>
+                  <td>{{ pl.value.Codigo_Cum }}</td>
+                  <td>
+                    <input formControlName="amount" class="form-control input" type="number" />
+                  </td>
+                  <td>
+                    <div class="text-center">
+                      <label class="btn btn-primary btn-sm me-1">
+                        <i class="fas fa-file-pdf" style="font-size: 18px" aria-hidden="false">
+                          <input
+                            (change)="file1($event, pl, i)"
+                            style="display: none"
+                            id="file-input"
+                            type="file"
+                          />
+                        </i>
+                      </label>
+
+                      <label class="btn btn-primary btn-sm me-1">
+                        <i class="fas fa-file-pdf" style="font-size: 18px" aria-hidden="false">
+                          <input
+                            (change)="file2($event, pl, i)"
+                            style="display: none"
+                            id="file-input"
+                            type="file"
+                          />
+                        </i>
+                      </label>
+
+                      <label
+                        class="btn btn-danger btn-sm"
+                        type="button"
+                        (click)="deletedProduct(i)"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </tbody>
+      </table>
+    </form>
+    <button class="btn btn-primary btn-block" (click)="save()" [disabled]="!form.valid">
+      Generar Acta
+    </button>
+  </div>
+</div>
+
+<app-modal-basic [dialogClass]="'modal-lg'" id="modal" #modal>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Listado de Productos</h4>
+    <button type="button" class="close basic-close" (click)="close()"></button>
+  </div>
+  <div class="app-modal-body">
+    <div class="form-row">
+      <div class="col-md-12">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="text-end fs-3">Nombre</th>
+              <th class="text-end fs-3">Cum</th>
+              <th class="text-end fs-3">Lote</th>
+              <th class="text-end fs-3">Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of ListaProductos; let i = index" id="fila{{ i }}">
+              <td style="width: 25px" class="text-center">
+                <input
+                  type="checkbox"
+                  (change)="selectedProduct($event, i)"
+                  [Nombre_Comercial]="item.Nombre_Comercial"
+                  [Codigo_Cum]="item.Codigo_Cum"
+                  [Lote]="item.Lote"
+                  [Id_Producto]="item.Id_Producto"
+                />
+              </td>
+              <td>{{ item.Nombre_Comercial }}</td>
+              <td>{{ item.Codigo_Cum }}</td>
+              <td>{{ item.Lote }}</td>
+              <td class="text-end">{{ item.cantidadA }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <div class="form-group text-end">
+      <button type="button" (click)="close()" class="btn btn-danger raised me-2 btn-sm">
+        Cerrar
+      </button>
+      <button type="submit" class="btn btn-primary btn-sm raised" (click)="addProduct()">
+        Agregar
+      </button>
+    </div>
+  </div>
+</app-modal-basic>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

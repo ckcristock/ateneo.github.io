@@ -1,0 +1,52 @@
+<form [formGroup]="formPrestation" (ngSubmit)="save()">
+  <div class="row">
+    <app-autocomplete-fc
+      class="col col-md-6"
+      label="EPS"
+      placeholder="Seleccionar EPS"
+      [control]="formPrestation.controls['eps_id']"
+      [class.is-invalid]="formPrestation.get('eps_id').invalid"
+      [list]="epss"
+    />
+    <app-autocomplete-fc
+      class="col col-md-6"
+      label="Caja de compensación"
+      placeholder="Seleccionar caja compensación"
+      [control]="formPrestation.controls['compensation_fund_id']"
+      [class.is-invalid]="formPrestation.get('compensation_fund_id').invalid"
+      [list]="compensationFunds"
+    />
+    <app-autocomplete-fc
+      class="col col-md-6"
+      label="Fondo de cesantías"
+      placeholder="Seleccionar fondo cesantías"
+      [control]="formPrestation.controls['severance_fund_id']"
+      [class.is-invalid]="formPrestation.get('severance_fund_id').invalid"
+      [list]="severanceFunds"
+    />
+    <app-autocomplete-fc
+      class="col col-md-6"
+      label="Fondo de pensiones"
+      placeholder="Seleccionar fondo pensiones"
+      [control]="formPrestation.controls['pension_fund_id']"
+      [class.is-invalid]="formPrestation.get('pension_fund_id').invalid"
+      [list]="pensionFunds"
+    />
+    <app-autocomplete-fc
+      class="col col-md-6"
+      label="ARL"
+      placeholder="Seleccionar ARL"
+      [control]="formPrestation.controls['arl_id']"
+      [class.is-invalid]="formPrestation.get('arl_id').invalid"
+      [list]="arl"
+    />
+    <div class="col-md-12">
+      <div class="d-flex justify-content-between">
+        <button type="button" mat-button (click)="previus()">Anterior</button>
+        <button type="submit" mat-button>Siguiente</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<app-reload-button [reload]="reload" (reloadData)="reloadData()"></app-reload-button>

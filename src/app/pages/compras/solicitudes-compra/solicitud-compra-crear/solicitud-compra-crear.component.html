@@ -1,0 +1,151 @@
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>
+<ng-container *ngIf="!loading && form; else placeholder">
+  <div class="card">
+    <div class="card-body">
+      <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+      <hr class="line" />
+      <ng-container [formGroup]="form" id="form">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Categoría</mat-label>
+            <mat-select required formControlName="category_id">
+              <mat-option *ngFor="let category of categories" [value]="category.value">{{
+                category.text
+              }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="category_id_valid"> Campo obligatorio </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha esperada</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              placeholder="Elije la fecha"
+              required
+              [min]="today"
+              formControlName="expected_date"
+              readonly
+              autocomplete="off"
+            />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="expected_date_valid"> Campo obligatorio </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+            <mat-label>Observaciones</mat-label>
+            <textarea
+              matInput
+              placeholder="Ingresa las observaciones"
+              rows="5"
+              formControlName="observations"
+              [cdkTextareaAutosize]="true"
+            ></textarea>
+          </mat-form-field>
+        </div>
+        <ng-container formArrayName="products">
+          <ng-container *ngIf="products.controls.length > 0; else notData">
+            <div class="rounded-top table-responsive">
+              <table class="table table-bordered table-striped table-sm">
+                <thead class="bg-light">
+                  <tr class="text-center text-uppercase">
+                    <th>#</th>
+                    <th>Producto</th>
+                    <th>Unidad de medida</th>
+                    @for (th of varTitles; track $index) {
+                      <th>{{ th }}</th>
+                    }
+                    <th>Cantidad</th>
+                    <th><i class="mdi mdi-chevron-down"></i></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    [formGroupName]="i"
+                    *ngFor="let product of products.controls; let i = index"
+                    class="text-center"
+                  >
+                    <td>{{ i + 1 }}</td>
+                    <td>
+                      <app-product-name
+                        [data]="{
+                          Nombre_Comercial: product.get('name').value,
+                          Nombre_General: product.get('general').value
+                        }"
+                      />
+                    </td>
+                    <td>{{ product.get('unit').value || 'N/A' }}</td>
+                    @for (th of varTitles; track $index) {
+                      <th>{{ product.get('variables').value[th] || 'N/A' }}</th>
+                    }
+                    <td>
+                      <input
+                        type="text"
+                        formControlName="ammount"
+                        aria-label="Unidades"
+                        currencyMask
+                        [options]="masks.maskNumbers"
+                        appInputPositionInitial
+                        class="w-100 border-0"
+                      />
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        aria-label="Eliminar"
+                        (click)="deleteProduct(i)"
+                        class="btn btn-danger btn-sm"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+          <div class="row">
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Productos</mat-label>
+              <input
+                #productInput
+                type="text"
+                placeholder="Buscar productos"
+                aria-label="Productos"
+                matInput
+                [matAutocomplete]="auto"
+                [disabled]="categoryId.invalid"
+                (input)="getSearchProduct(productInput.value)"
+              />
+              <mat-hint *ngIf="searching"> Buscando </mat-hint>
+              <mat-autocomplete #auto="matAutocomplete">
+                @for (option of productsForInput; track option) {
+                  <mat-option
+                    [value]="option.Nombre_Comercial"
+                    (click)="addProduct(option, false, productInput)"
+                    >{{ option.Nombre_Comercial }}</mat-option
+                  >
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <button
+            class="btn btn-block btn-primary"
+            type="submit"
+            form="form"
+            [disabled]="!form.valid"
+            (click)="savePurchaseRequest()"
+          >
+            Guardar
+          </button>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>
+
+<!-- <button type="button" class="btn btn-primary" (click)="view()"></button> -->
+<ng-template #notData>
+  <div class="alert alert-warning text-center" role="alert">Aún no has agregado productos.</div>
+</ng-template>

@@ -1,0 +1,107 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-4">
+            <h4 class="fw-bold">Asignación de Horas</h4>
+          </div>
+        </div>
+        <form [formGroup]="forma" (ngSubmit)="getData()">
+          <div class="row d-flex align-items-end">
+            <div class="col-md-2">
+              <label for="group" class="custom-label">Filtrar por grupos</label>
+              <select formControlName="group_id" class="form-control form-control-sm">
+                <option *ngFor="let group of groupList" [value]="group.value">
+                  {{ group.text }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="dependencia" class="custom-label">Filtrar por dependencia</label>
+              <select formControlName="dependency_id" class="form-control form-control-sm">
+                <option *ngFor="let dependency of dependencyList" [value]="dependency.value">
+                  {{ dependency.text }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label for="centroCosto" class="custom-label">Nombre funcionario</label>
+              <input
+                [readonly]="false"
+                placeholder="Buscar..."
+                formControlName="person"
+                class="form-control form-control-sm"
+              />
+            </div>
+            <div class="col-md-3">
+              <label for="dependencia" class="custom-label">Filtrar por semana</label>
+              <input
+                type="week"
+                formControlName="week"
+                class="form-control form-control-sm text-center"
+                required
+              />
+            </div>
+            <div class="col-md-2 text-end">
+              <button
+                class="btn btn-secondary default btn-sm"
+                (clicl)="makeRequestBySemana(); filtrar()"
+              >
+                <i class="fas fa-search"></i> Filtrar
+              </button>
+              <!-- <button
+                  *ngIf="datosGenerales.length"
+                  title="descargar"
+                  class="btn btn-info btn-sm ms-2"
+                  (click)="descargarInformeTurnos(group.id)"
+                >
+                  <i class="fa fa-download"></i> Descargar
+                </button> -->
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="datosGenerales.length && !loading; else notData">
+  <div class="card text-justify" *ngFor="let company of datosGenerales">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="card-title text-primary">
+        <strong> {{ company.name }} </strong>
+      </h5>
+    </div>
+
+    <div class="card-body depen">
+      <div *ngFor="let group of company.groups">
+        <h5>{{ group.name }}</h5>
+
+        <div *ngFor="let dependency of group.dependencies">
+          <h6 class="custom-label">{{ dependency.name }}</h6>
+          <app-semanas-extras
+            [people]="dependency.people"
+            [turnosRotativos]="turns"
+            [diaInicial]="diaInicialSemana"
+            [changeWeek]="changeWeek"
+            [diaFinal]="diaFinalSemana"
+          ></app-semanas-extras>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--
+  <div class="alert alert-secondary" >
+    <p class="fw-bold text-center">
+      Aún no existen centros de costos, puede agregarlos desde el menú
+      "Configuración"
+    </p>
+  </div> -->
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

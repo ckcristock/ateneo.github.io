@@ -1,0 +1,25 @@
+<hr />
+<div class="text-center text-uppercase card-title mt-2">
+  <i [class]="icon"></i>
+  {{ title }}
+</div>
+<div class="rounded-top table-responsive">
+  <table class="table table-bordered table-striped table-sm">
+    <thead class="bg-light">
+      <tr class="text-uppercase">
+        <th>Concepto</th>
+        <th class="text-center col-md-1">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of conceptos; let i = index">
+        <td [ngClass]="{ cssBold: i == conceptos.length - 1 }">
+          {{ item.concepto }}
+        </td>
+        <td class="text-center" [ngClass]="{ cssBold: i === conceptos.length - 1 }">
+          {{ item.valor | currency: '' : '' }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

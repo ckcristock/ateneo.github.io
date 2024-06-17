@@ -1,0 +1,38 @@
+<div class="mt-3">
+  <div class="col-md-12 text-center">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th style="width: 70px">Código</th>
+          <th>Nombre Elemento</th>
+          <th style="width: 100px">Calidad</th>
+          <th style="width: 100px">Tipo</th>
+          <th style="width: 130px" class="text-end">Costo</th>
+          <th style="width: 120px" class="text-end">Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let inventario of totalCategory; let i = index">
+          <td>
+            <strong>{{ inventario.code }}</strong>
+          </td>
+          <td>
+            <strong>{{ inventario.name }}</strong>
+          </td>
+          <td>
+            <strong>{{ inventario.status }}</strong>
+          </td>
+          <td>
+            <strong>{{ inventario.type }}</strong>
+          </td>
+          <td class="text-end">
+            <strong>$ {{ inventario.cost | number | puntos }}</strong>
+          </td>
+          <td class="text-end">
+            <strong>{{ inventario.stock }}</strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<ng-template #detail>
+  <app-modal titleModal="Detalle de por especialidad">
+    <app-table [loading]="loading" [arrayData]="data">
+      <ng-container titles>
+        <th scope="col">Especialidad</th>
+        <th scope="col">Total</th>
+      </ng-container>
+      <tbody content>
+        @for (item of data; track $index) {
+          <tr class="text-center">
+            <td>{{ item.name }}</td>
+            <td>{{ item.total }}</td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-modal>
+</ng-template>

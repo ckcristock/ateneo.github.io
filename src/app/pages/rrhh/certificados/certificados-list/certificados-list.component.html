@@ -1,0 +1,49 @@
+<h4 class="card-title mb-4">Certificados laborales</h4>
+<div *ngIf="!loading && certificates.length > 0; else notData">
+  <ul class="list-unstyled activity-wid">
+    <li class="activity-list pb-1" *ngFor="let item of certificates">
+      <div class="activity-icon">
+        <img
+          [src]="item.person?.image | image: 'users'"
+          class="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+          [title]="item.person?.full_names"
+          onerror="this.src='../../../../../assets/images/noprofile.png'"
+        />
+      </div>
+      <div class="d-flex justify-content-between">
+        <div>
+          <div class="card-title fw-bold">
+            {{ item.person?.full_names }}
+          </div>
+          <div class="card-text">
+            {{ item.created_at | date: 'longDate' }}
+            <small class="text-muted">{{ item.created_at | date: 'hh:mm aa' }} </small>
+          </div>
+          <span class="text-muted">{{ item.reason }}</span>
+        </div>
+        <div>
+          <i
+            role="button"
+            (click)="download(item)"
+            class="text-info h3"
+            [class]="!item.downloading ? 'fa fa-cloud-download-alt' : 'fas fa-spinner fa-spin'"
+          ></i>
+        </div>
+      </div>
+    </li>
+  </ul>
+  <mat-paginator
+    *ngIf="paginationMaterial"
+    [length]="paginationMaterial.total"
+    [pageSize]="paginationMaterial.per_page"
+    [pageIndex]="paginationMaterial.current_page - 1"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    (page)="handlePageEvent($event)"
+    aria-label="Select page"
+  >
+  </mat-paginator>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

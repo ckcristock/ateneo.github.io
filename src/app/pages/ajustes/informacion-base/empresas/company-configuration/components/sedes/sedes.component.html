@@ -1,0 +1,63 @@
+<app-card
+  viewTitle="Sedes"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-table
+    [loading]="loading"
+    [arrayData]="sedes"
+    [pagination]="pagination"
+    (pageChange)="getLocations()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Dirección</th>
+      <th>Ciudad</th>
+      <th>Código</th>
+      <!-- <th><i class="mdi mdi-chevron-down"></i></th> -->
+    </ng-container>
+    <tbody content>
+      @for (item of sedes; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">
+            {{ item.name | uppercase }}
+          </td>
+          <td class="align-middle">
+            {{ item.address || 'N/A' | uppercase }}
+          </td>
+          <td class="align-middle">
+            {{ item.city?.name || 'N/A' | uppercase }}
+          </td>
+          <td class="align-middle">
+            {{ item.code || 'N/A' }}
+          </td>
+          <!-- <td>
+            <app-dropdown-actions>
+              <app-action-edit  />
+              @if () {
+                <app-action-deactivate (action)="" />
+              }
+              @if () {
+                <app-action-activate (action)="" />
+              }
+            </app-dropdown-actions>
+          </td> -->
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filters.name"
+    (searching)="filters.name = $event; getLocations()"
+  ></app-automatic-search>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

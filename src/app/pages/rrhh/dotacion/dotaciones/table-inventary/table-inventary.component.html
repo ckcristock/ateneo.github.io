@@ -1,0 +1,276 @@
+<app-card viewTitle="Listado de entregas de dotación y EPP" [filterTemplate]="filterTemplate">
+  <ng-container ngProjectAs="[filters]">
+    <app-header-button
+      icon="plus"
+      text="Dotación"
+      type="primary"
+      (click)="openConfirm(add, 'Dotacion')"
+    ></app-header-button>
+    <app-header-button
+      icon="plus"
+      text="EPP"
+      type="warning"
+      (click)="openConfirm(add, 'EPP')"
+    ></app-header-button>
+    <app-header-button
+      icon="file-download"
+      [text]="downloading ? 'Cargando...' : 'Descargar'"
+      type="success"
+      [class.disabled]="downloading"
+      (click)="downloadDeliveries()"
+    ></app-header-button>
+  </ng-container>
+  @if (!loading && Lista_Dotaciones.length) {
+    <div class="row mb-3">
+      <div class="col-lg-6">
+        <h5 class="text-center">Montos totales</h5>
+        <div class="row text-center mt-2">
+          <div class="col-md-6 costo">
+            <i class="fas fa-dollar-sign text-primary"></i>
+            <p class="card-text mb-0">Costos total</p>
+            <h5 class="mb-1">$ {{ Totales | number | puntos }}</h5>
+          </div>
+          <div class="col-md-6 costo">
+            <i class="fas fa-hand-holding-heart text-primary"></i>
+            <p class="card-text mb-0"># Entregas realizadas</p>
+            <h5>{{ CantidadTotal | number | puntos }}</h5>
+          </div>
+        </div>
+        <div class="row text-center mt-2">
+          <div class="col-md-6 costo">
+            <i class="fas fa-street-view text-primary"></i>
+            <p class="card-text mb-0"># Dotaciones totales</p>
+            <h5 class="mb-1">{{ TotalesDotaciones | number | puntos }}</h5>
+          </div>
+          <div class="col-md-6 costo">
+            <i class="fas fa-user-shield text-primary"></i>
+            <p class="card-text mb-0"># EPP totales</p>
+            <h5>{{ totalEpp | number | puntos }}</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <h5 class="text-center">Dotación y EPP's por categorías</h5>
+        <div #dotacion_chart>
+          <canvas
+            baseChart
+            [datasets]="barChartData"
+            [labels]="barChartLabels"
+            [options]="barChartOptions"
+            [legend]="barChartLegend"
+          >
+          </canvas>
+        </div>
+      </div>
+    </div>
+  }
+  <app-table
+    [loading]="loading"
+    [arrayData]="Lista_Dotaciones"
+    [pagination]="pagination"
+    (pageChange)="ListarDotaciones()"
+  >
+    <ng-container titles>
+      <th class="align-middle">Código</th>
+      <th class="align-middle">Tipo</th>
+      <th class="align-middle">Fecha</th>
+      <th class="align-middle">F. Entrega</th>
+      <th class="align-middle">F. Recibe</th>
+      <th class="align-middle">Detalles</th>
+      <th class="align-middle">Artículos</th>
+      <th class="align-middle">Valor</th>
+      <th class="align-middle">Estado</th>
+      <th class="align-middle">Estado</th>
+      <th class="align-middle"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of Lista_Dotaciones; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">{{ item.delivery_code }}</td>
+          <td class="align-middle">{{ item.type }}</td>
+          <td class="align-middle">
+            {{ item.created_at | date: 'dd/MM/yyyy' }}
+          </td>
+          <td class="align-middle">{{ item.entrega | titlecase }}</td>
+          <td class="align-middle">{{ item.recibe | titlecase }}</td>
+          <td class="align-middle">
+            {{ item.description || 'Sin detalles' }}
+          </td>
+          <td class="align-middle">
+            <div class="articulos-table">
+              {{ item.product_name }}
+            </div>
+          </td>
+          <td class="align-middle">${{ item.total | number: '1.2-2' }}</td>
+          <td class="align-middle">
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-success': item.state === 'activa',
+                'bg-danger': item.state === 'anulada'
+              }"
+              >{{ item.state | uppercase }}</span
+            >
+          </td>
+          <td class="align-middle">
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-success': item.state === 'activa',
+                'bg-danger': item.state === 'anulada',
+                'bg-warning': item.delivery_state === 'Pendiente'
+              }"
+              >{{ item.delivery_state | uppercase }}</span
+            >
+          </td>
+          <td>
+            <app-dropdown-actions>
+              @if (item.state != 'anulada') {
+                <app-action-deactivate (action)="anularDotacion(item.id)" />
+              }
+              @if (item.delivery_state == 'Pendiente') {
+                <app-action-button
+                  icon="check"
+                  text="Aprobar"
+                  type="success"
+                  (click)="aprobarDotacion(item.id)"
+                ></app-action-button>
+              }
+              @if (item.delivery_state == 'Aprobado') {
+                <app-action-button
+                  icon="fas fa-file-pdf"
+                  text="Descargar"
+                  type="danger"
+                  (click)="descargarPDF(item.id)"
+                ></app-action-button>
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container *ngIf="people$ | async as people">
+    <app-autocomplete-mdl
+      class="col"
+      [model]="person"
+      [list]="people"
+      (optionSelectedEvent)="person = $event; filtrar()"
+      [label]="'Funcionario entrega'"
+      [placeholder]="'Selecciona'"
+    ></app-autocomplete-mdl>
+    <app-autocomplete-mdl
+      class="col"
+      [model]="persontwo"
+      [list]="people"
+      (optionSelectedEvent)="persontwo = $event; filtrar()"
+      [label]="'Funcionario recibe'"
+      [placeholder]="'Selecciona'"
+    ></app-autocomplete-mdl>
+  </ng-container>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por código"
+      autocomplete="off"
+      [(ngModel)]="cod"
+      (input)="filtrar()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo</mat-label>
+    <mat-select name="Tipo" id="tipo" [(ngModel)]="type" (selectionChange)="filtrar()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Dotacion">Dotacion</mat-option>
+      <mat-option value="EPP">EPP</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select name="Estado" id="estado" [(ngModel)]="delivery" (selectionChange)="filtrar()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Pendiente">Pendiente</mat-option>
+      <mat-option value="Anulada">Anulado</mat-option>
+      <mat-option value="Aprobado">Aprobado</mat-option>
+      <mat-option value="Entregado">Entregado</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Rango de fechas</mat-label>
+    <mat-date-range-input [formGroup]="formDateRange" [rangePicker]="picker">
+      <input
+        matStartDate
+        placeholder="Fecha de inicio"
+        required
+        formControlName="start"
+        name="date_start"
+      />
+      <input matEndDate placeholder="Fecha de fin" required formControlName="end" name="date_end" />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker>
+      <mat-date-range-picker-actions>
+        <button mat-button matDateRangePickerCancel>Cancelar</button>
+        <button mat-raised-button color="primary" matDateRangePickerApply (click)="filtrar()">
+          Aplicar
+        </button>
+      </mat-date-range-picker-actions>
+    </mat-date-range-picker>
+  </mat-form-field>
+</ng-template>
+
+<ng-template #add let-modal>
+  <div class="modal-header align-items-start gap-2">
+    <app-cabecera class="w-100" [datosCabecera]="headerData"></app-cabecera>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <app-table-stock
+      #tablestock
+      [name]="nombre"
+      [type]="flagDotacionApp"
+      [entrega]="true"
+      [find]="true"
+      (closeModal)="closeModal()"
+    ></app-table-stock>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cerrar
+    </button>
+    <button type="button" class="btn btn-primary" (click)="this.tablestock.save()">Reportar</button>
+  </div>
+</ng-template>
+
+<app-modal-basic #modalEntrega [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="text-primary text-center modal-title">Nueva entrega de dotación</h4>
+    <button type="button" class="close basic-close" (click)="closeModal()"></button>
+  </div>
+  <div class="app-modal-body">
+    <app-table-stock
+      #tablestock
+      [name]="nombre"
+      [type]="flagDotacionApp"
+      [entrega]="true"
+      [find]="false"
+      (closeModal)="closeModal()"
+    ></app-table-stock>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-primary btn-sm" (click)="this.tablestock.save()">
+      Reportar
+    </button>
+  </div>
+</app-modal-basic>

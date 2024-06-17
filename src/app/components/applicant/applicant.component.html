@@ -1,0 +1,74 @@
+<ng-template #applicantM let-modal>
+  <div class="modal-header">
+    <div class="d-flex align-items-center gap-2">
+      <h4 class="text-primary modal-title">Detalle del postulante </h4>
+      <span class="text-muted">{{ data.created_at | date: 'dd/M/yyyy' }}</span>
+    </div>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Educación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            <td>{{ data.name }} {{ data.surname }}</td>
+            <td>{{ data.email }}</td>
+            <td>{{ data.phone }}</td>
+            <td>{{ data.education }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Experiencia</th>
+            <th>Vehículo</th>
+            <th>Visa</th>
+            <th>Tipo Visa</th>
+            <th>Licencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            <td>{{ data.experience_year }} años</td>
+            <td>{{ data.conveyance || 'No aplica' }}</td>
+            <td>{{ data.visa == 1 ? 'Si' : 'No' }}</td>
+            <td>{{ data.visa_type?.name || 'No aplica' }}</td>
+            <td>{{ data.driving_license?.type || 'No aplica' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button type="button" (click)="download(data.id)" class="btn btn-success btn-block">
+      <span *ngIf="!donwloading; else status"
+        ><i class="fas fa-file-download"></i> Descargar curriculum</span
+      >
+      <ng-template #status>
+        <div class="spinner-border spinner-border-sm" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        Descargando
+      </ng-template>
+    </button>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cerrar</button>
+  </div>
+</ng-template>

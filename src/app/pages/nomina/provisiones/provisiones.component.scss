@@ -1,0 +1,18 @@
+.provisiones {
+  &__card {
+    min-width: 10rem;
+  }
+  &__icon {
+    font-size: 1.9rem;
+  }
+  &__chart {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0;
+  }
+}
+::ng-deep .apexcharts-legend {
+  gap: 1rem;
+}

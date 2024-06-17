@@ -1,0 +1,26 @@
+img {
+  width: 38px;
+  border-radius: 50%;
+}
+.turno {
+  color: #2a93d5;
+  font-size: 13px;
+  padding: 0px 5px;
+  border: 1px solid #2a93d5;
+}
+.item-hora {
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+}
+input[type='week']::-webkit-inner-spin-button,
+input[type='week']::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0;
+  height: 15px;
+  width: 15px;
+}
+
+.hover:hover {
+  color: grayk;
+}

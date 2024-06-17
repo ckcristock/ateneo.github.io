@@ -1,0 +1,329 @@
+<app-card viewTitle="Rotativo de compras nacionales">
+  <div class="alert alert-info" role="alert">
+    <span>
+      <strong>Nota:</strong> Una vez generado el rotativo, si se modifican las fechas este se
+      borrará con las precompras seleccionadas.
+    </span>
+  </div>
+  <div class="row my-3">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="Tipo" (selectionChange)="consultarContratos(Tipo)">
+        <mat-option value="Medicamentos">Medicamentos</mat-option>
+        <mat-option value="Contrato">Contrato</mat-option>
+        <mat-option value="Materiales">Materiales</mat-option>
+        <mat-option value="Nutriciones">Nutriciones</mat-option>
+      </mat-select>
+    </mat-form-field>
+    @if (Tipo === 'Contrato') {
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Seleccione contrato</mat-label>
+        <mat-select (selectionChange)="fechasContrato($event.value)">
+          @for (item of Contratos; track $index) {
+            <mat-option [value]="item.Id_Contrato">
+              {{ item.Nombre_Contrato }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    } @else {
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Medicamento</mat-label>
+        <mat-select [(ngModel)]="Tipo_Medicamento">
+          <mat-option value="Todos">Todos</mat-option>
+          <mat-option value="Pos">Pos</mat-option>
+          <mat-option value="No Pos">No Pos</mat-option>
+          <mat-option value="Clientes">Clientes</mat-option>
+        </mat-select>
+      </mat-form-field>
+    }
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Fecha rotativo</mat-label>
+      <mat-date-range-input [formGroup]="formRange" [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          required
+          formControlName="start"
+          name="date_start"
+        />
+        <input
+          matEndDate
+          placeholder="Fecha de fin"
+          required
+          formControlName="end"
+          name="date_end"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button
+            mat-raised-button
+            color="primary"
+            matDateRangePickerApply
+            (click)="onFilterDate()"
+          >
+            Aplicar
+          </button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Excluir vencimientos</mat-label>
+      <mat-select [(ngModel)]="ExcluirVencimientos">
+        <mat-option value="Si">Si</mat-option>
+        <mat-option value="No">No</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Meses</mat-label>
+      <mat-select [(ngModel)]="Mes_Compra">
+        <mat-option value="1">1</mat-option>
+        <mat-option value="2">2</mat-option>
+        <mat-option value="3">3</mat-option>
+        <mat-option value="4">4</mat-option>
+        <mat-option value="5">5</mat-option>
+        <mat-option value="6">6</mat-option>
+        <mat-option value="7">7</mat-option>
+        <mat-option value="8">8</mat-option>
+        <mat-option value="9">9</mat-option>
+        <mat-option value="10">10</mat-option>
+        <mat-option value="11">11</mat-option>
+        <mat-option value="12">12</mat-option>
+      </mat-select>
+    </mat-form-field>
+    @if (Tipo_Medicamento !== 'Clientes' && Tipo === 'Medicamentos') {
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Seleccione cliente</mat-label>
+        <mat-select [(ngModel)]="ClienteEPS">
+          @for (item of ClientesContrato; track $index) {
+            <mat-option [value]="item.Nombre">
+              {{ item.Nombre }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+  </div>
+  <button class="btn btn-block btn-primary" (click)="consultarRemisiones()">Consultar</button>
+  @if (!Lista && !Validar && !Lista_Producto) {
+    <div class="text-center">
+      <i class="fa fa-smile fa-5x"></i>
+      <h4>No se ha consultado aún</h4>
+    </div>
+  }
+  @if (Validar) {
+    <div class="text-center">
+      <i class="fa fa-spinner fa-spin fa-5x"></i>
+      <h4>Cargando productos</h4>
+    </div>
+  }
+  @if (Lista) {
+    <div class="text-center">
+      <i class="fa fa-smile fa-5x"></i>
+      <h4>No existen productos para este periodo de tiempo</h4>
+    </div>
+  }
+  @if (Tipo !== 'Contrato') {
+    <div class="row my-3" *ngFor="let item of Lista_Producto; let i = index">
+      @if (item.ATC) {
+        <div class="d-flex gap-2">
+          <h5 class="text-info">
+            {{ item.ATC }}
+          </h5>
+          <span> - </span>
+          <span>
+            {{ item.Descripcion }}
+          </span>
+        </div>
+      } @else {
+        <h6>Producto sin ATC</h6>
+      }
+      @if (cabecera) {
+        <div class="d-flex mt-2">
+          <h6 class="fw-bold">Producto:</h6>
+          <span> {{ item.CUM }} - {{ item.Producto }} </span>
+        </div>
+        <h6 class="fw-bold mt-2">Cantidades:</h6>
+        <app-table>
+          <ng-container titles>
+            <th>Consumida</th>
+            <th>Prom. Tiempo</th>
+            <th>Actual</th>
+            <th>Cant. Compras</th>
+            <th>Por Comprar</th>
+            @if (item.Desabilitado) {
+              <th></th>
+            }
+          </ng-container>
+          <tbody content>
+            <tr class="text-center">
+              <td>
+                {{ item.Consumida }}
+              </td>
+              <td>
+                {{ item.Promedio_Tiempo }}
+              </td>
+              <td>
+                {{ item.CantidadActual }}
+              </td>
+              <td>
+                {{ item.CantidadCompras }}
+              </td>
+              <td>
+                {{ item.CantidadTotal }}
+              </td>
+              @if (item.Desabilitado) {
+                <td>
+                  <button class="btn btn-primary btn-sm" (click)="searchProduct(i)">
+                    <i class="fa fa-search"></i>
+                  </button>
+                </td>
+              }
+            </tr>
+          </tbody>
+        </app-table>
+        <h6 class="fw-bold mt-2">Compras:</h6>
+        <app-table [loading]="false" [arrayData]="item.Compras">
+          <ng-container titles>
+            <th>Orden Compra</th>
+            <th>Proveedor</th>
+            <th>Cantidad</th>
+            <th>Precio Uni.</th>
+            <th></th>
+          </ng-container>
+          <tbody content>
+            @for (compra of item.Compras; track compra.Codigo; let j = $index) {
+              <tr class="text-center">
+                <td>{{ compra.Codigo }} - {{ compra.Fecha | date: 'dd/MM/yyyy' }}</td>
+                <td>
+                  {{ compra.NombreProveedor }}
+                </td>
+                <td>
+                  {{ compra.Cantidad }}
+                </td>
+                <td>
+                  {{ compra.Total | currency }}
+                </td>
+                <td>
+                  <mat-radio-button
+                    name="compra{{ i }}"
+                    id="compra{{ i }}{{ j }}"
+                    color="primary"
+                    (change)="seleccionarCompra(i, j)"
+                  ></mat-radio-button>
+                </td>
+              </tr>
+              @if (compra.DivMensaje) {
+                <tr>
+                  <td colspan="100%">
+                    {{ compra.Mensaje }}
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </app-table>
+        @if (boton) {
+          <button
+            type="button"
+            class="btn btn-primary btn-block btn-enviar"
+            (click)="showAlert($event)"
+          >
+            Generar pre-Compra
+          </button>
+        }
+      }
+    </div>
+  }
+</app-card>
+
+<ng-template #modalProveedor>
+  <app-modal titleModal="Busqueda proveedores">
+    <div class="row">
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Nombre proveedor</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Ingresar nombre de proveedor"
+          [(ngModel)]="filtro_nombre"
+          (keyup)="buscar($event)"
+        />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>NIT</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Ingresar NIT"
+          [(ngModel)]="filtro_nit"
+          (keyup)="buscar($event)"
+        />
+      </mat-form-field>
+      <div class="col">
+        <button type="button" class="btn btn-primary" (click)="filtros()">
+          <i class="fa fa-search"></i> Buscar
+        </button>
+      </div>
+    </div>
+    <app-table [loading]="Cargando" [arrayData]="Proveedores">
+      <ng-container titles>
+        <th></th>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Cantidad</th>
+        <th>Precio</th>
+      </ng-container>
+      <tbody content>
+        @for (Proveedor of Proveedores; track Proveedor.Id_Proveedor; let i = $index) {
+          <tr class="text-center">
+            <td>
+              <mat-radio-button
+                id="radio{{ i }}"
+                color="primary"
+                [value]="Proveedor.Id_Proveedor"
+                (change)="HabilitarCampos(i)"
+              ></mat-radio-button>
+            </td>
+            <td>
+              {{ Proveedor.Id_Proveedor }}
+            </td>
+            <td>
+              {{ Proveedor.Nombre }}
+            </td>
+            <td>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Cantidad"
+                [(ngModel)]="Proveedor.Cantidad"
+                [readonly]="Proveedor.Desabilitado"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                placeholder="Cantidad"
+                [(ngModel)]="Proveedor.Precio"
+                [readonly]="Proveedor.Desabilitado"
+              />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+    @if (Tipo !== 'Contrato') {
+      <button buttons type="button" class="btn btn-primary" (click)="AgregarProveedor()">
+        Agregar
+      </button>
+    } @else {
+      <button buttons type="button" class="btn btn-primary" (click)="AgregarProveedorContrato()">
+        Agregar
+      </button>
+    }
+  </app-modal>
+</ng-template>

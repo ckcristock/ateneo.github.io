@@ -1,0 +1,30 @@
+@if (isModal) {
+<app-modal titleModal="Listado de archivos">
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+</app-modal>
+} @else {
+<ng-container *ngTemplateOutlet="content"></ng-container>
+}
+
+<ng-template #content>
+  @if (listFiles.length > 0) {
+  <div class="alert alert-info" role="alert">Para descargar has click en el archivo</div>
+  <div class="row gap-4 m-0 mt-2">
+    @for (file of listFiles; track file.name; let i = $index) {
+    <div class="d-flex gap-2 list-files__cardFile">
+      <i class="fas fa-file-{{ file.type | iconFile }}"></i>
+      <a [href]="file.file" target="_blank">
+        {{ file.name }}
+      </a>
+      @if (isRemove && !file?.notDelete) {
+      <button type="button" class="btn btn-danger list-files__closeFile" (click)="onRemove(file.id ?? i)">
+        <i class="fas fa-times-circle"></i>
+      </button>
+      }
+    </div>
+    }
+  </div>
+  } @else {
+  <app-not-data [loading]="loading"></app-not-data>
+  }
+</ng-template>

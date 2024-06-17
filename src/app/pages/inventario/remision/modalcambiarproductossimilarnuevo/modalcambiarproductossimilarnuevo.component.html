@@ -1,0 +1,54 @@
+<ng-template #ModalCambiarProductoSimilar>
+  <app-modal titleModal="Cambiar Producto">
+    <div class="form-row">
+      <div class="col-md-12">
+        <table class="table table-bordered table-striped table-sm">
+          <thead>
+            <tr>
+              <th style="width: 70%">Nombre</th>
+              <th style="width: 30%">Cantidad Disponible</th>
+            </tr>
+            <!-- <tr *ngIf="Cargando">
+              <td colspan="5" class="text-center">
+                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+                <span class="sr-only">Cargando...</span>
+                <h4>Cargando productos...</h4>
+              </td>
+            </tr>
+            <tr *ngIf="ListaProductos.length == 0 && !Cargando">
+              <td colspan="5" class="text-center">
+                  <i class="fa fa-exclamation-circle fa-5x"></i>
+                  <h4>No hay datos para mostrar</h4>
+              </td>
+            </tr> -->
+          </thead>
+          <tbody *ngIf="!Cargando">
+            <tr
+              *ngFor="let p of ListaProductos; let i = index"
+              (click)="SeleccionarProducto(p.Seleccionado, p.Id_Producto, p)"
+              [ngClass]="{ 'bg-selected': p.Seleccionado == 1 }"
+              style="cursor: pointer"
+            >
+              <td>
+                <strong>{{ p.Nombre_Comercial }}</strong>
+                <p class="text-muted" style="font-size: 9px">{{ p.Nombre }}</p>
+              </td>
+              <td>
+                {{ p.Cantidad_Disponible }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <button
+      buttons
+      type="button"
+      class="btn btn-outline-primary btn-round btn-sm"
+      [disabled]="ProductoAgregar == null"
+      (click)="onChangeProduct()"
+    >
+      Cambiar Producto
+    </button>
+  </app-modal>
+</ng-template>

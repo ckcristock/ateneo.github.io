@@ -1,0 +1,59 @@
+<ng-container *ngIf="taxi.length">
+  <hr />
+  <h6>Taxis</h6>
+  <app-table>
+    <ng-container titles>
+      <th>Trayecto</th>
+      <th>Ciudad</th>
+      <th>Tipo</th>
+      <th>Tarifa</th>
+      <th>Trayectos</th>
+      <th>Total</th>
+      @if (legal) {
+        <th>Legalizar</th>
+      }
+      @if (legal) {
+        <th>Archivo</th>
+      }
+    </ng-container>
+    <tbody content>
+      @for (item of taxi; track item.id; let i = $index) {
+        <tr class="text-center">
+          <td>{{ item.taxi_city?.taxi?.route }}</td>
+          <td>{{ item.taxi_city?.city.name }}</td>
+          <td>{{ item.taxi_city?.type }}</td>
+          <td class="text-end">${{ item.rate | number: '1.2-2' }}</td>
+          <td>{{ item.journeys }}</td>
+          <td class="text-end">${{ item.total | number: '1.2-2' }}</td>
+          @if (legal) {
+            <td>
+              <input
+                class="form-control form-control-sm"
+                currencyMask
+                [options]="masks.maskCOP"
+                appInputPosition
+                placeholder="Ingresa el valor reportado"
+                [(ngModel)]="item.reported"
+              />
+            </td>
+          }
+          @if (legal) {
+            <td>
+              <div class="image-upload">
+                <label for="file-input-tax{{ i }}" class="text-end">
+                  <i class="fas fa-cloud-upload-alt text-primary"></i>
+                </label>
+                <input
+                  #file
+                  (change)="onFileChanged($event, i, item)"
+                  id="file-input-tax{{ i }}"
+                  type="file"
+                />
+              </div>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</ng-container>

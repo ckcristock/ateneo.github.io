@@ -1,0 +1,60 @@
+<div *ngIf="person">
+  <form #form="ngForm" (ngSubmit)="save(form)">
+    <div class="form-row">
+      <mat-form-field class="col w-100" appearance="outline">
+        <mat-label>Ingreso</mat-label>
+        <mat-select required name="ingresosPDatos" ngModel>
+          @for (item of ingresosPDatos; track $index) {
+            <mat-option [value]="item.value">
+              {{ item.text }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col w-100" appearance="outline">
+        <mat-label>Valor</mat-label>
+        <input matInput type="number" name="value" required ngModel />
+      </mat-form-field>
+    </div>
+    <div class="alert alert-warning text-center" *ngIf="nominaPaga" role="alert">
+      No puede agregar mas ingresos porque la nómina ya ha sido pagada.
+    </div>
+    <button type="submit" [disabled]="form.invalid" class="btn btn-primary btn-block">
+      Agregar
+    </button>
+  </form>
+  <ng-container *ngIf="ingresos.length && !loading; else notData">
+    <h6 class="text-center mt-2">Ingresos actuales para {{ person.name }}</h6>
+    <div class="row mt-2" *ngFor="let ingresoNP of ingresos">
+      <div class="col-md-6">
+        <p>{{ ingresoNP.ingreso.concept }}</p>
+      </div>
+      <div class="col-md-3">
+        <p>{{ ingresoNP.value | currency: '' : '' }}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="text-end">
+          <a title="eliminar" (click)="delete(ingresoNP.id)" class="trash ms-1 text-danger">
+            <i class="fas fa-trash-alt"></i>
+          </a>
+        </p>
+      </div>
+    </div>
+  </ng-container>
+  <div class="alert alert-success text-center" role="alert">
+    Si se desea crear más ingresos constitutivos puede ir al apartado de parametrización "ingresos
+    constitutivos".
+  </div>
+</div>
+
+<!-- <div class="container text-center" v-else>
+  <img src="/img/loading.gif" class="img-fluid" />
+  <p class="text-center">Cargando Información</p>
+</div> -->
+
+<ng-template #notData>
+  <app-not-data
+    [loading]="loading"
+    [text]="'No se encontraron ingresos no constitutivos para este funcionario'"
+  ></app-not-data>
+</ng-template>

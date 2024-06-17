@@ -1,0 +1,39 @@
+.input-edit {
+  width: 6rem;
+  border: none;
+  background-color: transparent;
+  &:focus {
+    outline: none;
+  }
+}
+
+.menu {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 180px;
+  max-width: 280px;
+  background-color: #fff;
+  padding: 6px 0;
+}
+
+.menu-item {
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  min-width: 64px;
+  line-height: 36px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex: 1;
+}
+
+.menu-item:hover {
+  background-color: #F8F9FA;
+}
+
+.menu-item:active {
+  background-color: #F8F9FA;
+}

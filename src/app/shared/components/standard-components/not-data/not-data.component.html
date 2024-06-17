@@ -1,0 +1,14 @@
+<div>
+  <div class="text-info p-3 d-flex flex-column text-center flex-align-center align-items-center">
+    <div class="mb-3">
+      <i
+        style="font-size: 70px"
+        [ngClass]="{ 'fa-cloud': !loading, 'fa-sync fa-spin': loading }"
+        class="fas"
+      ></i>
+    </div>
+    <h4 class="fs-4 text-center font-weight-semi-bold">
+      {{ loading ? 'Buscando información...' : description }}
+    </h4>
+  </div>
+</div>

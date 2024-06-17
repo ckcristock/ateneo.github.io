@@ -1,0 +1,47 @@
+<form [formGroup]="formDotation" (ngSubmit)="save()">
+  <div class="row">
+    <mat-form-field class="col-md-4" appearance="outline">
+      <mat-label>Talla de camisa</mat-label>
+      <mat-select formControlName="shirt_size">
+        @for (shirt of shirtSize; track shirt) {
+          <mat-option [value]="shirt.value"> {{ shirt.text }}</mat-option>
+        }
+      </mat-select>
+      @if (shirt_size_invalid) {
+        <mat-error> Campo obligatorio </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field class="col-md-4" appearance="outline">
+      <mat-label>Talla de pantalón</mat-label>
+      <mat-select formControlName="pants_size">
+        @for (pant of pantSizes; track pant) {
+          <mat-option [value]="pant.value"> {{ pant.text }}</mat-option>
+        }
+      </mat-select>
+      @if (pants_size_invalid) {
+        <mat-error>Campo obligatorio</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field class="col-md-4" appearance="outline">
+      <mat-label>Talla de calzado</mat-label>
+      <mat-select v-model="dotacion.shue_size" formControlName="shue_size">
+        @for (shue of shueSizes; track shue) {
+          <mat-option [value]="shue.value"> {{ shue.text }}</mat-option>
+        }
+      </mat-select>
+      @if (shue_size_invalid) {
+        <mat-error>Campo obligatorio</mat-error>
+      }
+    </mat-form-field>
+    <div class="col-md-12">
+      <div class="d-flex justify-content-between">
+        <button type="button" mat-button (click)="previus()">Anterior</button>
+        <!--  <button type="submit" class="btn btn-sm btn-primary"> Siguiente</button> -->
+
+        <button type="submit" [disabled]="saving" class="btn btn-primary btn-sm">
+          {{ saving ? ' Creando funcionario...' : 'Crear funcionario' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,42 @@
+<app-modal titleModal="Cerrar proceso disciplinario">
+  @if (!loading) {
+    <form [formGroup]="formClose">
+      <mat-form-field class="col-12" appearance="outline">
+        <mat-label>Causales</mat-label>
+        <mat-select formControlName="disciplinary_closure_reasons_id">
+          @for (item of causes; track $index) {
+            <mat-option [value]="item.value">{{ item.text }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+        <mat-label>Descripción</mat-label>
+        <textarea
+          matInput
+          placeholder="Ingrese la descripción"
+          rows="5"
+          formControlName="description"
+          id="descripcion"
+          name="description"
+          [cdkTextareaAutosize]="true"
+        ></textarea>
+      </mat-form-field>
+      <div class="col">
+        <div class="form-group text-center">
+          <label for="fileInvolved" class="custom-input-file col-md-12"> Cargar documentos </label>
+          <input id="fileInvolved" type="file" class="d-none" (change)="onFileChanged($event)" />
+          <div class="col-md-12 text-center">
+            @if (loadFile) {
+              <small class="text-success">Documentos cargados</small>
+            }
+          </div>
+        </div>
+      </div>
+    </form>
+  } @else {
+    <app-not-data [loading]="loading"></app-not-data>
+  }
+  <button buttons class="btn btn-secondary" [disabled]="formClose.invalid" (click)="closeProcess()">
+    Cerrar proceso
+  </button>
+</app-modal>

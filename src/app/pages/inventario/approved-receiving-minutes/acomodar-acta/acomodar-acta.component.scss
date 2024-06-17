@@ -1,0 +1,96 @@
+.ver {
+  background: #e9eef0 !important;
+  border-radius: 5px 5px !important;
+  font-size: 11px !important;
+  h6 {
+    margin-top: 5px !important;
+  }
+}
+
+.titular {
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 0;
+}
+
+.invoice-total {
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.space thead {
+  background: #c1c1c1;
+}
+
+.space tbody {
+  background: #f3f3f3;
+}
+
+.grupo {
+  min-height: 100px;
+  background: #e6e6e6;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 0;
+}
+
+.space {
+  th,
+  td,
+  p,
+  strong {
+    white-space: normal;
+    font-size: 10px;
+  }
+}
+
+.tabla {
+  thead {
+    th {
+      padding: 3px;
+    }
+  }
+  td {
+    padding: 3px;
+  }
+  th,
+  td,
+  p,
+  strong {
+    vertical-align: middle !important;
+    white-space: normal;
+    font-size: 10px;
+    margin: 0;
+  }
+}
+
+.contenido2 {
+  span,
+  h6,
+  p {
+    font-size: 12px !important;
+  }
+}
+
+.tabla-interna {
+  background: transparent !important;
+  tbody,
+  tr,
+  td {
+    background: transparent !important;
+  }
+  tr:last-child {
+    td {
+      border-bottom: 0 !important;
+    }
+  }
+}
+
+.label-1 {
+  background: linear-gradient(45deg, #313131, #9fb9b4);
+}
+
+td {
+  word-wrap: none;
+  word-break: normal;
+}

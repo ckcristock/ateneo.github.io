@@ -1,0 +1,60 @@
+<hr />
+<h6>Hospedaje</h6>
+<app-table>
+  <ng-container titles>
+    <th class="align-middle">Destino</th>
+    <th class="align-middle">Hotel</th>
+    <th class="align-middle" *ngIf="!legal">Dirección</th>
+    <th class="align-middle">Teléfono</th>
+    <th class="align-middle">Acomodación</th>
+    <th class="align-middle">Tarifa</th>
+    <th class="align-middle"># Días</th>
+    <th class="align-middle" *ngIf="!legal">Desayuno</th>
+    <th class="align-middle">R. Pago</th>
+    <th class="align-middle">total</th>
+    <th class="align-middle" *ngIf="legal">Legalizar</th>
+    <th class="align-middle" *ngIf="legal">Archivo</th>
+  </ng-container>
+  <tbody content>
+    @for (item of hotels; track item.name; let i = $index) {
+      <tr class="text-center">
+        <td>{{ item.type }}</td>
+        <td>{{ item.name }}</td>
+        <td *ngIf="!legal">{{ item.address }}</td>
+        <td>{{ item.phone }}</td>
+        <td>
+          <!-- {{ item?.accommodations?.name }} -->
+          {{ data.te_hotel[i]?.accommodation?.name }}
+        </td>
+        <td>${{ item?.pivot?.rate | number: '1.2-2' }}</td>
+        <td>{{ item.pivot.n_night }}</td>
+        <td *ngIf="!legal">{{ item.pivot.breakfast }}</td>
+        <td>{{ item.pivot.who_cancels | uppercase }}</td>
+        <td class="text-end">${{ item.pivot.total | number: '1.2-2' }}</td>
+        <td *ngIf="legal">
+          <input
+            class="form-control form-control-sm"
+            currencyMask
+            [options]="masks.maskCOP"
+            appInputPosition
+            placeholder="Ingresa el valor reportado"
+            [(ngModel)]="item.reported"
+          />
+        </td>
+        <td *ngIf="legal">
+          <div class="image-upload">
+            <label for="file-input{{ i }}" class="text-end">
+              <i class="fas fa-cloud-upload-alt text-primary"></i>
+            </label>
+            <input
+              #file
+              (change)="onFileChanged($event, i, item)"
+              id="file-input{{ i }}"
+              type="file"
+            />
+          </div>
+        </td>
+      </tr>
+    }
+  </tbody>
+</app-table>

@@ -1,0 +1,64 @@
+<hr />
+<div class="text-center text-uppercase card-title">
+  <i class="fas fa-money-bill"></i>
+  Salario Base y Subsidio
+</div>
+<div class="rounded-top table-responsive">
+  <table class="table table-bordered table-striped table-sm">
+    <thead class="bg-light">
+      <tr class="text-uppercase">
+        <th>Item</th>
+        <th class="text-center">Valor/Periodo</th>
+        <th class="text-center">Días trabajados</th>
+        <th class="text-center">Fórmula = Valor mensual * días trabajados / Periodo días</th>
+        <th class="text-center">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="text-center">
+        <td class="text-start">Salario</td>
+        <td>${{ funcionario.contractultimate.salary | currency: '' : '' }}</td>
+        <td>{{ salarioDatos.worked_days }}</td>
+        <td>
+          ${{ funcionario.contractultimate.salary | currency: '' : '' }} *
+          {{ salarioDatos.worked_days }} / {{ salarioDatos.period_days }}
+        </td>
+        <td>${{ salarioDatos.salary | currency: '' : '' }}</td>
+      </tr>
+      <tr
+        *ngIf="
+          funcionario.contractultimate.transport_subsidy &&
+          datosEmpresa.pay_configuration.payment_transport_subsidy == 'Mensual'
+        "
+        class="text-center"
+      >
+        <td class="text-start">Auxilio de transporte</td>
+        <td>${{ datosEmpresa.transportation_assistance | currency: '' : '' }}</td>
+        <td>{{ salarioDatos.worked_days }}</td>
+        <td>
+          ${{ datosEmpresa.transportation_assistance | currency: '' : '' }} *
+          {{ salarioDatos.worked_days }} / {{ salarioDatos.period_days }}
+        </td>
+        <td>${{ salarioDatos.transportation_assistance | currency: '' : '' }}</td>
+      </tr>
+      <!-- TODO verificar BRAND SI ES QUINCENAL O MENSUAL LA VALIDACION -->
+      <tr
+        *ngIf="
+          funcionario.contractultimate.transport_subsidy &&
+          brand &&
+          datosEmpresa.pay_configuration.payment_transport_subsidy == 'Quincenal'
+        "
+        class="text-center"
+      >
+        <td class="text-start">Auxilio de transporte</td>
+        <td>${{ datosEmpresa.transportation_assistance | currency: '' : '' }}</td>
+        <td>{{ salarioDatos.worked_days }}</td>
+        <td>
+          ${{ datosEmpresa.transportation_assistance | currency: '' : '' }} *
+          {{ salarioDatos.worked_days }} / {{ salarioDatos.period_days }}
+        </td>
+        <td>${{ salarioDatos.transportation_assistance | currency: '' : '' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

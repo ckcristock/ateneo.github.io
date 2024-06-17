@@ -1,0 +1,341 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-3">
+      <div class="card">
+        <app-activity class="" [activities]="acdisp" titleActivity="Actividad"
+          ><app-not-data-sa loading [loading]="Cargando"></app-not-data-sa
+        ></app-activity>
+      </div>
+
+      <!-- soportes dispensacion positiva -->
+      <div *ngIf="detalles?.EPS == 'Positiva' || detalles?.EPS == 'POSITIVA'" class="card">
+        <div class="card-header" style="padding-bottom: 0px">
+          <h6>Soportes de dispensación</h6>
+        </div>
+        <div class="card-body" style="overflow-y: auto">
+          <div class="col-md-12">
+            <div *ngIf="Soportes.length == 0" class="row">
+              <h6 clase="text-center">No hay Soportes para mostrar</h6>
+            </div>
+            <table class="table table-hover">
+              <tr *ngFor="let item of Soportes; let i = index">
+                <td>
+                  <p>{{ item.Tipo_Soporte | uppercase }}</p>
+                </td>
+                <td style="width: 75px">
+                  <a
+                    class="btn btn-success btn-sm"
+                    target="_blank"
+                    style="text-align: right"
+                    href="{{ item.Archivo }}"
+                  >
+                    <i class="ti-eye"></i>
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-9">
+      <div class="row">
+        <div class="col-12">
+          <div *ngIf="detalles?.Codigo != undefined" class="card">
+            <div class="row card-body">
+              <!-- cabecera -->
+              <app-cabecera [datosCabecera]="DatosCabecera"> </app-cabecera>
+              <hr class="line" />
+              <!-- datos interm -->
+              <div class="col-12">
+                <!-- tabla 1 -->
+                <div *ngIf="!Cargando && detalles != undefined; else notData">
+                  <app-table>
+                    <ng-container titles>
+                      <th>Direccion Punto</th>
+                      <th>Telefono Punto</th>
+                      <th>Tipo</th>
+                      <th>Entrega Actual</th>
+                      <th>Cantidad Entregas</th>
+                      <th>Punto dispensacion</th>
+                      <th>Departamento</th>
+                      <!-- <th>Codigo_Qr</th> -->
+                    </ng-container>
+                    <tbody content>
+                      <tr class="text-center align-middle text-uppercase">
+                        <td>
+                          {{ Punto?.Direccion || 'N/A' }}
+                        </td>
+                        <td>
+                          {{ Punto?.Telefono || 'N/A' }}
+                        </td>
+                        <td>{{ detalles?.Tipo || 'N/A' }}-{{ detalles?.Servicio || 'N/A' }}</td>
+                        <td>
+                          {{ detalles?.Entrega_Actual || 'N/A' }}
+                        </td>
+                        <td>
+                          {{ detalles?.Cantidad_Entregas || 'N/A' }}
+                        </td>
+                        <td>
+                          {{ detalles?.Punto_Dispensacion || 'N/A' }}
+                        </td>
+                        <td>
+                          {{ detalles?.Departamento || 'N/A' }}
+                        </td>
+                      </tr>
+                      <tr class="text-center align-middle" *ngIf="Auditoria.Archivo">
+                        <td>
+                          <a
+                            *ngIf="Auditoria.Archivo && Auditoria.Fecha > '2019-07-31 00:00:00'"
+                            href="{{ environ.ruta }}IMAGENES/AUDITORIAS/{{
+                              Auditoria.Id_Auditoria
+                            }}/{{ Auditoria.Archivo }}"
+                            target="_blank"
+                            class="btn btn-block btn-info btn-sm m-b-10"
+                            ><i class="fa fa-file-pdf-o"></i> ARCHIVOS ESCANEADOS AUDITORÍA</a
+                          >
+                          <a
+                            *ngIf="Auditoria.Archivo && Auditoria.Fecha < '2019-07-31 00:00:00'"
+                            href="https://sigesproph.com.co/IMAGENES/AUDITORIAS/{{
+                              Auditoria.Id_Auditoria
+                            }}/{{ Auditoria.Archivo }}"
+                            target="_blank"
+                            class="btn btn-block btn-info btn-sm m-b-10"
+                            ><i class="fa fa-file-pdf-o"></i> ARCHIVOS ESCANEADOS AUDITORÍA</a
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </app-table>
+                </div>
+              </div>
+            </div>
+            <!-- paciente productos -->
+            <div class="card-body">
+              <!-- tabla paciente -->
+              <div *ngIf="!Cargando && detalles != undefined; else notData">
+                <app-table>
+                  <ng-container titles>
+                    <th>Paciente</th>
+                    <th>Identificación</th>
+                    <th>Dirección</th>
+                    <th>Régimen</th>
+                    <th>Teléfono</th>
+                    <th>Eps</th>
+                    <th>Diagnostico</th>
+                    <th>Observaciones</th>
+                  </ng-container>
+                  <tbody content>
+                    <tr class="text-center align-middle text-uppercase">
+                      <td>
+                        {{ detalles?.Nombre_Paciente || 'N/A' }}
+                      </td>
+                      <td>
+                        {{ detalles?.Id_Paciente || 'N/A' }}
+                      </td>
+                      <td>
+                        {{ detalles?.Direccion_Paciente || 'N/A' }}
+                      </td>
+                      <td>{{ detalles?.Regimen_Paciente || 'N/A' }}</td>
+                      <td>{{ detalles?.Telefono_Paciente || 'N/A' }}</td>
+                      <td>
+                        {{ detalles?.EPS || 'N/A' }}
+                      </td>
+                      <td>{{ detalles?.CIE || 'N/A' }}</td>
+                      <td>{{ detalles?.Observaciones || 'N/A' }}</td>
+                    </tr>
+                  </tbody>
+                </app-table>
+              </div>
+
+              <!-- /////////// productos -->
+              <div class="row">
+                <div class="col-sm-12">
+                  <app-table [loading]="Cargando" [arrayData]="productos">
+                    <ng-container titles>
+                      <th>Producto</th>
+                      <th *ngIf="detalles?.Tipo != 'Capita'">Autorización</th>
+                      <th *ngIf="detalles?.Tipo != 'Capita'">F. Autorización</th>
+                      <th>Lote</th>
+                      <th>Cant. Formulada</th>
+                      <th>Cant. Entregada</th>
+                    </ng-container>
+                    <tbody content>
+                      @for (producto of productos; track productos.id) {
+                        <tr class="text-center align-middle text-uppercase">
+                          <td>
+                            <strong>{{ producto?.Nombre_Comercial || 'N/A' }}</strong>
+                            <p class="text-muted">{{ producto?.Nombre_Producto || 'N/A' }}</p>
+                          </td>
+                          <td *ngIf="detalles?.Tipo != 'Capita'">
+                            {{ producto?.Numero_Autorizacion || 'N/A' }}
+                          </td>
+                          <td *ngIf="detalles?.Tipo != 'Capita'">
+                            {{ producto?.Fecha_Autorizacion || 'N/A' }}
+                          </td>
+                          <td>{{ producto?.Lote || 'N/A' }}</td>
+                          <td>
+                            <ng-container
+                              *ngIf="
+                                editarDisp &&
+                                  producto?.Cantidad_Entregada !== producto?.Cantidad_Formulada &&
+                                  !producto?.Producto_Editado;
+                                else elseTemplate
+                              "
+                            >
+                              <input
+                                type="number"
+                                id="cantidad_formulada_{{ i }}"
+                                name="Cantidad_Formulada_{{ i }}"
+                                [(ngModel)]="producto.Cantidad_Formulada"
+                                type="number"
+                                min="0"
+                                class="form-control text-right prod f-9"
+                                (change)="actualizarSumas()"
+                                (focusout)="verificarCambios()"
+                              />
+                            </ng-container>
+                            <ng-template #elseTemplate>
+                              {{ producto?.Cantidad_Formulada || 'N/A' }}
+                            </ng-template>
+                          </td>
+
+                          <td>
+                            {{ producto?.Cantidad_Entregada || 'N/A' }}
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </app-table>
+
+                  <button
+                    class="btn btn-success btn-sm btn-block"
+                    *ngIf="cambiosDispensacion"
+                    (click)="confirmarGuardar()"
+                  >
+                    Guardar Cambios
+                  </button>
+                </div>
+              </div>
+
+              <div class="row d-flex justify-content-end">
+                <div class="col-sm-4">
+                  <div class="rounded-top table-responsive">
+                    <table class="table table-responsive invoice-table invoice-total space">
+                      <tbody class="text-start align-middle">
+                        <tr>
+                          <td style="font-weight: bold">Productos Solicitados:</td>
+                          <td>{{ cant_formulada || 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight: bold">Productos Entregados :</td>
+                          <td>{{ cant_entregada || 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight: bold">Diferencia:</td>
+                          <td>{{ cant_diferencia || 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight: bold">
+                            <p *ngIf="detalles?.Tipo == 'Capita'">Couta Moderadora:</p>
+                            <p *ngIf="detalles?.Tipo != 'Capita'">Couta Recuperación:</p>
+                          </td>
+                          <td>{{ detalles?.Cuota || 'N/A' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row invoive-info" style="margin-bottom: 0">
+                <div class="col-md-5">
+                  <strong style="font-size: 1em">Reclamante</strong>
+                  <!-- <p>{{reclamante.Nombre}}</p>
+                                  revisar
+                                -->
+                </div>
+                <div class="col-md-4">
+                  <strong style="font-size: 1em">Identificación</strong>
+                  <!-- <p>{{reclamante.Id_Reclamante}}</p> -->
+                </div>
+                <div class="col-md-3">
+                  <strong style="font-size: 1em">Parentesco</strong>
+                  <!-- <p>{{reclamante.Parentesco}}</p> -->
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 40px">
+                <div class="col-sm-12">
+                  <table class="table invoice-detail-table">
+                    <tbody>
+                      <tr>
+                        <td style="width: 10%"></td>
+                        <td style="width: 35%"></td>
+                        <td style="width: 10%"></td>
+                        <td style="width: 35%">
+                          <!-- <img
+                        *ngIf="detalles?.Firma_Reclamante !== ''"
+                        src="{{ environ.ruta }}/IMAGENES/FIRMAS-DIS/{{
+                          detalles?.Firma_Reclamante
+                        }}"
+                        class="img-fluid"
+                      /> -->
+                          <app-load-image
+                            [src]="
+                              environ?.ruta + 'IMAGENES/FIRMAS-DIS/' + detalles?.Firma_Reclamante
+                            "
+                            classImg="img-thumbnail rounded-circle header-profile-user d-block d-flex
+                        justify-content-start"
+                            style="object-fit: cover; min-height: 11rem"
+                          ></app-load-image>
+                        </td>
+                        <td style="width: 10%"></td>
+                      </tr>
+                      <tr>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                        <td style="width: 35%; border-top: 2px solid #000">
+                          Elaborado por: {{ detalles?.Funcionario }}
+                        </td>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                        <td style="width: 35%; border-top: 2px solid #000">
+                          Recibí conforme:
+                          <br />
+                          CC:
+                        </td>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <!--<button class="btn btn-success btn-block">Entregar Dispensación</button>-->
+                  <a
+                    href="{{ environ.ruta }}php/dispensaciones/dispensacion_pdf.php?id={{
+                      idDispensacion
+                    }}"
+                    target="_blank"
+                    class="btn btn-success btn-sm btn-block"
+                    ><i class="fa fa-print"></i> IMPRIMIR DISPENSACIÓN</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card" *ngIf="detalles?.Codigo == undefined">
+            <div class="card-body text-center">
+              <app-not-data-sa [loading]="Cargando"></app-not-data-sa>
+            </div>
+          </div>
+        </div>
+        <div class="col-12"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data-sa [loading]="Cargando"></app-not-data-sa>
+</ng-template>

@@ -1,0 +1,103 @@
+<div class="row mb-2">
+  <div class="col-6">
+    <h5>Fondo Empleado</h5>
+  </div>
+  <div class="col-6 text-end">
+    <button class="btn btn-sm btn-primary" (click)="movimiento.show()">Crear Movimiento</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Origen</th>
+          <th>Ingreso</th>
+          <th>Egreso</th>
+          <th>Sando</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-modal-basic #movimiento [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Nuevo Movimiento</h4>
+    <button type="button" class="close basic-close" (click)="movimiento.hide()"></button>
+  </div>
+  <div style="overflow-x: unset !important; overflow-y: unset !important" class="app-modal-body">
+    <div class="row">
+      <div class="col-12">
+        <form [formGroup]="forma">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="movement">Movimiento</label>
+              <select class="form-control form-control-sm" id="movement" formControlName="movement">
+                <option value="Ingreso">Ingreso</option>
+                <option value="Egreso">Egreso</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="type">Tipo</label>
+              <select class="form-control form-control-sm" id="type" formControlName="type">
+                <option value="Aporte">Aporte</option>
+                <option value="Ahorro">Ahorro</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="type">Tipo Origen</label>
+              <select class="form-control form-control-sm" id="type" formControlName="type_origin">
+                <option value="Caja">Caja</option>
+                <option value="Funcionario">Funcionario</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="origin">Origen</label>
+
+              <input
+                type="text"
+                id="Funcionario"
+                name="Funcionario"
+                class="up form-control form-control-sm"
+                [ngbTypeahead]="search"
+                [resultTemplate]="rt"
+                [inputFormatter]="formatter"
+                formControlName="origin"
+                required
+              />
+            </div>
+
+            <div class="form-group col-md-12">
+              <label for="inputPassword4">Valor</label>
+              <input
+                type="number"
+                formControlName="value"
+                class="form-control form-control-sm"
+                placeholder="valor"
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button class="btn btn-sm btn-primary">Guardar</button>
+  </div>
+</app-modal-basic>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9"> {{ r.text }}</span>
+</ng-template>

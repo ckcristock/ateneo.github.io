@@ -1,0 +1,51 @@
+<ng-template #modalLiquidar let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title text-truncate">
+      <app-load-image
+        classImg="img-thumbnail rounded-circle header-profile-user"
+        size="50"
+        [src]="userDetail.image ?? ''"
+      ></app-load-image>
+      Preliquidar a {{ userDetail.full_name | titlecase }}
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <ng-container [formGroup]="form">
+      <div class="alert alert-danger text-center" role="alert">
+        Al pre-liquidar el funcionario, este no podrá acceder al sistema
+      </div>
+      <div class="row">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Fecha de preliquidación</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            (dateInput)="selectedDate($event)"
+            [value]="date"
+            [max]="maxDate"
+            name="daterange"
+            readonly
+            autocomplete="off"
+          />
+          <mat-hint>Selecciona la fecha de preliquidación</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button type="button" (click)="liquidar('PreLiquidado')" class="btn btn-primary">
+      Preliquidar
+    </button>
+  </div>
+</ng-template>

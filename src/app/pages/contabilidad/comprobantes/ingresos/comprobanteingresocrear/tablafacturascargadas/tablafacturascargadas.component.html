@@ -1,0 +1,84 @@
+<table class="table" style="max-height: 400px">
+  <thead>
+    <tr class="thead-default">
+      <th>Factura</th>
+      <th>Total</th>
+      <th>Pagado</th>
+      <th>Gravado</th>
+      <th>Iva</th>
+      <th>Excenta</th>
+      <th>Por Pagar</th>
+      <th>Descuentos</th>
+      <th>Mayor a Pagar</th>
+      <th>Retenciones</th>
+      <th>Valor Recibido</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let F of Facturas; let i = index" id="fila{{ i }}">
+      <td>{{ F.Codigo }}</td>
+      <td class="text-end">{{ F.Total_Compra | currency }}</td>
+      <td class="text-end">{{ F.Pagado | currency }}</td>
+      <td class="text-end">{{ F.Gravada | currency }}</td>
+      <td class="text-end">{{ F.Iva | currency }}</td>
+      <td class="text-end">{{ F.Exenta | currency }}</td>
+      <td class="text-end">{{ F.Por_Pagar | currency }}</td>
+
+      <td>
+        <div *ngIf="F.DescuentosFactura.length > 0" class="row">
+          <div class="col-md-6"><label>Cuenta</label></div>
+          <div class="col-md-6 text-end"><label>Valor</label></div>
+        </div>
+        <div *ngFor="let item of F.DescuentosFactura" class="row">
+          <div class="col-md-6">
+            {{ item.Cuenta }}
+          </div>
+          <div class="col-md-6 text-end">
+            {{ item.ValorDescuento | currency }}
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="row" *ngIf="F.Cuenta_Mayor_Pagar != ''">
+          <div class="col-md-6">
+            <div class="form group">
+              <label>Cuenta</label> <br />
+              {{ F.Cuenta_Mayor_Pagar }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Valor</label> <br />
+              {{ F.ValorMayorPagar | currency }}
+            </div>
+          </div>
+        </div>
+        <div *ngIf="F.Cuenta_Mayor_Pagar == ''" class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Valor</label> <br />
+              {{ F.ValorMayorPagar | currency }}
+            </div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div *ngIf="F.RetencionesFacturas.length > 0" class="row">
+          <div class="col-md-6"><label>Cuenta</label></div>
+          <div class="col-md-6 text-end"><label>Valor</label></div>
+        </div>
+        <div *ngFor="let item of F.RetencionesFacturas" class="row">
+          <div class="col-md-6">
+            {{ item.Cuenta }}
+          </div>
+          <div class="col-md-6 text-end">
+            {{ item.Valor | currency }}
+          </div>
+        </div>
+      </td>
+      <td class="text-end">
+        {{ F.ValorIngresado | currency }}
+      </td>
+    </tr>
+  </tbody>
+</table>

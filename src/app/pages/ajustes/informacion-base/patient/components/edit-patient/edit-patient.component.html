@@ -1,0 +1,117 @@
+<app-modal titleModal="Editar paciente">
+  <form class="row" [formGroup]="formEdit">
+    @if (!loading && loadMunDep) {
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Tipo identif</mat-label>
+        <mat-select formControlName="type_document_id">
+          @for (doc of documents; track $index) {
+            <mat-option [value]="doc.value">
+              {{ doc.text }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Identificación</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Número de identificación"
+          formControlName="identifier"
+        />
+      </mat-form-field>
+    }
+    <app-department-municipality
+      [values]="valuesDepMun"
+      [loading]="loading"
+      (loadData)="loadMunDep = true"
+      (changeSelection)="changeMundep($event)"
+    ></app-department-municipality>
+    @if (!loading && loadMunDep) {
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Primer nombre</mat-label>
+        <input matInput type="text" placeholder="" formControlName="firstname" />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Segundo nombre</mat-label>
+        <input matInput type="text" placeholder="" formControlName="middlename" />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Primer apellido</mat-label>
+        <input matInput type="text" placeholder="" formControlName="surname" />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Segundo apellido</mat-label>
+        <input matInput type="text" placeholder="" formControlName="secondsurname" />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Fecha de nacimiento</mat-label>
+        <input matInput type="date" formControlName="date_of_birth" />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Género</mat-label>
+        <mat-select formControlName="gener">
+          <mat-option value="M"> Masculino </mat-option>
+          <mat-option value="F"> Femenino </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Teléfono</mat-label>
+        <input matInput type="text" placeholder="" formControlName="phone" />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Correo</mat-label>
+        <input matInput type="email" placeholder="" formControlName="email" />
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Dirección</mat-label>
+        <input matInput type="text" placeholder="" formControlName="address" />
+      </mat-form-field>
+      <app-autocomplete-fc
+        class="col"
+        label="EPS"
+        placeholder="Ingresa la EPS"
+        [control]="formEdit.controls['eps_id']"
+        [list]="eps"
+      ></app-autocomplete-fc>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Nivel</mat-label>
+        <mat-select formControlName="level_id">
+          @for (level of levels; track $index) {
+            <mat-option [value]="level.value">
+              {{ level.text }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Régimen</mat-label>
+        <mat-select formControlName="regimen_id">
+          @for (reg of regimen; track $index) {
+            <mat-option [value]="reg.value">
+              {{ reg.text }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="Activo"> Activo </mat-option>
+          <mat-option value="Inactivo"> Inactivo </mat-option>
+        </mat-select>
+      </mat-form-field>
+    } @else {
+      <app-not-data [loading]="true"></app-not-data>
+    }
+  </form>
+  <button
+    buttons
+    type="button"
+    class="btn btn-primary"
+    [disabled]="formEdit.invalid"
+    (click)="onEditData()"
+  >
+    Guardar
+  </button>
+</app-modal>

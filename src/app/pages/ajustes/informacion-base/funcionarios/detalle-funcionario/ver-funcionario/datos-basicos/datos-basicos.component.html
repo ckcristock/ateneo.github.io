@@ -1,0 +1,323 @@
+<div class="d-flex justify-content-end">
+  @if (userDetail) {
+    <button class="btn btn-link" (click)="openConfirm(add)">
+      <i class="fas fa-pencil-alt"></i>
+    </button>
+  }
+</div>
+@if (!loading && userDetail) {
+  <div class="row">
+    <div class="col-lg-6 text-lg-end text-center text-primary">Nombre completo</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.full_names }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">Documento de identidad</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.identifier | number }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">Correo electrónico</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.email || 'N/A' }}
+    </div>
+
+    <div class="col-lg-6 text-lg-end text-center text-primary">Título de estudio</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.degree || 'N/A' | capitalLetter }}
+    </div>
+
+    <div class="col-lg-6 text-lg-end text-center text-primary">Fecha de nacimiento</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.birth_date || 'N/A' }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">Género</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.gener || 'N/A' }}
+    </div>
+
+    <div class="col-lg-6 text-lg-end text-center text-primary">Estado civil</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.marital_status || 'N/A' }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">Dirección de residencia</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.address || 'N/A' | uppercase }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">Celular</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.cell_phone || 'N/A' }}
+    </div>
+  </div>
+} @else {
+  <app-not-data [loading]="loading"></app-not-data>
+}
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Actualizar funcionario</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <div class="col-xl-2">
+          <div class="form-group text-center">
+            <img
+              [src]="fileString"
+              id="imageOutput"
+              class="img-rounded d-block m-auto img-rounded d-block img-thumbnail rounded-circle mx-auto img-fluid header-profile-user"
+              alt=""
+              onerror="this.src='../../../../../../../assets/images/noprofile.png'"
+            />
+            <div class="custom-input-file col-md-12 mt-3">
+              <input
+                type="file"
+                #fileInput
+                class="input-file"
+                name="image"
+                id="image"
+                (change)="onFileChanged($event)"
+                accept="image/*"
+              />
+              Cargar imagen
+            </div>
+            <div class="col-md-12 text-center">
+              @if (fileString) {
+                <small class="text-success">Imagen cargada</small>
+              }
+            </div>
+            @if (image_valid) {
+              <div class="text-center text-danger">
+                <small class="invalid">Imagen obligatoria</small>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="col-xl-10">
+          <div class="row">
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Primer nombre</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="Ingresa el primer nombre"
+                id="first_name"
+                formControlName="first_name"
+                autocomplete="off"
+                required
+              />
+              @if (first_name_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Segundo nombre</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="Ingresa el segundo nombre"
+                id="second_name"
+                formControlName="second_name"
+                autocomplete="off"
+              />
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Primer apellido</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="Ingresa el primer apellido"
+                id="first_surname"
+                formControlName="first_surname"
+                autocomplete="off"
+                required
+              />
+              @if (first_surname_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Segundo apellido</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="Ingresa el segundo apellido"
+                id="second_surname"
+                formControlName="second_surname"
+                autocomplete="off"
+              />
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Documento de identidad</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="Ingresa el número de documento"
+                name="identifier"
+                id="identifier"
+                formControlName="identifier"
+                autocomplete="off"
+                required
+              />
+              @if (identifier_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Dirección de residencia</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="Ingresa la dirección de residencia"
+                id="address"
+                formControlName="address"
+                autocomplete="off"
+                required
+              />
+              @if (address_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input
+                matInput
+                type="date"
+                placeholder=""
+                id="birth_date"
+                formControlName="birth_date"
+                autocomplete="off"
+                required
+              />
+              @if (birth_date_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Título de estudio</mat-label>
+              <mat-select id="degree" formControlName="degree">
+                @for (degree of degrees; track degree) {
+                  <mat-option [value]="degree.valor"> {{ degree.clave }}</mat-option>
+                }
+              </mat-select>
+              @if (degree_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Correo electrónico</mat-label>
+              <input
+                matInput
+                type="email"
+                placeholder="Ingresa el correo electrónico"
+                id="email"
+                formControlName="email"
+                autocomplete="off"
+                required
+              />
+              @if (email_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Género</mat-label>
+              <mat-select id="gener" formControlName="gener">
+                <mat-option value="Masculino">Masculino</mat-option>
+                <mat-option value="Femenino">Femenino</mat-option>
+              </mat-select>
+              @if (gener_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Estado civil</mat-label>
+              <mat-select id="marital_status" formControlName="marital_status">
+                @for (estado of estados; track estado) {
+                  <mat-option [value]="estado.valor"> {{ estado.clave }}</mat-option>
+                }
+              </mat-select>
+              @if (marital_status_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Teléfono celular</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="Ingresa el número de celular"
+                id="cell_phone"
+                formControlName="cell_phone"
+                autocomplete="off"
+                required
+              />
+              @if (cell_phone_valid) {
+                <mat-error>Campo necesario</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="col">
+              <mat-label>Visa</mat-label>
+              <mat-select formControlName="visa">
+                <mat-option value="Si">Sí</mat-option>
+                <mat-option value="No">No</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>flight</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="col">
+              <mat-label>Número de pasaporte</mat-label>
+              <input
+                matInput
+                placeholder="Ingresa número de pasaporte"
+                type="text"
+                formControlName="passport_number"
+                autocomplete="off"
+              />
+              <mat-icon matSuffix>flight_takeoff</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="col">
+              <mat-label>Título</mat-label>
+              <input
+                matInput
+                placeholder="Ingresa título"
+                type="text"
+                formControlName="title"
+                autocomplete="off"
+              />
+              <mat-icon matSuffix>verified</mat-icon>
+            </mat-form-field>
+            <div class="col-12">
+              <div class="input-group">
+                <span class="input-group-text">Firma del funcionario</span>
+                <label class="form-control" tabindex="0"
+                  >{{ titleFile ? titleFile : 'Selecciona imagen' }}
+                  <input
+                    type="file"
+                    class="invisible"
+                    accept=".png,.jpg,.jpeg,.svg"
+                    (change)="onFileChangedSignature($event)"
+                  />
+                </label>
+              </div>
+              <small>La imagen debe ser de 800px de ancho por 450px de alto</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="modal.dismiss('Cross click'); hideModal()"
+    >
+      Cancelar
+    </button>
+    <button type="button" (click)="guardar()" class="btn btn-primary">Actualizar</button>
+  </div>
+</ng-template>

@@ -1,0 +1,230 @@
+<form class="row mt-3" #registerCita="ngForm">
+  <mat-form-field class="col-12" appearance="outline">
+    <mat-label>Diagnóstico</mat-label>
+    <input
+      matInput
+      type="text"
+      required
+      [(ngModel)]="diagnosticoId"
+      [ngbTypeahead]="search"
+      placeholder="Busca por diagnóstico"
+      name="diagnosticoId"
+      [resultTemplate]="diagnostic"
+      [inputFormatter]="Inputdiagnostic"
+    />
+    <mat-icon matSuffix><i class="fas fa-stethoscope"></i></mat-icon>
+    <mat-hint *ngIf="searchingDiagnostic">Buscando...</mat-hint>
+    <mat-hint *ngIf="searchFailedDiagnostic">Sin resultados</mat-hint>
+  </mat-form-field>
+  <mat-form-field class="col-lg-12" appearance="outline">
+    <mat-label>Ruta</mat-label>
+    <mat-select [(ngModel)]="route_id" name="route_id" required>
+      <mat-option *ngFor="let option of routes" [value]="option.value">
+        {{ option.text }}
+      </mat-option>
+    </mat-select>
+    <mat-icon matSuffix><i class="fas fa-route"></i></mat-icon>
+  </mat-form-field>
+  <mat-form-field class="col-lg-6" appearance="outline">
+    <mat-label>IPS Remisora</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Ingresa la IPS"
+      [(ngModel)]="cita.ips_remisor"
+      name="ips_remisor"
+      required
+      autocomplete="off"
+    />
+    <mat-icon matSuffix><i class="fas fa-hospital-alt"></i></mat-icon>
+  </mat-form-field>
+  <mat-form-field class="col-lg-6" appearance="outline">
+    <mat-label>Médico remisor</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Ingresa el nombre del médico"
+      [(ngModel)]="cita.person_remisor"
+      name="person_remisor"
+      required
+      autocomplete="off"
+    />
+    <mat-icon matSuffix><i class="fas fa-user-md"></i></mat-icon>
+  </mat-form-field>
+  <mat-form-field class="col-lg-6" appearance="outline">
+    <mat-label>Especialidad médico remisor</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Ingresa el nombre del médico"
+      name="especiality"
+      [(ngModel)]="cita.especiality"
+      required
+      autocomplete="off"
+    />
+    <mat-icon matSuffix><i class="fas fa-notes-medical"></i></mat-icon>
+  </mat-form-field>
+
+  <mat-form-field class="col-lg-6" appearance="outline">
+    <mat-label>Fecha</mat-label>
+    <input
+      matInput
+      type="date"
+      name="date_remisor"
+      [(ngModel)]="cita.date_remisor"
+      required
+      autocomplete="off"
+    />
+  </mat-form-field>
+  <mat-form-field class="col-12" appearance="outline">
+    <mat-label>Código CUPS asignado</mat-label>
+    <input
+      matInput
+      type="text"
+      required
+      [(ngModel)]="procedureId"
+      [ngbTypeahead]="searchCustomProcedureByAppointment"
+      placeholder="Busca por CUP"
+      name="procedureId"
+      [resultTemplate]="procedure"
+      [inputFormatter]="InputProcedure"
+    />
+    <mat-icon matSuffix><i class="fas fa-cogs"></i></mat-icon>
+    <mat-hint *ngIf="searchingProcedure">Buscando...</mat-hint>
+    <mat-hint *ngIf="searchFailedProcedure">Sin resultados</mat-hint>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Contrato</mat-label>
+    <mat-select [(ngModel)]="contract_id" name="contract_id" required>
+      <mat-option *ngFor="let option of contratos" [value]="option.value">
+        {{ option.text }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <input type="hidden" name="space" [(ngModel)]="space" />
+  <input type="hidden" name="call" [(ngModel)]="call" />
+  <input type="hidden" name="patient" [(ngModel)]="patient" />
+  <input type="hidden" name="anotherData" [(ngModel)]="dataCitaToAssign" />
+  <input type="hidden" name="tipification" [(ngModel)]="tipification" />
+
+  <mat-form-field class="col-12 mat-form-field-no-padding textarea" appearance="outline">
+    <mat-label>Observaciones</mat-label>
+    <textarea
+      matInput
+      placeholder="Ingresa las observaciones"
+      rows="5"
+      [(ngModel)]="cita.observacion"
+      id="observaciones"
+      name="observation"
+      required
+      minlength="10"
+      [cdkTextareaAutosize]="true"
+    ></textarea>
+  </mat-form-field>
+  <div class="col-12">
+    <mat-checkbox color="primary" value="" name="repeat" [(ngModel)]="repeat"
+      >¿ Agendar de manera recurrente ?</mat-checkbox
+    >
+  </div>
+
+  <ng-container *ngIf="repeat">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Inicio</mat-label>
+      <input
+        matInput
+        type="date"
+        [(ngModel)]="fechaInicioRecurrente"
+        required
+        name="date_startRecurrente"
+        autocomplete="off"
+        #date_start="ngModel"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Fin</mat-label>
+      <input
+        matInput
+        type="date"
+        [(ngModel)]="fechaFinRecurrente"
+        required
+        name="date_endRecurrente"
+        autocomplete="off"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Días</mat-label>
+      <mat-select [(ngModel)]="daysRecurrente" name="daysRecurrente" multiple="true" required>
+        <mat-option *ngFor="let item of diasSemana" [value]="item.value">{{
+          item.text
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+
+  <div class="col-12">
+    <button
+      class="btn btn-success btn-block"
+      [disabled]="registerCita.invalid || loading"
+      (click)="save(registerCita)"
+    >
+      <span *ngIf="!loading; else status">Crear cita</span>
+
+      <ng-template #status>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Creando Cita...
+      </ng-template>
+    </button>
+  </div>
+</form>
+
+<ng-template #diagnostic let-r="result" let-t="term">
+  <span class="f-9">
+    <strong>{{ r.text }}</strong>
+  </span>
+</ng-template>
+
+<ng-template #procedure let-r="result" let-t="term">
+  <span class="f-9">
+    <strong>{{ r.text }}</strong>
+  </span>
+</ng-template>
+
+<!-- <ng-select
+  class="col-10"
+  [items]="ips_remisors"
+  bindLabel="text"
+  bindValue="value"
+  [(ngModel)]="cita.ips_remisor"
+  placeholder="Seleccione "
+  name="ips_remisor"
+  loadingText="loading"
+  ngDefaultControl
+>
+</ng-select>
+
+<ng-select
+  class="col-10"
+  [items]="persons_remisors"
+  bindLabel="text"
+  bindValue="value"
+  [(ngModel)]="cita.person_remisor"
+  placeholder="Seleccione "
+  name="person_remisor"
+  loadingText="loading"
+  ngDefaultControl
+>
+</ng-select>
+
+<ng-select
+  class="col-10"
+  [items]="procedurs_remisors"
+  bindLabel="text"
+  bindValue="value"
+  [(ngModel)]="cita.especiality"
+  placeholder="Seleccione "
+  name="especiality"
+  loadingText="loading"
+  ngDefaultControl
+>
+</ng-select> -->

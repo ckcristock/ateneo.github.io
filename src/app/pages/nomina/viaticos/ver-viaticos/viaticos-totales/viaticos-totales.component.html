@@ -1,0 +1,58 @@
+<app-table>
+  <ng-container titles>
+    <th>Observaciones</th>
+  </ng-container>
+  <tbody content>
+    <td>{{ data.observation || 'Sin observaciones' }}</td>
+  </tbody>
+</app-table>
+<hr />
+<app-table>
+  <ng-container titles>
+    <th>Item</th>
+    <th>Dolares</th>
+    <th>Pesos</th>
+    <th>Item</th>
+    <th>Dolares</th>
+    <th>Pesos</th>
+  </ng-container>
+  <tbody content>
+    <tr class="text-center">
+      <th class="align-middle">Hospedaje</th>
+      <td class="text-end">USD {{ data.total_hotels_usd | number: '1.2-2' }}</td>
+      <td class="text-end">${{ data.total_hotels_cop | number: '1.2-2' }}</td>
+      <th class="align-middle">Transporte Terrestre</th>
+      <td></td>
+      <td class="text-end">${{ data.total_transports_cop | number: '1.2-2' }}</td>
+    </tr>
+    <tr class="text-center">
+      <th class="align-middle">Taxis</th>
+      <td class="text-end">USD {{ data.total_taxis_usd | number: '1.2-2' }}</td>
+      <td class="text-end">${{ data.total_taxis_cop | number: '1.2-2' }}</td>
+      <th class="align-middle">Transporte aéreo</th>
+      <td></td>
+      <td class="text-end">${{ data.total_air_transport_cop | number: '1.2-2' }}</td>
+    </tr>
+    <tr class="text-center">
+      <th class="align-middle">Lavanderia</th>
+      <td class="text-end">USD {{ data.total_laundry_usd | number: '1.2-2' }}</td>
+      <td class="text-end">${{ data.total_laundry_cop | number: '1.2-2' }}</td>
+      <th class="align-middle">Alimentación</th>
+      <td class="text-end">USD {{ data.total_feedings_usd | number: '1.2-2' }}</td>
+      <td class="text-end">${{ data.total_feedings_cop | number: '1.2-2' }}</td>
+    </tr>
+    <tr class="text-center">
+      <th class="align-middle">Otros Gastos</th>
+      <td class="text-end">USD {{ data.other_expenses_usd | number: '1.2-2' }}</td>
+      <td class="text-end">${{ data.other_expenses_cop | number: '1.2-2' }}</td>
+      <th class="align-middle">Sobre Equipaje</th>
+      <td class="text-end">USD {{ data.baggage_usd | number: '1.2-2' }}</td>
+      <td class="text-end">${{ data.baggage_cop | number: '1.2-2' }}</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <td class="text-end">USD {{ data.total_usd | number: '1.2-2' }}</td>
+      <td class="text-end">${{ data.total_cop | number: '1.2-2' }}</td>
+    </tr>
+  </tbody>
+</app-table>

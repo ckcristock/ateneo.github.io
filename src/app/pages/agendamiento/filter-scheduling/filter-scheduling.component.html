@@ -1,0 +1,53 @@
+<form class="row" [formGroup]="formFilter">
+  <mat-form-field class="col-md-2" appearance="outline">
+    <mat-label>Tipo de agenda</mat-label>
+    <mat-select formControlName="type_agenda_id" (selectionChange)="getRequestType()">
+      @for (item of agendasType; track $index) {
+        <mat-option [value]="item.value">{{ item.text }} </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col-md-2" appearance="outline">
+    <mat-label>Tipo de consulta</mat-label>
+    <mat-select formControlName="type_appointment_id" (selectionChange)="getIpss()">
+      @for (item of inquiriesType; track $index) {
+        <mat-option [value]="item.value">{{ item.text }} </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <app-autocomplete-fc
+    class="col-md-4"
+    label="Especialidad"
+    placeholder="Buscar especialidad"
+    [control]="formFilter.controls['speciality_id']"
+    [list]="specialties"
+    (optionSelectedEvent)="onFilterSpecialty()"
+  ></app-autocomplete-fc>
+  <app-autocomplete-fc
+    class="col-md-4"
+    label="Profesional"
+    placeholder="Busca profesional"
+    [control]="formFilter.controls['person_id']"
+    [list]="professionals"
+    (optionSelectedEvent)="onFilterEvent()"
+  ></app-autocomplete-fc>
+  @if (agendaType?.face_to_face) {
+    <app-autocomplete-fc
+      class="col"
+      label="IPS"
+      placeholder="Busca IPS"
+      [control]="formFilter.controls['company_id']"
+      [list]="ipss"
+      (optionSelectedEvent)="getSites()"
+    ></app-autocomplete-fc>
+    <app-autocomplete-fc
+      class="col"
+      label="Sede"
+      placeholder="Busca sede"
+      [control]="formFilter.controls['location_id']"
+      [list]="sites"
+      (optionSelectedEvent)="onFilterSite()"
+    ></app-autocomplete-fc>
+  }
+  <ng-content></ng-content>
+</form>

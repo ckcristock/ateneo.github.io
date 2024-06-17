@@ -1,0 +1,25 @@
+/* p small {
+  font-size: 13.5px;
+  font-weight: bold;
+}
+p i {
+  font-size: 26px;
+} */
+.icon-cards-row {
+  display: flex;
+  justify-content: center;
+}
+
+.icon-cards-row i {
+  font-size: 36px;
+  line-height: 66px;
+  color: #2a93d5;
+}
+.lead {
+  color: #2a93d5;
+  font-size: 16px;
+}
+
+.no-word-break {
+  word-break: normal;
+}

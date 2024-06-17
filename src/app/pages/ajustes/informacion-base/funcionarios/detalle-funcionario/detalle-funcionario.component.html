@@ -1,0 +1,213 @@
+<div class="row card-title d-flex justify-content-between">
+  <div class="col-md-6 px-0">
+    <h4 class="text-dark">
+      {{ userDetail.full_name }}
+    </h4>
+  </div>
+  <div class="col-md-6 px-0 text-end">
+    <div class="btn-group rounded w-sm-100">
+      @if (user === 1) {
+        <button type="button" class="btn btn-dark btn-sm" (click)="restorePassword()">
+          <i class="fas fa-sync-alt"></i>
+          Restablecer contraseña
+        </button>
+      }
+      @if (userDetail.status == 'activo') {
+        <button type="button" class="btn btn-warning btn-sm" (click)="modalPreliquidar.openModal()">
+          <i class="fas fa-money-bill"></i>
+          Preliquidar
+        </button>
+      }
+      @if (userDetail.status == 'activo') {
+        <button type="button" class="btn btn-danger btn-sm" (click)="bloquear('inactivo')">
+          <i class="fas fa-ban"></i> Bloquear
+        </button>
+      }
+      @if (userDetail.usuario?.usuario == 'inactivo') {
+        <button type="button" class="btn btn-success btn-sm" (click)="bloquear('activo')">
+          <i class="fas fa-check"></i> Activar
+        </button>
+      }
+      @if (userDetail.status == 'liquidado') {
+        <button type="button" class="btn btn-danger btn-sm" (click)="downloadPreliquidation()">
+          @if (!downloading) {
+            <i class="fas fa-file-pdf"></i> Descargar liquidación
+          } @else {
+            <i class="fas fa-spinner fa-spin"></i> Descargando...
+          }
+        </button>
+      }
+    </div>
+  </div>
+</div>
+<ul
+  ngbNav
+  #nav="ngbNav"
+  aria-hidden="true"
+  [(activeId)]="active"
+  class="nav nav-tabs justify-content-center mt-2"
+  role="tablist"
+>
+  <li [ngbNavItem]="1" class="nav-item">
+    <a
+      ngbNavLink
+      data-toggle="tab"
+      role="tab"
+      routerLink="../info"
+      aria-hidden="true"
+      aria-controls="home"
+      aria-selected="true"
+      class="nav-link border-0 text-uppercase fw-bold"
+      >Información</a
+    >
+    <ng-template ngbNavContent>
+      <div class="row placeholder-glow mt-4">
+        <div class="col-lg-6">
+          <div class="card w-100" [class.placeholder]="loadings.basic_data">
+            @if (!loadings.basic_data) {
+              <app-load-image
+                class="mt-4 mx-auto"
+                classImg="card-img-top img-rounded img-thumbnail rounded-circle img-fluid {{
+                  userDetail.status == 'activo'
+                    ? 'bg-success'
+                    : userDetail.status == 'inactivo'
+                      ? 'bg-danger'
+                      : userDetail.status == 'preliquidado'
+                        ? 'bg-warning'
+                        : 'bg-secondary'
+                }}"
+                [src]="userDetail.image"
+              ></app-load-image>
+              <div class="card-body text-center">
+                <h5 class="card-title text-uppercase">
+                  {{ userDetail.first_name }} {{ userDetail.second_name }}
+                  {{ userDetail.first_surname }}
+                  {{ userDetail.second_surname }}
+                </h5>
+                @if (userDetail.title != 'null') {
+                  <strong>
+                    {{ userDetail.title }}
+                  </strong>
+                }
+                <app-datos-basicos
+                  [userDetail]="userDetail"
+                  (updateSuccess)="getAllUserInfo('basic_data')"
+                ></app-datos-basicos>
+              </div>
+              <div class="card-footer">
+                <div
+                  [ngbPopover]="imgSignature"
+                  [popoverTitle]="'Firma del funcionario'"
+                  aria-hidden="true"
+                  role="button"
+                  triggers="mouseenter:mouseleave"
+                >
+                  <app-load-image
+                    [src]="userDetail.signature"
+                    srcDefault="./assets/images/sinfirma.png"
+                    classImg="signature-image w-100"
+                    [stylesImg]="{ height: '6rem' }"
+                  ></app-load-image>
+                  <ng-template #imgSignature>
+                    <div>
+                      <img [src]="userDetail.signature" class="img-fluid" />
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="card w-100" [class.placeholder]="loadings.company">
+            @if (!loadings.company) {
+              <div class="card-body">
+                <app-datos-empresa
+                  [userDetail]="userDetail"
+                  (updateSuccess)="getAllUserInfo('company')"
+                ></app-datos-empresa>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="row">
+            <div class="col-12">
+              <div class="card w-100" [class.placeholder]="loadings.salary">
+                @if (!loadings.salary) {
+                  <div class="card-body">
+                    <app-salario
+                      [userDetail]="userDetail"
+                      (updateSuccess)="getAllUserInfo('salary')"
+                    ></app-salario>
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card w-100" [class.placeholder]="loadings.affiliation">
+                @if (!loadings.affiliation) {
+                  <div class="card-body">
+                    <app-afiliaciones
+                      [userDetail]="userDetail"
+                      (updateSuccess)="getAllUserInfo('affiliation')"
+                    ></app-afiliaciones>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="2" class="nav-item">
+    <a
+      ngbNavLink
+      data-toggle="tab"
+      role="tab"
+      routerLink="../permit"
+      aria-hidden="true"
+      aria-controls="home"
+      aria-selected="true"
+      class="nav-link border-0 text-uppercase fw-bold"
+      >Privilegios</a
+    >
+    <ng-template ngbNavContent>
+      <div class="card mt-4">
+        <div class="card-body">
+          <app-permissions></app-permissions>
+        </div>
+      </div>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="3" class="nav-item">
+    <a
+      ngbNavLink
+      data-toggle="tab"
+      role="tab"
+      routerLink="../doc"
+      aria-controls="home"
+      aria-hidden="true"
+      aria-selected="true"
+      class="nav-link border-0 text-uppercase fw-bold"
+      >Documentos</a
+    >
+    <ng-template ngbNavContent>
+      @if (url) {
+        <iframe
+          [src]="url | safe"
+          height="400"
+          scrolling="no"
+          class="mt-4 w-100 border-0"
+          aria-hidden="true"
+        ></iframe>
+      }
+    </ng-template>
+  </li>
+</ul>
+<div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+<app-modal-preliquidar
+  [funcionario]="userDetail"
+  (reload)="recargarDatos()"
+  #modalPreliquidar
+></app-modal-preliquidar>

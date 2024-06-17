@@ -1,0 +1,11 @@
+<app-solicitud-compra-crear
+  [title]="'Editar solicitud de compra'"
+  [id]="id"
+  [dataEdit]="data"
+  *ngIf="!loading && data; else placeholder"
+>
+</app-solicitud-compra-crear>
+
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>

@@ -1,0 +1,266 @@
+<app-card viewTitle="Certificados" [filterTemplate]="filterTemplate">
+  <ng-container ngProjectAs="[filters]">
+    <app-header-button
+      icon="plus"
+      text="Solicitar certificado"
+      type="primary"
+      (click)="openConfirm(laboral)"
+    ></app-header-button>
+    <app-header-button
+      icon="plus"
+      text="Solicitar carta cesantía"
+      type="success"
+      (click)="openConfirm(cesantia)"
+    ></app-header-button>
+  </ng-container>
+  <div class="row">
+    <div class="col-lg-6">
+      <app-certificados-list [filtro]="filtroLaboral" #laboralchild></app-certificados-list>
+    </div>
+    <div class="col-lg-6">
+      <app-cesantias [filtro]="filtroCesantias" #cesantiaschild></app-cesantias>
+    </div>
+  </div>
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container *ngIf="peopleAll$ | async as people">
+    <app-autocomplete-mdl
+      class="col"
+      label="Nombre en c. laboral"
+      placeholder="Buscar funcionario"
+      [model]="filtroLaboral.name"
+      [list]="people"
+      (optionSelectedEvent)="filtroLaboral.name = $event; laboralchild.getWorkCertificates()"
+    ></app-autocomplete-mdl>
+    <app-autocomplete-mdl
+      class="col"
+      label="Nombre en cesantías"
+      placeholder="Buscar funcionario"
+      [model]="filtroCesantias.name"
+      [list]="people"
+      (optionSelectedEvent)="filtroCesantias.name = $event; cesantiaschild.getLayoffsCertificates()"
+    ></app-autocomplete-mdl>
+  </ng-container>
+</ng-template>
+
+<ng-template #laboral let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Solicitud de certificado laboral</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="formLaboral">
+      <div class="row">
+        <mat-form-field class="col-12" appearance="outline">
+          <mat-label>Información a mostrar</mat-label>
+          <mat-select [multiple]="true" formControlName="information" required>
+            <mat-option
+              value="0"
+              *ngIf="
+                formLaboral.value.information == '' ||
+                formLaboral.value.information == '0' ||
+                formLaboral.value.information == null
+              "
+              >Ninguna</mat-option
+            >
+            <mat-option value="cargo" *ngIf="formLaboral.value.information != '0'"
+              >Cargo</mat-option
+            >
+            <mat-option value="salario" *ngIf="formLaboral.value.information != '0'"
+              >Salario</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+        <div class="col-12">
+          <app-autocomplete-fc
+            class="col"
+            label="Funcionario"
+            placeholder="Selecciona"
+            [control]="formLaboral.controls['person_id']"
+            [class.is-invalid]="formLaboral.get('person_id').invalid"
+            [list]="people$ | async"
+          ></app-autocomplete-fc>
+        </div>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Dirigido a</mat-label>
+          <input
+            matInput
+            type="cel"
+            placeholder="Ingresa hacia quién va dirigido"
+            formControlName="addressee"
+            autocomplete="off"
+          />
+          <mat-hint
+            >Llena este campo únicamente si el certificado va dirigido a alguien en
+            concreto</mat-hint
+          >
+        </mat-form-field>
+        <mat-form-field
+          class="col-md-12 mat-form-field-no-padding textarea mt-4"
+          appearance="outline"
+        >
+          <mat-label>Motivo</mat-label>
+          <textarea
+            matInput
+            placeholder="Ingresa el motivo de la solicitud"
+            rows="5"
+            formControlName="reason"
+            maxlength="500"
+            required
+            [cdkTextareaAutosize]="true"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+    <button
+      type="button"
+      (click)="newLaboral()"
+      [disabled]="!formLaboral.valid"
+      class="btn btn-primary"
+    >
+      Solicitar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #cesantia let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Solicitud de carta de cesantías</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="formCesantias">
+      <div class="row">
+        <mat-form-field class="col-12" appearance="outline">
+          <mat-label>Motivo del retiro</mat-label>
+          <mat-select formControlName="reason_withdrawal" required>
+            <mat-option
+              *ngFor="let item of reason_withdrawal"
+              [value]="item.id"
+              (click)="getRequisitos(item.requirements)"
+              >{{ item.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+
+        <div class="col-12">
+          <app-autocomplete-fc
+            class="col"
+            label="Funcionario"
+            placeholder="Selecciona"
+            [control]="formLaboral.controls['person_id']"
+            [class.is-invalid]="formLaboral.get('person_id').invalid"
+            [list]="people$ | async"
+            (valueSelected)="optionSelected($event)"
+          ></app-autocomplete-fc>
+        </div>
+        <!-- <mat-form-field class="col" appearance="outline">
+          <mat-label>Total o parcial</mat-label>
+          <mat-select formControlName="monto" required>
+            <mat-option
+              *ngFor="let item of reason_withdrawal"
+              [value]="item.id"
+              (click)="getRequisitos(item.requirements)"
+              >{{ item.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field> -->
+        <div class="col mt-2">
+          <mat-radio-group aria-labelledby="example-radio-group-label" formControlName="monto">
+            <mat-radio-button value="total" color="primary"> Total </mat-radio-button>
+            <mat-radio-button value="parcial" color="primary"> Parcial </mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <mat-form-field
+          *ngIf="formCesantias.get('monto').value == 'parcial'"
+          class="col"
+          appearance="outline"
+        >
+          <mat-label>Monto a retirar</mat-label>
+          <input
+            matInput
+            formControlName="valormonto"
+            currencyMask
+            appInputPosition
+            [options]="{ prefix: '$ ', thousands: '.', decimal: ',' }"
+            required
+            placeholder="Ingresa el monto a retirar"
+          />
+        </mat-form-field>
+        @if (requisitos != '') {
+          <div class="col-12 pre-line">
+            <p>
+              {{ requisitos }}
+            </p>
+          </div>
+        }
+        <div class="col-12 mt-2">
+          <div class="alert alert-info" role="alert">
+            Solo podrás cargar un archivo que debe contener todos los requisitos solicitados
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-group text-center">
+            <div class="custom-input-file col-md-12">
+              <input
+                type="file"
+                class="input-file"
+                aria-label="Cargar documento"
+                (change)="onFileChanged($event)"
+                accept=".pdf"
+              />
+              Cargar documento
+            </div>
+            <div class="col-md-12 text-center">
+              <small *ngIf="pdfCargado" class="text-success">Documento cargado</small>
+            </div>
+          </div>
+        </div>
+        <mat-form-field
+          class="col-md-12 mat-form-field-no-padding textarea mt-3"
+          appearance="outline"
+        >
+          <mat-label>Motivo</mat-label>
+          <textarea
+            matInput
+            placeholder="Ingresa el motivo de la solicitud"
+            rows="5"
+            maxlength="500"
+            formControlName="reason"
+            required
+            [cdkTextareaAutosize]="true"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+    <button
+      type="button"
+      (click)="newCesantia()"
+      [disabled]="!formCesantias.valid"
+      class="btn btn-primary"
+    >
+      Solicitar
+    </button>
+  </div>
+</ng-template>

@@ -1,0 +1,24 @@
+<app-modal titleModal="Iniciar inventario físico {{ Tipo | lowercase }}">
+  <mat-form-field class="col w-100" appearance="outline">
+    <mat-label>Identificación funcionario digitador</mat-label>
+    <input matInput type="text" [(ngModel)]="Funcionario_Digita" aria-hidden="true" />
+  </mat-form-field>
+  <p *ngIf="Error_Funcionario_Digita" class="text-danger">Debe ingresar este campo</p>
+  <mat-form-field class="col w-100" appearance="outline">
+    <mat-label>Identificación funcionario contador</mat-label>
+    <input matInput type="text" [(ngModel)]="Funcionario_Cuenta" aria-hidden="true" />
+  </mat-form-field>
+  <p *ngIf="Error_Funcionario_Cuenta" class="text-danger">Debe ingresar este campo</p>
+  <mat-form-field class="col w-100" appearance="outline">
+    <mat-label>Código de barras de estiba</mat-label>
+    <input matInput type="text" [(ngModel)]="Codigo_Barras" aria-hidden="true" />
+  </mat-form-field>
+  <p *ngIf="Error_Codigo_Barras" class="text-danger">Debe ingresar este campo</p>
+  <div class="text-center m-2 d-flex flex-column justify-content-center">
+    <i class="fa fa-barcode fa-4x"></i>
+    <h5 class="text">Escanee el código de barras de la estiba</h5>
+  </div>
+  <button buttons type="button" class="btn btn-primary" (click)="onSaveInventory()">
+    Iniciar inventario
+  </button>
+</app-modal>

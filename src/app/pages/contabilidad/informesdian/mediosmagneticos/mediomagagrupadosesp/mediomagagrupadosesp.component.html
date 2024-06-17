@@ -1,0 +1,84 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Agrupar medios magnéticos especiales</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            [routerLink]="['/contabilidad/informesdian/agruparmediosmagneticos/crear']"
+          >
+            <i class="fa fa-plus"></i>
+            Agregar
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!Cargando && listaMediosMag.length > 0; else notData"
+      >
+        <thead>
+          <tr>
+            <th>Codigo</th>
+            <th>Agrupación</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of listaMediosMag">
+            <td>{{ item.Codigo_Formato }}</td>
+            <td>{{ item.Nombre_Formato }}</td>
+            <td>
+              <div ngbDropdown container="body" class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a
+                    class="dropdown-item"
+                    href="{{
+                      enviromen.ruta
+                    }}php/contabilidad/mediosmagneticos/reporte_formatos_agrupados.php?id={{
+                      item.Id
+                    }}"
+                    target="_blank"
+                  >
+                    <i class="fa fa-table"></i> Reporte</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    [routerLink]="[
+                      '/contabilidad/informesdian/agruparmediosmagneticos/editar',
+                      item.Id
+                    ]"
+                  >
+                    <i class="fa fa-pencil"></i> Editar</a
+                  >
+                  <a
+                    class="dropdown-item bg-danger"
+                    (click)="onRemoveFormat(); IdMedioMag = item.Id"
+                  >
+                    <i class="fa fa-trash"></i> Eliminar</a
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- {{(page*maxSize)-maxSize+1}} al {{((page*maxSize) > TotalItems ? TotalItems : (page*maxSize))}} de {{ TotalItems }} -->
+    <!-- <ngb-pagination class="pull-right" [(collectionSize)]="TotalItems" [(page)]="page" [maxSize]="10" [pageSize]="20"  size="sm" (pageChange)="filtrar(true)" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>  -->
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>

@@ -1,0 +1,14 @@
+<ngb-pagination
+  size="sm"
+  class="d-flex justify-content-center pagination-rounded pagination-sm"
+  [collectionSize]="pagination.collectionSize"
+  [pageSize]="pagination.pageSize"
+  [(page)]="pagination.page"
+  (pageChange)="onPageChange($event)"
+  aria-label="Default pagination"
+  [maxSize]="5"
+  [rotate]="true"
+  [ellipses]="false"
+  [boundaryLinks]="true"
+>
+</ngb-pagination>

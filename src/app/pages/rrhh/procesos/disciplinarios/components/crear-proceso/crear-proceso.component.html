@@ -1,0 +1,168 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="headerData"></app-cabecera>
+    <hr class="line" />
+    <form [formGroup]="createForm">
+      <div class="row">
+        <div class="col-md-5">
+          <div class="row">
+            <mat-form-field class="col-md-12" appearance="outline">
+              <mat-label>Título</mat-label>
+              <input
+                matInput
+                type="text"
+                id="title"
+                formControlName="title"
+                name="title"
+                autocomplete="off"
+              />
+            </mat-form-field>
+            <app-autocomplete-fc
+              class="col"
+              label="Funcionario"
+              placeholder="Busca el nombre del funcionario"
+              [control]="createForm.controls['person_id']"
+              [list]="people$ | async"
+              (optionSelectedEvent)="nameUser = $event"
+            ></app-autocomplete-fc>
+            <mat-form-field class="col-md-12" appearance="outline">
+              <mat-label>Fecha de inicio</mat-label>
+              <input
+                matInput
+                type="date"
+                id="fecha_inicio"
+                formControlName="date_of_admission"
+                name="fecha_inicio"
+                required
+                autocomplete="off"
+              />
+            </mat-form-field>
+            <app-multi-files
+              class="col-md-12 mb-4"
+              typeUse="button"
+              (sendFiles)="openMultiFiles($event)"
+            />
+            <mat-form-field
+              class="col-md-12 mat-form-field-no-padding textarea"
+              appearance="outline"
+            >
+              <mat-label>Descripción</mat-label>
+              <textarea
+                matInput
+                placeholder="Ingrese la descripción"
+                rows="5"
+                formControlName="process_description"
+                id="descripcion"
+                name="notas"
+                [cdkTextareaAutosize]="true"
+              ></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-7 panel">
+          <div class="panel-body">
+            <div class="card-title d-flex justify-content-between">
+              <h5>Involucrados</h5>
+              <button
+                class="btn btn-primary btn-sm"
+                (click)="openAddInvolvedDisciplinary()"
+                type="button"
+              >
+                <i class="fa fa-plus"></i> Agregar
+              </button>
+            </div>
+            <div class="rounded-top table-responsive">
+              @if (!loading && involvedList.length > 0) {
+                <table class="table table-bordered table-striped table-sm">
+                  <thead class="bg-light">
+                    <tr class="text-center text-uppercase">
+                      <th>Funcionario</th>
+                      <th>Observación</th>
+                      <th>Documentos</th>
+                      <th>Memorandos</th>
+                      <th><i class="mdi mdi-chevron-down"></i></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (involved of involvedList.controls; track involved; let i = $index) {
+                      <tr class="text-center">
+                        <td class="align-middle">
+                          {{ involved.value.person }}
+                        </td>
+                        <td class="align-middle">
+                          {{ involved.value.observation }}
+                        </td>
+                        <td class="align-middle">
+                          <marquee behavior="" direction="">{{ involved.value.filename }}</marquee>
+                        </td>
+                        <td class="align-middle">
+                          <i
+                            [ngClass]="collapsed[i] ? 'fa-angle-up' : 'fa-angle-down'"
+                            class="fas text-primary"
+                            role="button"
+                            (click)="collapsed[i] = !collapsed[i]"
+                          ></i>
+                        </td>
+                        <td class="align-middle">
+                          <button
+                            class="btn btn-outline-danger btn-sm"
+                            type="button"
+                            (click)="deletedInvolved(i)"
+                          >
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      @if (collapsed[i]) {
+                        <tr>
+                          <td colspan="100%">
+                            <div class="rounded-top table-responsive">
+                              <table class="table table-bordered table-striped table-sm">
+                                @if (involvedList.controls['memorandums'].value.length > 0) {
+                                  <thead class="bg-light">
+                                    <tr class="text-center text-uppercase">
+                                      <th>Motivo</th>
+                                      <th>Detalle</th>
+                                      <th>Fecha C.</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    @for (
+                                      item of involved['controls']['memorandums']['value'];
+                                      track $index
+                                    ) {
+                                      <tr class="text-center">
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ item.value }}</td>
+                                        <td>{{ item.date | date }}</td>
+                                      </tr>
+                                    }
+                                  </tbody>
+                                } @else {
+                                  <tr class="bg-light">
+                                    <td colspan="100%" class="text-center align-middle">
+                                      <span class="text-dark">Sin memorandos agregados</span>
+                                    </td>
+                                  </tr>
+                                }
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    }
+                  </tbody>
+                </table>
+              } @else {
+                <app-not-data [loading]="loading" [text]="'Sin datos agregados'"></app-not-data>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <button class="btn-block btn btn-primary" (click)="save()">Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

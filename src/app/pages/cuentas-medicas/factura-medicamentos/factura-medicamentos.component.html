@@ -1,0 +1,368 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-md-4 col-xl-4">
+      <h4>Facturadores</h4>
+      <div class="card bg-info notification-card" *ngFor="let auditor of auditores">
+        <div class="card-block">
+          <div class="row align-items-center">
+            <div class="col-3 notify-icon">
+              <div class="media-center media-middle photo-table">
+                <img *ngIf="auditor.Imagen == ''" class="img-circle" src="assets/images/user.jpg" />
+                <img
+                  *ngIf="auditor.Imagen !== ''"
+                  class="img-circle"
+                  src="{{ globales.ruta }}/IMAGENES/FUNCIONARIOS/{{ auditor.Imagen }}"
+                />
+              </div>
+            </div>
+            <div class="col-9 notify-cont">
+              <div class="media-body cuerpo text-start" style="padding-left: 30px">
+                <h6>{{ auditor.Funcionario }}</h6>
+                <p>
+                  {{ auditor.Cargo }} ({{ auditor.Dependencia }}) <br />
+                  Facturas asignadas: {{ auditor.asignados }} <br />
+                  Facturas realizadas: {{ auditor.facturadas }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-8">
+      <div class="card m-t-30">
+        <div class="card-body">
+          <div class="f-right bug-issue-link">
+            <ol class="breadcrumb bg-white m-0 p-t-5 p-b-0">
+              <li class="breadcrumb-item">
+                <a href="javascript:;">{{ indicadores.facturadas }} Facturada (s)</a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="javascript:;">{{ indicadores.no_facturadas }} Dispensaciones x Facturar</a>
+              </li>
+            </ol>
+          </div>
+          <h3>Dispensación</h3>
+          <button
+            *ngIf="seleccionados > 0"
+            (click)="AsignarFuncionarios()"
+            type="button"
+            class="btn btn-sm btn-success btn-new-tickets waves-effect waves-light m-r-15 m-t-5 m-b-5"
+          >
+            <i class="fa fa-plus"></i>
+            <span class="m-l-10">Asignar Facturador</span>
+          </button>
+          <br *ngIf="seleccionados > 0" />
+          <table class="table table-condesed table-striped">
+            <thead>
+              <tr>
+                <th style="width: 20px"></th>
+                <th style="width: 140px">Codigo</th>
+                <th style="width: 120px">Fecha</th>
+                <th style="width: 160px">Tipo</th>
+                <th>Facturador</th>
+                <th style="width: 120px">Cliente</th>
+                <th style="width: 100px">Estado</th>
+                <th style="width: 80px">Acciones</th>
+              </tr>
+              <tr>
+                <th class="tabla-filtro"></th>
+                <th class="tabla-filtro">
+                  <input
+                    type="text"
+                    [(ngModel)]="filtro_cod"
+                    (blur)="filtros()"
+                    class="form-control input-sm"
+                    placeholder="Filtro Codigo"
+                  />
+                </th>
+                <th class="tabla-filtro">
+                  <!-- Mirar commits anteriores a 16/10/23 -->
+                </th>
+                <th class="tabla-filtro">
+                  <select
+                    [(ngModel)]="filtro_tipo"
+                    class="form-control input-sm"
+                    (change)="filtros()"
+                  >
+                    <option value="">Todas</option>
+                    <option *ngFor="let s of Servicios" [value]="s.Id_Tipo_Servicio">
+                      {{ s.Nombre }}
+                    </option>
+                  </select>
+                </th>
+                <th class="tabla-filtro">
+                  <input
+                    type="text"
+                    [(ngModel)]="filtro_facturador"
+                    (blur)="filtros()"
+                    class="form-control input-sm"
+                    placeholder="Filtro Cargos"
+                  />
+                </th>
+                <th class="tabla-filtro">
+                  <input
+                    type="text"
+                    [(ngModel)]="filtro_cliente"
+                    (blur)="filtros()"
+                    class="form-control input-sm"
+                    placeholder="Filtro Cliente"
+                  />
+                </th>
+                <th class="tabla-filtro"></th>
+                <th class="tabla-filtro"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="Cargando">
+                <td colspan="11" class="text-center">
+                  <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+                  <span class="sr-only">Cargando...</span>
+                  <h4>Cargando Radicaciones ...</h4>
+                </td>
+              </tr>
+              <tr *ngIf="Dispensaciones.length == 0 && !Cargando">
+                <td colspan="7" class="text-center">
+                  <i class="fa fa-exclamation-circle fa-5x"></i>
+                  <h4>No Existen Dispensaciones Sin Facturar por el Momento</h4>
+                </td>
+              </tr>
+              <tr *ngFor="let dispensacion of Dispensaciones">
+                <td style="max-width: 30px">
+                  <input
+                    type="checkbox"
+                    [checked]="checked"
+                    [value]="dispensacion.Id_Dispensacion"
+                    (change)="onSelect($event)"
+                  />
+                </td>
+                <td>
+                  <strong>{{ dispensacion.Codigo }}</strong>
+                </td>
+                <td class="text-center">
+                  {{ dispensacion.Fecha_Dis }}
+                </td>
+                <td>
+                  <div class="text-center">
+                    <span
+                      class="label {{
+                        dispensacion.Tipo == 'NoPos' ? 'label-primary' : 'label-inverse'
+                      }}"
+                      >{{ dispensacion.Servicio }}</span
+                    >
+                  </div>
+                </td>
+                <td>
+                  {{ dispensacion.Funcionario }}
+                </td>
+                <td>
+                  {{ dispensacion.EPS }}
+                </td>
+                <td>
+                  <div class="text-center">
+                    <span
+                      class="label {{
+                        dispensacion.Estado_Facturacion == 'Sin Facturar'
+                          ? 'label-danger'
+                          : 'label-success'
+                      }}"
+                      >{{ dispensacion.Estado_Facturacion }}</span
+                    >
+                  </div>
+                </td>
+
+                <td>
+                  <div class="text-center">
+                    <div
+                      class="btn-group"
+                      role="group"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title=""
+                      data-original-title=".btn-mini"
+                    >
+                      <div ngbDropdown class="dropdown-primary">
+                        <button
+                          ngbDropdownToggle
+                          class="btn btn-secondary btn-mini waves-effect waves-light"
+                          type="button"
+                        >
+                          Acciones
+                        </button>
+                        <div ngbDropdownMenu>
+                          <a
+                            class="dropdown-item waves-light waves-effect caja-botones"
+                            [routerLink]="['/dispensacion', dispensacion.Id_Dispensacion]"
+                          >
+                            <i class="ti-eye"></i>Ver</a
+                          >
+                          <a
+                            class="dropdown-item waves-light waves-effect caja-botones"
+                            [routerLink]="['/facturacrear', dispensacion.Id_Dispensacion]"
+                          >
+                            <i class="ti-eye"></i>Facturar</a
+                          >
+                          <a
+                            class="dropdown-item waves-light waves-effect caja-botones"
+                            (click)="EditarDispensacion(dispensacion.Id_Dispensacion)"
+                          >
+                            <i class="fa fa-user"></i>Facturador</a
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- <ngb-pagination size="sm"
+            class="pull-right"
+            [collectionSize]="TotalItems"
+            [(page)]="page"
+            [maxSize]="maxSize"
+            size="sm"
+            (pageChange)="paginacion()"
+            [boundaryLinks]="true"
+          ></ngb-pagination> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <app-tabla-facturacion></app-tabla-facturacion>
+    </div>
+  </div>
+</div>
+
+<app-modal-basic #modalAsignarFacturador>
+  <div class="app-modal-header">
+    <h4>Asignar Facturador</h4>
+    <button
+      type="button"
+      class="close basic-close"
+      (click)="modalAsignarFacturador.hide()"
+    ></button>
+  </div>
+  <div class="app-modal-body">
+    <form
+      #FormAsignarFacturador="ngForm"
+      (ngSubmit)="AsignarFacturador(FormAsignarFacturador, modalAsignarFacturador)"
+    >
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <input type="hidden" name="id" ngModel="{{ IdDispensacion }}" required />
+            <label>Asignar a:</label>
+            <select
+              class="form-control form-control-sm"
+              name="Facturador_Asignado"
+              ngModel="{{ idFacturador }}"
+            >
+              <option value="">Seleccione Facturador</option>
+              <option
+                *ngFor="let auditor of auditores"
+                [value]="auditor.Identificacion_Funcionario"
+              >
+                {{ auditor.Funcionario }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-end">
+      <button type="button" class="btn btn-default btn-sm" (click)="modalAsignarFacturador.hide()">
+        Cancelar
+      </button>
+      <!-- <button
+        type="button"
+        [swal]="{
+          title: '¿Está Seguro?',
+          text: 'Se asignará la dispensación al facturador seleccionado',
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Si, Guardar',
+          cancelButtonText: 'No, Dejame Comprobar!'
+        }"
+        (confirm)="
+          AsignarFacturador(FormAsignarFacturador, modalAsignarFacturador)
+        "
+        [disabled]="!FormAsignarFacturador.valid"
+        class="btn btn-primary btn-sm"
+      >
+        Guardar
+      </button> -->
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalAsignarFacturadorTodos>
+  <div class="app-modal-header">
+    <h4>Asignar Facturador</h4>
+    <button
+      type="button"
+      class="close basic-close"
+      (click)="modalAsignarFacturadorTodos.hide()"
+    ></button>
+  </div>
+  <div class="app-modal-body">
+    <form
+      #FormAsignarFacturadorTodos="ngForm"
+      (ngSubmit)="AsignarFacturador(FormAsignarFacturador, modalAsignarFacturador)"
+    >
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Asignar a:</label>
+            <select class="form-control form-control-sm" name="Facturador_Asignado" ngModel>
+              <option value="">Seleccione Facturador</option>
+              <option
+                *ngFor="let auditor of auditores"
+                [value]="auditor.Identificacion_Funcionario"
+              >
+                {{ auditor.Funcionario }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-end">
+      <button
+        type="button"
+        class="btn btn-default btn-sm"
+        (click)="modalAsignarFacturadorTodos.hide()"
+      >
+        Cancelar
+      </button>
+      <!-- <button
+        type="button"
+        [swal]="{
+          title: '¿Está Seguro?',
+          text: 'Se asignará las dispensaciones al facturador seleccionado',
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Si, Guardar',
+          cancelButtonText: 'No, Dejame Comprobar!'
+        }"
+        (confirm)="
+          guardarAsignaciones(
+            FormAsignarFacturadorTodos,
+            modalAsignarFacturadorTodos
+          )
+        "
+        [disabled]="!FormAsignarFacturadorTodos.valid"
+        class="btn btn-primary btn-sm"
+      >
+        Guardar
+      </button> -->
+    </div>
+  </div>
+</app-modal-basic>

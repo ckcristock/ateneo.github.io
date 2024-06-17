@@ -1,0 +1,29 @@
+<div>
+  <hr />
+  <div class="text-center text-uppercase card-title mt-2">
+    <i class="fas fa-stethoscope"></i>
+    Cálculo IBC salud y pensión
+  </div>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-uppercase">
+          <th>Concepto</th>
+          <th class="text-center col-md-1">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let factor of ibc">
+          <td>{{ factor.concepto }}</td>
+          <td class="text-center">{{ factor.valor | currency: '' : '' }}</td>
+        </tr>
+        <tr>
+          <td class="fw-bold">IBC Salud y pensión</td>
+          <td class="text-center fw-bold">
+            {{ retenciones.IBC_seguridad | currency: '' : '' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

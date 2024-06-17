@@ -1,0 +1,135 @@
+<article class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Direccionamientos</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button class="btn btn-info btn-sm" (click)="matPanel.toggle()">
+            <i class="fas fa-sliders-h"></i> Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel #matPanel class="mat-elevation-z0">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fechas direccionamiento</mat-label>
+            <mat-date-range-input [formGroup]="formRange" [rangePicker]="picker">
+              <input
+                matStartDate
+                placeholder="Fecha de inicio"
+                formControlName="start"
+                name="date_start"
+              />
+              <input matEndDate placeholder="Fecha de fin" formControlName="end" name="date_end" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker>
+              <mat-date-range-picker-actions>
+                <button mat-button matDateRangePickerCancel>Cancelar</button>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  matDateRangePickerApply
+                  (click)="onFilterDate()"
+                >
+                  Aplicar
+                </button>
+              </mat-date-range-picker-actions>
+            </mat-date-range-picker>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha máxima entrega</mat-label>
+            <mat-date-range-input [formGroup]="formRange" [rangePicker]="pickerTwo">
+              <input
+                matStartDate
+                placeholder="Fecha de inicio"
+                formControlName="start"
+                name="date_start"
+              />
+              <input matEndDate placeholder="Fecha de fin" formControlName="end" name="date_end" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="pickerTwo"></mat-datepicker-toggle>
+            <mat-date-range-picker #pickerTwo>
+              <mat-date-range-picker-actions>
+                <button mat-button matDateRangePickerCancel>Cancelar</button>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  matDateRangePickerApply
+                  (click)="onFilterDate()"
+                >
+                  Aplicar
+                </button>
+              </mat-date-range-picker-actions>
+            </mat-date-range-picker>
+          </mat-form-field>
+          <app-automatic-search
+            class="col"
+            label="Filtro paciente"
+            placeholder="Busca por paciente"
+            [value]="Filtros.paciente"
+            (searching)="Filtros.paciente = $event; onFilter()"
+          ></app-automatic-search>
+          <app-automatic-search
+            class="col"
+            label="Filtro prescripción"
+            placeholder="Busca por prescripción"
+            [value]="Filtros.NoPrescripcion"
+            (searching)="Filtros.NoPrescripcion = $event; onFilter()"
+          ></app-automatic-search>
+          <app-automatic-search
+            class="col"
+            label="Filtro dispensación"
+            placeholder="Busca por dispensación"
+            [value]="Filtros.Dispensacion"
+            (searching)="Filtros.Dispensacion = $event; onFilter()"
+          ></app-automatic-search>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs mt-3">
+      <li [ngbNavItem]="1">
+        <button ngbNavLink>Programados</button>
+        <ng-template ngbNavContent>
+          <app-tabladireccionamientos
+            [Tipo]="'Programado'"
+            [Filtros]="Filtros"
+          ></app-tabladireccionamientos>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="2">
+        <button ngbNavLink>Radicados programados</button>
+        <ng-template ngbNavContent>
+          <app-tabladireccionamientos
+            [Tipo]="'Radicado Programado'"
+            [Filtros]="Filtros"
+          ></app-tabladireccionamientos>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="3">
+        <button ngbNavLink>Entregados</button>
+        <ng-template ngbNavContent>
+          <app-tabladireccionamientos
+            [Tipo]="'Entregado'"
+            [Filtros]="Filtros"
+          ></app-tabladireccionamientos>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="4">
+        <button ngbNavLink>Facturados</button>
+        <ng-template ngbNavContent>
+          <app-tabladireccionamientos
+            [Tipo]="'Facturado'"
+            [Filtros]="Filtros"
+          ></app-tabladireccionamientos>
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+  </div>
+</article>

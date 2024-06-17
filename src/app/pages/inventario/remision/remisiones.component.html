@@ -1,0 +1,231 @@
+<app-card viewTitle="Remisiones" [filterTemplate]="filterTemplate">
+  <app-add-button filters [routerLink]="['remisioncrearnuevo']" />
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Lista_Remisiones"
+    [pagination]="pagination"
+    (pageChange)="filtros()"
+  >
+    <ng-container titles>
+      <th>Fecha</th>
+      <th>Código</th>
+      <th>Tipo</th>
+      <th>Origen</th>
+      <th>Grupo</th>
+      <th>Destino</th>
+      <th class="col-md-2">Observaciones</th>
+      <th>Items</th>
+      <th>Estado</th>
+      <th>Fase</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (remision of Lista_Remisiones; track remision.Codigo; let i = $index) {
+        <tr class="text-center">
+          <td>
+            {{ remision.Fecha_Remision }}
+          </td>
+          <td>
+            {{ remision.Codigo }}
+          </td>
+          <td>
+            <span class="label {{ remision.Tipo == 'Cliente' ? 'label-success' : 'label-primary' }}"
+              >{{ remision.Tipo }}
+            </span>
+          </td>
+          <td>
+            {{ remision.Punto_Origen || 'N/A' }}
+          </td>
+          <td>
+            {{ remision.Grupo || 'N/A' }}
+          </td>
+          <td>
+            {{ remision.Punto_Destino || 'N/A' }}
+          </td>
+          <td>
+            <details>
+              <summary>Ver observación</summary>
+              <span>{{
+                remision.Observaciones == '' ? 'No tiene Observaciones!' : remision.Observaciones
+              }}</span>
+            </details>
+          </td>
+          <td>{{ remision.Items }}</td>
+          <td>
+            <app-status-badge [status]="remision.Estado" />
+          </td>
+          <td>
+            <strong>{{ remision.Fase }}</strong>
+          </td>
+          <td>
+            <app-dropdown-actions [loading]="loadingDownload === i">
+              <app-action-view
+                [link]="{
+                  url: '/inventario/remisiones/remision/' + remision.Id_Remision
+                }"
+              />
+              @if (remision.Estado === 'facturada') {
+                <app-action-button
+                  icon="file-invoice"
+                  text="Ver factura"
+                  type="warning"
+                  [link]="{
+                    url: '/inventario/ver-factura-venta/' + remision.Id_Factura
+                  }"
+                />
+              }
+              @if (remision.Estado != 'anulada') {
+                <app-action-button
+                  icon="file"
+                  text="Remisión"
+                  type="secondary"
+                  (click)="
+                    onFileDownload(
+                      'php/archivos/descarga_pdf.php?tipo=Remision&id=' + remision.Id_Remision,
+                      'remision',
+                      i
+                    )
+                  "
+                />
+              }
+              @if (remision.Estado != 'anulada' && remision.Tipo == 'Cliente') {
+                <app-action-button
+                  icon="file"
+                  text="Archivo con costos"
+                  type="info"
+                  (click)="
+                    onFileDownload(
+                      'php/archivos/descarga_pdf_price.php?tipo=Remision&id=' +
+                        remision.Id_Remision,
+                      'archivo_costos',
+                      i
+                    )
+                  "
+                />
+              }
+              @if (remision.Estado != 'anulada') {
+                <app-action-button
+                  icon="print"
+                  text="Imprimir etiqueta"
+                  type="primary"
+                  (click)="
+                    onFileDownload(
+                      'php/archivos/descarga_zebra.php?id=' + remision.Id_Remision,
+                      'imprimir_etiqueta',
+                      i
+                    )
+                  "
+                />
+              }
+              <!-- @if (remision.Estado != 'anulada') {
+                <app-action-button
+                  icon="file-excel"
+                  text="Descargar plano"
+                  type="success"
+                  (click)="
+                    onFileDownload(
+                      'php/archivos/descarga_excel.php?id=' + remision.Id_Remision,
+                      'plano',
+                      i,
+                      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    )
+                  "
+                />
+              } -->
+              @if (remision.Estado != 'anulada' && remision.Entrega_Pendientes == 'Si') {
+                <app-action-button
+                  icon="folder-open"
+                  text="Documento disp."
+                  type="warning"
+                  (click)="
+                    onFileDownload(
+                      'php/remision/entrega_pendientes_pdf.php?id=' + remision.Id_Remision,
+                      'dispensacion',
+                      i
+                    )
+                  "
+                />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-form-field class="col-md-3" appearance="outline">
+    <mat-label>Rango de fechas</mat-label>
+    <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+      <input
+        matStartDate
+        placeholder="Fecha de inicio"
+        required
+        formControlName="start"
+        name="date_start"
+      />
+      <input matEndDate placeholder="Fecha de fin" required formControlName="end" name="date_end" />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+  </mat-form-field>
+  <app-automatic-search
+    class="col"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtro_cod"
+    (searching)="filtro_cod = $event; filtros()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo</mat-label>
+    <mat-select [(ngModel)]="filtro_tipo" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Cliente">Cliente</mat-option>
+      <mat-option value="Interna">Interna</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <app-automatic-search
+    class="col"
+    label="Origen"
+    placeholder="Busca por origen"
+    [value]="filtro_origen"
+    (searching)="filtro_origen = $event; filtros()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Grupo"
+    placeholder="Busca por grupo"
+    [value]="filtro_grupo"
+    (searching)="filtro_grupo = $event; filtros()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Destino"
+    placeholder="Busca por destino"
+    [value]="filtro_destino"
+    (searching)="filtro_destino = $event; filtros()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filtro_est" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Pendiente">Pendiente</mat-option>
+      <mat-option value="Alistada">Alistada</mat-option>
+      <mat-option value="Enviada">Enviada</mat-option>
+      <mat-option value="Recibida">Recibida</mat-option>
+      <mat-option value="No conforme">No conforme</mat-option>
+      <mat-option value="Anulada">Anulada</mat-option>
+      <mat-option value="Facturada">Facturada</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Fase</mat-label>
+    <mat-select [(ngModel)]="filtro_fase" (selectionChange)="filtros()">
+      <mat-option value="">Todas</mat-option>
+      <mat-option value="0">Fase 1</mat-option>
+      <mat-option value="1">Fase 2</mat-option>
+      <mat-option value="2">Listo</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

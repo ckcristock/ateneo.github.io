@@ -1,0 +1,582 @@
+<app-card viewTitle="Punto" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="openModal(add)" />
+  <app-table
+    [loading]="loadingIndicator"
+    [arrayData]="puntodispensacion"
+    [pagination]="pagination"
+    (pageChange)="filtros(true)"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Departamento</th>
+      <th>Tipo</th>
+      <th>Dirección</th>
+      <th>Tipo Entrega</th>
+      <th>Teléfono</th>
+      <th>No Pos</th>
+      <th>Turnero</th>
+      <th>Entrega Doble</th>
+      <th>Wacom</th>
+      <th class="col-1">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (punto of puntodispensacion; track $index) {
+        <tr class="text-center">
+          <td>{{ punto.Nombre }}</td>
+          <td>{{ punto.NombreDepartamento }}</td>
+          <td>{{ punto.Tipo }}</td>
+          <td>{{ punto.Direccion }}</td>
+          <td>{{ punto.Tipo_Entrega }}</td>
+          <td>{{ punto.Telefono }}</td>
+          <td>{{ punto.No_Pos }}</td>
+          <td>{{ punto.Turnero }}</td>
+          <td>{{ punto.Entrega_Doble }}</td>
+          <td>{{ punto.Wacom }}</td>
+          <td><app-status-badge [status]="punto.Estado" /></td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit
+                (action)="EditarPuntoDispensacionNuevo(punto.Id_Punto_Dispensacion, edit)"
+              />
+              <!-- <app-action-button
+                icon="cubes"
+                text="Grupos - Estibas"
+                type="warning"
+                [link]="{
+                  url: 'grupos-estibas-by-puntos' + punto.Id_Punto_Dispensacion
+                }"
+              ></app-action-button> -->
+              @if (punto.Estado == 'activo') {
+                <app-action-deactivate
+                  (action)="EliminarPuntoDispensacion(punto.Id_Punto_Dispensacion, 'Inactivo')"
+                />
+              } @else {
+                <app-action-activate
+                  (action)="EliminarPuntoDispensacion(punto.Id_Punto_Dispensacion, 'Activo')"
+                />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtro_punto_dispensacion"
+    (searching)="filtro_punto_dispensacion = $event; filtros()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Departamento</mat-label>
+    <mat-select [(ngModel)]="filtro_departamento" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      @for (departamento of Departamentos; track departamento) {
+        <mat-option [value]="departamento.Id_Departamento"> {{ departamento.Nombre }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <app-automatic-search
+    class="col pb-3"
+    label="Tipo"
+    placeholder="Busca por tipo"
+    [value]="filtro_tipo_dispensacion"
+    (searching)="filtro_tipo_dispensacion = $event; filtros()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Dirección"
+    placeholder="Busca por dirección"
+    [value]="filtro_direccion"
+    (searching)="filtro_direccion = $event; filtros()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo de entrega</mat-label>
+    <mat-select [(ngModel)]="filtro_tipo_entrega" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Despacho">Despacho</mat-option>
+      <mat-option value="Radicacion">Radicación</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <app-automatic-search
+    class="col pb-3"
+    label="Teléfono"
+    placeholder="Busca por teléfono"
+    [value]="filtro_telefono"
+    (searching)="filtro_telefono = $event; filtros()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>No Pos</mat-label>
+    <mat-select [(ngModel)]="filtro_no_pos" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Si">Sí</mat-option>
+      <mat-option value="No">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Turnero</mat-label>
+    <mat-select [(ngModel)]="filtro_turnero" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Si">Sí</mat-option>
+      <mat-option value="No">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Entrega</mat-label>
+    <mat-select [(ngModel)]="filtro_entrega" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Si">Sí</mat-option>
+      <mat-option value="No">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Wacom</mat-label>
+    <mat-select [(ngModel)]="filtro_wacom" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Si">Sí</mat-option>
+      <mat-option value="No">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<ng-template #add let-modal>
+  <app-modal titleModal="Punto">
+    <form #FormPuntoDispensacion="ngForm">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            name="name"
+            ngModel
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre punto</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder=""
+            name="Nombre"
+            ngModel
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo punto</mat-label>
+          <mat-select ngModel name="Tipo" required>
+            <mat-option value="">Selecciona tipo</mat-option>
+            <mat-option value="PROPIO"> PROPIO </mat-option>
+            <mat-option value="TERCERO"> TERCERO </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <app-department-municipality class="col-md-8" (changeSelection)="changeMundep($event)" />
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Dirección</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder=""
+            name="Direccion"
+            ngModel
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Teléfono</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder=""
+            name="Telefono"
+            ngModel
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo entrega</mat-label>
+          <mat-select
+            name="Tipo_Entrega"
+            required
+            ngModel
+            (selectionChange)="changeTipo($event.value)"
+          >
+            <mat-option value="">Selecciona</mat-option>
+            <mat-option value="dispensacion">Dispensación</mat-option>
+            <mat-option value="aplicacion">Aplicación</mat-option>
+            <mat-option value="venta">Venta</mat-option>
+          </mat-select>
+        </mat-form-field>
+        @if (Control) {
+          <app-autocomplete-mdl
+            class="col"
+            label="Bodega"
+            placeholder="Selecciona bodega"
+            classList="pb-0"
+            [model]="Id_Bodega_Despacho"
+            [list]="Bodegas"
+            (optionSelectedEvent)="Id_Bodega_Despacho = $event"
+          ></app-autocomplete-mdl>
+        }
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Turnero</mat-label>
+          <mat-select name="Turnero" required ngModel>
+            <mat-option value="">Selecciona turnero</mat-option>
+            <mat-option value="Si">Si</mat-option>
+            <mat-option value="No">No</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Wacom</mat-label>
+          <mat-select name="Wacom" required ngModel>
+            <mat-option value="">Selecciona wacom</mat-option>
+            <mat-option value="Si">Si</mat-option>
+            <mat-option value="No">No</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Cajas</mat-label>
+          <input matInput type="number" name="Cajas" placeholder="" ngModel required />
+        </mat-form-field>
+      </div>
+      <div class="col">
+        <app-autocomplete-mdl
+          class="col"
+          label="Tipo de servicio"
+          placeholder="Seleccionar tipo de servicio"
+          classList="pb-0"
+          [model]="TipoServiciosEscogidos"
+          [list]="serviceTypes"
+          (optionSelectedEvent)="TipoServiciosEscogidos = $event"
+        ></app-autocomplete-mdl>
+      </div>
+    </form>
+    <button
+      buttons
+      type="button"
+      (click)="GuardarPuntoDispensacionNuevo(FormPuntoDispensacion)"
+      [disabled]="!FormPuntoDispensacion.valid"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </app-modal>
+</ng-template>
+
+<ng-template #edit let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Editar punto</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form #FormPuntoDispensacionEditar="ngForm">
+      <input type="hidden" name="id" ngModel="{{ IdPuntoDispensacion }}" required />
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Nombre Punto de dispensacion</label>
+            <input
+              type="text"
+              name="Nombre"
+              placeholder=""
+              class="form-control"
+              ngModel="{{ PuntoDispensacion.Nombre }}"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Tipo Punto de dispensacion</label>
+            <input
+              type="text"
+              name="Tipo"
+              placeholder=""
+              class="form-control"
+              ngModel="{{ PuntoDispensacion.Tipo }}"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Departamento</label>
+            <select
+              class="form-control"
+              name="Departamento"
+              (change)="Municipios_Departamento($event.target.value)"
+              ngModel="{{ PuntoDispensacion.Departamento }}"
+              required
+            >
+              <option>Seleccione Departamento</option>
+              @for (Departamento of Departamentos; track Departamento) {
+                <option [value]="Departamento.Id_Departamento">
+                  {{ Departamento.Nombre }}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Municipio</label>
+            <select
+              class="form-control"
+              name="Municipio"
+              ngModel="{{ PuntoDispensacion.Municipio }}"
+              required
+            >
+              <option>Seleccione Municipio</option>
+              @for (Municipio of Municipios; track Municipio) {
+                <option [value]="Municipio.Id_Municipio">
+                  {{ Municipio.Nombre }}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Direccion</label>
+            <input
+              type="text"
+              name="Direccion"
+              placeholder=""
+              class="form-control"
+              ngModel="{{ PuntoDispensacion.Direccion }}"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Telefono</label>
+            <input
+              type="text"
+              name="Telefono"
+              placeholder=""
+              class="form-control"
+              ngModel="{{ PuntoDispensacion.Telefono }}"
+              required
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <!-- <div class="col-md-3">
+                    <div class="form-group">
+                        <label>No Pos</label>
+                        <input type="text" name="No_Pos" placeholder="" class="form-control" ngModel="{{PuntoDispensacion.No_Pos}}" required>
+                        <select name="No_Pos" class="form-control" required ngModel="{{PuntoDispensacion.No_Pos}}" >
+                            <option value="">Seleccione</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div> -->
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Turnero</label>
+            <select
+              name="Turnero"
+              class="form-control"
+              required
+              ngModel="{{ PuntoDispensacion.Turnero }}"
+            >
+              <option value="">Seleccione Turnero</option>
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Wacom</label>
+            <select
+              name="Wacom"
+              class="form-control"
+              required
+              ngModel="{{ PuntoDispensacion.Wacom }}"
+            >
+              <option value="">Seleccione Wacom</option>
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Caja</label>
+            <input
+              type="text"
+              name="Cajas"
+              placeholder=""
+              class="form-control"
+              ngModel="{{ PuntoDispensacion.Cajas }}"
+              required
+            />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Campo Mipres</label>
+            <select
+              name="Campo_Mipres"
+              class="form-control"
+              required
+              ngModel="{{ PuntoDispensacion.Campo_Mipres }}"
+            >
+              <option value="Numero_Prescripcion" selected>Número Prescripción</option>
+              <option value="Id_Direccionamiento">Id Direccionamineto</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tipo Entrega</label>
+            <select
+              name="Wacom"
+              class="form-control"
+              required
+              ngModel="{{ PuntoDispensacion.Tipo_Entrega }}"
+            >
+              <option value="">Tipo Entrega</option>
+              <option value="Despacho">Despacho</option>
+              <option value="Radicacion">Radicación</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Entregas Dobles en el Mes</label>
+            <select
+              class="form-control encabezado"
+              name="Entrega_Doble"
+              ngModel="{{ PuntoDispensacion.Entrega_Doble }}"
+            >
+              <option value="Si">Si</option>
+              <option value="No" selected>No</option>
+            </select>
+            <small id="Entrega_Doble" class="form-text text-muted">
+              Esta opción habilita la entrega de pendientes por ATC y entregar el mismo producto dos
+              veces o mas en el mismo mes
+            </small>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Bodega</label>
+
+            <!-- <ng-select [options]="Bodegas" name="Id_Bodega_Despacho" bindLabel="label" bindValue="value" placeholder="Selecciona Bodega" [(ngModel)]="PuntoDispensacion.Id _Bodega_Despacho" ></ng-select> -->
+            <ng-select
+              [items]="Bodegas"
+              name="Id_Bodega_Despacho"
+              bindLabel="label"
+              bindValue="value"
+              placeholder="Selecciona Bodega"
+              ngModel="{{ PuntoDispensacion.Id_Bodega_Despacho }}"
+            ></ng-select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row"></div>
+
+      <div class="row"></div>
+
+      <!-- <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Bodega</label>
+            <select class="form-control" name="Id_Bodega_Despacho" ngModel="{{PuntoDispensacion.Id_Bodega_Despacho}}"
+              required>
+              <option value="">Seleccione Bodega</option>
+              <option *ngFor="let Bodega of Bodegas" [value]="Bodega.Id_Bodega_Nuevo">{{Bodega.Nombre}}</option>
+            </select>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="servicio">Servicio</label>
+            <ng-select
+              [ngClass]="'ng-select'"
+              class="ang-select"
+              (blur)="GetTipoServicioNgSelect()"
+              [items]="Servicios"
+              name="Servicio_E"
+              id="servicio"
+              bindValue="value"
+              bindLabel="label"
+              [(ngModel)]="ServiciosEscogidos"
+              [multiple]="true"
+            >
+            </ng-select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="tipo_servicio">Tipo Servicio</label>
+            <ng-select
+              [ngClass]="'ng-select'"
+              class="ang-select"
+              [items]="TipoServicios"
+              name="Tipo_Servicio_E"
+              id="tipo_servicio"
+              [(ngModel)]="TipoServiciosEscogidos"
+              [multiple]="true"
+            ></ng-select>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close(); LimpiarVariablesEditar()">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      (click)="EdicionPuntoDispensacion(FormPuntoDispensacionEditar, modalPuntoDispensacionEditar)"
+      [disabled]="!FormPuntoDispensacionEditar.valid"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>

@@ -1,0 +1,104 @@
+<app-card viewTitle="Licencias de conducción" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="openConfirm(add, 'Nueva licencia de conducción')" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="licenses"
+    [pagination]="pagination"
+    (pageChange)="getDrivingLicenses()"
+  >
+    <ng-container titles>
+      <th>Tipo</th>
+      <th>Descripción</th>
+      <th class="col-1">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (license of licenses; track $index) {
+        <tr class="text-center">
+          <td>{{ license.type | uppercase }}</td>
+          <td>
+            {{ license.description || 'Sin descripción' | uppercase }}
+          </td>
+          <td><app-status-badge [status]="license.state" /></td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit
+                (action)="
+                  getDrivingLicense(license); openConfirm(add, 'Editar licencia de conducción')
+                "
+              />
+              @if (license.state == 'activo') {
+                <app-action-deactivate (action)="activateOrInactivate(license, 'inactivo')" />
+              }
+              @if (license.state == 'inactivo') {
+                <app-action-activate (action)="activateOrInactivate(license, 'activo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Tipo"
+    placeholder="Busca por tipo"
+    [value]="filtro.tipo"
+    (searching)="filtro.tipo = $event; getDrivingLicenses()"
+  ></app-automatic-search>
+</ng-template>
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click'); form.reset()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el tipo"
+            formControlName="type"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa la descripción"
+            formControlName="description"
+          />
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="modal.dismiss('Cross click'); form.reset()"
+    >
+      Cancelar
+    </button>
+    <button type="button" (click)="save()" class="btn btn-primary">Guardar</button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

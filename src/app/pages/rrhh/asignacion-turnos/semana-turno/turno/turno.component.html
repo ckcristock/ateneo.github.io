@@ -1,0 +1,16 @@
+<select
+  class="form-control mb-2 form-control-sm"
+  [(ngModel)]="turno"
+  [ngStyle]="{ 'background-color': withColor, color: '#FFF' }"
+  (change)="changeColor($event.target.value)"
+>
+  <option value="seleccione">Seleccione</option>
+  <option value="0" [ngStyle]="{ 'background-color': '#000', color: '#FFF' }">Descanso</option>
+  <option
+    *ngFor="let turn of turnos"
+    [value]="turn.id"
+    [ngStyle]="{ 'background-color': turn.color, color: '#FFF' }"
+  >
+    {{ turn.name }} ({{ turn.entry_time }} {{ turn.leave_time }})
+  </option>
+</select>

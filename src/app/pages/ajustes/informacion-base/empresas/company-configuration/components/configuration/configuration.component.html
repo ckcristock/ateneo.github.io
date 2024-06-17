@@ -1,0 +1,43 @@
+<app-modal titleModal="Configuración">
+  <form class="row" [formGroup]="formMemorandums">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Cantidad de memorandos permitidos</mat-label>
+      <input
+        matInput
+        type="number"
+        placeholder="Cantidad por funcionario"
+        min="0"
+        formControlName="max_memos_per_employee"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Vencimiento de llamado de atención</mat-label>
+      <input
+        matInput
+        type="number"
+        placeholder="Tiempo en días para vencimiento"
+        min="0"
+        formControlName="attention_expiry_days"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Máximo ítem remisión</mat-label>
+      <input
+        matInput
+        type="number"
+        placeholder="Número máximo, ítem remisión"
+        min="0"
+        formControlName="max_item_remision"
+      />
+    </mat-form-field>
+  </form>
+  <button
+    buttons
+    type="button"
+    class="btn btn-primary"
+    [disabled]="formMemorandums.invalid"
+    (click)="onSaveQuantityMemorandums()"
+  >
+    Guardar
+  </button>
+</app-modal>

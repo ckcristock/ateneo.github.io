@@ -1,0 +1,403 @@
+<div class="row">
+  <app-card viewTitle="Fase I" class="col-md-6 mb-4" [filterTemplate]="filterTemplate">
+    <app-table
+      [loading]="ValidaFase1"
+      [arrayData]="FaseI"
+      [pagination]="pagination_phase1"
+      (pageChange)="filtrosFase1()"
+    >
+      <ng-container titles>
+        <th>Foto</th>
+        <th>Información</th>
+        <th>Tipo</th>
+        <th>Prioridad</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (item of FaseI; track item.Id_Remision; let i = $index) {
+          <tr class="text-center">
+            <td class="text-center align-middle">
+              <app-load-image
+                classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                [src]="item.Imagen"
+              ></app-load-image>
+            </td>
+            <td class="align-middle text-center">
+              <h6>{{ item.Tipo }} {{ item.Codigo }}</h6>
+              <span class="text-muted"> <strong>Origen: </strong> {{ item.Nombre_Origen }} </span>
+              <br />
+              <span class="destino"> <strong>Destino: </strong> {{ item.Nombre_Destino }} </span>
+            </td>
+            <td *ngIf="item.Tipo_Bodega" #tipoBodega1 class="text-center align-middle">
+              <i
+                *ngIf="item.Tipo_Bodega == 'MEDICAMENTOS'"
+                class="fa fa-medkit fa-2x"
+                style="color: green"
+              ></i>
+              <i
+                *ngIf="item.Tipo_Bodega == 'MATERIALES'"
+                class="fa fa-th-large fa-2x"
+                style="color: rgb(87, 87, 67)"
+              ></i>
+              <i
+                *ngIf="item.Tipo_Bodega == 'REFRIGERADOS'"
+                class="fas fa-snowflake fa-2x"
+                style="color: #2569e8"
+              ></i>
+            </td>
+            <td class="text-center align-middle">
+              <span class="text-muted">Prioridad {{ item.Prioridad }}</span>
+            </td>
+            <td class="text-center align-middle">
+              <button
+                class="btn btn-warning btn-sm"
+                [disabled]="redirectPhase1 === i"
+                (click)="Bandera_Fase1(item.Id_Remision, item.Tipo, item.Id_Contrato, i)"
+              >
+                @if (redirectPhase1 === i) {
+                  <i _ngcontent-ng-c2830628797="" class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                } @else {
+                  Iniciar
+                }
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <ng-template #filterTemplate>
+    <div class="row row-gap-3 mb-3">
+      <app-automatic-search
+        class="col"
+        label="Código"
+        placeholder="Busca por código"
+        [value]="filtro_Codigo1"
+        (searching)="filtro_Codigo1 = $event; filtrosFase1()"
+      ></app-automatic-search>
+      <app-automatic-search
+        class="col"
+        label="Origen"
+        placeholder="Busca por origen"
+        [value]="filtro_Origen1"
+        (searching)="filtro_Origen1 = $event; filtrosFase1()"
+      ></app-automatic-search>
+      <app-automatic-search
+        class="col"
+        label="Destino"
+        placeholder="Busca por destino"
+        [value]="filtro_Destino1"
+        (searching)="filtro_Destino1 = $event; filtrosFase1()"
+      ></app-automatic-search>
+    </div>
+  </ng-template>
+  <app-card viewTitle="Fase II" class="col-md-6 mb-4" [filterTemplate]="filterTemplate1">
+    <app-table
+      [loading]="ValidaFase2"
+      [arrayData]="FaseII"
+      [pagination]="pagination_phase2"
+      (pageChange)="filtrosFase2()"
+    >
+      <ng-container titles>
+        <th>Foto</th>
+        <th>Información</th>
+        <th>Tipo</th>
+        <th>Prioridad</th>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (item of FaseII; track item.Id_Remision; let i = $index) {
+          <tr class="text-center">
+            <td class="text-center align-middle">
+              <app-load-image
+                classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                [src]="item.Imagen"
+              ></app-load-image>
+            </td>
+            <td class="align-middle text-center">
+              <h6>{{ item.Tipo }} {{ item.Codigo }}</h6>
+              <span class="text-muted"> <strong>Origen: </strong> {{ item.Nombre_Origen }} </span>
+              <br />
+              <span class="destino"> <strong>Destino: </strong> {{ item.Nombre_Destino }} </span>
+            </td>
+            <td *ngIf="item.Tipo_Bodega" #tipoBodega class="text-center align-middle">
+              <i
+                *ngIf="item.Tipo_Bodega == 'MEDICAMENTOS'"
+                class="fa fa-medkit fa-2x"
+                style="color: green"
+              ></i>
+              <i
+                *ngIf="item.Tipo_Bodega == 'MATERIALES'"
+                class="fa fa-th-large fa-2x"
+                style="color: rgb(87, 87, 67)"
+              ></i>
+              <i
+                *ngIf="item.Tipo_Bodega == 'REFRIGERADOS'"
+                class="fas fa-snowflake fa-2x"
+                style="color: #2569e8"
+              ></i>
+            </td>
+            <td class="text-center align-middle">
+              <span class="text-muted">Prioridad {{ item.Prioridad }}</span>
+            </td>
+            <td class="text-center align-middle">
+              <button
+                class="btn btn-success btn-sm"
+                [disabled]="redirectPhase2 === i"
+                (click)="Bandera_Fase2(item.Id_Remision, item.Tipo, item.Id_Contrato, i)"
+              >
+                @if (redirectPhase2 === i) {
+                  <i _ngcontent-ng-c2830628797="" class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+                } @else {
+                  Iniciar
+                }
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <ng-template #filterTemplate1>
+    <div class="row row-gap-3 mb-3">
+      <app-automatic-search
+        class="col"
+        label="Código"
+        placeholder="Busca por código"
+        [value]="filtro_Codigo2"
+        (searching)="filtro_Codigo2 = $event; filtrosFase2()"
+      ></app-automatic-search>
+      <app-automatic-search
+        class="col"
+        label="Origen"
+        placeholder="Busca por origen"
+        [value]="filtro_Origen2"
+        (searching)="filtro_Origen2 = $event; filtrosFase2()"
+      ></app-automatic-search>
+      <app-automatic-search
+        class="col"
+        label="Destino"
+        placeholder="Busca por destino"
+        [value]="filtro_Destino2"
+        (searching)="filtro_Destino2 = $event; filtrosFase2()"
+      ></app-automatic-search>
+    </div>
+  </ng-template>
+</div>
+<app-card viewTitle="Alistamiento" [filterTemplate]="filterEndontment">
+  <app-table
+    [loading]="loading"
+    [arrayData]="Alistamientos"
+    [pagination]="pagination_enlistment"
+    (pageChange)="filtros()"
+  >
+    <ng-container titles>
+      <th>Fecha</th>
+      <th>Codigo</th>
+      <th>Tipo</th>
+      <th>Origen</th>
+      <th>Destino</th>
+      <th>Guía</th>
+      <th>Items</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (alistamiento of Alistamientos; track alistamiento; let i = $index) {
+        <tr class="text-center">
+          <td class="align-middle">
+            {{ alistamiento.Fecha | date: 'dd/MM/yyyy' }}
+          </td>
+          <td class="align-middle">{{ alistamiento.Codigo }}</td>
+          <td class="align-middle">
+            <span
+              class="badge {{ alistamiento.Tipo == 'Cliente' ? 'bg-success' : 'bg-warning' }} {{
+                alistamiento.Tipo == 'Devolucion' ? 'bg-danger' : ''
+              }}"
+              >{{ alistamiento.Tipo }}
+            </span>
+          </td>
+          <td class="align-middle">
+            {{ alistamiento.Nombre_Origen }}
+            <i *ngIf="alistamiento.Tipo_Bodega == 'MEDICAMENTOS'" class="fa fa-medkit"></i>
+            <i *ngIf="alistamiento.Tipo_Bodega == 'MATERIALES'" class="fa fa-archive"></i>
+            <i *ngIf="alistamiento.Tipo_Bodega == 'REFRIGERADOS'" class="fa fa-asterisk"></i>
+          </td>
+          <td class="align-middle">{{ alistamiento.Nombre_Destino }}</td>
+          <td class="align-middle">
+            <div *ngIf="alistamiento.Guia != ''">
+              <i class="fa fa-barcode"></i> {{ alistamiento.Guia }}<br />
+              <i class="fa fa-truck"></i>
+              {{ alistamiento.Empresa_Envio }}
+            </div>
+          </td>
+          <td class="align-middle">{{ alistamiento.Items || 'N/A' }}</td>
+          <td class="align-middle">
+            @if (alistamiento.Estado != 'Facturada') {
+              <app-status-badge [status]="alistamiento.Estado" />
+            } @else {
+              <a
+                class="badge bg-success"
+                [routerLink]="['/facturasventasver', alistamiento.Id_Factura]"
+                >Facturada</a
+              >
+            }
+          </td>
+          <td>
+            <app-dropdown-actions [loading]="downloading === i">
+              @if (alistamiento.Tipo != 'Devolucion') {
+                <app-action-view
+                  [link]="{
+                    url: '/inventario/remisiones/remision/' + alistamiento.Id_Remision
+                  }"
+                />
+              }
+              @if (alistamiento.Tipo == 'Devolucion') {
+                <app-action-view
+                  [link]="{
+                    url: '/inventario/devoluciones/verdetalledevolucion/' + alistamiento.Id_Remision
+                  }"
+                />
+              }
+              <app-action-button
+                icon="print"
+                text="Imprimir archivo"
+                type="secondary"
+                (click)="
+                  onFileDownload(
+                    '/php/archivos/descarga_pdf.php',
+                    alistamiento.Id_Remision,
+                    i,
+                    'archivo'
+                  )
+                "
+              />
+              <app-action-button
+                icon="ticket-alt"
+                text="Imprimir etiqueta"
+                type="primary"
+                (click)="
+                  onFileDownload(
+                    '/php/archivos/descarga_zebra.php',
+                    alistamiento.Id_Remision,
+                    i,
+                    'etiqueta'
+                  )
+                "
+              />
+              @if (alistamiento.Estado_Alistamiento == 2 && alistamiento.Estado == 'Alistada') {
+                <app-action-button
+                  icon="plus"
+                  text="Agregar Guía"
+                  type="success"
+                  (click)="CapturarId(alistamiento.Id_Remision, alistamiento.Tipo)"
+                />
+              }
+              @if (
+                alistamiento.Guia != '' &&
+                alistamiento.Estado != 'Recibida' &&
+                alistamiento.Estado != 'Anulada'
+              ) {
+                <app-action-edit
+                  (action)="EditarGuia(alistamiento.Id_Remision, i, alistamiento.Tipo)"
+                />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterEndontment>
+  <app-date-picker class="col" (dateChange)="selectedDate($event)" />
+  <app-automatic-search
+    class="col"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtro_cod"
+    (searching)="filtro_cod = $event; filtros()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo</mat-label>
+    <mat-select [(ngModel)]="filtro_tipo" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Interna">Interna</mat-option>
+      <mat-option value="Cliente">Cliente</mat-option>
+      <mat-option value="Devolucion">Devolución</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <app-automatic-search
+    class="col"
+    label="Origen"
+    placeholder="Busca por origen"
+    [value]="filtro_origen"
+    (searching)="filtro_origen = $event; filtros()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Destino"
+    placeholder="Busca por destino"
+    [value]="filtro_destino"
+    (searching)="filtro_destino = $event; filtros()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filtro_est" (selectionChange)="filtros()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Pendiente">Pendiente</mat-option>
+      <mat-option value="Activa">Activa - Dev</mat-option>
+      <mat-option value="Alistada">Alistada</mat-option>
+      <mat-option value="Enviada">Enviada</mat-option>
+      <mat-option value="Recibida">Recibida</mat-option>
+      <mat-option value="No conforme">No conforme</mat-option>
+      <mat-option value="Anulada">Anulada</mat-option>
+      <mat-option value="Facturada">Facturada</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<ng-template #editEnlistment>
+  <app-modal titleModal="Datos de envío de la remisión">
+    <form #FormGuiaRemision="ngForm">
+      <div class="row">
+        <div class="col-md-5">
+          <div class="form-group">
+            <label>Número de guía</label>
+            <input
+              name="Numero_Guia"
+              type="text"
+              placeholder="Número de guía"
+              class="form-control form-control-sm"
+              [(ngModel)]="Editar.Numero_Guia"
+              required
+            />
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="form-group">
+            <label>Empresa de envio</label>
+            <input
+              name="Empresa_Envio"
+              type="text"
+              placeholder="Empresa de envio"
+              class="form-control form-control-sm"
+              [(ngModel)]="Editar.Empresa_Envio"
+              required
+            />
+          </div>
+        </div>
+      </div>
+    </form>
+    <button
+      buttons
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!FormGuiaRemision.valid"
+      (click)="save()"
+    >
+      Guardar información
+    </button>
+  </app-modal>
+</ng-template>

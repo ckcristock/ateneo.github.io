@@ -1,0 +1,87 @@
+.files-img {
+  width: 100%;
+  object-fit: cover;
+}
+
+.card-style {
+  height: 6rem;
+}
+
+.body-custom {
+  max-height: 30rem;
+  overflow-y: auto;
+}
+
+/* The actual timeline (the vertical ruler) */
+.main-timeline-5 {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* The actual timeline (the vertical ruler) */
+.main-timeline-5::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  background-color: #eff2f7;
+  top: 0;
+  bottom: 0;
+  left: auto;
+  margin-left: -3px;
+}
+
+/* Container around content */
+.timeline-5 {
+  position: relative;
+  background-color: inherit;
+  width: 100%;
+}
+
+/* The circles on the timeline */
+.timeline-5::after {
+  content: '';
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  right: 1px;
+  background-color: #eff2f7;
+  top: 18px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* Place the container to the right */
+.right-5 {
+  padding: 0px 0px 1px 40px;
+  left: auto;
+}
+
+/* Add arrows to the right container (pointing left) */
+.right-5::before {
+  content: ' ';
+  position: absolute;
+  top: 18px;
+  z-index: 1;
+  left: 30px;
+  border: medium solid #eff2f7;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent #eff2f7 transparent transparent;
+}
+
+/* Fix the circle for containers on the right side */
+.right-5::after {
+  left: -10px;
+  color: #eff2f7;
+  background-color: #eff2f7;
+}
+
+@media (max-width: 991px) {
+  .main-timeline-5 {
+    max-width: 100%;
+  }
+}
+
+.card-shadow {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 10px;
+}

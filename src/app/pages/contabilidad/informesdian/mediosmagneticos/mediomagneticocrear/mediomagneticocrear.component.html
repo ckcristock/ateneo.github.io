@@ -1,0 +1,210 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <form #FormMediosMag="ngForm">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Periodo</mat-label>
+          <input
+            type="text"
+            id="periodo"
+            matInput
+            [(ngModel)]="MediosMagModel.Periodo"
+            (blur)="campoPeriodo($event)"
+            name="periodo"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Código formato</mat-label>
+          <input
+            type="text"
+            id="cod_formato"
+            matInput
+            name="codigo_formato"
+            [(ngModel)]="MediosMagModel.Codigo_Formato"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre formato</mat-label>
+          <input
+            type="text"
+            id="nombre_formato"
+            matInput
+            name="nombre_formato"
+            [(ngModel)]="MediosMagModel.Nombre_Formato"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo exportación</mat-label>
+          <mat-select
+            name="tipo_formato"
+            id="tipo_formato"
+            [(ngModel)]="MediosMagModel.Tipo_Exportacion"
+            required
+          >
+            <mat-option value="D">Debito</mat-option>
+            <mat-option value="C">Credito</mat-option>
+            <mat-option value="D-C">Deb-Cred</mat-option>
+            <mat-option value="C-D">Cred-Deb</mat-option>
+            <mat-option value="Saldo">Saldo</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <ng-container *ngIf="formatoEspecial">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Tipo columna</mat-label>
+            <mat-select
+              name="tipo_columna"
+              id="tipo_columna"
+              [(ngModel)]="MediosMagModel.Tipo_Columna"
+            >
+              <mat-option value="P">Principal</mat-option>
+              <mat-option value="A">Alterna</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Columna principal</mat-label>
+            <mat-select
+              name="columna_principal"
+              id="columna_principal"
+              [(ngModel)]="MediosMagModel.Columna_Principal"
+            >
+              <mat-option value="">Ninguno</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+        <!-- <div class="col-md-3">
+          <div class="form-group">
+            <label>Empresa</label>
+            <select
+              name="Id_Empresa"
+              id="Id_Empresa"
+              class="form-control form-control-sm"
+              [(ngModel)]="MediosMagModel.Id_Empresa"
+            >
+              <option *ngFor="let item of companies" [value]="item.value">
+                {{ item.text }}
+              </option>
+            </select>
+          </div>
+        </div> -->
+      </div>
+    </form>
+
+    <h6>Detalles</h6>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Codigo Cuenta</th>
+            <th>Concepto</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of Cuentas_Contables; let i = index" class="text-center">
+            <td>
+              <input
+                [(ngModel)]="item.Cuenta"
+                type="text"
+                name="Cuenta"
+                id="Cuenta{{ i }}"
+                class="form-control form-control-sm f-9"
+                [ngbTypeahead]="search1"
+                placeholder="Código de cuenta"
+                [resultTemplate]="rt1"
+                [inputFormatter]="formatter1"
+                (ngModelChange)="BuscarCuenta(item.Cuenta, i)"
+                (blur)="validarCampo(item.Cuenta, $event, 'Cuenta')"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                [(ngModel)]="item.Concepto"
+                name="Concepto{{ i }}"
+                placeholder="Concepto"
+                class="form-control form-control-sm"
+              />
+            </td>
+            <td>
+              <button
+                *ngIf="i != Cuentas_Contables.length - 1; else iconNull"
+                style="padding: 0"
+                class="btn btn-sm text-danger"
+                (click)="eliminarFila('Cuentas', i)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+              <ng-template #iconNull>
+                <i class="fas fa-ban"></i>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h6>Tipos</h6>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Tipo Documentos</th>
+            <th width="20"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of Tipos_Documentos; let i = index">
+            <td>
+              <ng-select
+                id="tipo_documento{{ i }}"
+                appearance="outline"
+                [appendTo]="'body'"
+                bindLabel="label"
+                bindValue="value"
+                [items]="listaTiposDocumentos"
+                [clearable]="false"
+                name="tipo_documento{{ i }}"
+                [(ngModel)]="item.Tipo"
+                (ngModelChange)="nuevoTipoDocumento(i)"
+              ></ng-select>
+            </td>
+            <td>
+              <button
+                *ngIf="i != Tipos_Documentos.length - 1"
+                class="btn btn-link text-danger"
+                (click)="eliminarFila('Tipos', i)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button
+      class="btn btn-primary btn-block"
+      (click)="onSaveFormat()"
+      [disabled]="!FormMediosMag.valid"
+    >
+      <i class="fa fa-save"></i> Guardar
+    </button>
+  </div>
+</div>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9"
+    ><strong>{{ r.Nombre }}</strong>
+  </span>
+</ng-template>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>
+
+<ng-template #rt2 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombre }} </span>
+</ng-template>

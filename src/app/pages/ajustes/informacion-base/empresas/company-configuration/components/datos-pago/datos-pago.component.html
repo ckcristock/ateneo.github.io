@@ -1,0 +1,117 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-10 px-0">
+        <h6 class="text-dark"><i class="fas fa-piggy-bank"></i> Datos de pago</h6>
+      </div>
+      <div class="col-md-2 px-0 text-end">
+        <button type="button" class="btn btn-link" (click)="openModal(modal)">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+      </div>
+    </div>
+    @if (!loading && payments) {
+      <div class="row">
+        <div class="col-lg-6 text-lg-end text-center text-primary">Frecuencia de pago</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ payments.payment_frequency }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Medio de pago</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ payments.payment_method }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Banco</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ payments.bank?.name }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Tipo de cuenta</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ payments.account_type }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Número de cuenta</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ payments.account_number }}
+        </div>
+      </div>
+    } @else {
+      <app-not-data [loading]="loading"></app-not-data>
+    }
+  </div>
+</div>
+
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Datos de pago</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Frecuencia de pago</mat-label>
+          <mat-select formControlName="payment_frequency" required>
+            @for (payment_frequency of payment_frequencys; track payment_frequency) {
+              <mat-option [value]="payment_frequency.valor">
+                {{ payment_frequency.clave }}</mat-option
+              >
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Medio de pago</mat-label>
+          <mat-select formControlName="payment_method" required>
+            @for (payment of payment_method; track payment) {
+              <mat-option [value]="payment.valor"> {{ payment.clave }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Banco para los pagos</mat-label>
+          <mat-select formControlName="bank_id" required>
+            @for (bank of banks; track bank) {
+              <mat-option [value]="bank.value"> {{ bank.text }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de cuenta</mat-label>
+          <mat-select formControlName="account_type" required>
+            @for (account_type of account_types; track account_type) {
+              <mat-option [value]="account_type.valor"> {{ account_type.clave }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Número de cuenta</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el número de cuenta"
+            formControlName="account_number"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!form.valid"
+      (click)="savePaymentData()"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>

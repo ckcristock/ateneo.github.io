@@ -1,0 +1,102 @@
+<div class="card-title d-flex justify-content-between">
+  <h6>Bonificación recurrente</h6>
+  <button class="btn btn-link btn-sm" (click)="openModal()">
+    <i class="fas fa-plus"></i>
+  </button>
+</div>
+@if (bonus.length > 0) {
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-center text-uppercase">
+          <th scope="col">Tipo de bono</th>
+          <th scope="col">Valor</th>
+          <th><i class="mdi mdi-chevron-down"></i></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (bono of bonus; track bono) {
+          <tr class="text-center" [ngClass]="{ 'text-danger fw-bold': bono.status == 0 }">
+            <th>{{ bono.ingreso.concept }}</th>
+            <td>${{ bono.value | number: '1.2-2' }}</td>
+            <td>
+              @if (bono.status == 1) {
+                <button class="btn btn-danger btn-sm" (click)="anular(bono, 0)">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <app-not-data [loading]="loading"></app-not-data>
+}
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Nueva bonificación</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de bono</mat-label>
+          <mat-select (selectionChange)="getBonusList($event.value)" id="type_of_bonus" required>
+            @for (bonusType of bonusTypes; track bonusType) {
+              <mat-option [value]="bonusType.valor"> {{ bonusType.clave | uppercase }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Selecciona para obtener bonos</mat-hint>
+          <!-- <div class="col-md-7 offset-4">
+            <small class="invalid text-danger" *ngIf="bonus_type_valid">
+              Es necesario el tipo de bono
+            </small>
+          </div> -->
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Bono</mat-label>
+          <mat-select formControlName="countable_income_id">
+            @for (bonus of bonusType; track bonusType) {
+              <mat-option [value]="bonus.value"> {{ bonus.text }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Valor</mat-label>
+          <input
+            matInput
+            currencyMask
+            appInputPosition
+            [options]="mask.maskCOP"
+            placeholder="Ingresa el valor"
+            formControlName="value"
+            id="valor"
+            required
+            autocomplete="off"
+          />
+          @if (value_valid) {
+            <mat-error> Campo obligatorio </mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button type="button" (click)="addBonus()" [disabled]="!form.valid" class="btn btn-primary">
+      Guardar
+    </button>
+  </div>
+</ng-template>

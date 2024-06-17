@@ -1,0 +1,197 @@
+<app-card
+  viewTitle="Bodegas"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters (click)="openConfirm(add, 'Agregar')" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="bodegas"
+    [pagination]="pagination"
+    (pageChange)="getBodegas()"
+  >
+    <ng-container titles>
+      <th>Bodega</th>
+      <th>Dirección</th>
+      <th>Teléfono</th>
+      <th>Compra Internacional</th>
+      <th class="col-1">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (bodega of bodegas; track $index) {
+        <tr class="text-center">
+          <td>{{ bodega.Nombre }}</td>
+          <td>{{ bodega.Direccion }}</td>
+          <td>{{ bodega.Telefono }}</td>
+          <td>{{ bodega.Compra_Internacional }}</td>
+          <td><app-status-badge [status]="bodega.Estado" /></td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="openConfirm(add, 'Editar'); getBodega(bodega)" />
+              <app-action-button
+                icon="cubes"
+                text="Grupos - Estibas"
+                type="warning"
+                [link]="{
+                  url: 'grupoestiba/' + bodega.Id_Bodega_Nuevo
+                }"
+              ></app-action-button>
+              @if (bodega.Estado == 'activo') {
+                <app-action-deactivate (action)="cambiarEstado(bodega, 'inactivo')" />
+              }
+              @if (bodega.Estado == 'inactivo') {
+                <app-action-activate (action)="cambiarEstado(bodega, 'activo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtros.Nombre"
+    (searching)="filtros.Nombre = $event; getBodegas()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Dirección"
+    placeholder="Busca por dirección"
+    [value]="filtros.Direccion"
+    (searching)="filtros.Direccion = $event; getBodegas()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Teléfono"
+    placeholder="Busca por teléfono"
+    [value]="filtros.Telefono"
+    (searching)="filtros.Telefono = $event; getBodegas()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Compra Internacional</mat-label>
+    <mat-select
+      (selectionChange)="getBodegas()"
+      [(ngModel)]="filtros.Compra_Internacional"
+      matInput
+      placeholder="Busca por Compra Internacional"
+    >
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Sí">Sí</mat-option>
+      <mat-option value="No">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<!-- Modals -->
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ selected }} bodega</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="formBodega">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre bodega</mat-label>
+          <input
+            type="text"
+            formControlName="nombre"
+            matInput
+            placeholder="Nombre de la bodega"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Direccion</mat-label>
+          <input
+            type="text"
+            formControlName="direccion"
+            matInput
+            placeholder="Dirección de la bodega"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Teléfono</mat-label>
+          <input
+            type="text"
+            formControlName="telefono"
+            matInput
+            placeholder="Teléfono de la bodega"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label for="Aplica_Separacion_Categorias">¿Compras internacionales?</mat-label>
+          <mat-select
+            formControlName="compraInternacional"
+            id="Aplica_Separacion_Categorias"
+            placeholder="Compras internacionales?"
+            required
+          >
+            <mat-option value="Sí">Sí</mat-option>
+            <mat-option value="No">No</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 px-0">
+        <div class="form-group text-center">
+          <div class="custom-input-file w-100">
+            <input
+              type="file"
+              placeholder="Mapa de la Bodega"
+              class="input-file"
+              container="body"
+              (change)="onFileChanged($event)"
+              accept=".png, .jpg, .jpeg"
+              [required]="selected == 'Agregar'"
+            />
+            Cargar
+            @if (bodega.Mapa) {
+              <span>nuevo</span>
+            }
+            mapa de la bodega.
+          </div>
+          <div class="col-md-12 text-center">
+            @if (file && type) {
+              <small class="text-success">Documento cargado</small>
+            }
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button
+      type="button"
+      (click)="createBodega()"
+      [disabled]="formBodega.invalid"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

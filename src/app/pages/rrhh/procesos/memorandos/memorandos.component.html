@@ -1,0 +1,98 @@
+<app-process-header
+  titlePage="Memorandos"
+  [filters]="filters"
+  (request)="getMemorandum()"
+  (onAdd)="openAddMemorandum()"
+>
+  <ng-container actions>
+    <button class="btn btn-warning btn-sm" (click)="openAddReason()">
+      <i class="fa fa-plus"></i> Motivo
+    </button>
+  </ng-container>
+  <app-table
+    [loading]="loading"
+    [arrayData]="memorandums"
+    [pagination]="pagination"
+    (pageChange)="getMemorandum()"
+  >
+    <ng-container titles>
+      <th scope="col">Foto</th>
+      <th scope="col">Funcionario</th>
+      <th scope="col">Nivel</th>
+      <th scope="col">Motivo</th>
+      <th scope="col">Detalles</th>
+      <th scope="col">Fecha</th>
+      <th scope="col">Estado</th>
+      <th scope="col">
+        <i class="mdi mdi-chevron-down"></i>
+      </th>
+    </ng-container>
+    <tbody content>
+      @for (memorandum of memorandums; track $index) {
+        <tr class="text-center">
+          <td class="align-middle p-0">
+            <app-load-image
+              classImg="d-block img-thumbnail rounded-circle mx-auto img-fluid header-profile-user"
+              [src]="memorandum.person.image"
+            ></app-load-image>
+          </td>
+          <td class="align-middle">{{ memorandum.person.full_names }}</td>
+          <td class="align-middle">
+            {{ (memorandum.level | titlecase) || 'No aplica' }}
+          </td>
+          <td class="align-middle">
+            {{ memorandum.memorandumtype?.name || 'No aplica' }}
+          </td>
+          <td class="align-middle">
+            <app-view-more [text]="memorandum.details"></app-view-more>
+          </td>
+          <td class="align-middle">
+            {{ memorandum.created_at | date: 'longDate' }}
+          </td>
+          <td class="align-middle">
+            <span
+              class="badge"
+              [class]="memorandum.state == 'pendiente' ? 'bg-warning' : 'bg-success'"
+            >
+              {{ (memorandum.state ? memorandum.state : 'No aplica') | uppercase }}
+            </span>
+          </td>
+          <td>
+            @if (loadingDownload === memorandum.id) {
+              <button class="btn btn-primary btn-sm" type="button">
+                <i _ngcontent-ng-c2830628797="" class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+              </button>
+            } @else {
+              <app-dropdown-actions>
+                @if (memorandum.disciplinary_process?.id) {
+                  <app-action-button
+                    icon="eye"
+                    text="Ver proceso disiplinario"
+                    type="success"
+                    [link]="{
+                      url: '../disciplinarios/' + memorandum.disciplinary_process?.id
+                    }"
+                  />
+                }
+                <app-action-button
+                  icon="file-download"
+                  text="Descargar"
+                  type="danger"
+                  (click)="downloadMemorandum(memorandum.id)"
+                />
+                @if (memorandum.files.length) {
+                  <app-action-button
+                    icon="file"
+                    text="Ver documentos"
+                    type="info"
+                    (click)="openListFiles(memorandum.files)"
+                  />
+                }
+              </app-dropdown-actions>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-process-header>

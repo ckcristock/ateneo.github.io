@@ -1,0 +1,65 @@
+<ng-template #addPackaging let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Agregar embalaje</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <ng-container [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>{{ title }} embalaje</mat-label>
+          <input
+            matInput
+            formControlName="name"
+            placeholder="Ingresa el nombre"
+            type="text"
+            autocomplete="off"
+            required
+          />
+          <button mat-icon-button matSuffix (click)="save()">
+            <mat-icon>save</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+    </ng-container>
+    <app-table
+      [loading]="loading"
+      [arrayData]="packagings"
+      [pagination]="pagination"
+      (pageChange)="paginate()"
+    >
+      <ng-container titles>
+        <td>Nombre</td>
+        <td>Fecha creación</td>
+        <th><i class="mdi mdi-chevron-down"></i></th>
+      </ng-container>
+      <tbody content>
+        @for (item of packagings; track $index) {
+          <tr class="text-center">
+            <td>{{ item.name | uppercase }}</td>
+            <td>{{ item.created_at | date }}</td>
+            <td>
+              <a class="text-info" (click)="edit(item)" href="javascript: void(0);">
+                <i class="fas fa-edit"></i>
+              </a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

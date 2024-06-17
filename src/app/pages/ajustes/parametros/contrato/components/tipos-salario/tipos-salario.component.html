@@ -1,0 +1,23 @@
+<app-card viewTitle="Tipos de salarios" [filterTemplate]="filterTemplate">
+  <app-table [loading]="loading" [arrayData]="salaries" [pagination]="pagination" (pageChange)="getSalaryTypes()">
+    <ng-container titles>
+      <th>Tipos de Salario</th>
+    </ng-container>
+    <tbody content>
+      @for (salary of salaries; track $index) {
+      <tr class="text-center">
+        <td>{{ salary.name }}</td>
+      </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search class="col pb-3" label="Nombre" placeholder="Busca por nombre" [value]="filtro.name"
+    (searching)="filtro.name = $event; getSalaryTypes()"></app-automatic-search>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data-sa [loading]="loading"></app-not-data-sa>
+</ng-template>

@@ -1,0 +1,113 @@
+<app-card viewTitle="Actas de recepción aprobadas" [filterTemplate]="filterTemplate">
+  <app-table
+    [loading]="loading"
+    [arrayData]="records"
+    [pagination]="pagination"
+    (pageChange)="getApprovedReceivingMinutes()"
+  >
+    <ng-container titles>
+      <th scope="col">Código Acta</th>
+      <th scope="col">Fecha Acta</th>
+      <th scope="col">Orden Compra</th>
+      <th scope="col">Fecha Compra</th>
+      <th scope="col">Facturas</th>
+      <th scope="col">Proveedor</th>
+      <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of records; track $index) {
+        <tr class="text-center">
+          <td class="text-start">
+            <app-load-image
+              classImg="rounded-circle mx-auto img-fluid header-profile-user"
+              [src]="item.image"
+            ></app-load-image>
+            <strong>{{ item.Codigo }}</strong>
+          </td>
+          <td>{{ item.Fecha_Creacion | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <strong>{{
+              item.Codigo_Compra_N != '' ? item.Codigo_Compra_N : item.Codigo_Compra_I
+            }}</strong>
+          </td>
+          <td *ngIf="item.Fecha_Compra_N">
+            {{
+              item.Fecha_Compra_N != 'INTERNA'
+                ? (item.Fecha_Compra_N | date: 'dd/MM/yyyy')
+                : item.Fecha_Compra_N
+            }}
+          </td>
+          <td *ngIf="item.Fecha_Compra_I">
+            {{
+              item.Fecha_Compra_I != 'INTERNA'
+                ? (item.Fecha_Compra_I | date: 'dd/MM/yyyy')
+                : item.Fecha_Compra_I
+            }}
+          </td>
+          <td>{{ item.Facturas || 'N/A' }}</td>
+          <td>
+            <strong>{{ item.Proveedor }}</strong>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="eye"
+                text="Acomodar"
+                type="info"
+                [link]="{
+                  url:
+                    '/inventario/acta-recepcion-acomodar/' +
+                    item.Tipo_Acomodar +
+                    '/' +
+                    item.Id_Acta +
+                    '/' +
+                    'Bodega_Nuevo/' +
+                    0
+                }"
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Filtro acta"
+    placeholder="Buscar acta"
+    (searching)="onFilters('cod', $event)"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Filtro compra"
+    placeholder="Buscar compra"
+    (searching)="onFilters('compra', $event)"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Filtro facturas"
+    placeholder="Buscar facturas"
+    (searching)="onFilters('fact', $event)"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Filtro proveedor"
+    placeholder="Buscar proveedor"
+    (searching)="onFilters('proveedor', $event)"
+  ></app-automatic-search>
+  <app-date-picker
+    class="col pt-4"
+    label="Fecha de actas"
+    [value]="filters"
+    (dateChange)="selectedDate($event)"
+  />
+  <app-date-picker
+    class="col pt-4"
+    label="Fecha compra"
+    [value]="filters"
+    (dateChange)="selectedDate($event, true)"
+  />
+</ng-template>

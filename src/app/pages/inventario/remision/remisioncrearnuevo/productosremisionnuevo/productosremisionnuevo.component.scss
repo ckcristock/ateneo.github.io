@@ -1,0 +1,31 @@
+.display-table-cell {
+  display: table-cell;
+}
+
+.no-display {
+  display: none;
+}
+
+.display-totals {
+  display: block;
+}
+
+.nota {
+  background: #e8e8e8;
+  border-radius: 5px;
+  padding-top: 1rem;
+}
+
+.tooltip-text2 {
+  font-size: 12px !important;
+}
+.input-barras {
+  width: 30%;
+  margin-left: 35%;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+}

@@ -1,0 +1,20 @@
+/* Para navegadores basados en WebKit */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Para Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.form-check-input.custom {
+  border: 1px solid #a5a6a7;
+  background-color: white;
+}
+.form-check-input:checked.custom {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}

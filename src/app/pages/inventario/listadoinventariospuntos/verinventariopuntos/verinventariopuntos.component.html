@@ -1,0 +1,71 @@
+<app-card viewTitle="Listado de productos">
+  <app-header-download filters (click)="descargarExcel()" />
+  <app-table [loading]="Cargando" [arrayData]="inventario">
+    <ng-container titles>
+      <th>Documento</th>
+      <th>Producto</th>
+      <th>Estiba</th>
+      <th>1er Conteo</th>
+      <th>Fecha 1er Conteo</th>
+      <th>2do Conteo</th>
+      <th>Fecha 2do Conteo</th>
+      <th>Conteo Auditor</th>
+      <th>Cant Inventario</th>
+      <th>Lote</th>
+      <th>Diferencia</th>
+    </ng-container>
+    <tbody content>
+      @for (producto of inventario; track $index) {
+        <tr class="text-center">
+          <td>
+            <strong>{{ producto.Id_Doc_Inventario_Fisico_Punto }}</strong
+            ><br />
+          </td>
+          <td>
+            <strong>{{ producto.Nombre_Comercial }}</strong
+            ><br />
+            <span class="text-muted">{{ producto.Nombre_Producto }}</span>
+          </td>
+
+          <td>
+            {{ producto.Nombre_Estiba }}
+          </td>
+          <td>
+            {{ producto.Primer_Conteo }}
+          </td>
+          <td>
+            {{ producto.Fecha_Primer_Conteo }}
+          </td>
+          <td>
+            {{ producto.Segundo_Conteo }}
+          </td>
+          <td>
+            {{ producto.Fecha_Segundo_Conteo }}
+          </td>
+          <td>
+            <span *ngIf="producto.Cantidad_Auditada">{{ producto.Cantidad_Auditada }}</span>
+          </td>
+          <td>
+            {{ producto.Cantidad_Inventario }}
+          </td>
+          <td>
+            {{ producto.Lote }}
+          </td>
+          <td>
+            <span
+              [ngClass]="{
+                'text-danger': producto.Cantidad_Diferencial < 0,
+                'text-success': producto.Cantidad_Diferencial > 0
+              }"
+            >
+              @if (producto.Cantidad_Diferencial > 0) {
+                <span>+</span>
+              }
+              {{ producto.Cantidad_Diferencial }}
+            </span>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>

@@ -1,0 +1,470 @@
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>
+<ng-container *ngIf="!loading; else placeholder">
+  <div class="row">
+    <!-- Historial  -->
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="text-primary">Seguimiento</h6>
+        </div>
+        <div class="card-body pt-0 pe-1 card-body-edit">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item px-0" *ngFor="let activity of activities">
+              <div class="d-flex w-100 justify-content-between">
+                <div>
+                  <!-- faltan las actividades -->
+                  <h6 class="mb-0">
+                    <span
+                      class="badge"
+                      [class]="
+                        activity.status == 'Creación'
+                          ? 'bg-info'
+                          : activity.status == 'Edición'
+                            ? 'bg-warning'
+                            : activity.status == 'Cotización'
+                              ? 'bg-danger'
+                              : activity.status == 'Aprobación'
+                                ? 'bg-success '
+                                : activity.status == 'Compra'
+                                  ? 'bg-primary '
+                                  : ''
+                      "
+                    >
+                      {{ activity.status }}</span
+                    >
+                  </h6>
+                  <p class="mb-1">{{ activity.details }}</p>
+                  <small>{{ activity.date }}</small>
+                  <small class="d-block">{{ activity.person.full_names }}</small>
+                  <span class="badge"> </span>
+                </div>
+                <app-load-image
+                  class="col-2"
+                  classImg="d-block img-thumbnail rounded-circle img-fluid header-profile-user"
+                  [src]="activity.person.image"
+                />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Contenido principal -->
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-body">
+          <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+          <hr class="line" />
+          <div class="d-flex justify-content-end">
+            <div class="btn-group" role="group" aria-label="Button group">
+              <button
+                type="button"
+                class="btn btn-sm btn-info"
+                *ngIf="solicitud.status == 'Pendiente' && permission.permissions.add"
+                [routerLink]="['/compras/solicitud/editar', solicitud.id]"
+              >
+                <i class="fas fa-edit"></i> Editar
+              </button>
+            </div>
+          </div>
+          <app-table>
+            <ng-container titles>
+              <th>Funcionario que solicita</th>
+              <th>Area o departamento</th>
+              <th>Fecha de solicitud</th>
+              <th>Fecha Probable de Entrega</th>
+            </ng-container>
+            <tbody content>
+              <tr class="text-center">
+                <td>
+                  {{ solicitud.person.full_names | titlecase }}
+                </td>
+                <td>
+                  {{ solicitud.person.contractultimate.position.dependency.name | capitalLetter }}
+                </td>
+                <td>
+                  {{ solicitud.created_at | date: 'MMM d, y' }}
+                </td>
+                <td>
+                  {{ solicitud.expected_date | date: 'MMM d, y' }}
+                </td>
+              </tr>
+            </tbody>
+          </app-table>
+          <hr />
+          <app-table>
+            <ng-container titles>
+              <th>#</th>
+              <th>Referencia</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Unidad Medida</th>
+              <th>Estado</th>
+              <th><i class="mdi mdi-chevron-down"></i></th>
+            </ng-container>
+            <ng-container ngProjectAs="[content]">
+              <tbody>
+                @for (
+                  product of solicitud.product_purchase_request;
+                  track product.id;
+                  let i = $index
+                ) {
+                  <tr class="text-center">
+                    <th>
+                      {{ i + 1 }}
+                    </th>
+                    <td class="align-middle">
+                      {{ product.product.Referencia | uppercase }}
+                    </td>
+                    <td class="align-middle">
+                      {{ product.name | uppercase }}
+                    </td>
+                    <td class="align-middle">
+                      {{ product.ammount | number }}
+                    </td>
+                    <td class="align-middle">
+                      {{ product.product.unit?.name }}
+                    </td>
+                    <td class="align-middle">
+                      <span
+                        class="badge"
+                        [class]="
+                          product.status == 'Cotización Aprobada'
+                            ? 'bg-success'
+                            : product.status == 'Cotizaciones cargadas'
+                              ? 'bg-info'
+                              : product.status == 'Pendiente'
+                                ? 'bg-warning'
+                                : 'bg-danger'
+                        "
+                      >
+                        {{ product.status | uppercase }}
+                      </span>
+                    </td>
+                    <td>
+                      @if (
+                        product.status == 'Pendiente' ||
+                        (product.status == 'Cotizaciones cargadas' &&
+                          product.quotation.length > 0) ||
+                        (product.status == 'Cotización Aprobada' && product.quotation.length > 0)
+                      ) {
+                        <app-dropdown-actions>
+                          @if (product.status == 'Pendiente') {
+                            <app-action-button
+                              icon="cloud-upload-alt"
+                              text="Cargar"
+                              type="info"
+                              (click)="openModal(modalCotizar, product.id, false)"
+                            />
+                          }
+                          @if (product.status == 'Cotizaciones cargadas') {
+                            <app-action-button
+                              icon="check"
+                              text="Aprobar"
+                              type="success"
+                              (click)="openModal2(modalAprobar, product.id, 'lg', 'product')"
+                            />
+                          }
+                          @if (product.status == 'Cotización Aprobada') {
+                            <app-action-view
+                              (click)="openModal2(modalAprobar, product.id, 'sm', 'product')"
+                            />
+                          }
+                        </app-dropdown-actions>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr
+                  class="table-warning"
+                  *ngIf="
+                    solicitud.quotation_purchase_request.length > 0 ||
+                    solicitud.status == 'Pendiente'
+                  "
+                >
+                  <th colspan="6" class="text-end text-uppercase align-middle">
+                    Cotización general
+                  </th>
+                  <th class="text-center">
+                    <div ngbDropdown container="body" class="dropdown-primary">
+                      <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                        <i class="mdi mdi-chevron-down"></i>
+                      </button>
+
+                      <div ngbDropdownMenu>
+                        <a
+                          class="dropdown-item text-info"
+                          href="javascript: void(0);"
+                          *ngIf="solicitud.status == 'Pendiente'"
+                          (click)="openModal(modalCotizar, solicitud.id, true)"
+                        >
+                          <i class="fas fa-cloud-upload-alt"></i> Cargar
+                        </a>
+                        <a
+                          class="dropdown-item text-success"
+                          href="javascript: void(0);"
+                          *ngIf="solicitud.status == 'Cotizada'"
+                          (click)="openModal2(modalAprobar, solicitud.id, 'lg', 'purchase')"
+                        >
+                          <i class="fas fa-check"></i> Aprobar
+                        </a>
+                        <ng-container *ngIf="solicitud.status == 'Aprobada'">
+                          <a
+                            class="dropdown-item text-info"
+                            href="javascript: void(0);"
+                            (click)="openModal2(modalAprobar, solicitud.id, 'sm', 'purchase')"
+                          >
+                            <i class="fas fa-eye"></i> Ver
+                          </a>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </th>
+                </tr>
+              </tfoot>
+            </ng-container>
+          </app-table>
+          <app-table>
+            <ng-container titles>
+              <th class="bg-light">Observaciones</th>
+            </ng-container>
+            <tbody content>
+              <tr>
+                <td>
+                  {{ solicitud.observations || 'Sin observaciones' | uppercase }}
+                </td>
+              </tr>
+            </tbody>
+          </app-table>
+          <ng-container *ngIf="solicitud.status == 'Aprobada'">
+            <h6>Crear orden de compra</h6>
+            <div class="row">
+              <ng-container *ngFor="let order of orders">
+                <div class="col-lg-4 d-flex align-items-stretch">
+                  <div class="card bg-light w-100">
+                    <div class="card-body pb-0">
+                      <h6 class="text-primary">
+                        {{ order[0]?.third_party?.full_name | uppercase }}
+                      </h6>
+                      <ng-container *ngFor="let product of order">
+                        <div>- {{ product?.product_info?.name }}</div>
+                      </ng-container>
+                    </div>
+                    <div class="card-footer">
+                      <button
+                        class="btn btn-primary btn-block"
+                        type="button"
+                        (click)="sendOrder(order)"
+                      >
+                        Crear orden de compra
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </ng-container>
+          <!-- Fin tablas con información -->
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!--  Modal cotizar proveedor existente por producto-->
+<ng-template #modalCotizar let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Cotizaciones material</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <ul
+      ngbNav
+      #nav="ngbNav"
+      class="nav-tabs"
+      [(activeId)]="active"
+      [formGroup]="formCotizacionRegular"
+    >
+      <ng-container formArrayName="items">
+        <li
+          *ngFor="let item of items.controls; let i = index"
+          [ngbNavItem]="i + 1"
+          [formGroupName]="i"
+        >
+          <button ngbNavLink>Cotización {{ i + 1 }}</button>
+          <ng-template ngbNavContent>
+            <div class="row mt-3">
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Nombre proveedor {{ i + 1 }}</mat-label>
+                <mat-select
+                  formControlName="third_party_id"
+                  required
+                  [disableOptionCentering]="true"
+                  #selectProveedor
+                >
+                  <mat-select-filter
+                    *ngIf="selectProveedor.focused"
+                    [placeholder]="'Selecciona el proveedor'"
+                    [array]="proveedores"
+                    [displayMember]="'text'"
+                    (filteredReturn)="filteredProveedor = $event"
+                  ></mat-select-filter>
+                  <mat-option *ngFor="let proveedor of filteredProveedor" [value]="proveedor.value">
+                    {{ proveedor.text }}
+                  </mat-option>
+                </mat-select>
+                <button
+                  mat-icon-button
+                  matSuffix
+                  matTooltip="Crear nuevo tercero"
+                  (click)="redirectTercero()"
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Número de cotización {{ i + 1 }}</mat-label>
+                <input matInput readonly formControlName="code" required />
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Precio total cotización {{ i + 1 }}</mat-label>
+                <input
+                  matInput
+                  currencyMask
+                  appInputPosition
+                  [options]="mask.maskCOP"
+                  placeholder="Digita el precio total de la cotización"
+                  formControlName="total_price"
+                  required
+                  autocomplete="off"
+                />
+              </mat-form-field>
+
+              <div class="form-group text-center col-md-12">
+                <div class="custom-input-file col-md-12">
+                  <input
+                    type="file"
+                    #fileInput
+                    id="importFile"
+                    accept=".pdf"
+                    class="input-file"
+                    (change)="onFileChanged($event, i)"
+                  />
+                  Cargar cotización {{ i + 1 }}
+                </div>
+                <div class="col-md-12 text-centerm mt-3">
+                  <small *ngIf="item.get('file').value" class="text-success"
+                    >Cotización cargada exitosamente</small
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="alert alert-info col-md-12 text-center" role="alert">
+              Solo podrás cargar una vez las cotizaciones, puedes cargar una o más cotizaciones de
+              este producto.
+            </div>
+          </ng-template>
+        </li>
+      </ng-container>
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button type="submit" class="btn btn-primary" (click)="saveQuotation()">Guardar</button>
+  </div>
+</ng-template>
+
+<!--  Modal Aprobar por producto-->
+<ng-template #modalAprobar let-modal>
+  <div class="modal-header">
+    <h5 class="text-primary modal-title" *ngIf="!loadingQuotations">
+      {{ validate() ? 'Cotización aprobada' : 'Cotizaciones del producto' }}
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+  <!-- El modalbody va en un ngfor  -->
+  <div class="modal-body">
+    <ng-container *ngIf="!loadingQuotations && quotations.length > 0; else notDataQuotations">
+      <div class="row">
+        <div
+          *ngFor="let quotation of quotations; let i = index"
+          [class]="quotation.status === 'Aprobada' ? 'col-12' : 'col-md-4'"
+        >
+          <div
+            class="card border border-success overflow-hidden"
+            *ngIf="quotation.status == 'Pendiente' || quotation.status == 'Aprobada'"
+          >
+            <div class="card-header d-flex justify-content-between">
+              <h6 class="text-primary">Cotización {{ i + 1 }}</h6>
+              <mat-radio-button
+                color="primary"
+                (click)="selectedQuotation(quotation.id)"
+                *ngIf="quotation.status == 'Pendiente'"
+              ></mat-radio-button>
+            </div>
+            <div class="card-body pt-0">
+              <h5 class="card-title">
+                N°cotización: <small>{{ quotation?.code }}</small>
+              </h5>
+              <h5 class="card-title">
+                Proveedor:
+                <small>{{ quotation?.third_party?.full_name }}</small>
+              </h5>
+              <h5 class="card-title">
+                Precio:
+                <small> $ {{ quotation?.total_price | number: '1.2-2' }}</small>
+              </h5>
+              <h5 class="card-title">
+                PDF adjunto:
+                <a [href]="quotation?.file" target="_blank "
+                  ><small>Cotización {{ i + 1 }}</small></a
+                >
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="!validate()">
+        <div class="alert alert-info text-center" role="alert">
+          <strong
+            >Selecciona una cotización para aprobar. Esta acción sólo se podrá realizar una
+            vez.</strong
+          >
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cerrar</button>
+    <ng-container *ngIf="!validate() && !loadingQuotations">
+      <button type="button" class="btn btn-primary" (click)="saveQuotationApproved()">
+        Aprobar
+      </button>
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template #notDataQuotations>
+  <app-not-data [loading]="loadingQuotations"></app-not-data>
+</ng-template>

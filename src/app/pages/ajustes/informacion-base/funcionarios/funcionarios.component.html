@@ -1,0 +1,146 @@
+<div class="row">
+  <div class="col-xl-3 col-lg-4">
+    <div class="card pb-3">
+      <div class="card-body">
+        <div class="card-title">
+          <h5 class="mb-0">Filtros</h5>
+        </div>
+        <hr />
+        <div class="row">
+          <app-automatic-search
+            label="Funcionario"
+            placeholder="Busca por nombre"
+            [value]="formFilters.controls['name'].value"
+            (searching)="onSearchName($event)"
+          ></app-automatic-search>
+        </div>
+      </div>
+      <ng-container [formGroup]="formFilters">
+        <mat-accordion>
+          @if (permission?.permissions?.all_companies) {
+            <mat-expansion-panel class="mat-elevation-z0">
+              <mat-expansion-panel-header>
+                <mat-panel-title> Empresas </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="px-4">
+                <mat-radio-group class="d-flex flex-column" formControlName="company_id">
+                  @for (company of companies; track company) {
+                    <mat-radio-button
+                      [value]="company.value"
+                      (change)="onFilters('company_id', $event.value); getDependencies(matExpDep)"
+                    >
+                      {{ company.text }}
+                    </mat-radio-button>
+                  }
+                </mat-radio-group>
+              </div>
+            </mat-expansion-panel>
+          }
+        </mat-accordion>
+        <mat-accordion>
+          <mat-expansion-panel class="mat-elevation-z0">
+            <mat-expansion-panel-header>
+              <mat-panel-title> Estado </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="px-4">
+              <mat-radio-group class="d-flex flex-column" formControlName="status">
+                @for (stat of status; track stat) {
+                  <mat-radio-button [value]="stat.id" (change)="onFilters('status', $event.value)">
+                    {{ stat.name }}
+                  </mat-radio-button>
+                }
+              </mat-radio-group>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <mat-accordion>
+          <mat-expansion-panel #matExpDep class="mat-elevation-z0" [disabled]="loadingCompany">
+            <mat-expansion-panel-header>
+              <mat-panel-title> Dependencias </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="px-4">
+              <mat-radio-group class="d-flex flex-column" formControlName="dependency_id">
+                @for (dependency of dependencies; track dependency) {
+                  <mat-radio-button
+                    [value]="dependency.value"
+                    (change)="onFilters('dependency_id', $event.value)"
+                  >
+                    {{ dependency.text }}
+                  </mat-radio-button>
+                }
+              </mat-radio-group>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </ng-container>
+    </div>
+  </div>
+
+  <app-card class="col" viewTitle="Funcionarios">
+    <ng-container filters>
+      <app-header-download [downloading]="donwloading" (click)="download()" />
+      <app-add-button [routerLink]="['crear']" />
+    </ng-container>
+    @if (!loading && people.length > 0) {
+      <div class="row">
+        @for (person of people; track person) {
+          <div class="col-sm-6 col-md-3 d-flex align-items-stretch">
+            <a
+              role="button"
+              class="card w-100 pointer border border-light"
+              [routerLink]="['/ajustes/informacion-base/funcionario', person.id, 'info']"
+            >
+              <span class="badge bg-primary">{{
+                person.contractultimate?.company?.short_name || 'N/A'
+              }}</span>
+              <app-load-image
+                style="height: 176px"
+                width="176"
+                height="176"
+                classImg="card-img-top"
+                [src]="person.image"
+              ></app-load-image>
+              <div
+                style="width: 100%; height: 5px"
+                [ngClass]="
+                  person.status == 'activo'
+                    ? 'bg-success'
+                    : person.status == 'inactivo'
+                      ? 'bg-danger'
+                      : person.status == 'preliquidado'
+                        ? 'bg-warning'
+                        : 'bg-secondary'
+                "
+              ></div>
+              <div class="card-body p-2 text-center">
+                {{ person.first_name | uppercase }} <br />
+                {{ person.first_surname | uppercase }}
+              </div>
+              <div class="card-footer p-1 text-center">
+                <small>{{ person.contractultimate?.position?.name || 'N/A' | uppercase }}</small>
+              </div>
+            </a>
+          </div>
+        }
+      </div>
+    } @else {
+      <app-not-data [loading]="loading"></app-not-data>
+    }
+    <div class="row mt-4">
+      <div class="col-lg-12">
+        @if (pagination) {
+          <mat-paginator
+            aria-label="Select page"
+            [length]="pagination.total"
+            [pageSize]="pagination.per_page"
+            [pageIndex]="pagination.current_page - 1"
+            [pageSizeOptions]="[20, 60, 100, 200]"
+            (page)="handlePageEvent($event)"
+          >
+          </mat-paginator>
+        }
+      </div>
+    </div>
+  </app-card>
+</div>

@@ -1,0 +1,22 @@
+<div id="layout-wrapper">
+  <mat-drawer-container class="min-vh-100 bg-transparent" [hasBackdrop]="true">
+    <mat-drawer #drawer [mode]="'over'" position="end">
+      <app-rightsidebar *ngIf="drawer.opened"></app-rightsidebar>
+    </mat-drawer>
+    <mat-drawer-content class="min-vh-100">
+      <app-horizontaltopbar></app-horizontaltopbar>
+      <app-horizontalnavbar></app-horizontalnavbar>
+      <div class="main-content">
+        <div class="page-content">
+          <div class="container-fluid mt-0">
+            <app-restore-password />
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+        <app-footer></app-footer>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</div>
+
+<!-- END layout-wrapper -->

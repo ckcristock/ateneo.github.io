@@ -1,0 +1,31 @@
+<div>
+  <hr />
+  <div class="text-center text-uppercase card-title mt-2">
+    <i class="fas fa-sticky-note"></i>
+    Cálculo IBC aportes parafiscales
+  </div>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-uppercase">
+          <th>Concepto</th>
+          <th class="text-center col-md-1">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of ibc; let i = index">
+          <td [ngClass]="{ bold: i === ibc.length - 1 }">{{ item.concepto }}</td>
+          <td class="text-center" [ngClass]="{ bold: i === ibc.length - 1 }">
+            {{ item.valor | currency: '' : '' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <small
+    ><b>
+      Tenga en cuenta que durante el periodo de licencia remunerada, maternidad o paternidad, no hay
+      lugar al pago de Aportes Parafiscales
+    </b></small
+  >
+</div>

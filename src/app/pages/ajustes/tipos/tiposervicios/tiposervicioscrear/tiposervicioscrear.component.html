@@ -1,0 +1,229 @@
+<app-card [viewTitle]="Accion + ' tipo de servicio'">
+  <form #FormTipoServicioCrear="ngForm" class="row">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput type="text" name="Nombre" required [(ngModel)]="tiposervicio.Nombre" />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Servicio</mat-label>
+      <mat-select name="Id_Servicio" [(ngModel)]="tiposervicio.Id_Servicio" required>
+        @for (item of Servicios; track $index) {
+          <mat-option [value]="item.Id_Servicio">
+            {{ item.Nombre }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Código CIE</mat-label>
+      <mat-select name="Coidgo_CIE" [(ngModel)]="tiposervicio.Codigo_CIE" required>
+        <mat-option value="Si">Si</mat-option>
+        <mat-option value="No">No</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Lista precio</mat-label>
+      <mat-select name="Tipo_Lista" [(ngModel)]="tiposervicio.Tipo_Lista" required>
+        <mat-option value="No_Aplica">No aplica</mat-option>
+        <mat-option value="Producto_Cohorte">Lista cohorte</mat-option>
+        <mat-option value="Producto_NoPos">Lista No Pos</mat-option>
+        <mat-option value="Producto_Evento">Lista evento</mat-option>
+        <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Nota</mat-label>
+      <input matInput type="text" required name="Nota" [(ngModel)]="tiposervicio.Nota" />
+    </mat-form-field>
+  </form>
+  <h6>Campos cabecera</h6>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-center text-uppercase">
+          <th>Nombre Campo</th>
+          <th>Tipo</th>
+          <th>Requerido</th>
+          <th>Longitud</th>
+          <th>Módulo</th>
+          <th><i class="mdi mdi-chevron-down"></i></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of Campos_Cabecera; track item; let i = $index) {
+          <tr class="text-center">
+            <td>
+              <input
+                type="text"
+                name="Nombre{{ i }}"
+                placeholder=""
+                class="form-control form-control-sm"
+                [(ngModel)]="item.Nombre"
+                (change)="Agregar_Campos_Cabecera(i, 'Campos_Cabecera')"
+              />
+            </td>
+            @if (item.Edicion == 0) {
+              <td>
+                <select
+                  class="form-control form-control-sm"
+                  name="Tipo{{ i }}"
+                  [(ngModel)]="item.Tipo"
+                >
+                  @for (campo of Tipo_Campos; track campo) {
+                    <option [value]="campo.Tipo">
+                      {{ campo.Nombre }}
+                    </option>
+                  }
+                </select>
+              </td>
+            } @else if (item.Edicion == 1) {
+              <label>{{ item.Tipo }}</label>
+            }
+            <td>
+              @if (item.Edicion == 0) {
+                <select
+                  class="form-control form-control-sm"
+                  name="Requerido{{ i }}"
+                  [(ngModel)]="item.Requerido"
+                >
+                  <option value="Si">Si</option>
+                  <option value="No">No</option>
+                </select>
+              } @else if (item.Edicion == 1) {
+                <label>{{ item.Requerido }}</label>
+              }
+            </td>
+            <td>
+              @if (item.Edicion == 0) {
+                <input
+                  class="form-control form-control-sm"
+                  type="number"
+                  [(ngModel)]="item.Longitud"
+                  name="Longitud{{ i }}"
+                />
+              } @else if (item.Edicion == 1) {
+                <input
+                  class="form-control form-control-sm"
+                  type="number"
+                  name="Longitud{{ i }}"
+                  [(ngModel)]="item.Longitud"
+                  (change)="CambiarEstadoCampo(item, 'Longitud')"
+                />
+              }
+            </td>
+            <td>
+              @if (item.Edicion == 0) {
+              } @else if (item.Edicion == 1) {}
+              @if (item.Edicion == 0) {
+                <select
+                  class="form-control form-control-sm"
+                  name="Modulo{{ i }}"
+                  [(ngModel)]="item.Modulo"
+                >
+                  <option value="Ambos">Ambos</option>
+                  <option value="Dispensacion" selected>Dispensación</option>
+                  <option value="Auditoria">Auditoria</option>
+                </select>
+              } @else if (item.Edicion == 1) {
+                <label>{{ item.Modulo }}</label>
+              }
+            </td>
+            <td>
+              @if (item.Edicion == 0) {
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="EliminarColumna(i, 'Campos_Cabecera')"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              } @else if (item.Edicion == 1) {
+                <select
+                  class="form-control form-control-sm"
+                  name="Estado{{ i }}"
+                  [(ngModel)]="item.Estado"
+                  (change)="CambiarEstadoCampo(item, 'Estado')"
+                >
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <h6>Tipo soporte</h6>
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-center text-uppercase">
+          <th>Tipo de Soporte</th>
+          <th>Comentario</th>
+          <th>Pre-Auditoria</th>
+          <th>Auditoria</th>
+          <th><i class="mdi mdi-chevron-down"></i></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of Campos_Cabecera; track item; let i = $index) {
+          <tr class="text-center">
+            <td>
+              <input
+                type="text"
+                name="Tipo_Soporte{{ i }}"
+                class="form-control form-control-sm"
+                [(ngModel)]="item.Tipo_Soporte"
+                (change)="valuechange(i)"
+              />
+            </td>
+            <td>
+              <input
+                name="Comentario{{ i }}"
+                type="text"
+                [(ngModel)]="item.Comentario"
+                class="form-control form-control-sm"
+              />
+            </td>
+            <td class="ths">
+              <input
+                name="Pre_Auditoria{{ i }}"
+                type="checkbox"
+                class="form-control form-control-sm"
+                [checked]="item.Pre_Auditoria == 'Si' ? true : false"
+                (click)="CambiarEstado(i, 'Pre_Auditoria')"
+              />
+            </td>
+            <td class="ths">
+              <input
+                name="Auditoria{{ i }}"
+                type="checkbox"
+                class="form-control form-control-sm"
+                [checked]="item.Auditoria == 'Si' ? true : false"
+                (click)="CambiarEstado(i, 'Auditoria')"
+              />
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="EliminarColumnaSoporte(i)"
+              >
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <button
+    type="button"
+    (click)="onSaveInfo()"
+    [disabled]="!FormTipoServicioCrear.valid"
+    class="btn btn-success btn-block"
+  >
+    Guardar la Informacion
+  </button>
+</app-card>

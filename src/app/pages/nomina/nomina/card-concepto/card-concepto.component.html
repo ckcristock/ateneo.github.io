@@ -1,0 +1,16 @@
+<div class="info-cards align-items-stretch py-2">
+  <div class="card border border-3 border-light w-100 h-100">
+    <div class="card-body align-middle text-center" style="padding: 10px">
+      <i [class]="icon"></i>
+      <p class="card-text mb-0">
+        {{ label }}
+      </p>
+      <p *ngIf="concepto > 0; else notValue" class="lead card-item-nomina text-center">
+        $ {{ concepto | currency: '' : '' }}
+      </p>
+      <ng-template #notValue>
+        <p class="lead card-item-nomina text-center">$ 0</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

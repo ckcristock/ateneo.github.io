@@ -1,0 +1,428 @@
+<div class="container-fuild">
+  <!-- cuadros -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="text-primary text-start">Estadísticas</h4>
+          <div class="row" *ngIf="!Cargando && Indicador.length > 0; else notData">
+            <!-- cuadro individual -->
+            <div
+              class="d-flex flex-column flex-sm-row flex-wrap justify-content-between align-items-center gap-1"
+            >
+              <div
+                class="card text-white my-auto bg-secondary w-100"
+                [ngClass]="item.class"
+                *ngFor="let item of Indicador"
+              >
+                <div class="card-body">
+                  <h1 class="card-title text-white fs-3">{{ item.Total }}</h1>
+                  <p class="card-text">
+                    <i
+                      class="me-2"
+                      [ngClass]="
+                        item.icono === 'bi bi-ticket'
+                          ? 'bi bi-ticket'
+                          : item?.icono === 'fas fa-hourglass-end'
+                            ? 'fas fa-hourglass-end'
+                            : item?.icono === 'bi bi-cash-stack'
+                              ? 'bi bi-cash-stack'
+                              : 'bi bi-ban'
+                      "
+                    ></i
+                    >{{ item?.Titulo.replace('Dis.', 'Dispensaciones') | capitalLetter }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- dispensaciones -->
+<app-card
+  viewTitle="Dispensaciones"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="UrlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]"> </ng-container>
+  <!-- ordenar por -->
+  <mat-form-field style="max-width: fit-content" appearance="outline">
+    <mat-label>Ordenar por:</mat-label>
+    <mat-select (selectionChange)="ListarDispensaciones()" [(ngModel)]="filtros.orden">
+      <mat-option value="Fecha">Fecha</mat-option>
+      <mat-option value="Tutela">Tutela</mat-option>
+      <mat-option value="Platino">Linea de Oro</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Dispensaciones"
+    [pagination]="pagination"
+    (pageChange)="onPagination($event)"
+  >
+    <ng-container titles>
+      <th>Codigo</th>
+      <th>Fecha</th>
+      <th>Tipo servicio</th>
+      <th>Paciente</th>
+      <th>Punto Dispensación</th>
+      <th>Departamento</th>
+      <th>Pendientes</th>
+      <th>Facturación</th>
+      <th>Auditoría</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (dispensacion of Dispensaciones; track $index) {
+        <tr class="text-center text-uppercase">
+          <td>
+            {{ dispensacion?.Codigo || 'N/A' }}
+          </td>
+          <td>
+            {{ dispensacion?.Fecha_Dis || 'N/A' }}
+          </td>
+          <td>
+            <div class="text-center">
+              <span class="label label-inverse">{{ dispensacion?.Tipo || 'N/A' }}</span>
+            </div>
+          </td>
+          <td>
+            {{ dispensacion?.Numero_Documento || 'N/A' }} - {{ dispensacion?.Paciente || 'N/A' }}
+          </td>
+          <td>
+            {{ dispensacion?.Punto_Dispensacion || 'N/A' }}
+          </td>
+          <td>
+            {{ dispensacion?.Departamento || 'N/A' }}
+          </td>
+          <td>
+            <strong>
+              {{ dispensacion?.Pendientes || 'N/A' }}
+            </strong>
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="badge {{
+                  dispensacion?.Estado_Facturacion == 'Sin Facturar' ? 'bg-danger' : 'bg-success'
+                }}"
+                >{{ dispensacion?.Estado_Facturacion || 'N/A' }}</span
+              >
+              <span
+                *ngIf="
+                  dispensacion?.Estado_Facturacion == 'Facturada' &&
+                  dispensacion?.Nombre_Tipo_Servicio == 'CAPITA'
+                "
+                class="badge {{
+                  dispensacion?.Estado_Facturacion == 'Sin Facturar' ? 'bg-danger' : 'bg-success'
+                }}"
+                >{{ dispensacion?.Estado_Facturacion || 'N/A' }}</span
+              >
+              <a
+                *ngIf="
+                  dispensacion?.Estado_Facturacion == 'Facturada' &&
+                  dispensacion?.Nombre_Tipo_Servicio != 'CAPITA'
+                "
+                [routerLink]="['/cmfacturaver', dispensacion?.Id_Factura]"
+                class="badge bg-success"
+                >{{ dispensacion?.Estado_Facturacion || 'N/A' }}</a
+              >
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="badge {{
+                  dispensacion?.Estado_Auditoria == 'Auditada' ? 'bg-warning' : 'bg-danger'
+                }}"
+                >{{ dispensacion?.Estado_Auditoria || 'N/A' }}</span
+              >
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <span
+                class="badge {{
+                  dispensacion?.Estado_Dispensacion == 'Anulada' ? 'bg-danger' : 'bg-success'
+                }}"
+                >{{ dispensacion?.Estado_Dispensacion || 'N/A' }}</span
+              >
+            </div>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="eye"
+                text="Ver"
+                type="success"
+                [link]="{
+                  url: '/cuentas-medicas/dispensacion/' + dispensacion?.Id_Dispensacion
+                }"
+              ></app-action-button>
+              <app-action-button
+                icon="print"
+                text="Imprimir dispensación"
+                type="info"
+                (click)="
+                  openPages(
+                    environment?.base_url +
+                      '/php/dispensaciones/dispensacion_pdf.php?id=' +
+                      dispensacion?.Id_Dispensacion
+                  )
+                "
+              ></app-action-button>
+              <app-action-button
+                icon="print"
+                text="Imprimir productos"
+                type="info"
+                (click)="
+                  openPages(
+                    environment?.base_url +
+                      '/php/dispensaciones/productos_pdf.php?id=' +
+                      dispensacion?.Id_Dispensacion
+                  )
+                "
+              ></app-action-button
+              ><app-action-button
+                icon="print"
+                text="Imprimir productos pendientes"
+                type="info"
+                (click)="
+                  openPages(
+                    environment?.base_url +
+                      '/php/dispensaciones/descarga_pdf.php?id=' +
+                      dispensacion?.Id_Dispensacion
+                  )
+                "
+              ></app-action-button
+              ><app-action-button
+                icon="print"
+                text="Ver acta"
+                type="success"
+                (click)="
+                  openPages(
+                    dispensacion?.Acta_Entrega?.includes('https')
+                      ? dispensacion?.Acta_Entrega
+                      : environment?.base_url +
+                          '/ARCHIVOS/DISPENSACION/ACTAS_ENTREGAS/' +
+                          dispensacion?.Acta_Entrega
+                  )
+                "
+              ></app-action-button
+              ><app-action-button
+                *ngIf="
+                  ValidarValorFactura(dispensacion?.Valor_Factura) &&
+                  dispensacion?.Nombre_Tipo_Servicio != 'CAPITA' &&
+                  dispensacion?.Id_Factura != ''
+                "
+                icon="print"
+                text="Imprimir factura"
+                type="info"
+                (click)="
+                  openPages(
+                    environment?.base_url +
+                      '/php/facturasventas/factura_dis_pdf.php?id=' +
+                      dispensacion?.Id_Factura
+                  )
+                "
+              ></app-action-button>
+              <!-- <a
+                *ngIf="
+                  dispensacion?.Estado != 'Anulada' &&
+                  dispensacion?.Estado_Facturacion == 'Sin Facturar'
+                "
+                class="ms-4 text-danger"
+                href="javascript:;"
+                (click)="motivoAnulacion(modalAnular, track)"
+              >
+                <i class="far fa-trash-alt"></i>&nbsp;Anular</a
+              > -->
+              @if (
+                dispensacion?.Estado != 'Anulada' &&
+                dispensacion?.Estado_Facturacion == 'Sin Facturar'
+              ) {
+                <app-action-deactivate (action)="motivoAnulacion(modalAnular, $index)" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<app-modalactaentrega
+  [AbrirModalActaEntregaEvent]="AbrirModalActa.asObservable()"
+  (Guardar)="LimpiarModelo($event)"
+>
+</app-modalactaentrega>
+
+<ng-template #modalAnular let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-primary">Anular dispensación - {{ Disp.Cod_Disp }}</h4>
+    <button type="button" class="btn-close" (click)="modal.dismiss()">
+      <!-- <span aria-hidden="true">&times;</span> -->
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #FormAnular="ngForm">
+      <input type="hidden" name="Id_Dispensacion" [(ngModel)]="Disp.Id_Dispensacion" />
+      <textarea
+        name="Motivo_Anulacion"
+        id="Motivo_Anulacion"
+        class="form-control"
+        placeholder="Explique sus razones para esta anulación"
+        [(ngModel)]="Disp.Motivo_Anulacion"
+        required
+      ></textarea>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="text-right">
+      <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+      &nbsp;<button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!FormAnular.valid"
+        (click)="SuspenderDispensacion()"
+      >
+        Continuar
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>
+
+<ng-template #filterTemplate>
+  <!-- Código -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtros.cod"
+      (input)="ListarDispensaciones()"
+      placeholder="Filtro Codigo"
+    />
+  </mat-form-field>
+  <!-- rango de fechas -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Rango de fechas</mat-label>
+    <mat-date-range-input [formGroup]="range" [rangePicker]="rangePicker">
+      <input
+        matStartDate
+        placeholder="Fecha de inicio"
+        [readonly]="true"
+        formControlName="start"
+        name="date_start"
+      />
+      <input
+        matEndDate
+        placeholder="Fecha de fin"
+        [readonly]="true"
+        formControlName="end"
+        name="date_end"
+      />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+    <mat-datepicker-toggle matIconSuffix (click)="borrarFechas()">
+      <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+    </mat-datepicker-toggle>
+
+    <mat-date-range-picker #rangePicker>
+      <mat-date-range-picker-actions>
+        <button mat-button matDateRangePickerCancel>Cancelar</button>
+        <button mat-raised-button color="primary" matDateRangePickerApply>Filtrar</button>
+      </mat-date-range-picker-actions>
+    </mat-date-range-picker>
+  </mat-form-field>
+  <!-- tipo de servicio -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo servicio</mat-label>
+    <mat-select (selectionChange)="ListarDispensaciones()" [(ngModel)]="filtros.tipo">
+      <mat-option value="todos">Todos</mat-option>
+      <mat-option *ngFor="let t of Servicios" [value]="t.Id_Tipo_Servicio">
+        {{ t.Nombre }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- paciente -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Paciente</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtros.pers"
+      (input)="ListarDispensaciones()"
+      placeholder="Filtro Persona"
+    />
+  </mat-form-field>
+  <!-- punto dispensacion -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Punto dispensación</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtros.punto"
+      (input)="ListarDispensaciones()"
+      placeholder="Filtro Punto"
+    />
+  </mat-form-field>
+  <!-- departamento -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Departamento</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="filtros.dep"
+      (input)="ListarDispensaciones()"
+      placeholder="Filtro Depart."
+    />
+  </mat-form-field>
+  <!-- pendientes -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Pendientes</mat-label>
+    <mat-select (selectionChange)="ListarDispensaciones()" [(ngModel)]="filtros.pend">
+      <mat-option value="">Todas</mat-option>
+      <mat-option value="Si">Con Pendientes</mat-option>
+      <mat-option value="No">Sin Pendientes</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- facturación -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Facturación</mat-label>
+    <mat-select (selectionChange)="ListarDispensaciones()" [(ngModel)]="filtros.fact">
+      <mat-option value="">Todas</mat-option>
+      <mat-option value="Facturada">Facturadas</mat-option>
+      <mat-option value="Sin Facturar">No Facturadas</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- auditoría -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Auditoría</mat-label>
+    <mat-select (selectionChange)="ListarDispensaciones()" [(ngModel)]="filtros.auditoria">
+      <mat-option value="">Todas</mat-option>
+      <mat-option value="Aceptar">Auditadas Aceptadas</mat-option>
+      <mat-option value="Rechazar">Auditadas Rechazadas</mat-option>
+      <mat-option value="Con Observacion">Auditadas Observacion</mat-option>
+      <mat-option value="Sin Auditar">Sin Auditar</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- estado -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select (selectionChange)="ListarDispensaciones()" [(ngModel)]="filtros.est">
+      <mat-option value="">Todas</mat-option>
+      <mat-option value="Activa">Activadas</mat-option>
+      <mat-option value="Anulada">Anuladas</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

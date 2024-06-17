@@ -1,0 +1,517 @@
+<div class="row d-flex justify-content-between">
+  <div class="col-md-10">
+    <ul
+      ngbNav
+      #nav="ngbNav"
+      [(activeId)]="active"
+      class="nav nav-tabs justify-content-center"
+      role="tablist"
+    >
+      <li [ngbNavItem]="1" class="nav-item flex-sm-fill">
+        <a
+          ngbNavLink
+          data-toggle="tab"
+          role="tab"
+          aria-controls="home"
+          aria-selected="true"
+          (click)="getTasks()"
+          class="nav-link border-0 text-uppercase font-weight-bold"
+          >Tareas</a
+        >
+        <ng-template ngbNavContent>
+          <div class="mt-4">
+            <div class="row">
+              <div class="col-md-3 pb-4">
+                <div class="card h-100">
+                  <div class="card-header text-center pb-0">
+                    <h4 class="card-title">Pendientes</h4>
+                    <hr style="border-color: #ef476f" />
+                  </div>
+                  <div class="card-body p-0">
+                    <div
+                      cdkDropList
+                      #pen="cdkDropList"
+                      class="m-2 example-list"
+                      [cdkDropListData]="pendientes"
+                      [cdkDropListConnectedTo]="[eje]"
+                      (cdkDropListDropped)="drop($event)"
+                      id="list-pendientes"
+                    >
+                      <ng-container
+                        *ngIf="!loadingPendientes && pendientes.length > 0; else notDataPendientes"
+                      >
+                        <div
+                          class="card bg-light"
+                          *ngFor="let item of pendientes"
+                          cdkDrag
+                          [routerLink]="['/task', item.id]"
+                        >
+                          <app-card-task [list]="item"></app-card-task>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="text-center">
+                      {{
+                        pendientes.length == 0
+                          ? 'Sin tareas'
+                          : pendientes.length == 1
+                            ? pendientes.length + ' tarea'
+                            : pendientes.length > 1
+                              ? pendientes.length + ' tareas'
+                              : ''
+                      }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 pb-4">
+                <div class="card h-100">
+                  <div class="card-header text-center pb-0">
+                    <h5 class="card-title">En ejecución</h5>
+                    <hr style="border-color: #ffd166" />
+                  </div>
+                  <div class="card-body p-0">
+                    <div
+                      cdkDropList
+                      #eje="cdkDropList"
+                      class="m-2 example-list"
+                      [cdkDropListData]="ejecucion"
+                      [cdkDropListConnectedTo]="esp"
+                      (cdkDropListDropped)="drop($event)"
+                      id="list-ejecucion"
+                    >
+                      <ng-container
+                        *ngIf="!loadingEjecucion && ejecucion.length > 0; else notDataEjecucion"
+                      >
+                        <div
+                          class="card bg-light"
+                          *ngFor="let item of ejecucion"
+                          cdkDrag
+                          [routerLink]="['/task', item.id]"
+                        >
+                          <app-card-task [list]="item"></app-card-task>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="text-center">
+                      {{
+                        ejecucion.length == 0
+                          ? 'Sin tareas'
+                          : ejecucion.length == 1
+                            ? ejecucion.length + ' tarea'
+                            : ejecucion.length > 1
+                              ? ejecucion.length + ' tareas'
+                              : ''
+                      }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 pb-4">
+                <div class="card h-100">
+                  <div class="card-header text-center pb-0">
+                    <h5 class="card-title">En espera</h5>
+                    <hr style="border-color: #118ab2" />
+                  </div>
+                  <div class="card-body p-0">
+                    <div
+                      class="m-2 example-list"
+                      cdkDropList
+                      #esp="cdkDropList"
+                      [cdkDropListData]="espera"
+                      [cdkDropListConnectedTo]="[fin]"
+                      (cdkDropListDropped)="drop($event)"
+                      id="list-espera"
+                    >
+                      <ng-container *ngIf="!loadingEspera && espera.length > 0; else notDataEspera">
+                        <div
+                          class="card bg-light"
+                          *ngFor="let item of espera"
+                          cdkDrag
+                          [routerLink]="['/task', item.id]"
+                        >
+                          <app-card-task [list]="item"></app-card-task>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="text-center">
+                      {{
+                        espera.length == 0
+                          ? 'Sin tareas'
+                          : espera.length == 1
+                            ? espera.length + ' tarea'
+                            : espera.length > 1
+                              ? espera.length + ' tareas'
+                              : ''
+                      }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 pb-4">
+                <div class="card h-100">
+                  <div class="card-header pb-0">
+                    <h5 class="card-title text-center">Finalizado</h5>
+                    <hr style="border-color: #06d6a0" />
+                  </div>
+                  <div class="card-body p-0">
+                    <div
+                      class="m-2 example-list"
+                      cdkDropList
+                      #fin="cdkDropList"
+                      [cdkDropListData]="finalizado"
+                      (cdkDropListDropped)="drop($event)"
+                      id="list-finalizado"
+                    >
+                      <ng-container
+                        *ngIf="!loadingFinalizado && finalizado.length > 0; else notDataFinalizado"
+                      >
+                        <div
+                          class="card bg-light"
+                          *ngFor="let item of finalizado"
+                          cdkDrag
+                          [routerLink]="['/task', item.id]"
+                        >
+                          <app-card-task [list]="item"></app-card-task>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="text-center">
+                      {{
+                        finalizado.length == 0
+                          ? 'Sin tareas'
+                          : finalizado.length == 1
+                            ? finalizado.length + ' tarea'
+                            : finalizado.length > 1
+                              ? finalizado.length + ' tareas'
+                              : ''
+                      }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-md-11"></div>
+            <div class="col-md-1">
+              <select
+                class="custom-select custom-select-sm"
+                [(ngModel)]="params.max"
+                (change)="getTasks()"
+              >
+                <option *ngFor="let item of values" [value]="item">
+                  {{ item }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="2" class="nav-item flex-sm-fill">
+        <a
+          ngbNavLink
+          data-toggle="tab"
+          role="tab"
+          aria-controls="home"
+          aria-selected="true"
+          (click)="getTasks()"
+          class="nav-link border-0 text-uppercase font-weight-bold"
+          >Calendario</a
+        >
+        <ng-template ngbNavContent>
+          <div class="mt-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-3 d-flex justify-content-center">
+                    <div class="row">
+                      <h6 style="color: #ef476f">●</h6>
+                      <p>Pendientes</p>
+                    </div>
+                  </div>
+                  <div class="col-3 d-flex justify-content-center">
+                    <div class="row">
+                      <h6 style="color: #ffd166">●</h6>
+                      <p>En ejecución</p>
+                    </div>
+                  </div>
+                  <div class="col-3 d-flex justify-content-center">
+                    <div class="row">
+                      <h6 style="color: #118ab2">●</h6>
+                      <p>En espera</p>
+                    </div>
+                  </div>
+                  <div class="col-3 d-flex justify-content-center">
+                    <div class="row">
+                      <h6 style="color: #06d6a0">●</h6>
+                      <p>Finalizado</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="app-calendar">
+                  <full-calendar
+                    #calendar
+                    defaultView="dayGridMonth"
+                    [header]="{
+                      left: 'prevYear,prev,next,nextYear today',
+                      center: 'title',
+                      right: 'dayGridMonth,dayGridWeek,dayGridDay'
+                    }"
+                    [plugins]="calendarPlugins"
+                    [events]="events"
+                    (eventClick)="onEventClick($event)"
+                    [eventResizableFromStart]="'true'"
+                    [eventLimit]="false"
+                    themeSystem="bootstrap"
+                    [bootstrapFontAwesome]="true"
+                    deepChangeDetection="true"
+                    [locales]="locales"
+                    [eventTimeFormat]="{
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      meridiem: false,
+                      hour12: true
+                    }"
+                  >
+                  </full-calendar>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-md-11"></div>
+            <div class="col-md-1">
+              <select
+                class="custom-select custom-select-sm"
+                [(ngModel)]="params.max"
+                (change)="getTasks()"
+              >
+                <option *ngFor="let item of values" [value]="item">
+                  {{ item }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="3" class="nav-item flex-sm-fill">
+        <a
+          ngbNavLink
+          data-toggle="tab"
+          role="tab"
+          aria-controls="home"
+          aria-selected="true"
+          (click)="getAsignadas()"
+          class="nav-link border-0 text-uppercase font-weight-bold"
+          >Asignadas por mí</a
+        >
+        <ng-template ngbNavContent>
+          <div class="mt-4">
+            <div class="card">
+              <div class="card-body">
+                <ng-container
+                  *ngIf="!loadingAsignadas && asignadas.length > 0; else notDataAsignadas"
+                  ><div class="row">
+                    <div
+                      class="col-md-3"
+                      *ngFor="let item of asignadas"
+                      [routerLink]="['/task', item.id]"
+                    >
+                      <div class="card bg-light" role="button">
+                        <app-card-task [list]="item" [view_state]="true"></app-card-task>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <ngb-pagination
+                  class="d-flex justify-content-center pagination-rounded pagination-sm"
+                  [collectionSize]="paginationAsiggned.collectionSize"
+                  (pageChange)="getAsignadas($event)"
+                  [pageSize]="paginationAsiggned.pageSize"
+                  [(page)]="paginationAsiggned.page"
+                  aria-label="Default pagination"
+                  maxSize="5"
+                  rotate="true"
+                  ellipses="false"
+                  boundaryLinks="true"
+                >
+                </ngb-pagination>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="4" class="nav-item flex-sm-fill">
+        <a
+          ngbNavLink
+          data-toggle="tab"
+          role="tab"
+          aria-controls="home"
+          aria-selected="true"
+          (click)="getArchivadas()"
+          class="nav-link border-0 text-uppercase font-weight-bold"
+          >Archivadas</a
+        >
+        <ng-template ngbNavContent>
+          <div class="mt-4">
+            <div class="card">
+              <div class="card-body">
+                <ng-container
+                  *ngIf="!loadingArchivadas && archivadas.length > 0; else notDataArchivadas"
+                >
+                  <div class="row">
+                    <div
+                      class="col-3"
+                      *ngFor="let item of archivadas"
+                      [routerLink]="['/task', item.id]"
+                    >
+                      <div class="card bg-light" role="button">
+                        <app-card-task [list]="item"></app-card-task>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <ngb-pagination
+                  class="d-flex justify-content-center pagination-rounded pagination-sm"
+                  [collectionSize]="paginationArch.collectionSize"
+                  (pageChange)="getArchivadas($event)"
+                  [pageSize]="paginationArch.pageSize"
+                  [(page)]="paginationArch.page"
+                  aria-label="Default pagination"
+                  maxSize="5"
+                  rotate="true"
+                  ellipses="false"
+                  boundaryLinks="true"
+                >
+                </ngb-pagination>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+  </div>
+  <div class="col text-end">
+    <div class="btn-group rounded w-sm-100">
+      <button type="button" class="btn btn-warning btn-sm" (click)="openModalTypes(types)">
+        <i class="fa fa-plus"></i> Tipos
+      </button>
+      <button type="button" class="btn btn-primary btn-sm" (click)="newTask.openInit()">
+        <i class="fa fa-plus"></i> Agregar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+<ng-template #types let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Tipos de tareas</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="formTypes">
+      <div class="row">
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>{{ titleType }} tipo</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            formControlName="name"
+            required
+            autocomplete="off"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            color="primary"
+            (click)="saveType()"
+            [disabled]="!formTypes.valid"
+          >
+            <mat-icon>save</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+    </form>
+    <div
+      class="rounded-top table-responsive"
+      *ngIf="!loadingTypes && taskTypes.length > 0; else notDataTypes"
+    >
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Nombre</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center" *ngFor="let item of taskTypes">
+            <td>{{ item.name }}</td>
+            <td>
+              <a class="text-info" (click)="editTypes(item)" href="javascript: void(0);">
+                <i class="fas fa-edit"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      [collectionSize]="paginationTypes.collectionSize"
+      [pageSize]="paginationTypes.pageSize"
+      [(page)]="paginationTypes.page"
+      (pageChange)="paginateTypes($event)"
+      maxSize="5"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+    >
+    </ngb-pagination>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cerrar</button>
+  </div>
+</ng-template>
+<app-new-task #newTask (refresh)="getTasks()"></app-new-task>
+
+<ng-template #notDataTypes>
+  <app-not-data [loading]="loadingTypes"></app-not-data>
+</ng-template>
+<ng-template #notDataPendientes>
+  <app-not-data [loading]="loadingPendientes"></app-not-data>
+</ng-template>
+<ng-template #notDataEjecucion>
+  <app-not-data [loading]="loadingEjecucion"></app-not-data>
+</ng-template>
+<ng-template #notDataEspera>
+  <app-not-data [loading]="loadingEspera"></app-not-data>
+</ng-template>
+<ng-template #notDataFinalizado>
+  <app-not-data [loading]="loadingFinalizado"></app-not-data>
+</ng-template>
+<ng-template #notDataAsignadas>
+  <app-not-data [loading]="loadingAsignadas"></app-not-data>
+</ng-template>
+<ng-template #notDataArchivadas>
+  <app-not-data [loading]="loadingArchivadas"></app-not-data>
+</ng-template>

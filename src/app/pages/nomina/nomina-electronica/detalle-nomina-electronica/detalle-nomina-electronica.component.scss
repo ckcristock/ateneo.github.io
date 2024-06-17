@@ -1,0 +1,41 @@
+.stats {
+  i {
+    font-size: 50px;
+  }
+  h6 {
+    font-size: 15px;
+  }
+  p {
+    font-size: 18px;
+  }
+}
+
+.green {
+  color: #12b858;
+}
+
+.red {
+  color: #eb4308;
+}
+
+.blue {
+  color: #08cceb;
+}
+.tGray {
+  color: #576466;
+}
+
+.yelow {
+  color: #fead0c;
+}
+.yelowSoft {
+  color: #e7c30f;
+}
+
+td {
+  p {
+    word-wrap: break-word;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}

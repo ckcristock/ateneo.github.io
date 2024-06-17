@@ -1,0 +1,127 @@
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+        <hr class="line" />
+        <form #FormFiltros="ngForm">
+          <div class="row">
+            <mat-form-field class="col-md-4" appearance="outline">
+              <mat-label>Fecha inicial</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="CertificadoRetencionModel.Fecha_Inicial"
+                (change)="setQueryParams()"
+                name="Fecha_Inicial"
+                id="Fecha_Inicial"
+                required
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-4" appearance="outline">
+              <mat-label>Fecha de corte</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="CertificadoRetencionModel.Fecha_Final"
+                (change)="setQueryParams()"
+                name="Fecha_Corte"
+                id="Fecha_Corte"
+                required
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-4" appearance="outline">
+              <mat-label>Fecha de expedición</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="CertificadoRetencionModel.Fecha_Expedicion"
+                (change)="setQueryParams()"
+                name="fecha_expedicion"
+                id="fecha_expedicion"
+                required
+              />
+            </mat-form-field>
+            <div class="col-md-6 mat-form-field-wrapper">
+              <!-- <input
+                [(ngModel)]="Cuenta_Inicial"
+                type="text"
+                name="Cuenta_Inicial"
+                id="Cuenta_Inicial"
+                class="form-control form-control-sm f-9"
+                [ngbTypeahead]="search1"
+                [resultTemplate]="rt1"
+                [inputFormatter]="formatter1"
+                (ngModelChange)="BuscarCuenta(Cuenta_Inicial, 'Inicial')"
+              />
+              <input
+                type="hidden"
+                name="Cuenta_I"
+                [(ngModel)]="CertificadoRetencionModel.Cuenta_Inicial"
+              /> -->
+              <ng-select
+                [ngClass]="'ng-select'"
+                placeholder="Cuentas"
+                appearance="outline"
+                [appendTo]="'body'"
+                [items]="Cuentas"
+                name="cuentas"
+                [(ngModel)]="CertificadoRetencionModel.Cuentas"
+                (ngModelChange)="setQueryParams()"
+                [multiple]="true"
+              ></ng-select>
+            </div>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>NIT o C.C</mat-label>
+              <input
+                matInput
+                type="text"
+                [(ngModel)]="TerceroSeleccionado"
+                (change)="AsignarTercero(TerceroSeleccionado)"
+                name="Nit"
+                [ngbTypeahead]="search_tercero"
+                [resultTemplate]="rt_tercero"
+                [inputFormatter]="formatter_tercero"
+                placeholder="Ingrese NIT o C.C"
+              />
+            </mat-form-field>
+          </div>
+        </form>
+
+        <button
+          class="btn btn-primary btn-lg btn-block"
+          [disabled]="!FormFiltros.valid"
+          (click)="generarCertificado()"
+        >
+          <i class="fa fa-eye"></i> Generar certificado
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>
+<ng-template #rt_tercero let-r="result" let-t="term">
+  <span class="f-9">
+    {{ r.Nombre_Tercero }}
+  </span>
+</ng-template>
+
+<!-- <div class="col-md-2 text-end">
+    <div>
+        <label for="" class="f-12">
+            Cuenta Final
+        </label>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <div class="form-group">
+        <input [(ngModel)]="Cuenta_Final" type="text" name="Cuenta_Final" id="Cuenta_Final"
+            class="form-control form-control-sm f-9" [ngbTypeahead]="search1" [resultTemplate]="rt1"
+            [inputFormatter]="formatter1" (ngModelChange)="BuscarCuenta(Cuenta_Final, 'Final')" />
+        <input type="hidden" name="Cuenta_F" [(ngModel)]="CertificadoRetencionModel.Cuenta_Final">
+    </div>
+</div> -->

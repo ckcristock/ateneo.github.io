@@ -1,0 +1,206 @@
+<app-card viewTitle="Documentos iniciados">
+  <app-add-button filters (click)="iniciar_inventario_fisico()" />
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Documentos"
+    [pagination]="initDocsPag"
+    (pageChange)="initDocsPagination($event)"
+  >
+    <ng-container titles>
+      <th>#</th>
+      <th>Tipo</th>
+      <th>Estado</th>
+      <th>Fecha</th>
+      <th>Digitador</th>
+      <th>Contador</th>
+      <th>Bodega</th>
+      <th>Estiba</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (documento of Documentos; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">
+            {{ documento.Id_Doc_Inventario_Fisico || 'N/A' }}
+          </td>
+          <td class="align-middle">{{ documento.Tipo || 'N/A' }}</td>
+          <td class="align-middle">
+            <div
+              class="badge"
+              [ngClass]="{
+                'text-bg-warning': documento.Estado.toLowerCase() === 'primer conteo',
+                'text-bg-success': documento.Estado.toLowerCase() === 'segundo conteo',
+                'text-bg-secondary': documento.Estado.toLowerCase() === 'haciendo primer conteo',
+                'text-bg-danger':
+                  documento.Estado.toLowerCase() === 'pendiente primer conteo' ||
+                  documento.Estado.toLowerCase() === 'patient segundo conteo'
+              }"
+            >
+              {{ (documento.Estado | uppercase) || 'N/A' }}
+            </div>
+          </td>
+          <td class="align-middle">{{ (documento.Fecha_Inicio | date) || 'N/A' }}</td>
+          <td class="align-middle">
+            {{ documento.Funcionario_Digita_Nombres || 'N/A' }}
+            {{ documento.Funcionario_Digita_Apellidos || 'N/A' }}
+          </td>
+          <td class="align-middle">
+            {{ documento.Funcionario_Cuenta_Nombres || 'N/A' }}
+            {{ documento.Funcionario_Cuenta_Apellidos || 'N/A' }}
+          </td>
+          <td class="align-middle">{{ documento.Bodega || 'N/A' }}</td>
+          <td class="align-middle">{{ documento.Estiba || 'N/A' }}</td>
+          <td>
+            <app-dropdown-actions [buttonDisabled]="checkCondition(documento)">
+              @if (
+                documento.Estado.toLowerCase() == 'pendiente primer conteo' &&
+                documento.Tipo.toLowerCase() == 'general'
+              ) {
+                <app-action-button
+                  icon="long-arrow-alt-right"
+                  text="Continuar conteo"
+                  type="info"
+                  [link]="{
+                    url: '/inventario/inventario-estibas/' + documento.Id_Doc_Inventario_Fisico
+                  }"
+                ></app-action-button>
+              }
+              @if (
+                documento.Estado.toLowerCase() == 'haciendo primer conteo' &&
+                documento.Tipo.toLowerCase() == 'general'
+              ) {
+                <app-action-button
+                  icon="list-ol"
+                  text="Cambiar a pendiente primer conteo"
+                  type="info"
+                  (click)="onChangeState('primer', documento)"
+                ></app-action-button>
+              }
+              @if (
+                documento.Estado.toLowerCase() == 'primer conteo' &&
+                documento.Tipo.toLowerCase() == 'general'
+              ) {
+                <app-action-button
+                  icon="list-ol"
+                  text="Reconteo"
+                  type="info"
+                  (click)="
+                    AccionInventario(
+                      '/inventario/reconteo-estiba',
+                      documento.Id_Doc_Inventario_Fisico
+                    )
+                  "
+                ></app-action-button>
+              }
+              @if (
+                documento.Estado.toLowerCase() == 'haciendo segundo conteo' &&
+                documento.Tipo.toLowerCase() == 'general'
+              ) {
+                <app-action-button
+                  icon="list-ol"
+                  text="Cambiar estado segundo conteo"
+                  type="info"
+                  (click)="onChangeState('segundo', documento)"
+                ></app-action-button>
+              }
+              @if (
+                documento.Estado.toLowerCase() == 'segundo conteo' &&
+                documento.Tipo.toLowerCase() == 'general'
+              ) {
+                <app-action-button
+                  icon="id-card"
+                  text="Ajustar documentos"
+                  type="success"
+                  (click)="AccionInventario('/inventario/ajuste-documentos', documento.Id_Estiba)"
+                ></app-action-button>
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<app-card viewTitle="Inventarios realizados y ajustados" [filterTemplate]="filterTemplate">
+  <app-table
+    [loading]="Cargando2"
+    [arrayData]="Inventarios_Terminados"
+    [pagination]="adjInvPag"
+    (pageChange)="ConsultaFiltrada()"
+  >
+    <ng-container titles>
+      <th>#</th>
+      <th>Fecha</th>
+      <th>Funcionario Autorizó</th>
+      <th>Bodega</th>
+      <th>Grupo</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of Inventarios_Terminados; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">
+            {{ item.Id_Inventario_Fisico_Nuevo || 'N/A' }}
+          </td>
+          <td class="align-middle">
+            {{ (item.fecha | date) || 'N/A' }}
+          </td>
+          <td class="align-middle">{{ item.Nombre_Funcionario_Autorizo || 'N/A' }}</td>
+          <td class="align-middle">{{ item.Nombre_Bodega || 'N/A' }}</td>
+          <td class="align-middle">{{ item.Nombre_Grupo || 'N/A' }}</td>
+          <td>
+            <app-dropdown-actions>
+              @if (item.Tipo != 'Auditoria') {
+                <app-action-button
+                  icon="eye"
+                  text="Ver detalles"
+                  type="success"
+                  [link]="{
+                    url: '/inventario/inventariofisicoestibas/' + item.Id_Inventario_Fisico_Nuevo
+                  }"
+                ></app-action-button>
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-form-field appearance="outline" class="col">
+    <mat-label>Rango de fechas</mat-label>
+    <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+      <input
+        matStartDate
+        placeholder="Fecha de inicio"
+        required
+        formControlName="start"
+        name="date_start"
+      />
+      <input matEndDate placeholder="Fecha de fin" required formControlName="end" name="date_end" />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline" *ngIf="listaBodegas.length > 0">
+    <mat-label>Bodegas</mat-label>
+    <mat-select [(ngModel)]="FiltrosTabla.Bodega" (selectionChange)="ConsultaFiltrada()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option *ngFor="let item of listaBodegas" [value]="item.Id_Bodega_Nuevo">{{
+        item.Nombre
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline" *ngIf="listaGrupoEstibas.length > 0">
+    <mat-label>Estibas</mat-label>
+    <mat-select [(ngModel)]="FiltrosTabla.Grupo" (selectionChange)="ConsultaFiltrada()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option *ngFor="let item of listaGrupoEstibas" [value]="item.Id_Grupo_Estiba">{{
+        item.Nombre
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

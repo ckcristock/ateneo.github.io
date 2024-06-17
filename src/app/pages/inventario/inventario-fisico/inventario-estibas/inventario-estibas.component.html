@@ -1,0 +1,198 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="DatosCabecera" />
+    @if (!loadingProductos) {
+      <div class="d-flex flex-wrap justify-content-between align-items-center">
+        @if (Funcionario_Cuenta) {
+          <div class="d-flex flex-column align-items-center">
+            <app-load-image
+              [src]="Funcionario_Cuenta.image"
+              classImg="img-thumbnail rounded-circle header-profile-user"
+            />
+            {{ Funcionario_Cuenta?.full_name || 'N/A' }}
+            <strong>Funcionario que cuenta</strong>
+          </div>
+        }
+        @if (Funcionario_Digita) {
+          <div class="d-flex flex-column align-items-center">
+            <app-load-image
+              [src]="Funcionario_Digita.image"
+              classImg="img-thumbnail rounded-circle header-profile-user"
+            />
+            {{ Funcionario_Digita?.full_name || 'N/A' }}
+            <strong>Funcionario que digita</strong><br />
+          </div>
+        }
+        <div class="d-flex flex-column align-items-center">
+          <div>
+            ESTIBA: <strong>{{ Inventario.Estiba.Nombre || 'N/A' }}</strong>
+          </div>
+          <div>
+            BODEGA: <strong>{{ Inventario.Bodega.Nombre || 'N/A' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        @if (Cargando) {
+          <div class="col-md-12 text-center">
+            <i class="fa fa-spinner fa-spin"></i>
+            <h6>Cargando productos</h6>
+          </div>
+        } @else {
+          <div class="col-md-12 text-center">
+            <div class="input-group mb-3">
+              <span class="input-group-text" id="basic-addon1">
+                <i class="fa fa-barcode fa-3x mt-1"></i>
+              </span>
+              <input
+                type="text"
+                autofocus
+                class="form-control input-barras"
+                placeholder="Escanea el código de barras del producto a inventariar"
+                class="form-control input-barras"
+                #Barra
+                name="Barras"
+                aria-hidden="true"
+                id="Barras"
+                [(ngModel)]="Codigo_Barras"
+                (change)="addProductQuantity($event.target.value)"
+              />
+            </div>
+          </div>
+        }
+        <div class="mb-4" *ngIf="Cargado">
+          <div class="text-start">
+            <h5>Información del producto a inventariar</h5>
+            <app-table class="text-nowrap">
+              <ng-container titles>
+                <th>Nombre</th>
+                <th *ngFor="let label of productToInventory.VariablesLabels">{{ label }}</th>
+                <th *ngIf="!productToInventory.Lotes">Cantidad Encontrada</th>
+                <th *ngIf="productToInventory.Lotes">Lotes</th>
+              </ng-container>
+              <tbody content>
+                <tr class="text-center">
+                  <td class="text-start">
+                    <app-load-image
+                      [src]="productToInventory.Imagen"
+                      classImg="img-fluid img-thumbnail"
+                      width="75"
+                      height="75"
+                      srcDefault="./assets/images/product.jpg"
+                    />
+                    {{ productToInventory.Nombre_Comercial || 'N/A' }}
+                  </td>
+                  <td *ngFor="let label of productToInventory.VariablesLabels">
+                    {{ productToInventory.Variables[label] }}
+                  </td>
+                  <td *ngIf="!productToInventory.Lotes">
+                    <input
+                      type="number"
+                      min="0"
+                      onkeypress="return event.charCode >= 48  && event.charCode <= 57 "
+                      [(ngModel)]="productToInventory.Cantidad_Encontrada"
+                      (input)="enableAndDisableAddQuantitydButton()"
+                      placeholder="Digita la cantidad encontrada"
+                      class="form-control form-control-xs text-end"
+                    />
+                  </td>
+                  <td *ngIf="productToInventory.Lotes">
+                    <app-table>
+                      <ng-container titles>
+                        <th></th>
+                        <th>Codigo</th>
+                        <th>Lote</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Cantidad Encontrada</th>
+                      </ng-container>
+                      <tbody content>
+                        <tr
+                          *ngFor="let lote of productToInventory.Lotes; let i = index"
+                          id="fila{{ i }}"
+                        >
+                          <td>{{ i + 1 }}</td>
+                          <td>{{ lote.Codigo }}</td>
+                          <td>
+                            <input
+                              type="text"
+                              [(ngModel)]="lote.Lote"
+                              placeholder="Ingresa lote"
+                              aria-hidden="true"
+                              id="Lote{{ i }}"
+                              class="form-control form-control-xs text-uppercase"
+                              (change)="ValidarLote(i); enableAndDisableAddPrpdButton(i)"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              aria-hidden="true"
+                              [(ngModel)]="lote.Fecha_Vencimiento"
+                              id="Vencimiento{{ i }}"
+                              (blur)="ValidarFecha(i); enableAndDisableAddPrpdButton(i)"
+                              class="form-control form-control-xs"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              aria-hidden="true"
+                              placeholder="Ingresa la cantidad"
+                              onkeypress="return event.charCode >= 48  && event.charCode <= 57 "
+                              [(ngModel)]="lote.Cantidad_Encontrada"
+                              id="Cantidad{{ i }}"
+                              (blur)="ValidarCantidad(i)"
+                              class="form-control form-control-xs text-end"
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </app-table>
+                  </td>
+                </tr>
+              </tbody>
+            </app-table>
+            <button
+              class="btn btn-block btn-success"
+              [disabled]="!canSaveProduct"
+              (click)="addProductAsInventoried()"
+            >
+              Agregar producto como inventariado
+            </button>
+          </div>
+        </div>
+      </div>
+      @if (Productos.length > 0) {
+        <div class="mt-3">
+          <app-listadoproductosyainventariadosestiba [Model]="Inventario" [Productos]="Productos" />
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <button
+              type="button"
+              (click)="saveUnfinishedCount()"
+              class="btn btn-danger btn-block"
+              [disabled]="Productos.length >= 1 ? false : true"
+            >
+              <i class="fa fa-save"></i> Guardar y salir
+            </button>
+          </div>
+          <div class="col-md-6">
+            <button
+              type="button"
+              (click)="saveFinishedCount()"
+              class="btn btn-primary btn-block"
+              [disabled]="Productos.length >= 1 ? false : true"
+            >
+              <i class="fa fa-check"></i> Guardar y terminar conteo
+            </button>
+          </div>
+        </div>
+      }
+    } @else {
+      <app-not-data-sa [loading]="loadingProductos" />
+    }
+  </div>
+</div>

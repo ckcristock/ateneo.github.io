@@ -1,0 +1,21 @@
+<!-- eslint-disable @angular-eslint/template/no-inline-styles -->
+<img
+  *ngIf="!isLoadImage"
+  alt="preview"
+  [src]="srcDefault"
+  [style.object-fit]="objectFit"
+  [class]="classImg + ' object-fit-cover'"
+  [width]="width"
+  [height]="height"
+/>
+<img
+  aria-hidden="true"
+  [width]="width"
+  [height]="height"
+  [class.imageServer]="!isLoadImage"
+  [ngSrc]="src || srcDefault"
+  [alt]="alt"
+  [class]="classImg + ' object-fit-cover'"
+  [ngStyle]="stylesImg"
+  (load)="loadImage()"
+/>

@@ -1,0 +1,79 @@
+<app-card viewTitle="Productos a vencer" [filterTemplate]="filterTemplate">
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Vencidos"
+    [pagination]="pagination"
+    (pageChange)="paginacion()"
+  >
+    <ng-container titles>
+      <th>Producto</th>
+      <th>Lote</th>
+      <th>Cantidades</th>
+      <th>Fecha Entrega</th>
+      <th>Fecha Vencimiento</th>
+      <th>Meses Devolución</th>
+      <th>Proveedor</th>
+    </ng-container>
+    <tbody content>
+      @for (vencido of Vencidos; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">{{ vencido.NomProducto }}</td>
+          <td class="align-middle">{{ vencido.Lote }}</td>
+          <td class="align-middle">{{ vencido.Cantidades }}</td>
+          <td class="align-middle">{{ vencido.FechaEntrega }}</td>
+          <td class="align-middle">{{ vencido.Fecha_Vencimiento }}</td>
+          <td class="align-middle">{{ vencido.Meses_Devolucion }}</td>
+          <td class="align-middle">{{ vencido.NomProveedor }}</td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-form-field class="col-md-2" appearance="outline">
+    <mat-label>Producto</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por producto"
+      [(ngModel)]="filtro_nom"
+      (input)="filtros()"
+      autocomplete="off"
+    />
+  </mat-form-field>
+  <mat-form-field class="col-md-2" appearance="outline">
+    <mat-label>Lote</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por lote"
+      [(ngModel)]="filtro_lot"
+      (input)="filtros()"
+      autocomplete="off"
+    />
+  </mat-form-field>
+  <mat-form-field class="col-md-2" appearance="outline">
+    <mat-label>Cantidades</mat-label>
+    <input matInput type="text" placeholder="Busca por cantidades (NW)" autocomplete="off" />
+  </mat-form-field>
+  <mat-form-field class="col-md-2" appearance="outline">
+    <mat-label>Fecha de entrega</mat-label>
+    <input matInput type="text" placeholder="Busca por fecha de entrega (NW)" autocomplete="off" />
+  </mat-form-field>
+  <mat-form-field class="col-md-2" appearance="outline">
+    <mat-label>Meses devolución</mat-label>
+    <input matInput type="text" placeholder="Busca por meses devolución (NW)" autocomplete="off" />
+  </mat-form-field>
+  <mat-form-field class="col-md-2" appearance="outline">
+    <mat-label>Proveedor</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por proveedor"
+      autocomplete="off"
+      [(ngModel)]="filtro_pro"
+      (input)="filtros()"
+    />
+  </mat-form-field>
+</ng-template>

@@ -1,0 +1,86 @@
+<app-card
+  viewTitle="Préstamos y libranzas"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters (click)="abrirModalPrestamo()" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="Prestamos"
+    [pagination]="pagination"
+    (pageChange)="listaPrestamo()"
+  >
+    <ng-container titles>
+      <th>Foto</th>
+      <th>Identificación</th>
+      <th>Funcionario</th>
+      <th>Fecha</th>
+      <th>Valor</th>
+      <th>Tipo</th>
+      <th># Cuotas</th>
+      <th>Pagada</th>
+      <th>Valor Cuota</th>
+      <th>% Intereses</th>
+      <th>Saldo</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of Prestamos; track $index) {
+        <tr class="text-center">
+          <td class="p-0">
+            <app-load-image
+              classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+              [src]="item.person.image"
+            ></app-load-image>
+          </td>
+          <td>{{ item.person.identifier }}</td>
+          <td>{{ item.person.first_name }} {{ item.person.first_surname }}</td>
+          <td>{{ item.date | date: 'dd/MM/yyyy' }}</td>
+          <td class="text-end">${{ item.value | number: '1.2-2' }}</td>
+          <td>{{ item.payment_type }}</td>
+          <td>{{ item.fees.length }}</td>
+          <td>0</td>
+          <td class="text-end">${{ item.monthly_fee | number: '1.2-2' }}</td>
+          <td>{{ item.interest }}%</td>
+          <td class="text-end">${{ item.value | number: '1.2-2' }}</td>
+          <td>
+            <app-dropdown-actions [loading]="indexDownload === item.id">
+              <app-action-button
+                icon="file-pdf"
+                text="Descargar PDF"
+                type="danger"
+                (click)="downloadPDF(item.id)"
+              ></app-action-button>
+              <app-action-button
+                icon="file-excel"
+                text="Descargar EXCEL"
+                type="success"
+                (click)="downloadExcel(item.id)"
+              ></app-action-button>
+              @if (!item.value) {
+                <app-action-button
+                  icon="file-pdf"
+                  text="Descargar paz y salvo"
+                  type="info"
+                  (click)="downloadPaz(item.id)"
+                ></app-action-button>
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-autocomplete-mdl
+    class="col"
+    label="Funcionario"
+    placeholder="Buscar funcionario"
+    [model]="filters.person_id"
+    [list]="people$ | async"
+    (optionSelectedEvent)="filters.person_id = $event; listaPrestamo()"
+  ></app-autocomplete-mdl>
+  <app-date-picker class="col" [value]="filters" (dateChange)="selectedDate($event)" />
+</ng-template>

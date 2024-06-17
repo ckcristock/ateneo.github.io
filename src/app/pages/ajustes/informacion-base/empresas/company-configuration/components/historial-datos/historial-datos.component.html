@@ -1,0 +1,33 @@
+<app-card viewTitle="Historial de cambios">
+  <app-table
+    [loading]="loading"
+    [arrayData]="historialdatos"
+    [pagination]="pagination"
+    (pageChange)="getHistoryDataCompany()"
+  >
+    <ng-container titles>
+      <th>Fecha de cambio</th>
+      <th>Dato</th>
+      <th>Valor hasta fecha de cambio</th>
+      <th>Usuario</th>
+    </ng-container>
+    <tbody content>
+      @for (item of historialdatos; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">{{ item.date_end | date: 'dd-MMM-yyyy h:mm a' }}</td>
+          <td class="align-middle">
+            {{ item.data_name_for_user }}
+          </td>
+          <td class="align-middle">
+            {{ item.value || 'Vacío' }}
+          </td>
+          <td class="align-middle">{{ item.person.complete_name }}</td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading" text="No hay historial"></app-not-data>
+</ng-template>

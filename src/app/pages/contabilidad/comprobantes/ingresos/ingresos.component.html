@@ -1,0 +1,115 @@
+<app-card
+  viewTitle="Comprobantes de ingresos"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="UrlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]">
+    <button
+      type="button"
+      class="btn btn-primary btn-sm"
+      [routerLink]="['/contabilidad/comprobantes/comprobanteingresocrear']"
+    >
+      <i class="fa fa-plus"></i>
+      Agregar
+    </button>
+  </ng-container>
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Comprobantes"
+    [pagination]="pagination"
+    (pageChange)="onPagination($event)"
+  >
+    <ng-container titles>
+      <th>Código</th>
+      <th>Proveedor</th>
+      <th>Fecha</th>
+      <th>Cliente</th>
+      <th>Tipo Pago</th>
+      <th class="col-1">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (comprobante of Comprobantes; track $index) {
+        <tr class="text-center text-uppercase">
+          <td>{{ comprobante?.Codigo || 'N/A' }}</td>
+          <td>{{ comprobante?.Proveedor || 'N/A' }}</td>
+          <td>{{ comprobante?.Fecha_Comprobante | date: 'dd/MM/yyyy' || 'N/A' }}</td>
+          <td>{{ comprobante?.Cliente || 'N/A' }}</td>
+          <td>{{ comprobante?.Forma_Pago || 'N/A' }}</td>
+          <td>
+            <span
+              [ngClass]="comprobante?.Estado == 'Anulada' ? 'badge bg-danger' : 'badge bg-success'"
+            >
+              {{ comprobante?.Estado || 'N/A' }}
+            </span>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <!-- <a class="dropdown-item text-info" href="{{ environment.ruta }}php/comprobantes/comprobantes_pdf.php?id={{
+                    comprobante?.Id_Comprobante
+                  }}" target="_blank">
+                <i class="fa fa-eye"></i> Ver</a> -->
+              <app-action-button
+                icon="fa fa-eye"
+                text="Ver"
+                type="info"
+                (click)="verComprobante(comprobante?.Id_Comprobante)"
+              ></app-action-button>
+              <app-action-button
+                icon="fas fa-file-pdf"
+                text="Contabilización"
+                type="danger"
+                (click)="contabNIIF(comprobante?.Id_Comprobante)"
+              ></app-action-button>
+              <!-- <a class="dropdown-item text-danger" href="{{
+                    environment.ruta
+                  }}php/contabilidad/movimientoscontables/movimientos_comprobante_pdf.php?id_registro={{
+                    comprobante?.Id_Comprobante
+                  }}&id_funcionario_elabora={{ 1 }}&tipo=Ingreso&tipo_valor=Niif" target="_blank">
+                <i class="fas fa-file-pdf"></i> Contab. NIIF</a> -->
+              <app-action-button
+                *ngIf="comprobante?.Estado != 'Anulada' && perfilUsuario == '27'"
+                icon="fas fa-times"
+                text="Anular"
+                type="danger"
+                (click)="onCancelDoc(); IdDocumento = comprobante?.Id_Documento_Contable"
+              ></app-action-button>
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+<ng-template #filterTemplate>
+  <!-- rango de fechas -->
+  <app-date-picker class="col" [value]="filtros" (dateChange)="selectedDate($event)" />
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Buscar por código"
+      [(ngModel)]="filtros.cod"
+      (input)="ListarComprobantes()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Cliente</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Buscar por cliente"
+      [(ngModel)]="filtros.cli"
+      (input)="ListarComprobantes()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filtros.est" (selectionChange)="ListarComprobantes()">
+      <mat-option value="">Todas</mat-option>
+      <mat-option value="Activa">Activas</mat-option>
+      <mat-option value="Anulada">Anuladas</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

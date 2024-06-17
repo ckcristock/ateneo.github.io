@@ -1,0 +1,109 @@
+<form [formGroup]="formCompany" (ngSubmit)="save()">
+  <app-filter-roles-company
+    [showAll]="false"
+    [companyId]="formCompany.controls['company_id'].value"
+    [hideSelect]="{ person_id: true }"
+    [formRef]="formRefRoles"
+    (newValues)="onSelectRol($event)"
+  >
+    <mat-form-field initContent appearance="outline" class="col">
+      <mat-label>Empresa</mat-label>
+      <mat-select formControlName="company_id" required>
+        @for (item of companies; track item) {
+          <mat-option [value]="item.value">
+            {{ item.text }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-error>Campo obligatorio</mat-error>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Salario</mat-label>
+      <input
+        matInput
+        type="string"
+        placeholder="Ingresa el salario"
+        currencyMask
+        [options]="maskCOP"
+        appInputPosition
+        formControlName="salary"
+        required
+        autocomplete="off"
+      />
+      <mat-error>Campo obligatorio</mat-error>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Fecha de ingreso</mat-label>
+      <input matInput type="date" formControlName="date_of_admission" required />
+      <mat-error>Campo obligatorio</mat-error>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Término</mat-label>
+      <mat-select
+        formControlName="work_contract_type_id"
+        (selectionChange)="getContractTerms($event.value)"
+        required
+      >
+        @for (item of workContractTypes; track item) {
+          <mat-option [value]="item.id" (click)="workContractTypesChanged(item.conclude)">{{
+            item.name
+          }}</mat-option>
+        }
+      </mat-select>
+      <mat-error>Campo obligatorio</mat-error>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Tipo de contrato</mat-label>
+      <mat-select formControlName="contract_term_id" required>
+        @for (item of contractTerms; track item) {
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
+        }
+      </mat-select>
+      <mat-error>Campo obligatorio</mat-error>
+    </mat-form-field>
+    @if (conludeContract) {
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Fecha de retiro</mat-label>
+        <input matInput type="date" formControlName="date_end" required />
+        <mat-error>Campo obligatorio</mat-error>
+      </mat-form-field>
+    }
+    <mat-form-field class="col-4" appearance="outline">
+      <mat-label>Tipo de turno</mat-label>
+      <mat-select
+        formControlName="turn_type"
+        (selectionChange)="turnChanged($event.value)"
+        required
+      >
+        @for (turn of turnos; track turn) {
+          <mat-option [value]="turn.value">
+            {{ turn.text }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-error>Campo obligatorio</mat-error>
+    </mat-form-field>
+    <mat-form-field class="col-5" appearance="outline">
+      <mat-label>Turno asignado</mat-label>
+      <mat-select formControlName="fixed_turn_id" required>
+        @for (turn of fixedTurns; track turn) {
+          <mat-option [value]="turn.value">
+            {{ turn.text }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-error>Campo obligatorio</mat-error>
+    </mat-form-field>
+    <mat-checkbox class="col-3 mt-2" color="primary" formControlName="transport_assistance"
+      ><small> ¿Pagar auxilio de transporte?</small></mat-checkbox
+    >
+  </app-filter-roles-company>
+  <div class="col-12">
+    <div class="d-flex justify-content-between">
+      <button type="button" mat-button (click)="previus()">Anterior</button>
+      <button type="submit" mat-button>Siguiente</button>
+    </div>
+  </div>
+</form>
+
+<app-reload-button [reload]="reload" (reloadData)="reloadData()"></app-reload-button>

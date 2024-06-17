@@ -1,0 +1,157 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Depreciaciones</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button class="btn btn-sm btn-primary" [routerLink]="['/contabilidad/depreciacion']">
+            <i class="fa fa-plus"></i> Agregar
+          </button>
+          <button class="btn btn-info btn-sm" (click)="openClose()">
+            <i class="fas fa-sliders-h"></i> Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel class="mat-elevation-z0">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha de inicio</mat-label>
+            <input
+              matInput
+              type="date"
+              [(ngModel)]="fechita"
+              (input)="fechitaF($event)"
+              autocomplete="off"
+              placeholder="Busca por fecha"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha de fin</mat-label>
+            <input
+              matInput
+              type="date"
+              [(ngModel)]="fechita2"
+              (input)="fechitaF2($event)"
+              autocomplete="off"
+              placeholder="Busca por fecha"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Código</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por código"
+              [(ngModel)]="Filtros.codigo_orden"
+              (input)="ConsultaFiltrada()"
+            />
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!Cargando && Depreciaciones.length > 0; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Fecha Creación</th>
+            <th>Codigo</th>
+            <th>Funcionario</th>
+            <th>Año</th>
+            <th>Mes</th>
+            <th class="col-1">Estado</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ai of Depreciaciones; let i = index" id="fila{{ i }}" class="text-center">
+            <td class="align-middle">
+              {{ ai.Fecha_Registro | date: 'longDate' }}
+            </td>
+            <td class="align-middle">
+              <strong>{{ ai.Codigo }}</strong>
+            </td>
+            <td class="align-middle">{{ ai.Funcionario }}</td>
+            <td class="align-middle">
+              <strong>{{ ai.Anio }}</strong>
+            </td>
+            <td class="align-middle">{{ ai.Nombre_Mes }}</td>
+            <td class="align-middle">
+              <span [ngClass]="ai.Estado != 'Anulada' ? 'badge bg-primary' : 'badge bg-danger'">
+                {{ ai.Estado }}</span
+              >
+            </td>
+            <td class="align-middle">
+              <div ngbDropdown container="body" class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <!-- <a
+                    class="dropdown-item text-info"
+                    href="{{
+                      enviromen.base_url
+                    }}/php/contabilidad/movimientoscontables/movimientos_depreciacion_pdf.php?id_registro={{
+                      ai.Id_Depreciacion
+                    }}&id_funcionario_elabora={{ 1 }}"
+                    target="_blank"
+                  >
+                    <i class="fa fa-print"></i> Ver PCGA
+                  </a> -->
+                  <a
+                    class="dropdown-item text-danger"
+                    href="{{
+                      enviromen.base_url
+                    }}/php/contabilidad/movimientoscontables/movimientos_depreciacion_pdf.php?id_registro={{
+                      ai.Id_Depreciacion
+                    }}&id_funcionario_elabora={{ 1 }}&tipo_valor=Niif"
+                    target="_blank"
+                  >
+                    <i class="fas fa-file-pdf"></i> Descargar NIIF
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      [collectionSize]="TotalItems"
+      [(page)]="page"
+      [maxSize]="maxSize"
+      [pageSize]="pageSize"
+      size="sm"
+      (pageChange)="ConsultaFiltrada(true)"
+      [boundaryLinks]="true"
+    >
+    </ngb-pagination>
+    <!-- <div class="d-flex justify-content-center">
+      <small>
+        {{ InformacionPaginacion.desde }} - {{ InformacionPaginacion.hasta }} de
+        {{ InformacionPaginacion.total }}
+      </small>
+    </div> -->
+    <!-- <div id="paginacion-container" *ngIf="Depreciaciones.length > 0">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                    </div>
+                                    <div class="col-md-8">
+                                    </div>
+                                </div>
+                            </div> -->
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>

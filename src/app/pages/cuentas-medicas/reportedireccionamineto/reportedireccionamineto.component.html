@@ -1,0 +1,85 @@
+<article class="card">
+  <div class="card-body">
+    <div class="card-title">
+      <h4 class="text-primary">Reporte direccionamiento</h4>
+    </div>
+    <div class="row">
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Rango de fechas</mat-label>
+        <mat-date-range-input [formGroup]="formRange" [rangePicker]="pickerMax">
+          <input
+            matStartDate
+            placeholder="Fecha de inicio"
+            formControlName="start"
+            name="date_start"
+          />
+          <input matEndDate placeholder="Fecha de fin" formControlName="end" name="date_end" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="pickerMax"></mat-datepicker-toggle>
+        <mat-date-range-picker #pickerMax>
+          <mat-date-range-picker-actions>
+            <button mat-button matDateRangePickerCancel>Cancelar</button>
+            <button
+              mat-raised-button
+              color="primary"
+              matDateRangePickerApply
+              (click)="onFilterDate()"
+            >
+              Aplicar
+            </button>
+          </mat-date-range-picker-actions>
+        </mat-date-range-picker>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Departamento</mat-label>
+        <mat-select
+          [(ngModel)]="Filtros.Departamento"
+          (selectionChange)="cargarPuntos($event.value)"
+        >
+          <mat-option value="0" selected>Todos</mat-option>
+          @for (item of Departamentos; track $index) {
+            <mat-option [value]="item.Id_Departamento">
+              {{ item.Nombre }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>EPS</mat-label>
+        <mat-select [(ngModel)]="Filtros.Eps">
+          @for (item of Eps; track $index) {
+            <mat-option [value]="item.Id_Cliente">
+              {{ item.Nombre }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <app-autocomplete-mdl
+        class="col"
+        label="Punto"
+        placeholder="Buscar funcionario"
+        [model]="Filtros.Punto"
+        [list]="Puntos"
+        (optionSelectedEvent)="Filtros.Punto = $event"
+      ></app-autocomplete-mdl>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Estado Direccionamiento</mat-label>
+        <mat-select [(ngModel)]="Filtros.Estado">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="Pendiente">Pendiente</mat-option>
+          <mat-option value="Radicado">Radicado</mat-option>
+          <mat-option value="Programado">Programado</mat-option>
+          <mat-option value="Entregado">Entregado</mat-option>
+          <mat-option value="Rechazado">Rechazado</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Código CUM</mat-label>
+        <input matInput type="text" placeholder="Ingrese el CUM" [(ngModel)]="Filtros.Cum" />
+      </mat-form-field>
+    </div>
+    <button class="btn btn-primary btn-block" (click)="downloadReporte()">
+      <i class="fa fa-file"></i> Descargar Reporte
+    </button>
+  </div>
+</article>

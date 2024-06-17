@@ -1,0 +1,344 @@
+<div class="card p-3">
+  <form class="bg-white" [formGroup]="form">
+    <div class="row text-center">
+      <div class="col-12 card-body text-center">
+        <label for="" style="font-size: 18px">Variables del modelo</label>
+        <div class="form-group text-center">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm raised"
+            (click)="openModal()"
+            title="agregar variable de alto costo"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <ng-container>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>
+                <label for="">Propiedad</label>
+              </th>
+
+              <th>
+                <label for="tipo">Caracteristica</label>
+              </th>
+
+              <th>
+                <label>Valor</label>
+              </th>
+
+              <th>
+                <label for="">Obligatoriedad</label>
+              </th>
+
+              <th>
+                <label for="">Dependencia</label>
+              </th>
+
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody formArrayName="fields">
+            <ng-container *ngIf="fieldList.controls.length; else sinDatos">
+              <ng-container *ngFor="let item of fieldList.controls; let i = index">
+                <tr [formGroupName]="i">
+                  <td>
+                    <input
+                      type="text"
+                      class="form-control form-control-sm"
+                      formControlName="property"
+                    />
+                  </td>
+
+                  <td>
+                    <select
+                      class="form-control form-control-sm"
+                      name="color"
+                      formControlName="type"
+                    >
+                      <option value="number">Number</option>
+                      <option value="text">Text</option>
+                      <option value="textarea">Textarea</option>
+                      <option value="date">Date</option>
+                      <option value="text">Color</option>
+                      <option value="time">Hora</option>
+                      <option value="select">Select</option>
+                      <option value="check">Check</option>
+                    </select>
+                  </td>
+
+                  <td>
+                    <textarea
+                      *ngIf="item['controls']['type']['value'] == 'textarea'"
+                      class="form-control form-control-sm"
+                      formControlName="value"
+                    ></textarea>
+
+                    <input
+                      *ngIf="item['controls']['type']['value'] != 'textarea'"
+                      [type]="item['controls']['type']['value']"
+                      class="form-control form-control-sm"
+                      formControlName="value"
+                    />
+
+                    <small
+                      *ngIf="
+                        item['controls']['type']['value'] == 'seleccione' ||
+                        item['controls']['type']['value'] == 'chequee'
+                      "
+                    >
+                      Escriba las opciones separadas por coma
+                    </small>
+                  </td>
+
+                  <td>
+                    <select
+                      type="text"
+                      class="form-control form-control-sm"
+                      formControlName="required"
+                    >
+                      <option value="true">Si</option>
+                      <option value="false">No</option>
+                    </select>
+                  </td>
+
+                  <td>
+                    <tr
+                      *ngFor="
+                        let myitem of item.controls['dependencex']['controls'];
+                        let ii = index
+                      "
+                      formArrayName="dependencex"
+                    >
+                      <ng-container [formGroupName]="ii">
+                        <td>
+                          <select
+                            type="text"
+                            class="form-control form-control-sm"
+                            formControlName="dependencia"
+                          >
+                            <option value="true">Si</option>
+                            <option value="false">No</option>
+                          </select>
+                        </td>
+
+                        <td *ngIf="myitem['controls']['dependencia']['value'] == 'true'">
+                          <select class="form-control form-control-sm" formControlName="parent">
+                            <ng-container *ngFor="let subitem of fieldList.controls">
+                              <option [value]="subitem['controls']['property']['value']">
+                                <!-- *ngIf="item['controls']['property']['value'] != subitem['controls']['property']['value']  " -->
+                                {{ subitem['controls']['property']['value'] }}
+                              </option>
+                            </ng-container>
+                          </select>
+                        </td>
+
+                        <td *ngIf="myitem['controls']['dependencia']['value'] == 'true'">
+                          <input
+                            [type]="text"
+                            class="form-control form-control-sm"
+                            formControlName="valueDependend"
+                          />
+                          <small>
+                            Digite el valor del cual es dependiente, si son varios separelos por
+                            coma
+                          </small>
+                        </td>
+
+                        <td *ngIf="myitem['controls']['dependencia']['value'] == 'true'">
+                          <select name="" id="" class="form-control form-control-sm">
+                            <option value="">is equal</option>
+                            <option value="">is not equal</option>
+                            <option value="">contain</option>
+                            <option value="">does not contain</option>
+                          </select>
+                          <input
+                            [type]="text"
+                            class="form-control form-control-sm"
+                            formControlName="valueConditions"
+                          />
+                          <small>
+                            Digite los valores que se cargaran dependiendo la condicion dada
+                          </small>
+
+                          <a href="">add rule </a>
+                        </td>
+
+                        <button
+                          style="float: right"
+                          class="btn btn-danger btn-sm"
+                          placement="bottom"
+                          type="button"
+                          *ngIf="ii != 0"
+                          ngbTooltip="Borrar"
+                          (click)="deleteDependence(ii)"
+                        >
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </ng-container>
+                    </tr>
+
+                    <div class="btn-group" style="float: right">
+                      <button
+                        class="btn btn-success btn-sm"
+                        placement="bottom"
+                        type="button"
+                        ngbTooltip="Agregar"
+                        (click)="newDependence(item)"
+                      >
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                    <!-- <div class="btn-group" style="float: right">
+
+                  <button class="btn btn-success btn-sm" placement="bottom" type="button" ngbTooltip="Agregar"
+                    (click)="newDependence(item)">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                  <button style="float: right;" class="btn btn-danger btn-sm" placement="bottom" type="button"
+                    *ngIf="ii != 0 " ngbTooltip="Borrar" (click)="deleteDependence(ii)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+
+                </div> -->
+                  </td>
+
+                  <td>
+                    <button
+                      style="float: right"
+                      class="btn btn-danger btn-sm"
+                      placement="bottom"
+                      type="button"
+                      ngbTooltip="Borrar"
+                      (click)="deleteField(i)"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-container>
+            <tr>
+              <td colspan="8">
+                <div class="btn-group" style="float: right">
+                  <button
+                    class="btn btn-info btn-sm"
+                    placement="bottom"
+                    type="button"
+                    ngbTooltip="Agregar"
+                    (click)="newField()"
+                  >
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-container>
+    </div>
+  </form>
+
+  <div>
+    <div class="form-group text-end">
+      <button
+        (click)="modal.hide(); form.reset()"
+        type="button"
+        class="btn btn-danger raised me-2 btn-sm"
+      >
+        Cerrar
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm raised"
+        [disabled]="!form.valid"
+        (click)="save()"
+      >
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #sinDatos>
+  <tr class="bg-light">
+    <td colspan="100%" class="text-center">
+      <p class="text-dark">Sin datos agregados</p>
+    </td>
+  </tr>
+</ng-template>
+
+<app-modal-basic [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="modal-title">Agregar variable de alto costo</h5>
+    <button type="button" class="close basic-close" (click)="closeModal()">
+      <span aria-hidden="true">
+        <i class="fas fa-times" (click)="closeModal()"></i>
+      </span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <ng-container>
+      <form class="bg-white" [formGroup]="formVarHiCost">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>
+                <label for="">Variable</label>
+              </th>
+
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody formArrayName="variableHightCostList">
+            <ng-container *ngFor="let item of xxx.controls; let i = index">
+              <tr [formGroupName]="i">
+                <td>
+                  <ng-select name="color" formControlName="property">
+                    <ng-option [value]="item.name" *ngFor="let item of this.varHiCostList">{{
+                      item.name
+                    }}</ng-option>
+                  </ng-select>
+                </td>
+
+                <td>
+                  <button
+                    style="float: right"
+                    class="btn btn-danger btn-sm"
+                    placement="bottom"
+                    type="button"
+                    ngbTooltip="Borrar"
+                    (click)="deleteVariableHightCost()"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+            <tr>
+              <td colspan="8">
+                <div class="btn-group" style="float: right">
+                  <button
+                    class="btn btn-info btn-sm"
+                    placement="bottom"
+                    type="button"
+                    ngbTooltip="Agregar"
+                    (click)="newVariableHightCost()"
+                  >
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </ng-container>
+  </div>
+</app-modal-basic>

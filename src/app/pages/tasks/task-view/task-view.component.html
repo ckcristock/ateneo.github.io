@@ -1,0 +1,264 @@
+<div class="row" *ngIf="!loading && task_data; else notData">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-center">
+          <h5>{{ task_data.titulo | uppercase }}</h5>
+        </div>
+        <h6>Descripción</h6>
+        <div
+          class="card-text"
+          [ngClass]="'inner-html-mb-0'"
+          [innerHTML]="task_data.descripcion"
+        ></div>
+        <div class="d-flex justify-content-between">
+          <div>
+            <span
+              class="badge bg-success"
+              [ngClass]="estado == 'Vencida' ? 'bg-danger' : 'bg-success'"
+              >{{ estado }}</span
+            >
+            <span
+              class="badge ml-2 text-white"
+              [ngStyle]="
+                task_data.estado == 'Pendiente'
+                  ? { 'background-color': '#ef476f' }
+                  : task_data.estado == 'En ejecucion'
+                    ? { 'background-color': '#ffd166' }
+                    : task_data.estado == 'En espera'
+                      ? { 'background-color': '#118ab2' }
+                      : task_data.estado == 'Finalizado'
+                        ? { 'background-color': '#06d6a0' }
+                        : task_data.estado == 'Archivada'
+                          ? { 'background-color': 'gray' }
+                          : ''
+              "
+            >
+              {{ task_data.estado }}
+            </span>
+          </div>
+          <div class="btn-group" role="group">
+            <a
+              class="btn btn-primary btn-sm"
+              *ngIf="task_data.link"
+              [routerLink]="task_data.link"
+              role="button"
+              >Realizar</a
+            >
+            <button
+              type="button"
+              *ngIf="task_data.estado != 'Archivada'"
+              class="btn btn-secondary btn-sm"
+              (click)="archivar()"
+            >
+              Archivar
+            </button>
+          </div>
+        </div>
+        <hr />
+        <h5 class="card-title text-center">Comentarios</h5>
+
+        <ng-container *ngIf="!loading && task_data.comment.length > 0; else notData">
+          <ul class="list-group list-group-flush">
+            <li
+              class="list-group-item flex-column align-items-start"
+              *ngFor="let item of task_data.comment"
+            >
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">
+                  {{ item.autor.full_names }}
+                </h6>
+                <small class="text-muted">
+                  <div (click)="deleteComment(item.id)">
+                    <button
+                      class="btn btn-outline-danger btn-sm rounded-2"
+                      type="button"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title="Eliminar comentario"
+                      *ngIf="item.deleted"
+                    >
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </small>
+              </div>
+              <div class="card-text" [ngClass]="'inner-html-mb-0'" [innerHTML]="item.comment"></div>
+              <small class="text-muted">{{ item.created_at | date: 'MMM d, y, h:mm a' }}</small>
+            </li>
+          </ul>
+        </ng-container>
+        <form [formGroup]="form_comment">
+          <div class="d-flex flex-start w-100 mt-2">
+            <div class="form-outline w-100">
+              <ckeditor
+                [editor]="_texteditor.Editor"
+                (ready)="_texteditor.onReady($event)"
+                [config]="_texteditor.configEditor"
+                placeholder="Publica un nuevo comentario"
+                formControlName="comment_temp"
+              ></ckeditor>
+            </div>
+          </div>
+        </form>
+        <button
+          type="button"
+          (click)="saveComment()"
+          [disabled]="!form_comment.controls.comment_temp.valid"
+          class="btn btn-primary btn-block mt-2"
+        >
+          Publicar
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">
+          Asignada por: <small>{{ task_data.asignador.full_names }}</small>
+        </h5>
+        <h5 class="card-title">
+          Asignada a: <small>{{ task_data.realizador.full_names }}</small>
+        </h5>
+        <h5 class="card-title">
+          Categoría: <small>{{ task_data.types.name }}</small>
+        </h5>
+        <h5 class="card-title">
+          Fecha:
+          <small>{{ task_data.fecha + ' ' + task_data.hora | date: 'MMM d, y, h:mm:ss a' }}</small>
+        </h5>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title text-center">Archivos adjuntos</h5>
+        <ng-container *ngIf="!loading && task_data.adjuntos.length > 0; else notData">
+          <div class="row">
+            <ng-container *ngFor="let item of task_data.adjuntos">
+              <div
+                class="col-md-4"
+                *ngIf="item.type == 'png' || item.type == 'jpeg' || item.type == 'jpg'; else pdf"
+              >
+                <a [href]="item.file" target="_blank">
+                  <div class="card bg-light card-style" role="button">
+                    <div class="card-body d-flex align-items-center p-2 pt-3">
+                      <img
+                        [src]="item.file"
+                        class="files-img"
+                        onerror="this.src='../../../../assets/images/not-available.png'"
+                      />
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+              <ng-template #pdf>
+                <div class="col-md-4">
+                  <a [href]="item.file" target="_blank">
+                    <div class="card bg-light card-style" role="button">
+                      <div class="card-body text-center p-2 pt-3">
+                        <i class="fas fa-file-pdf fa-4x text-danger"></i>
+                        <div class="text-truncate">
+                          <small class="text-truncate">{{ item.name }}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title text-center">Seguimiento</h5>
+      </div>
+      <div class="card-body body-custom">
+        <ng-container *ngIf="!loading && task_data.timeline.length > 0; else notData">
+          <ng-container *ngFor="let item of task_data.timeline">
+            <section class="gradient-custom-5">
+              <div class="main-timeline-5">
+                <div class="timeline-5 right-5">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="row d-flex justify-content-between">
+                        <h6>
+                          <i [class]="item.icon"></i>
+                          {{ item.title }} <br />
+                          <div class="text-muted" style="font-size: x-small">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ item.created_at | date: 'MMM d, y, h:mm a' }}
+                          </div>
+                        </h6>
+                        <div>
+                          <img
+                            [src]="item.person.image"
+                            onerror="this.src='../../../../assets/images/noprofile.png'"
+                            class="rounded-circle mx-auto img-fluid header-profile-user"
+                          />
+                        </div>
+                      </div>
+                      <small>
+                        {{ item.description }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>
+
+<!-- <div class="card text-center">
+      <div class="card-body">
+        <h5 class="card-title">Otras tareas</h5>
+        <ng-container *ngIf="!loading && tasks.length > 0; else notData">
+          <div
+            class="row d-flex justify-content-between"
+            *ngFor="let item of tasks"
+          >
+            <a
+              href="javascript:void(0)"
+              [routerLink]="['/task', item.id]"
+              class="col-6 text-start"
+            >
+              <h6 class="text-truncate">
+                <span>
+                  <i
+                    class="fas fa-circle"
+                    [ngStyle]="
+                      item.estado == 'Pendiente'
+                        ? { color: '#ef476f' }
+                        : item.estado == 'En ejecucion'
+                        ? { color: '#ffd166' }
+                        : item.estado == 'En espera'
+                        ? { color: '#118ab2' }
+                        : item.estado == 'Finalizado'
+                        ? { color: '#06d6a0' }
+                        : item.estado == 'Archivada'
+                        ? { color: 'gray' }
+                        : ''
+                    "
+                  ></i>
+                </span>
+                {{ item.titulo }}
+              </h6>
+            </a>
+            <div class="col-6 text-end">
+              <small>{{ item.fecha | date }}</small>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div> -->

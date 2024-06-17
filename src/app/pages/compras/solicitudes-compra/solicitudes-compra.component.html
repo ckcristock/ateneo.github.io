@@ -1,0 +1,150 @@
+<app-card viewTitle="Solicitudes de compra" [filterTemplate]="filterTemplate">
+  @if (permission.permissions.add) {
+    <app-add-button filters [routerLink]="['crear']" />
+  }
+  <app-table
+    [loading]="loading"
+    [arrayData]="solicitudesCompra"
+    [pagination]="pagination"
+    (pageChange)="getPurchaseRequest()"
+  >
+    <ng-container titles>
+      <th>#Solicitud</th>
+      <th>Funcionario que solicita</th>
+      <th>#Productos</th>
+      <th>Fecha solicitud</th>
+      <th>Fecha esperada</th>
+      <th>Productos cotizados</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (solicitud of solicitudesCompra; track $index) {
+        <tr class="text-center">
+          <td class="align-middle">
+            {{ solicitud.code }}
+          </td>
+          <td class="align-middle">
+            {{ solicitud.person.full_names }}
+          </td>
+          <td class="align-middle">
+            {{ solicitud.quantity_of_products }}
+          </td>
+
+          <td class="align-middle">
+            {{ solicitud.created_at | date: 'MMM d, y' }}
+          </td>
+
+          <td class="align-middle">
+            {{ solicitud.expected_date | date: 'MMM d, y' }}
+          </td>
+          <td class="align-middle">
+            {{ count(solicitud) }}
+            de
+            {{ solicitud.product_purchase_request.length }}
+          </td>
+          <td><app-status-badge [status]="solicitud.status" /></td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view
+                [link]="{
+                  url: 'ver/' + solicitud.id
+                }"
+              />
+              @if (solicitud.status == 'pendiente' && permission.permissions.add) {
+                <app-action-edit [routerLink]="['editar', solicitud.id]" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container [formGroup]="formFilters">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="">Todas</mat-option>
+        <mat-option value="Pendiente">Pendiente</mat-option>
+        <mat-option value="Cotizada">Cotizadas</mat-option>
+        <mat-option value="Aprobada">Aprobadas</mat-option>
+        <mat-option value="Comprada">Compradas</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label> Número de solicitud</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="code"
+        autocomplete="off"
+        placeholder="Busca por número de solicitud"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Fecha de solicitud</mat-label>
+      <mat-date-range-input [formGroup]="rangeRequestForm" [rangePicker]="dateReq">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          formControlName="start_created_at"
+          name="date_start"
+        />
+        <input
+          matEndDate
+          placeholder="Fecha de fin"
+          formControlName="end_created_at"
+          name="date_end"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="dateReq"></mat-datepicker-toggle>
+      <mat-date-range-picker #dateReq>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button
+            mat-raised-button
+            color="primary"
+            matDateRangePickerApply
+            (click)="selectedDate('created_at')"
+          >
+            Aplicar
+          </button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Fecha de entrega estimada</mat-label>
+      <mat-date-range-input [formGroup]="rangeForm" [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          formControlName="start_expected_date"
+          name="date_start"
+        />
+        <input
+          matEndDate
+          placeholder="Fecha de fin"
+          formControlName="end_expected_date"
+          name="date_end"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button
+            mat-raised-button
+            color="primary"
+            matDateRangePickerApply
+            (click)="selectedDate('expected_date')"
+          >
+            Aplicar
+          </button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+  </ng-container>
+</ng-template>

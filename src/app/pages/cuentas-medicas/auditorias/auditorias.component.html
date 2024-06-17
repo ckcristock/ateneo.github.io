@@ -1,0 +1,609 @@
+<div class="page-body">
+  <div class="row">
+    <!-- columna correspondencia hasta gráfica -->
+    <div class="col">
+      <app-card viewTitle="Correspondencia">
+        <ng-container ngProjectAs="[filters]">
+          <app-header-button
+            (click)="modalCorrespondencia.show()"
+            icon="fa fa-hourglass-end"
+            text="{{ Dispensaciones }} Dispensaciones pendientes"
+            type="danger"
+          ></app-header-button>
+        </ng-container>
+        <app-table
+          [loading]="CargandoCorresp"
+          [arrayData]="correspondencia"
+          [pagination]="pagination"
+          (pageChange)="ConsultaFiltrada(true)"
+        >
+          <ng-container titles>
+            <th>Foto</th>
+            <th>Datos Envío</th>
+            <th>Folios</th>
+            <th>Fecha Envío</th>
+            <th>Estado</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </ng-container>
+          <tbody content>
+            @for (correspondencias of correspondencia; track correspondencias.id) {
+              <tr class="text-center align-middle text-uppercase">
+                <td>
+                  <app-load-image
+                    [src]="environment?.ruta + 'IMAGENES/FUNCIONARIOS/' + correspondencias?.Imagen"
+                    classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                    style="object-fit: cover; min-height: 11rem"
+                  ></app-load-image>
+                </td>
+                <td>
+                  <i class="fa fa-truck"></i>&nbsp;{{ correspondencias?.Empresa_Envio || 'N/A' }}
+                  <i class="fa fa-barcode"></i>{{ correspondencias?.Numero_Guia || 'N/A' }}
+                </td>
+                <td>
+                  {{ correspondencias?.Cantidad_Folios || 'N/A' }}
+                </td>
+                <td>
+                  {{
+                    correspondencias?.Fecha_Envio
+                      ? (correspondencias?.Fecha_Envio | date: 'dd-MM-yyyy')
+                      : 'N/A'
+                  }}
+                </td>
+                <td class="align-middle">
+                  <i
+                    class="me-1"
+                    [ngClass]="{
+                      'fas fa-check': correspondencias?.Estado == 'Recibida',
+                      'far fa-clock': correspondencias?.Estado == 'Enviada'
+                    }"
+                  ></i
+                  ><span
+                    class="badge"
+                    [class]="correspondencias?.Estado == 'Recibida' ? 'bg-success' : 'bg-danger'"
+                  >
+                    {{ correspondencias?.Estado || 'N/A' }}
+                  </span>
+                </td>
+                <td>
+                  <app-dropdown-actions>
+                    <app-action-button
+                      icon="eye"
+                      text="Ver"
+                      type="success"
+                      (click)="
+                        DispensacionesEnviadas(
+                          correspondencias?.Id_Correspondencia,
+                          correspondencias?.Estado
+                        );
+                        openModal(modalDisEnviadas)
+                      "
+                    ></app-action-button>
+                    <app-action-button
+                      icon="download"
+                      text="Descargar malla de dispensación"
+                      type="info"
+                      (click)="
+                        descargarMalla(
+                          environment.ruta +
+                            'php/correspondencia/descarga_malla.php?id=' +
+                            correspondencias.Id_Correspondencia
+                        )
+                      "
+                    ></app-action-button>
+                    <!-- <a
+                      class="text-info ms-3 ps-1"
+                      href="{{ environment.ruta }}php/correspondencia/descarga_malla.php?id={{
+                        correspondencias?.Id_Correspondencia
+                      }}"
+                      target="_blank"
+                      ><i class="fa fa-download"></i
+                      ><span class="ms-2">Descargar malla de dispensación</span></a
+                    > -->
+                  </app-dropdown-actions>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </app-table>
+      </app-card>
+      <!-- Descargar Reporte Auditoria -->
+      <div class="row">
+        <div class="col-6">
+          <app-reporteauditorias></app-reporteauditorias>
+        </div>
+        <!-- gráfica -->
+        <div class="col-6">
+          <div class="card">
+            <div class="card-body">
+              <div #studentChart>
+                <!-- <chart
+                  id="student_chart"
+                  [type]="'line'"
+                  [data]="studentChartData"
+                  [options]="studentChartOption"
+                ></chart> -->
+                <apx-chart
+                  class="apex-charts"
+                  dir="ltr"
+                  [series]="splineAreaChart.series"
+                  [chart]="splineAreaChart.chart"
+                  [dataLabels]="splineAreaChart.dataLabels"
+                  [stroke]="splineAreaChart.stroke"
+                  [colors]="splineAreaChart.colors"
+                  [xaxis]="splineAreaChart.xaxis"
+                  [grid]="splineAreaChart.grid"
+                  [tooltip]="splineAreaChart.tooltip"
+                ></apx-chart>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- listado Auditorías -->
+    <app-card viewTitle="Listado de auditorías" [filterTemplate]="filterTemplate">
+      <label for="sin-dis" class="mt-0 mb-2" style="cursor: pointer"
+        ><input
+          style="cursor: pointer"
+          type="checkbox"
+          name="sin-dis"
+          id="sin-dis"
+          (change)="AsignarValorSinDis()"
+        />
+        Sin dispensaciones</label
+      >
+      <!-- <app-add-button filters (click)="openModal(add)" /> -->
+      <app-table
+        [loading]="Cargando"
+        [arrayData]="auditorias"
+        [pagination]="paginationAuditorias"
+        (pageChange)="ConsultaFiltradaAuditoria(true)"
+      >
+        <ng-container titles>
+          <th>Foto</th>
+          <th>Codigo</th>
+          <th>Fecha Pre-Aud</th>
+          <th>Id Paciente</th>
+          <th>Punto</th>
+          <th>Servicio</th>
+          <th>Dispensación</th>
+          <th>Estado</th>
+          <th><i class="mdi mdi-chevron-down"></i></th>
+        </ng-container>
+        <tbody content>
+          @for (auditoria of auditorias; track auditoria.id) {
+            <tr
+              class="text-center align-middle text-uppercase"
+              id="fila{{ auditoria.id }}"
+              [ngClass]="{
+                'bg-warning': auditoria.Id_Dispensacion == '',
+                'bg-danger': auditoria.Estado == 'Anulada'
+              }"
+            >
+              <td>
+                <app-load-image
+                  [src]="environment?.ruta + 'IMAGENES/FUNCIONARIOS/' + auditoria?.Imagen1"
+                  classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                  style="object-fit: cover; min-height: 11rem"
+                ></app-load-image>
+              </td>
+              <td>AUD00{{ auditoria?.Id_Auditoria || 'N/A' }}</td>
+              <td>
+                {{
+                  auditoria?.Fecha_Preauditoria
+                    ? (auditoria?.Fecha_Preauditoria | date: 'dd-MM-yyyy')
+                    : 'N/A'
+                }}
+              </td>
+              <!-- <td >{{auditoria.Nombre_Funcionario_Auditoria}}</td>
+            <td >{{auditoria.Fecha_Auditoria | date: 'dd/MM/yyyy' }}</td> -->
+              <td>{{ auditoria?.Id_Paciente || 'N/A' }}</td>
+              <td>{{ auditoria?.Nombre_Punto || 'N/A' }}</td>
+              <td>{{ auditoria?.TipoServicio || 'N/A' }}</td>
+              <td>{{ auditoria?.DIS || 'N/A' }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class]="auditoria.Estado == 'Aceptar' ? 'bg-success' : 'bg-warning'"
+                >
+                  {{ auditoria?.Estado || 'N/A' }}
+                </span>
+              </td>
+              <td>
+                <app-dropdown-actions>
+                  <app-action-button
+                    icon="eye"
+                    text="Ver"
+                    type="success"
+                    [link]="{
+                      url: '/cuentas-medicas/dispensacionauditoria/' + auditoria?.Id_Auditoria
+                    }"
+                  ></app-action-button>
+                </app-dropdown-actions>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    </app-card>
+    <!-- listado Auditorías -->
+  </div>
+
+  <app-modal-basic #modalCorrespondencia [dialogClass]="'modal-lg'">
+    <div class="app-modal-header">
+      <h4 class="text-primary">Nueva correspondencia</h4>
+      <button type="button" class="btn-close basic-close" (click)="modalCorrespondencia.hide()">
+        <!-- <span aria-hidden="true">&times;</span> -->
+      </button>
+    </div>
+    <div class="app-modal-body">
+      <form #FormCorrespondencia="ngForm">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Cantidad de folios</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="Modelo_Envio.Cantidad_Folios"
+              placeholder="Digíte Cant."
+              min="0"
+              name="Cantidad_Folios"
+            />
+            <input
+              matInput
+              hidden
+              type="text"
+              name="Id_Funcionario_Envia"
+              [(ngModel)]="Modelo_Envio.Id_Funcionario_Envia"
+              placeholder=""
+              required
+            />
+            <input
+              matInput
+              hidden
+              name="Punto_Envio"
+              type="text"
+              [(ngModel)]="Modelo_Envio.Punto_Envio"
+              placeholder=""
+              required
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha de envío</mat-label>
+            <input
+              matInput
+              [matDatepicker]="pickerEnvio"
+              placeholder="Fecha de envío"
+              name="Fecha_Envio"
+              [(ngModel)]="Modelo_Envio.Fecha_Envio"
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="pickerEnvio"></mat-datepicker-toggle>
+            <mat-datepicker #pickerEnvio></mat-datepicker>
+          </mat-form-field>
+          <div class="col">
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Fecha probable de entrega</mat-label>
+              <input
+                matInput
+                name="Fecha_Probable_Entrega"
+                [matDatepicker]="pickerProbEntrega"
+                placeholder="Fecha probable de entrega"
+                [(ngModel)]="Modelo_Envio.Fecha_Probable_Entrega"
+              />
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="pickerProbEntrega"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerProbEntrega></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Empresa de envío</mat-label>
+              <input
+                matInput
+                name="Empresa_Envio"
+                type="text"
+                [(ngModel)]="Modelo_Envio.Empresa_Envio"
+                placeholder="¿Por donde envió?"
+              />
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Número de guía</mat-label>
+              <input
+                matInput
+                name="Numero_Guia"
+                type="text"
+                [(ngModel)]="Modelo_Envio.Numero_Guia"
+                placeholder="Digíte guía"
+              />
+            </mat-form-field>
+          </div>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Régimen</mat-label>
+            <mat-select
+              placeholder="Régimen"
+              name="Id_Regimen"
+              [(ngModel)]="Modelo_Envio.Id_Regimen"
+              required
+            >
+              <mat-option value="">Seleccione</mat-option>
+              <mat-option *ngFor="let R of Regimen; let i = index" [value]="R.Id_Regimen">
+                {{ R.Nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Tipo de servicio</mat-label>
+            <mat-select
+              placeholder="Filtro Servicio"
+              name="Id_Tipo_Servicio"
+              [(ngModel)]="Modelo_Envio.Id_Tipo_Servicio"
+              required
+            >
+              <mat-option value="">Seleccione</mat-option>
+              <mat-option *ngFor="let S of Servicios; let i = index" [value]="S.Id_Tipo_Servicio">
+                {{ S.Nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="col-auto">
+            <button
+              class="btn btn-success sm-mt-n2 md-mt-0"
+              [disabled]="Modelo_Envio.Id_Regimen == '' && Modelo_Envio.Id_Tipo_Servicio == ''"
+              (click)="dispPendientesCorresp()"
+            >
+              Listar dispensaciones
+            </button>
+          </div>
+        </div>
+        <div class="row">
+          <mat-form-field
+            class="col-md-12 mat-form-field-no-padding textarea mt-2"
+            appearance="outline"
+          >
+            <mat-label>Observaciones</mat-label>
+            <textarea
+              matInput
+              type="text"
+              id="Observaciones"
+              name="Observaciones_Envio"
+              placeholder="Ingrese las observaciones"
+              [(ngModel)]="Modelo_Envio.Observaciones_Envio"
+              rows="3"
+              [cdkTextareaAutosize]="true"
+            ></textarea>
+          </mat-form-field>
+        </div>
+
+        <!-- <div class="col-md-1 text-right f-9">Filtrar:</div> -->
+        <!-- <div class="col-md-2">
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              (keyup)="filtrar($event.target.value)"
+              placeholder="Dispensación"
+            />
+          </div> -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Filtrar</mat-label>
+          <input
+            matInput
+            type="text"
+            (input)="filtrar($event.target.value)"
+            placeholder="Dispensación"
+          />
+        </mat-form-field>
+        <div class="row">
+          <div class="col-md-12 m-t-10">
+            <div *ngIf="!Cargando && DispPendientesToFilter.length > 0; else notData">
+              <div class="rounded-top table-responsive">
+                <table class="table table-bordered table-striped table-sm">
+                  <!-- titulos -->
+                  <thead class="bg-light">
+                    <tr class="text-center align-middle text-uppercase">
+                      <th style="width: 10px">
+                        <input type="checkbox" id="checkTodos" (change)="MarcarTodos()" />
+                      </th>
+                      <th>Código Aud</th>
+                      <th>Fecha Aud</th>
+                      <th>Código Disp</th>
+                      <th>Tipo</th>
+                      <th>Paciente</th>
+                      <th>Régimen</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let item of DispPendientesToFilter"
+                      class="text-center align-middle text-uppercase"
+                    >
+                      <td style="text-align: center">
+                        <input
+                          type="checkbox"
+                          class="todos"
+                          [checked]="isSelect(item.Id_Dispensacion)"
+                          (change)="addCorresp(item.Id_Dispensacion)"
+                        />
+                      </td>
+                      <td>AUD{{ item?.Id_Auditoria || 'N/A' }}</td>
+                      <td>
+                        {{
+                          item?.Fecha_Preauditoria
+                            ? (item?.Fecha_Preauditoria | date: 'dd-MM-yyyy')
+                            : 'N/A'
+                        }}
+                      </td>
+                      <td>{{ item?.Codigo || 'N/A' }}</td>
+                      <td>{{ item?.Tipo || 'N/A' }}-{{ item?.Servicio || 'N/A' }}</td>
+                      <td class="text-left">{{ item?.Nombre_Paciente || 'N/A' }}</td>
+                      <td>{{ item?.Regimen || 'N/A' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="app-modal-footer">
+      <button type="button" class="btn btn-danger" (click)="modalCorrespondencia.hide()">
+        Cancelar</button
+      >&nbsp;
+      <button
+        type="button"
+        (click)="showAlert($event)"
+        [disabled]="!FormCorrespondencia.valid || disp_correspondencia.length == 0"
+        class="btn btn-primary"
+      >
+        Guardar
+      </button>
+    </div>
+  </app-modal-basic>
+  <ng-template #notData>
+    <app-not-data-sa [loading]="Cargando"></app-not-data-sa>
+  </ng-template>
+</div>
+
+<ng-template #filterTemplate>
+  <!-- Código -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Código</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="Filtros.Codigo"
+      (input)="ConsultaFiltradaAuditoria()"
+      placeholder="Filtro Código"
+    />
+  </mat-form-field>
+  <!-- rango de fechas -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Fecha pre-aud</mat-label>
+    <mat-date-range-input [formGroup]="range" [rangePicker]="rangePicker">
+      <input
+        matStartDate
+        placeholder="Fecha de inicio"
+        [readonly]="true"
+        formControlName="start"
+        name="date_start"
+      />
+      <input
+        matEndDate
+        placeholder="Fecha de fin"
+        [readonly]="true"
+        formControlName="end"
+        name="date_end"
+      />
+    </mat-date-range-input>
+    <!-- <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker> -->
+
+    <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+    <mat-datepicker-toggle matIconSuffix (click)="borrarFechas()">
+      <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+    </mat-datepicker-toggle>
+
+    <mat-date-range-picker #rangePicker>
+      <mat-date-range-picker-actions>
+        <button mat-button matDateRangePickerCancel>Cancelar</button>
+        <button mat-raised-button color="primary" matDateRangePickerApply>Filtrar</button>
+      </mat-date-range-picker-actions>
+    </mat-date-range-picker>
+  </mat-form-field>
+
+  <!-- Paciente -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Id paciente</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="Filtros.Paciente"
+      (input)="ConsultaFiltradaAuditoria()"
+      placeholder="Filtro Paciente"
+    />
+  </mat-form-field>
+
+  <!-- filtro servicio -->
+  <mat-form-field class="col-lg-12" appearance="outline">
+    <mat-label>Tipo de servicio</mat-label>
+    <mat-select
+      [(ngModel)]="Filtros.Servicio"
+      (selectionChange)="ConsultaFiltradaAuditoria()"
+      id=""
+      name=""
+      placeholder="Filtro Servicio"
+    >
+      <mat-option value="">Todos</mat-option>
+      <mat-option *ngFor="let t of Servicios" [value]="t.Id_Tipo_Servicio">
+        {{ t.Nombre }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- dispensacion -->
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Dispensación</mat-label>
+    <input
+      matInput
+      type="text"
+      [(ngModel)]="Filtros.Disp"
+      (input)="ConsultaFiltradaAuditoria()"
+      placeholder="Filtro Dispensación"
+    />
+  </mat-form-field>
+</ng-template>
+
+<ng-template #modalDisEnviadas let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ selected }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="col-md-12">
+      <div class="rounded-top table-responsive">
+        <table
+          class="table table-bordered table-striped table-sm"
+          *ngIf="!Cargando && DisEnviadas.length > 0; else notData"
+        >
+          <!-- titulos -->
+          <thead class="bg-light">
+            <tr class="font-weight-bold text-center align-middle text-uppercase">
+              <th>Código Aud</th>
+              <th>Fecha Aud</th>
+              <th>Código Disp</th>
+              <th>Tipo</th>
+              <th>Paciente</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="text-center align-middle text-uppercase" *ngFor="let item of DisEnviadas">
+              <td>AUD{{ item?.Id_Auditoria || 'N/A' }}</td>
+              <td>
+                {{
+                  item?.Fecha_Preauditoria ? (item?.Fecha_Preauditoria | date: 'dd-MM-yyyy') : 'N/A'
+                }}
+              </td>
+              <td>{{ item?.Codigo || 'N/A' }}</td>
+              <td>{{ item?.Tipo || 'N/A' }}</td>
+              <td>{{ item?.Nombre_Paciente || 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cerrar</button>
+  </div>
+</ng-template>

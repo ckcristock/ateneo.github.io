@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h6>Seguimiento {{ Modulo }}</h6>
+      </div>
+      <div class="card-body" style="height: 350px; overflow-y: auto">
+        <div *ngIf="Actividades.length == 0" class="col-md-12 text-center">
+          <h5>
+            <i class="fa fa-exclamation-circle fa-5x"></i>
+            <h6>No Existen datos para mostrar</h6>
+          </h5>
+        </div>
+        <ul class="feed-blog">
+          <li class="active-feed contenido2" *ngFor="let Actividad of Actividades">
+            <div class="feed-user-img">
+              <a *ngIf="Actividad.Imagen != ''" href="javascript:">
+                <img
+                  class="img-radius img-40"
+                  src="{{ globales.ruta }}/IMAGENES/FUNCIONARIOS/{{ Actividad.Imagen }}"
+                  alt=""
+                />
+              </a>
+              <a *ngIf="Actividad.Imagen == ''" href="javascript:">
+                <img class="img-radius img-40" src="assets/images/user.jpg" alt="chat-user" />
+              </a>
+            </div>
+            <h6 style="font-size: 9px !important">
+              <span
+                class="label {{ Actividad.Estado == 'Creacion' ? 'label-info' : '' }}
+                    {{ Actividad.Estado == 'Validacion' ? 'label-inverse' : '' }}
+                    {{ Actividad.Estado == 'Edicion' ? 'label-warning' : '' }}
+                    {{ Actividad.Estado == 'Anulada' ? 'label-danger' : '' }}
+               
+                    {{
+                  Actividad.Estado == 'Alistamiento' ||
+                  Actividad.Estado == 'Fase 1' ||
+                  Actividad.Estado == 'Fase 2'
+                    ? 'label-inverse'
+                    : ''
+                }}
+                    {{ Actividad.Estado == 'Enviada' ? 'label-success ' : '' }} 
+                    {{ Actividad.Estado == 'Recibida' ? 'label-1 ' : '' }}
+                    {{ Actividad.Estado == 'Facturada' ? 'label-2 ' : '' }}
+                    {{ Actividad.Estado == 'Actualizacion' ? 'label-warning' : '' }} {{
+                  Actividad.Estado == 'Creado' ? 'label-info' : ''
+                }}
+                    {{ Actividad.Estado == 'Aprobacion Corvus' ? 'label-info' : '' }}
+                    {{ Actividad.Estado == 'Aprobacion Proh' ? 'label-success' : '' }}
+                    {{ Actividad.Estado == 'Asignacion Desarrollador' ? 'label-info' : '' }}
+                    {{ Actividad.Estado == 'Solucionada' ? 'label-primary' : '' }}
+                    {{ Actividad.Estado == 'Rechazo' ? 'label-danger' : '' }}
+                    {{ Actividad.Estado == 'Inicio Desarrollo' ? 'label-warning' : '' }}
+                    {{ Actividad.Estado == 'Fin Desarrollo' ? 'label-warning' : '' }}
+                    {{ Actividad.Estado == 'Aprobacion Solicitante' ? 'label-success' : '' }}
+                    {{ Actividad.Estado == 'Aprobacion' ? 'label-success' : '' }}
+                    {{ Actividad.Estado == 'Acomodada' ? 'label-success' : '' }} "
+                >{{ Actividad.Estado }}</span
+              >
+              {{ Actividad.Funcionario }}
+            </h6>
+            <p>
+              {{ Actividad.Detalles }} <br />
+              <small class="text-muted"> {{ Actividad.Fecha }}</small>
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

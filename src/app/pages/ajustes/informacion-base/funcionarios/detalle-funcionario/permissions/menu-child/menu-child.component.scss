@@ -1,0 +1,107 @@
+/* .card {
+    border: 1px solid rgb(0 0 0 / 8%);
+    box-shadow: 5px 5px 1px rgb(0 0 0 / 4%);
+} */
+.border-3 {
+  border-width: 3px !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of slide-toggle that may no longer apply for the MDC version. */
+::ng-deep .mat-mdc-slide-toggle.fw-bold .mat-slide-toggle-label .mat-slide-toggle-content {
+  font-weight: 700;
+}
+
+.line-separator {
+  border-bottom: 1px dotted;
+  height: 0px;
+  padding: 0;
+  margin: 15px auto 0 auto;
+  width: 100%;
+}
+
+.item-permission {
+  cursor: pointer;
+}
+
+.item-permission:hover {
+  .line-separator {
+    border-bottom: 2px dotted;
+  }
+
+  .title-permission {
+    font-weight: 600;
+  }
+}
+
+.tree,
+.tree ul {
+  margin: 0 0 0 1em;
+  /* indentation */
+  padding: 0;
+  list-style: none;
+  color: #1f1f1f;
+  position: relative;
+}
+
+.tree ul {
+  margin-left: 0.5em;
+}
+
+.tree:before,
+.tree ul:before {
+  content: '';
+  display: block;
+  width: 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3rem;
+  border-left: 1px solid;
+}
+
+.tree li {
+  margin: 0;
+  padding: 0 1.5em;
+  /* indentation + .5em */
+  line-height: 2em;
+  /* default list item's `line-height` */
+  position: relative;
+}
+
+.tree li.d-flex:before {
+  //?Ya
+  content: '';
+  display: block;
+  width: 10px;
+  height: 0;
+  border-top: 1px solid;
+  margin-top: -1px;
+  position: absolute;
+  top: 1em;
+  left: 0;
+}
+
+.tree li:last-child:before {
+  background: #fff;
+  /* same with body background */
+  height: auto;
+  top: 1em;
+  /* (line-height/2) */
+  bottom: 0;
+}
+
+.tree li:after + .d-flex {
+  content: '\2022';
+  /* bullet */
+  position: absolute;
+  left: 9px;
+  top: -1px;
+}
+
+.tree.d-flex:after {
+  content: '\2022';
+  /* bullet */
+  position: absolute;
+  left: 2.8rem;
+  top: -12px;
+}

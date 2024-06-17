@@ -1,0 +1,8 @@
+<app-modal titleModal="Deducciones">
+  <app-deducciones
+    [person]="data.officer"
+    [periodo]="data.paymentFreq"
+    [nominaPaga]="data.payrollPay"
+    (updated)="onUpdate()"
+  ></app-deducciones>
+</app-modal>

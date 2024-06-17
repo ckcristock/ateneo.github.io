@@ -1,0 +1,110 @@
+<div class="card">
+  <div class="card-body">
+    <div class="card-title d-flex justify-content-between">
+      <h4 class="text-primary">Vacaciones</h4>
+    </div>
+    <hr class="line" />
+    <table
+      class="table table-borderless table-striped mt-4"
+      *ngIf="!loading && vacations.length > 0; else notData"
+    >
+      <thead class="bg-light">
+        <tr>
+          <th></th>
+          <th>Funcionario</th>
+          <th>Dependencia</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let vacation of vacations">
+          <td style="vertical-align: middle" class="text-center">
+            <img
+              src="{{ vacation.image | image: 'users' }}"
+              alt=""
+              class="rounded-circle avatar-sm"
+            />
+          </td>
+          <td style="vertical-align: middle">{{ vacation.name | titlecase }}</td>
+          <td style="vertical-align: middle">{{ vacation.dependency }}</td>
+          <td style="vertical-align: middle">{{ vacation.date_start | date: 'dd-MM-yyyy' }}</td>
+          <td style="vertical-align: middle">{{ vacation.date_end | date: 'dd-MM-yyyy' }}</td>
+          <td class="text-center">
+            <button
+              class="btn btn-lg"
+              (click)="openModal(); vacationData(vacation)"
+              placement="right"
+              ngbTooltip="Ver"
+            >
+              <span aria-hidden="true">
+                <i class="far fa-eye fa-lg"></i>
+              </span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      [collectionSize]="pagination.collectionSize"
+      [pageSize]="pagination.pageSize"
+      (pageChange)="getVacations($event)"
+      [(page)]="pagination.page"
+      aria-label="Default pagination"
+      maxSize="5"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+    >
+    </ngb-pagination>
+  </div>
+</div>
+<app-modal-basic #modal [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="modal-title">Detalles Vacaciones</h5>
+    <button type="button" class="close basic-close" (click)="modal.hide()">
+      <span aria-hidden="true">
+        <i class="fas fa-times" (click)="modal.hide()"></i>
+      </span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <table class="table table-borderless table-striped">
+      <thead class="bg-light">
+        <tr>
+          <th>Salario</th>
+          <th>Días</th>
+          <th class="text-center">Formula = Salario Promedio * Días / 30 Días</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ vacation.salary | currency }}</td>
+          <td>{{ daysDiference }}</td>
+          <td class="text-center">{{ vacation.salary }} * {{ daysDiference }} / 30</td>
+          <td>{{ valor | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="app-modal-footer">
+    <div class="form-group text-end">
+      <button (click)="modal.hide()" type="button" class="btn btn-danger raised me-2 btn-sm">
+        Cerrar
+      </button>
+      <button type="submit" class="btn btn-primary btn-sm raised" (click)="saveInformation('Pago')">
+        Guardar
+      </button>
+    </div>
+  </div>
+</app-modal-basic>
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

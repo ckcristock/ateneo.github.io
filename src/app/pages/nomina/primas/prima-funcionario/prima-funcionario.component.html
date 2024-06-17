@@ -1,0 +1,104 @@
+<app-card viewTitle="{{ empleados.status == 'pagado' ? 'Resumen' : 'Pago' }} de prima">
+  <ng-container filters>
+    @if (empleados.status == 'pagado') {
+      <app-header-download [downloading]="donwloadingPdfs" (click)="getReportPdfs()" />
+    }
+    <app-header-download
+      [downloading]="donwloadingExcel"
+      icon="file-excel"
+      text="Reporte"
+      type="warning"
+      (click)="getReport(empleados.status)"
+    />
+  </ng-container>
+  @if (empleados.status == 'pagado') {
+    <div>
+      <div class="alert alert-success text-center m-0" role="alert">
+        <b>Este listado ya se encuentra pago</b>
+      </div>
+      <div class="row">
+        <div class="col-lg-6 text-center py-3">
+          <b
+            >Responsable del pago:
+            {{ empleados.person_payer?.first_name }}
+            {{ empleados.person_payer?.second_name }}
+            {{ empleados.person_payer?.first_surname }}
+            {{ empleados.person_payer?.second_surname }}
+          </b>
+        </div>
+        <div class="col-lg-6 text-center py-3">
+          <b>Periodo {{ empleados.period }}</b>
+        </div>
+      </div>
+    </div>
+  }
+  <app-table
+    [loading]="loading"
+    [arrayData]="employees"
+    [pagination]="pagination"
+    (pageChange)="changePage()"
+  >
+    <ng-container titles>
+      <th>#</th>
+      <th>Foto</th>
+      <th>Persona</th>
+      <th>Salario</th>
+      <th>Días Trabajados</th>
+      <th>Monto</th>
+      @if (empleados.status == 'pagado') {
+        <th>
+          <i class="mdi mdi-chevron-down"></i>
+        </th>
+      }
+    </ng-container>
+    <tbody content>
+      @for (empleado of employees; track empleado.id; let i = $index) {
+        <tr class="text-center">
+          <td>{{ i + 1 }}</td>
+          <td class="align-middle p-0">
+            <div>
+              <app-load-image
+                classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+                [src]="empleado.image"
+              ></app-load-image>
+            </div>
+          </td>
+          <td class="text-start">
+            {{ empleado.first_name }} {{ empleado.second_name }} {{ empleado.first_surname }}
+            {{ empleado.second_surname }}
+          </td>
+          <td class="text-end">${{ empleado.avg_salary | number: '1.2-2' }}</td>
+          <td class="text-center">{{ empleado.worked_days }}</td>
+          <td class="text-end">${{ empleado.bonus | number: '1.2-2' }}</td>
+          <td>
+            <app-dropdown-actions [loading]="loadingIndex === i">
+              <app-action-button
+                icon="file-pdf"
+                text="Descargar"
+                type="danger"
+                (click)="getOneReportPdfs(empleado.id, empleados.period, i)"
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+  <div class="alert alert-info text-center" role="alert">
+    <b>TOTAL PRIMA: </b>$ {{ empleados.total_primas | number: '1.2-2' }}
+  </div>
+  <ng-container>
+    <div *ngIf="!habilitarPagar && empleados.status != 'pagado'">
+      <div class="alert alert-danger m-0 text-center" role="alert">
+        Solo podrá pagar primas en los meses de Junio y en Diciembre
+      </div>
+    </div>
+    <button
+      class="btn btn-primary btn-block"
+      *ngIf="empleados.status != 'pagado' && habilitarPagar"
+      (click)="pagar(empleados)"
+    >
+      Pagar
+    </button>
+  </ng-container>
+</app-card>

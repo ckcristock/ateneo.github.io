@@ -1,0 +1,76 @@
+<app-card viewTitle="Reportes generales">
+  <form #sendForm="ngForm">
+    <div class="row">
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Tipo de reporte</mat-label>
+        <mat-select
+          name="typeReport"
+          required
+          [(ngModel)]="typeReportDefault"
+          (selectionChange)="showInput()"
+        >
+          <mat-option *ngFor="let item of typeReports" [value]="item['text']">{{
+            item['text']
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <app-date-picker class="col" (dateChange)="selectedDate($event)" />
+      <div class="col-md-6">
+        <app-autocomplete-mdl
+          class="col"
+          label="Instituciones"
+          placeholder="Buscar instituciones"
+          [model]="institution"
+          [list]="companies"
+          (optionSelectedEvent)="institution = $event"
+        ></app-autocomplete-mdl>
+      </div>
+      <div class="col-md-6">
+        <app-autocomplete-mdl
+          class="col"
+          label="Especialidades"
+          placeholder="Buscar especialidades"
+          [model]="specialty"
+          [list]="specialities"
+          (optionSelectedEvent)="specialty = $event"
+        ></app-autocomplete-mdl>
+      </div>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>EPS</mat-label>
+        <mat-select name="eps_id" ngModel required>
+          <mat-option [value]="type.value" *ngFor="let type of epss">
+            {{ type.text }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Regimen</mat-label>
+        <mat-select name="regimen_id" ngModel required>
+          <mat-option [value]="type.value" *ngFor="let type of typeRegimens">
+            {{ type.text }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col-md-12" appearance="outline" *ngIf="show_input">
+        <mat-label>Por favor digite el/los numero(s) de identificación</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Ingresa identificación"
+          name="identifier"
+          [(ngModel)]="identifier"
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <div class="col-md-12">
+        <button class="btn btn-primary btn-block" [disabled]="loading" (click)="download(sendForm)">
+          <span *ngIf="!loading; else status">Reporte general</span>
+          <ng-template #status>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Generando reporte...
+          </ng-template>
+        </button>
+      </div>
+    </div>
+  </form>
+</app-card>

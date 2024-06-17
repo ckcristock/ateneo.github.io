@@ -1,0 +1,94 @@
+<article class="row">
+  <div class="col-md-4">
+    <app-activity
+      class="card flex-grow-1"
+      [activities]="Actividades"
+      titleActivity="Seguimiento de la remisión"
+    >
+      <app-not-data loading [loading]="false"></app-not-data>
+    </app-activity>
+  </div>
+  <app-card class="col" viewTitle="Ver detalle de devolución">
+    <a
+      *ngIf="Encabezado.Soporte && Encabezado.Soporte !== ''"
+      [href]="Encabezado.Soporte"
+      target="_blank"
+      class="btn btn-info btn-sm mb-4"
+    >
+      <i class="fas fa-file-pdf"></i> VER SOPORTE DEVOLUCION COMPRA
+    </a>
+    @if (Encabezado?.Nombre_Funcionario) {
+      <app-table [loading]="false">
+        <ng-container titles>
+          <th>Funcionario</th>
+          <th>Proveedor</th>
+          <th>Nit</th>
+          <th>Bodega</th>
+        </ng-container>
+        <tbody content>
+          <tr class="text-center">
+            <td>{{ Encabezado?.Nombre_Funcionario }}</td>
+            <td>{{ Encabezado?.Proveedor }}</td>
+            <td>{{ Encabezado?.Id_Proveedor }}</td>
+            <td>{{ Encabezado?.Bodega }}</td>
+          </tr>
+        </tbody>
+      </app-table>
+    }
+    @if (Productos_No_Conforme.length) {
+      <app-table [loading]="false">
+        <ng-container titles>
+          <th>Nombre Producto</th>
+          <th>Embalaje</th>
+          <th>Lote</th>
+          <th>Fecha Venc.</th>
+          @if (Productos_No_Conforme[0].Ubicacion) {
+            <th>Ubicación</th>
+          }
+          <th>Motivo</th>
+          <th>Cantidad</th>
+          <th>Costo</th>
+        </ng-container>
+        <tbody content>
+          @for (nc of Productos_No_Conforme; track $index) {
+            <tr class="text-center">
+              <td>
+                <b>{{ nc.Nombre_Comercial }}</b
+                ><br />
+                <span>
+                  {{ nc.Nombre_Producto || 'N/A' }}
+                </span>
+              </td>
+              <td>{{ nc.Embalaje || 'N/A' }}</td>
+              <td>{{ nc.Lote || 'N/A' }}</td>
+              <td>{{ nc.Fecha_Vencimiento || 'N/A' }}</td>
+              @if (nc.Ubicacion) {
+                <td>{{ nc.Ubicacion || 'N/A' }}</td>
+              }
+              <td>{{ nc.Motivo || 'N/A' }}</td>
+              <td>{{ nc.Cantidad || 'N/A' }}</td>
+              <td>{{ (nc.Costo | currency) || 'N/A' }}</td>
+            </tr>
+            <tr>
+              <td [attr.colspan]="Productos_No_Conforme[0].Ubicacion ? 6 : 5"></td>
+              <td>SubTotal:</td>
+              <td class="text-right">{{ (Totales.Subtotal | currency) || 'N/A' }}</td>
+            </tr>
+            <tr>
+              <td [attr.colspan]="Productos_No_Conforme[0].Ubicacion ? 6 : 5"></td>
+              <td>Iva:</td>
+              <td class="text-right">{{ (Totales.Iva | currency) || 'N/A' }}</td>
+            </tr>
+            <tr>
+              <td [attr.colspan]="Productos_No_Conforme[0].Ubicacion ? 6 : 5"></td>
+              <td>Total:</td>
+              <td class="text-right">{{ (Totales.Total | currency) || 'N/A' }}</td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    } @else {
+      <app-not-data loading [loading]="loading"></app-not-data>
+    }
+  </app-card>
+</article>

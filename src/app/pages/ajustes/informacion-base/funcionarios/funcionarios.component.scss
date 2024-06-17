@@ -1,0 +1,25 @@
+.product-box {
+  padding: 0 !important;
+  margin: 3px !important;
+  .product-ribbon {
+    left: 0 !important;
+  }
+}
+.img-fluid {
+  height: 250px;
+  width: 250px;
+}
+.badge {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  padding: 5px;
+}
+
+img {
+  object-fit: cover;
+}
+
+/* ::ng-deep .mat-expansion-panel-body {
+  padding: 0, 24px !important;
+} */

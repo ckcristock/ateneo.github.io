@@ -1,0 +1,96 @@
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+        <hr class="line" />
+        <form #FormFiltros="ngForm">
+          <div class="row">
+            <mat-form-field class="col-md-4" appearance="outline">
+              <mat-label>Fecha inicial</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="EstResultadoModel.Fecha_Inicial"
+                (change)="setQueryParams()"
+                name="Fecha_Inicial"
+                id="Fecha_Inicial"
+                required
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-4" appearance="outline">
+              <mat-label>Fecha de corte</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="EstResultadoModel.Fecha_Final"
+                (change)="setQueryParams()"
+                name="Fecha_Corte"
+                id="Fecha_Corte"
+                required
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-4 pr-0" appearance="outline">
+              <mat-label>Nivel</mat-label>
+              <mat-select
+                name="Nivel"
+                id="Nivel"
+                [(ngModel)]="EstResultadoModel.Nivel"
+                (selectionChange)="setQueryParams()"
+              >
+                <mat-option *ngFor="let item of Niveles" [value]="item"> {{ item }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Tipo de reporte</mat-label>
+              <mat-select
+                name="Discriminado"
+                id="Discriminado"
+                [(ngModel)]="EstResultadoModel.Tipo"
+                (selectionChange)="setQueryParams()"
+                required
+              >
+                <!-- <mat-option value="Pcga">PCGA</mat-option> -->
+                <mat-option value="Niif">NIIF</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div class="col-md-6">
+              <ng-select
+                id="Centro_Costo"
+                name="Centro_Costo"
+                [(ngModel)]="EstResultadoModel.Centro_Costo"
+                placeholder="Centro de costo"
+                appearance="outline"
+                [clearable]="false"
+                bindLabel="label"
+                bindValue="value"
+                [appendTo]="'body'"
+                [items]="Centro_Costos"
+                (ngModelChange)="setQueryParams()"
+              ></ng-select>
+            </div>
+          </div>
+        </form>
+
+        <div class="btn-group btn-block mt-1" role="group" aria-label="Vertical button group">
+          <a
+            class="btn btn-danger"
+            (click)="openNewTab('/php/contabilidad/estadoresultado/descarga_pdf.php?')"
+            role="button"
+            ><i class="fas fa-file-pdf"></i> PDF</a
+          >
+          <a
+            class="btn btn-primary"
+            (click)="openNewTab('/php/contabilidad/estadoresultado/descarga_excel.php?')"
+            role="button"
+            ><i class="fas fa-file-excel"></i> EXCEL</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>

@@ -1,0 +1,117 @@
+<div class="row">
+  <div class="col-md-12">
+    <h6 class="m-b-10">Productos que ingresan al inventario</h6>
+    <app-table [loading]="false" [arrayData]="Productos">
+      <ng-container titles>
+        <th>Nombre Producto</th>
+        <th>Presentación</th>
+        <th>Laboratorios</th>
+        <th>Invima</th>
+        <th>Cantidad</th>
+        <th>Lote</th>
+        <th>Fecha Venc.</th>
+        <th>Cumple</th>
+        <th>Revisado</th>
+        <th *ngIf="Temperatura == 'Si'">Temp.</th>
+      </ng-container>
+      <tbody content>
+        @for (item of Productos; track item.Nombre_Comercial; let i = $index) {
+          <tr class="text-center">
+            <td>
+              <strong>{{ item.Nombre_Comercial }}</strong>
+              <p class="text-muted" style="font-size: 9px">{{ item.Nombre_Producto }}</p>
+            </td>
+            <td>
+              <span class="mytooltip tooltip-effect-2"
+                ><span class="tooltip-item2"> Embalaje </span
+                ><span class="tooltip-content4 clearfix"
+                  ><span class="tooltip-text2">{{ item.Embalaje }}</span></span
+                >
+              </span>
+            </td>
+            <td>
+              <p class="text-muted" style="font-size: 9px">{{ item.Laboratorios }}</p>
+            </td>
+            <td>{{ item.Invima }}</td>
+            <td>{{ item.Cantidad }}</td>
+            <td>
+              {{ item.Lote }}
+            </td>
+            <td>
+              {{ item.Fecha_Vencimiento }}
+            </td>
+            <td>
+              <select
+                name="Cumple{{ i }}"
+                id="Cumple{{ i }}"
+                [(ngModel)]="item.Cumple"
+                class="form-control form-control-sm"
+              >
+                <option value="Si">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </td>
+            <td>
+              <select
+                name="Revisado{{ i }}"
+                id="Revisado{{ i }}"
+                [(ngModel)]="item.Revisado"
+                class="form-control form-control-sm"
+              >
+                <option value="Si">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </td>
+            <td *ngIf="Temperatura == 'Si'">
+              <input
+                id="Temperatura{{ i }}"
+                name="Temperatura{{ i }}"
+                type="text"
+                [(ngModel)]="item.Temperatura"
+                class="form-control form-control-sm"
+              />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </div>
+  <hr />
+  <div class="col-md-12">
+    <h6 class="m-b-10">Productos para la entrega de pendientes</h6>
+    <app-table [loading]="false" [arrayData]="Productos_Pendientes">
+      <ng-container titles>
+        <th>Dispensacion</th>
+        <th>Paciente</th>
+        <th>Producto</th>
+        <th>Lote</th>
+        <th class="text-center">Cantidad</th>
+      </ng-container>
+      <tbody content>
+        <tr *ngFor="let r of Productos_Pendientes; let i = index">
+          <td>{{ r.DIS }}</td>
+
+          <td>{{ r.Paciente }}</td>
+          <td>
+            <strong>{{ r.Nombre_Comercial }}</strong>
+            <p class="text-muted" style="font-size: 9px">{{ r.Nombre_Producto }}</p>
+          </td>
+          <td>{{ r.Lote }}</td>
+          <td class="text-right">{{ r.Cantidad }}</td>
+        </tr>
+      </tbody>
+    </app-table>
+  </div>
+  <div class="col-md-12">
+    <button
+      type="submit"
+      class="btn btn-info btn-block"
+      [disabled]="Observaciones == ''"
+      (click)="ValidarProductos()"
+    >
+      Guardar acta
+    </button>
+  </div>
+</div>
+
+<!-- <swal #confirmacionGuardar  [options]="alertOption"></swal> -->

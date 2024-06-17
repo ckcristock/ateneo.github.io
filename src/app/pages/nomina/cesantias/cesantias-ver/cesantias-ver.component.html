@@ -1,0 +1,43 @@
+@if (!loading && data) {
+  <app-card
+    [viewTitle]="
+      params.type === 'pago'
+        ? 'Ver pago de cesantías del año ' + data.year
+        : 'Ver pago de intereses de cesantías del año ' + data.year
+    "
+  >
+    <div class="alert alert-info" role="alert">
+      <b>RESPONSABLE DE PAGO: </b>
+      {{ data.user.person_name.complete_name | uppercase }}
+    </div>
+    <app-table [loading]="loading" [arrayData]="data.people">
+      <ng-container titles>
+        <td>Foto</td>
+        <td>Nombre</td>
+        <td>Monto pagado</td>
+      </ng-container>
+      <tbody content>
+        @for (item of data.people; track $index) {
+          <tr class="text-center">
+            <td class="p-0">
+              <app-load-image
+                classImg="rounded-circle mx-auto img-fluid header-profile-user"
+                [src]="item.person.image"
+              ></app-load-image>
+            </td>
+            <td>{{ item.person.person }}</td>
+            <td class="text-end">${{ item.total | number: '1.2-2' }}</td>
+          </tr>
+        }
+        <tr>
+          <th class="text-end" colspan="2">TOTAL PAGADO</th>
+          <th class="text-end">${{ data.total | number: '1.2-2' }}</th>
+        </tr>
+      </tbody>
+    </app-table>
+  </app-card>
+} @else {
+  <div class="card">
+    <app-not-data [loading]="loading"></app-not-data>
+  </div>
+}

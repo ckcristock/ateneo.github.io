@@ -1,0 +1,36 @@
+<app-modal [titleModal]="titleModal">
+  <form [formGroup]="formPayroll">
+    <div class="row">
+      <mat-form-field class="col-md-12" appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput type="text" placeholder="Ingresa el nombre" formControlName="name" />
+        @if (formPayroll.controls['name'].errors) {
+          <mat-error> Es necesario el nombre </mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>Código</mat-label>
+        <input matInput type="text" placeholder="Ingresa el código" formControlName="code" />
+        @if (formPayroll.controls['code'].errors) {
+          <mat-error> Es necesario el código </mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="col-md-6" appearance="outline">
+        <mat-label>NIT</mat-label>
+        <input matInput type="text" placeholder="Ingresa el NIT" formControlName="nit" />
+        @if (formPayroll.controls['nit'].errors) {
+          <mat-error> Es necesario el NIT </mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </form>
+  <button
+    buttons
+    type="button"
+    (click)="onSave()"
+    [disabled]="formPayroll.invalid"
+    class="btn btn-primary"
+  >
+    Guardar
+  </button>
+</app-modal>

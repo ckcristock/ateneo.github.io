@@ -1,0 +1,114 @@
+<!-- <div class="topnav">
+    <div class="container-fluid">
+        <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
+
+            <div class="collapse navbar-collapse" id="topnav-menu-content">
+
+                <app-nav-items-dynamic class="navbar-nav" [navItems]="navItems" [first]="'true'"></app-nav-items-dynamic>
+
+            </div>
+        </nav>
+    </div>
+</div> -->
+<div class="topnav">
+  <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
+    <div class="collapse navbar-collapse" id="topnav-menu-content">
+      <ul class="navbar-nav mx-auto">
+        <ng-container *ngFor="let item of navItems">
+          <div *ngIf="item.name != 'Tablero'">
+            <hr class="hr-custom" />
+          </div>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle arrow-none px-2"
+              href="javascript: void(0);"
+              (click)="item.name == 'Tablero' ? hideMenu($event) : onMenuClick($event)"
+              [routerLink]="item.name == 'Tablero' ? '/' : item.link"
+              id="topnav-components"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              <i class="{{ item.icon }} me-1"></i>{{ item.name }}
+              <i *ngIf="item.child.length > 0" class="arrow-down"></i>
+            </a>
+
+            <div
+              class="dropdown-menu row"
+              aria-labelledby="topnav-dashboard"
+              *ngIf="hasItems(item)"
+              id="navmenu"
+            >
+              <ng-template ngFor let-i="index" let-subitem [ngForOf]="item.child">
+                <a
+                  class="col dropdown-item side-nav-link-ref"
+                  *ngIf="!hasItems(subitem)"
+                  [routerLink]="subitem.link"
+                  (click)="hideMenu($event)"
+                  routerLinkActive="active"
+                  >{{ subitem.name }}</a
+                >
+
+                <div class="dropdown" *ngIf="hasItems(subitem)">
+                  <a
+                    #subMenu
+                    href="javascript:void(0)"
+                    class="dropdown-item"
+                    (click)="onMenuClick($event)"
+                    >{{ subitem.name }}
+                    <div class="arrow-down"></div>
+                  </a>
+                  <div
+                    class="dropdown-menu dropdown-menu-right"
+                    [ngStyle]="item.name == 'Tablero' ? { left: '100%' } : ''"
+                  >
+                    <ng-template ngFor let-subSubitem [ngForOf]="subitem.child">
+                      <div class="dropdown" *ngIf="hasItems(subSubitem); else refs">
+                        <a
+                          class="dropdown-item"
+                          href="javascript: void(0);"
+                          (click)="onMenuClick($event)"
+                          >{{ subSubitem.name }}
+                          <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <ng-template ngFor let-subSubitem2 [ngForOf]="subSubitem.child">
+                            <a
+                              class="dropdown-item side-nav-link-ref"
+                              [routerLink]="subSubitem2.link"
+                              (click)="hideMenu($event)"
+                              routerLinkActive="active"
+                              >{{ subSubitem2.name }}</a
+                            >
+                          </ng-template>
+                        </div>
+                      </div>
+                      <ng-template #refs>
+                        <a
+                          class="dropdown-item side-nav-link-ref"
+                          [routerLink]="subSubitem.link"
+                          (click)="hideMenu($event)"
+                          routerLinkActive="active"
+                          >{{ subSubitem.name }}</a
+                        >
+                      </ng-template>
+
+                      <!-- <a
+                        class="dropdown-item side-nav-link-ref"
+                        [routerLink]="subSubitem.link"
+                        href="javascript:void(0)"
+                        routerLinkActive="active"
+                        >{{ subSubitem.name }}</a
+                      > -->
+                    </ng-template>
+                  </div>
+                </div>
+              </ng-template>
+            </div>
+          </li>
+        </ng-container>
+      </ul>
+    </div>
+  </nav>
+</div>

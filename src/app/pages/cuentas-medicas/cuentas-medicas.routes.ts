@@ -1,0 +1,45 @@
+import { Routes } from '@angular/router';
+import { FacturaCapitaComponent } from './factura-capita/factura-capita.component';
+import { NuevaFacturaCapitaComponent } from './factura-capita/nueva-factura-capita/nueva-factura-capita.component';
+import { FacturaLaboratorioComponent } from './factura-laboratorio/factura-laboratorio.component';
+import { FacturaMedicamentosComponent } from './factura-medicamentos/factura-medicamentos.component';
+import { FacturaPgpComponent } from './factura-pgp/factura-pgp.component';
+import { RadicacionComponent } from './radicacion/radicacion.component';
+import { FormularioRadicacionComponent } from './radicacion/formulario-radicacion/formulario-radicacion.component';
+import { DispensacionComponent } from './dispensacion/dispensacion.component';
+import { ReportesComponent } from './reportes/reportes.component';
+import { DireccionamientosComponent } from './direccionamientos/direccionamientos.component';
+import { DireccionamientoComponent } from './direccionamientos/direccionamiento/direccionamiento.component';
+import { EstadosdireccionamientosComponent } from './estadosdireccionamientos/estadosdireccionamientos.component';
+import { ReportedireccionaminetoComponent } from './reportedireccionamineto/reportedireccionamineto.component';
+import { CmfacturacionComponent } from './cmfacturacion/cmfacturacion.component';
+import { CmfacturacrearComponent } from './cmfacturacion/cmfacturacrear/cmfacturacrear.component';
+import { CmfacturaverComponent } from './cmfacturacion/cmfacturaver/cmfacturaver.component';
+import { AuditoriasComponent } from './auditorias/auditorias.component';
+import { DispensacionauditoriaComponent } from './auditorias/dispensacionauditoria/dispensacionauditoria.component';
+import { CorrespondenciasComponent } from './correspondencias/correspondencias.component';
+import { DispensacionesComponent } from './dispensaciones/dispensaciones.component';
+
+export const routes: Routes = [
+  { path: 'radicacion', component: RadicacionComponent },
+  { path: 'radicacion/formulario', component: FormularioRadicacionComponent },
+  { path: 'facturas-laboratorio', component: FacturaLaboratorioComponent },
+  { path: 'facturas-medicamentos', component: FacturaMedicamentosComponent },
+  { path: 'facturas-capita', component: FacturaCapitaComponent },
+  { path: 'facturas-capita/nueva', component: NuevaFacturaCapitaComponent },
+  { path: 'facturas-pgp', component: FacturaPgpComponent },
+  { path: 'reportes', component: ReportesComponent },
+  { path: 'direccionamientos', component: DireccionamientosComponent },
+  { path: 'direccionamientos/:id', component: DireccionamientoComponent },
+  { path: 'estados-direccionamientos', component: EstadosdireccionamientosComponent },
+  { path: 'reportes-direccionamientos', component: ReportedireccionaminetoComponent },
+  { path: 'facturacion', component: CmfacturacionComponent },
+  { path: 'dispensacion/:id', component: DispensacionComponent },
+  { path: 'facturacrear/:id', component: CmfacturacrearComponent },
+  { path: 'cmfacturaver/:id', component: CmfacturaverComponent },
+  { path: 'dispensacion/:id', component: DispensacionComponent },
+  { path: 'auditorias', component: AuditoriasComponent },
+  { path: 'dispensacionauditoria/:id', component: DispensacionauditoriaComponent },
+  { path: 'correspondencias', component: CorrespondenciasComponent },
+  { path: 'dispensaciones', component: DispensacionesComponent },
+];

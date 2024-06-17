@@ -1,0 +1,62 @@
+<app-card viewTitle="Categorías" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="openManageCategory()" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="categorias"
+    [pagination]="pagination"
+    (pageChange)="getCategories()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Internacional</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (categoria of categorias; track $index) {
+        <tr class="text-center">
+          <td>
+            {{ categoria.Nombre }}
+            @if (categoria.Fijo == 1) {
+              <span class="badge rounded-pill bg-info"><i class="fas fa-lock"></i></span>
+            }
+          </td>
+          <td>{{ categoria.Compra_Internacional | uppercase }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="openManageCategory(categoria)" />
+              @if (categoria.Activo == 1 && categoria.Fijo == 0) {
+                <app-action-deactivate (action)="inOff(categoria.Id_Categoria_Nueva, 0, $event)" />
+              }
+              @if (categoria.Activo == 0 && categoria.Fijo == 0) {
+                <app-action-activate (action)="inOff(categoria.Id_Categoria_Nueva, 1, $event)" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filters.nombre"
+    (searching)="filters.nombre = $event; getCategories()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Compra internacional</mat-label>
+    <mat-select
+      (selectionChange)="getCategories()"
+      [(ngModel)]="filters.compraInternacional"
+      matInput
+      placeholder="Busca por compra internacional"
+    >
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Si">Sí</mat-option>
+      <mat-option value="No">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

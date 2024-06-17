@@ -1,0 +1,433 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-md-offset-4">
+      <form #FormTraslado="ngForm" ng-submit="">
+        <div class="card">
+          <div class="row invoice-contact" style="align-items: flex-start !important">
+            <div class="col-md-8">
+              <div class="invoice-box row">
+                <div class="col-sm-12">
+                  <table class="table invoice-table table-borderless">
+                    <tbody>
+                      <tr>
+                        <td style="width: 100px">
+                          <!-- <img src="{{globales.urlLogoColor}}" class="m-b-10 img-60" alt="Pro-H Software"> -->
+                        </td>
+                        <!-- <td>
+                          {{globales.Nombre}}
+                          <br> {{globales.Nit}}
+                          <br> {{globales.Direccion}}
+                          <br> {{globales.Telefono}}
+                        </td> -->
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="row text-end" style="margin-right: 5px">
+                <div class="col-sm-12">
+                  <h4>Editar Remisión</h4>
+                  <h6>{{ remision.Fecha | date: 'dd/MM/yyyy' }}</h6>
+
+                  <span class="f-right">
+                    {{ remision.Cliente }}
+                  </span>
+                  <div class="clearfix"></div>
+
+                  <div class="clearfix"></div>
+                  <span class="f-right">
+                    {{ remision.Codigo }}
+                  </span>
+                  <input
+                    type="hidden"
+                    name="Identificacion_Funcionario"
+                    ngModel="{{ Identificacion_Funcionario }}"
+                  />
+                  <input type="hidden" name="Codigo" ngModel="{{ remision.Codigo }}" />
+                  <div class="clearfix"></div>
+                  <span class="f-right m-t-5">
+                    Tipo:
+                    <strong>{{ remision.Tipo }}</strong>
+                  </span>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row invoive-info" style="margin-bottom: 0">
+              <div class="col-md-5">
+                <div class="form-group">
+                  <label> Origen</label>
+                  <input
+                    id="Origen"
+                    name="Origen"
+                    type="text"
+                    ngModel="{{ origen.Nombre }}"
+                    class="form-control form-control-sm text-letf f-9"
+                    readonly
+                  />
+                  <input
+                    hidden
+                    id="Id_Origen"
+                    name="Id_Origen"
+                    type="text"
+                    ngModel="{{ remision.Id_Origen }}"
+                    class="form-control form-control-sm text-letf f-9"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6" [ngStyle]="{ display: display_Interna }">
+                <div class="form-group">
+                  <label>Destino</label>
+                  <select
+                    id="Id_Destino"
+                    name="Id_Destino"
+                    ngModel="{{ Destino_Remision }}"
+                    class="form-control form-control-sm"
+                    (change)="AgregarNombreDestino()"
+                  >
+                    <option *ngFor="let item of Destino" [value]="item.Id">
+                      {{ item.Nombre }}
+                    </option>
+                  </select>
+                  <input
+                    hidden
+                    [(ngModel)]="Nombre_Destino"
+                    type="text"
+                    name="Nombre_Destino"
+                    class="form-control form-control-sm f-9"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4" [ngStyle]="{ display: display_Cliente }">
+                <div class="form-group">
+                  <label>Cliente</label>
+                  <input
+                    id="Cliente"
+                    name="Cliente"
+                    type="text"
+                    ngModel="{{ destino.Nombre }}"
+                    class="form-control form-control-sm text-letf f-9"
+                    readonly
+                  />
+                  <input
+                    hidden
+                    id="Id_Cliente"
+                    name="Id_Cliente"
+                    type="text"
+                    ngModel="{{ remision.Id_Destino }}"
+                    class="form-control form-control-sm text-letf f-9"
+                  />
+                </div>
+              </div>
+              <div class="col-md-1" [ngStyle]="{ display: display_Cliente }">
+                <div class="form-group">
+                  <label>Contrato</label>
+                  <select
+                    id="Id_Contrato"
+                    name="Contrato"
+                    ngModel="{{ Contrato }}"
+                    name="Id_Contrato"
+                    class="form-control form-control-sm tipo-dis-select"
+                    disabled="{{ disabled }}"
+                    (change)="Contrato($event.target.value)"
+                  >
+                    <option value="" disabled>Contrato</option>
+                    <option
+                      *ngFor="let contrato of Contratos; let i = index"
+                      [value]="contrato.Id_Contrato"
+                    >
+                      {{ contrato.NombreContrato }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2" [ngStyle]="{ display: display_Cliente }">
+                <div class="form-group">
+                  <label>L. Ganancia</label>
+                  <input
+                    name="ListaGanancia"
+                    id="ListaGanancia"
+                    class="form-control form-control-sm f-9"
+                    readonly
+                    ngModel="{{ Id_Lista }}"
+                  />
+                  <input
+                    hidden
+                    ngModel="{{ Lista_Ganancia1 }}"
+                    type="text"
+                    name="Lista_Ganancia"
+                    class="form-control form-control-sm f-9"
+                    readonly
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row invoive-info" style="margin-bottom: 0">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Observaciones</label>
+                  <textarea
+                    [(ngModel)]="remision.Observaciones"
+                    name="Observaciones"
+                    type="text"
+                    rows="3"
+                    class="form-control"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <hr />
+            <div class="row" style="margin-top: 30px">
+              <div class="col-sm-12">
+                <table class="table invoice-detail-table tabla">
+                  <thead>
+                    <tr class="thead-default">
+                      <th style="width: 15px"></th>
+                      <th>Producto</th>
+                      <th style="width: 200px">Embalaje / Categoría</th>
+                      <th style="width: 30px">Presentación</th>
+                      <th style="width: 50px">Cantidad Disponible</th>
+                      <th style="width: 65px">Cantidad</th>
+                      <th style="width: 200px">Lote</th>
+                      <th style="width: 65px" [ngStyle]="{ display: display_Cliente_tabla }">
+                        Precio
+                      </th>
+                      <th style="width: 65px" [ngStyle]="{ display: display_Cliente_tabla }">
+                        Descuento
+                      </th>
+                      <th style="width: 10px" [ngStyle]="{ display: display_Cliente_tabla }"></th>
+                      <th style="width: 65px" [ngStyle]="{ display: display_Cliente_tabla }">
+                        IVA
+                      </th>
+                      <th style="width: 100px" [ngStyle]="{ display: display_Cliente_tabla }">
+                        Subtotal
+                      </th>
+                      <th style="width: 10px"></th>
+                      <th style="width: 20px">-</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of Lista_Productos; let i = index" id="fila{{ i }}">
+                      <td style="vertical-align: middle">
+                        <strong>{{ i + 1 }}</strong>
+                      </td>
+                      <td>
+                        <!-- Producto -->
+                        <input
+                          type="text"
+                          name="Nombre_Producto{{ i }}"
+                          id="Producto{{ i }}"
+                          class="form-control form-control-sm f-9 input-product"
+                          [(ngModel)]="item.producto"
+                          [ngbTypeahead]="search1"
+                          [resultTemplate]="rt"
+                          [inputFormatter]="formatter1"
+                          (ngModelChange)="ProductoSeleccionado(item.producto, i)"
+                          [readonly]="item.Id_Producto_Remision != '' ? true : false"
+                        />
+                      </td>
+                      <td style="vertical-align: middle">
+                        <!-- Embalaje -->
+                        <strong>{{ item.Categoria }} / </strong
+                        ><span *ngIf="item.Id_Producto != ''" class="mytooltip tooltip-effect-2"
+                          ><span class="tooltip-item2">
+                            <p>
+                              {{ item.Embalaje | truncate: 12 }}
+                            </p></span
+                          ><span class="tooltip-content4 clearfix"
+                            ><span class="tooltip-text2">{{ item.Embalaje }}</span></span
+                          >
+                        </span>
+                      </td>
+                      <td>
+                        <!-- Presentación -->
+                        <input
+                          id="presentacion{{ i }}"
+                          name="presentacion{{ i }}"
+                          type="number"
+                          ngModel="{{ item.Cantidad_Presentacion }}"
+                          class="form-control form-control-sm text-end f-9 tabla"
+                          readonly
+                        />
+                      </td>
+                      <td>
+                        <!-- Cantidad_Disponible -->
+                        <input
+                          id="Cantidad_Disponible{{ i }}"
+                          name="Cantidad_Disponible{{ i }}"
+                          type="text"
+                          ngModel="{{ item.Cantidad_Disponible }}"
+                          class="form-control form-control-sm text-end f-9 tabla"
+                          readonly
+                        />
+                      </td>
+                      <td>
+                        <!-- Cantidad Ingresada-->
+                        <input
+                          id="CantidadIngresada{{ i }}"
+                          name="Cantidad_Total{{ i }}"
+                          type="number"
+                          [(ngModel)]="item.Cantidad"
+                          min="0"
+                          class="form-control form-control-sm text-end f-9 tabla"
+                          (change)="
+                            BuscarLote(i, $event.target.value); CalcularTotal(i); ActualizaValores()
+                          "
+                          [readonly]="item.Id_Producto_Remision != '' ? true : false"
+                        />
+                      </td>
+                      <td>
+                        <!-- Lote -->
+                        <!--<ng-select [ngClass]="'ng-select'" [multiple]="true" theme='bootstrap' multiple [placeholder]="'Seleccione Un Lote'" [options]="item.Lotes"
+                              [(ngModel)]="item.Lotes_Seleccionados" name="LotesSeleccionados{{i}}">
+                              </ng-select>-->
+                        <ul>
+                          <li *ngFor="let lote_visual of item.Lotes_Visuales" class="lista-lotes">
+                            <i class="fa fa-check-circle text-success"></i>{{ lote_visual }}
+                          </li>
+                        </ul>
+                      </td>
+                      <td [ngStyle]="{ display: display_Cliente_tabla }">
+                        <!-- Precio -->
+                        <input
+                          id="precioVenta{{ i }}"
+                          name="precioVenta{{ i }}"
+                          type="text"
+                          [(ngModel)]="item.Precio_Venta"
+                          class="form-control form-control-sm text-end f-9"
+                          (change)="CalcularTotal(i); ActualizaValores()"
+                        />
+                      </td>
+                      <td [ngStyle]="{ display: display_Cliente_tabla }">
+                        <!-- Descuento -->
+                        <input
+                          id="descuento{{ i }}"
+                          name="Descuento{{ i }}"
+                          [(ngModel)]="item.Descuento"
+                          type="number"
+                          min="0"
+                          class="form-control form-control-sm text-end f-9"
+                          (ngModelChange)="CalcularTotal(i); ActualizaValores()"
+                        />
+                      </td>
+                      <td
+                        [ngStyle]="{ display: display_Cliente_tabla }"
+                        style="vertical-align: middle"
+                      >
+                        %
+                      </td>
+
+                      <td [ngStyle]="{ display: display_Cliente_tabla }">
+                        <!-- IVA -->
+                        <select
+                          class="form-control form-control-sm"
+                          name="impuesto{{ i }}"
+                          id="impuesto{{ i }}"
+                          (change)="CalcularTotal(i); ActualizaValores()"
+                          [(ngModel)]="item.Impuesto"
+                        >
+                          <option value="">Sin IVA</option>
+                          <option
+                            *ngFor="let impuesto of Impuesto; let i = index"
+                            [value]="impuesto.Valor"
+                          >
+                            {{ impuesto.Valor }}
+                          </option>
+                        </select>
+                      </td>
+                      <td [ngStyle]="{ display: display_Cliente_tabla }">
+                        <!-- Subtotal -->
+                        <input
+                          name="Subtotal{{ i }}"
+                          [(ngModel)]="item.Subtotal"
+                          type="number"
+                          min="1"
+                          class="form-control form-control-sm text-end f-9"
+                          (change)="ActualizaValores()"
+                          readonly
+                        />
+                      </td>
+                      <td>
+                        <!-- Icono-->
+                        <input name="Suma{{ i }}" id="suma{{ i }}" hidden [(ngModel)]="item.Suma" />
+                        <i *ngIf="item.Suma < 0" class="fa fa-exclamation-circle"></i>
+                      </td>
+                      <td>
+                        <!-- Boton -->
+                        <button
+                          type="button"
+                          *ngIf="item.Id_Producto_Remision != ''"
+                          (click)="EliminaProductoFinal(i, item.Id_Producto_Remision)"
+                          class="btn btn-sm btn-danger"
+                        >
+                          <span>
+                            <i class="fa fa-trash-o"></i>
+                          </span>
+                        </button>
+
+                        <button
+                          *ngIf="item.Id_Producto_Remision == ''"
+                          class="btn btn-sm btn-danger"
+                          (click)="EliminarProductoRemsion(i)"
+                        >
+                          <span>
+                            <i class="fa fa-trash-o"></i>
+                          </span>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="row" [ngStyle]="{ display: display_Cliente }">
+              <div class="col-sm-12">
+                <div class="rounded-top table-responsive">
+                  <table class="table invoice-table invoice-total">
+                    <tbody>
+                      <tr>
+                        <th>Subtotal:</th>
+                        <td>{{ Subtotal_Remision | currency }}</td>
+                      </tr>
+                      <tr>
+                        <th>Descuento:</th>
+                        <td>{{ Descuento_Remision | currency }}</td>
+                      </tr>
+                      <tr>
+                        <th>Impuestos:</th>
+                        <td>{{ Impuesto_Remision | currency }}</td>
+                      </tr>
+                      <tr>
+                        <th>Precio Total:</th>
+                        <td>{{ Costo_Remision | currency }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="text-end mrg-top-5">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm btn-block"
+                (click)="showAlert($event)"
+              >
+                Actualizar Remisión
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombre }} </span>
+</ng-template>

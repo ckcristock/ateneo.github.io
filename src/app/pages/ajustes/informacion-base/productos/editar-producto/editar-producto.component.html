@@ -1,0 +1,5 @@
+@if (!loading && data) {
+  <app-crear-producto [title]="'Editar producto'" [data]="data" [id]="id"></app-crear-producto>
+} @else {
+  <app-placeholder-form></app-placeholder-form>
+}

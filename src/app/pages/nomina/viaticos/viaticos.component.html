@@ -1,0 +1,108 @@
+<app-card
+  viewTitle="Viáticos"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters [routerLink]="['/nomina/crear-viatico']" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="data"
+    [pagination]="pagination"
+    (pageChange)="getAll()"
+  >
+    <ng-container titles>
+      <th>Foto</th>
+      <th>Funcionario</th>
+      <th>Creador</th>
+      <th>Creación</th>
+      <th>Salida</th>
+      <th># Días</th>
+      <th>Total COP</th>
+      <th>Total USD</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of data; track $index) {
+        <tr class="text-center">
+          <td class="align-middle p-0">
+            <app-load-image
+              classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+              [src]="item.person?.image"
+            ></app-load-image>
+          </td>
+
+          <td>
+            {{ item.person.first_name | titlecase }}
+            {{ item.person.first_surname | titlecase }}
+          </td>
+          <td>
+            {{ item.user.person.first_name | titlecase }}
+            {{ item.user.person.first_surname | titlecase }}
+          </td>
+          <td>
+            {{ item.created_at | date: 'dd/MM/yyyy' }}
+          </td>
+          <td>
+            {{ item.departure_date | date: 'dd/MM/yyyy' }}
+          </td>
+          <td>{{ item.n_nights }}</td>
+          <td class="text-end">${{ item.total_cop | number: '1.2-2' }}</td>
+          <td class="text-end">USD {{ item.total_usd | number: '1.2-2' }}</td>
+          <td><app-status-badge [status]="item.state" /></td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view
+                [link]="{
+                  url: '/nomina/ver-viatico/' + item.id
+                }"
+              />
+              <app-action-edit [routerLink]="['/nomina/editar-viatico', item.id]" />
+              @if (permission.permissions.approve && item.state == 'aprobado') {
+                <app-action-button
+                  icon="thumbs-up"
+                  text="Legalizar"
+                  type="info"
+                  [link]="{
+                    url: 'legalizar-/' + item.id
+                  }"
+                />
+                <app-action-activate (click)="changeState(item, 'Aprobado')" />
+              }
+              @if (item.state != 'inactivo') {
+                <app-action-deactivate (click)="changeState(item, 'Inactivo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-autocomplete-mdl
+    class="col"
+    label="Funcionario"
+    placeholder="Buscar funcionario"
+    [model]="filtros.person_id"
+    [list]="people$ | async"
+    (optionSelectedEvent)="filtros.person_id = $event; getAll()"
+  ></app-autocomplete-mdl>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Fecha de creación</mat-label>
+    <input matInput type="date" [(ngModel)]="filtros.creation_date" (input)="getAll()" />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Fecha de salida</mat-label>
+    <input matInput type="date" [(ngModel)]="filtros.departure_date" (input)="getAll()" />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filtros.state" (selectionChange)="getAll()">
+      @for (state of states; track $index) {
+        <mat-option [value]="state.clave"> {{ state.clave }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</ng-template>

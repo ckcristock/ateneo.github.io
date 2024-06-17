@@ -1,0 +1,65 @@
+<app-card
+  viewTitle="Primas"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <ng-container filters>
+    @if (habilitarPagar) {
+      <app-action-button
+        icon="money-bill"
+        text="Generar prima"
+        type="primary"
+        (click)="openConfirm()"
+      />
+    }
+  </ng-container>
+  <app-table
+    [loading]="loading"
+    [arrayData]="premiums"
+    [pagination]="pagination"
+    (pageChange)="getPrimasList()"
+  >
+    <ng-container titles>
+      <th>Prima</th>
+      <th>Fecha</th>
+      <th>Responsable</th>
+      <th>Estatus</th>
+      <th>Total Prima</th>
+      <th>Total Empleados</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of premiums; track item.id; let i = $index) {
+        <tr class="text-center">
+          <td>Periodo {{ item.period }}</td>
+          <td>{{ item.payment_date }}</td>
+          <td>{{ item.payer_fullname }}</td>
+          <td class="text-capitalize">{{ item.status }}</td>
+          <td>$ {{ item.total_bonuses | currency: '' : '' }}</td>
+          <td>{{ item.total_employees }}</td>
+          <td>
+            <app-dropdown-actions [loading]="loadingIndex === i">
+              <app-action-view (click)="VerPrimaFuncionarios(item.period, i)" />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <mat-form-field appearance="outline">
+    <mat-label>Año</mat-label>
+    <input
+      matInput
+      type="number"
+      min="1900"
+      max="2099"
+      step="1"
+      placeholder="Ingrese el año"
+      [formControl]="yearControl"
+      (keydown.enter)="getPrimasList()"
+    />
+  </mat-form-field>
+</ng-template>

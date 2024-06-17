@@ -1,0 +1,71 @@
+<app-card
+  viewTitle="Empresas"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-table
+    [loading]="loading"
+    [arrayData]="enterprises"
+    [pagination]="pagination"
+    (pageChange)="getCompany()"
+  >
+    <ng-container titles>
+      <th>Logo</th>
+      <th>Nombre</th>
+      <th>Categoría</th>
+      <th>NIT</th>
+      <th>Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of enterprises; track item.id) {
+        <tr class="text-center">
+          <td>
+            <div class="company-logo m-auto">
+              <app-load-image
+                classImg="img-fluid"
+                srcDefault="./assets/images/not-available.png"
+                [src]="item.logo"
+              ></app-load-image>
+            </div>
+          </td>
+          <td class="text-start">{{ item.name | uppercase }}</td>
+          <td>{{ item.category | uppercase }}</td>
+          <td>{{ (item.tin | number) || 'N/A' }}</td>
+          <td>
+            <app-status-badge [status]="item.state ? 'activa' : 'inactiva'" />
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="eye"
+                text="Ver"
+                type="success"
+                [link]="{
+                  url: '/ajustes/configuracion/configuracion-empresa/' + item.id + '/informacion'
+                }"
+              ></app-action-button>
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtro.name"
+    (searching)="filtro.name = $event; getCompany()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="NIT"
+    placeholder="Busca por NIT"
+    [value]="filtro.tin"
+    (searching)="filtro.tin = $event; getCompany()"
+  ></app-automatic-search>
+</ng-template>

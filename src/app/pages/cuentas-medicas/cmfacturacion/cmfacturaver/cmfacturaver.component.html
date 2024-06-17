@@ -1,0 +1,469 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-md-12">
+      <app-actividad [Modulo]="'factura'" [Actividades]="Actividades"></app-actividad>
+    </div>
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-lg-12 col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <app-cabecera [datosCabecera]="headerData"></app-cabecera>
+              <div class="row" style="margin-top: 10px">
+                <div class="col-sm-12">
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                      <tbody>
+                        <tr>
+                          <td style="width: 20%">
+                            <strong>Cliente</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles.NombreCliente }}</td>
+                          <td style="width: 20%">
+                            <strong>N.I.T o C.C.</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles.IdCliente }}</td>
+                        </tr>
+                        <tr>
+                          <td style="width: 20%">
+                            <strong> Dirección</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles.DireccionCliente }}</td>
+                          <td style="width: 20%">
+                            <strong>Telefóno </strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles.TelefonoCliente }}</td>
+                        </tr>
+                        <tr>
+                          <td style="width: 20%">
+                            <strong>Paciente</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles.Nombre_Paciente }}</td>
+                          <td style="width: 20%">
+                            <strong>Numero de Documento</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles.Numero_Documento }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <app-table [loading]="loading" [arrayData]="productos">
+                <ng-container titles>
+                  <th>Producto</th>
+                  <th>Lote</th>
+                  <th>Fecha Venc.</th>
+                  <th>Cant.</th>
+                  <th>Precio</th>
+                  <th>Descuento</th>
+                  <th>Iva</th>
+                  <th>Subtotal</th>
+                </ng-container>
+                <tbody content>
+                  @for (item of productos; track $index) {
+                    <tr class="text-center">
+                      <td>
+                        {{ item.producto }} <br />
+                        INV: {{ item.Invima }} CUM: {{ item.Cum }}
+                      </td>
+                      <td>{{ item.Lote }}</td>
+                      <td>{{ item.Vencimiento }}</td>
+                      <td>{{ item.Cantidad }}</td>
+                      <td>{{ item.Precio }}</td>
+                      <td>{{ item.Descuento }}</td>
+                      <td>{{ item.Impuesto }}%</td>
+                      <td>{{ item.Subtotal }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </app-table>
+              <div class="row" style="margin-top: 10px">
+                <div class="col-md-8">
+                  <div class="row">
+                    <div class="col-md-12 claro">
+                      <p><strong>Valor en Letras: </strong>{{ valorLetra }} PESOS M/CTE</p>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 claro">
+                      <h6>Observaciones:</h6>
+                      <p>{{ detalles.observacion }}</p>
+                    </div>
+                    <div class="col-md-6 claro">
+                      <h6>Resolución:</h6>
+                      <p>
+                        {{ resolucion_fact.Descripcion }} {{ resolucion_fact.Resolucion }} desde
+                        {{ resolucion_fact.Fecha_Inicio }} hasta
+                        {{ resolucion_fact.Fecha_Fin }} habilita del Nº
+                        {{ resolucion_fact.Numero_Inicial }} al Nº
+                        {{ resolucion_fact.Numero_Final }} Actividad Economica Principal 4645
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <table
+                    class="table table-bordered table-striped table-sm"
+                    style="padding: 15px 0 !important"
+                  >
+                    <tbody>
+                      <tr>
+                        <td style="font-weight: bold">( = ) Subtotal :</td>
+                        <td>{{ Subtotal }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">( - ) Descuento :</td>
+                        <td>{{ Descuento }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">( + ) Iva :</td>
+                        <td>{{ Iva }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">( - ) Cuotas Moderadora :</td>
+                        <td>{{ detalles.Cuota }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">( = ) Total :</td>
+                        <td>{{ Total }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div
+                *ngIf="resolucion_fact.Tipo_Resolucion == 'Resolucion_Electronica'"
+                class="row"
+                style="margin-top: 10px"
+              >
+                <div class="col-md-12 oscuro">
+                  <p style="font-size: 11px !important">Cufe: {{ detalles.Cufe }}</p>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 10px">
+                <div class="col-md-12 oscuro">
+                  <p>{{ globales.Nota_1 }}</p>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 10px">
+                <div class="col-md-12 claro">
+                  <p><strong>Nota:</strong> {{ globales.Nota_2 }}</p>
+                </div>
+                <div class="col-md-12 claro">
+                  <p><strong>Cuentas Bancarias: </strong> {{ globales.Cuenta_Bancaria }}</p>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 40px">
+                <div class="col-sm-12">
+                  <table class="table table-bordered table-striped table-sm">
+                    <tbody>
+                      <tr>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                        <td style="width: 35%; border-top: 2px solid #000">
+                          Elaborado por: {{ firmaUsuario }}
+                        </td>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                        <td style="width: 35%; border-top: 2px solid #000">
+                          Recibí conforme:
+                          <br />
+                          CC:
+                        </td>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 10px"></div>
+
+              <div class="row mb-2" *ngIf="perfilUsuario == '27' || perfilUsuario == '50'">
+                <div class="col-md-6">
+                  <a
+                    href="{{
+                      environment.ruta
+                    }}php/contabilidad/movimientoscontables/movimientos_factura_nopos_pdf.php?id_registro={{
+                      detalles.Id_Factura
+                    }}&id_funcionario_elabora={{ funcionario.Identificacion_Funcionario }}"
+                    target="_blank"
+                    class="btn btn-info btn-block"
+                  >
+                    <i class="fa fa-book"></i> Ver Contabilización PCGA</a
+                  >
+                </div>
+                <div class="col-md-6">
+                  <a
+                    href="{{
+                      environment.ruta
+                    }}php/contabilidad/movimientoscontables/movimientos_factura_nopos_pdf.php?id_registro={{
+                      detalles.Id_Factura
+                    }}&id_funcionario_elabora={{
+                      funcionario.Identificacion_Funcionario
+                    }}&tipo_valor=Niif"
+                    target="_blank"
+                    class="btn btn-info btn-block"
+                  >
+                    <i class="fa fa-book"></i> Ver Contabilización NIIF</a
+                  >
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <a
+                    href="{{ environment.ruta }}php/facturasventas/factura_dis_pdf.php?id={{
+                      detalles.Id_Factura
+                    }}"
+                    target="_blank"
+                    class="btn btn-success btn-block"
+                  >
+                    <i class="fa fa-print"></i> Imprimir Factura</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div *ngIf="withHom == 1" class="col-lg-12 col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <app-cabecera [datosCabecera]="headerDataHom"></app-cabecera>
+              <div class="row" style="margin-top: 10px">
+                <div class="col-sm-12 mb-3">
+                  <div class="table-responsive">
+                    <table class="ttable table-bordered table-striped table-sm">
+                      <tbody>
+                        <tr>
+                          <td style="width: 20%">
+                            <strong>Cliente</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles_hom.NombreCliente }}</td>
+                          <td style="width: 20%">
+                            <strong>N.I.T o C.C.</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles_hom.IdCliente }}</td>
+                        </tr>
+                        <tr>
+                          <td style="width: 20%">
+                            <strong> Dirección</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles_hom.DireccionCliente }}</td>
+                          <td style="width: 20%">
+                            <strong>Telefóno </strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles_hom.TelefonoCliente }}</td>
+                        </tr>
+                        <tr>
+                          <td style="width: 20%">
+                            <strong>Paciente</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles.Nombre_Paciente }}</td>
+                          <td style="width: 20%">
+                            <strong>Numero de Documento</strong>
+                          </td>
+                          <td style="width: 25%">{{ detalles.Numero_Documento }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <app-table [loading]="loading" [arrayData]="productos_hom">
+                <ng-container titles>
+                  <th>Producto</th>
+                  <th>Lote</th>
+                  <th>Fecha Venc.</th>
+                  <th>Cant.</th>
+                  <th>Precio</th>
+                  <th>Descuento</th>
+                  <th>Iva</th>
+                  <th>Subtotal</th>
+                </ng-container>
+                <tbody content>
+                  @for (item of productos_hom; track $index) {
+                    <tr class="text-center">
+                      <td>
+                        {{ item.producto }} <br />
+                        INV: {{ item.Invima }} CUM: {{ item.Cum }}
+                      </td>
+                      <td>{{ item.Lote }}</td>
+                      <td>{{ item.Vencimiento }}</td>
+                      <td>{{ item.Cantidad }}</td>
+                      <td>{{ item.Precio }}</td>
+                      <td>{{ item.Descuento }}</td>
+                      <td>{{ item.Impuesto }}%</td>
+                      <td>{{ item.Subtotal }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </app-table>
+              <div class="row" style="margin-top: 10px">
+                <div class="col-md-8">
+                  <div class="row">
+                    <div class="col-md-12 claro">
+                      <p><strong>Valor en Letras: </strong>{{ valorLetra_hom }} PESOS M/CTE</p>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 claro">
+                      <h6>Observaciones:</h6>
+                      <p>{{ detalles_hom.observacion }}</p>
+                    </div>
+                    <div class="col-md-6 claro">
+                      <h6>Resolución:</h6>
+                      <p>
+                        {{ resolucion_hom.Descripcion }} {{ resolucion_hom.Resolucion }} desde
+                        {{ resolucion_hom.Fecha_Inicio }} hasta
+                        {{ resolucion_hom.Fecha_Fin }} habilita del Nº
+                        {{ resolucion_hom.Numero_Inicial }} al Nº
+                        {{ resolucion_hom.Numero_Final }} Actividad Economica Principal 4645
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <table
+                    class="table table-bordered table-striped table-sm"
+                    style="padding: 15px 0 !important"
+                  >
+                    <tbody>
+                      <tr>
+                        <td style="font-weight: bold">( = ) Subtotal :</td>
+                        <td>{{ Subtotal_hom }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">( - ) Descuento :</td>
+                        <td>{{ Descuento_hom }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">( + ) Iva :</td>
+                        <td>{{ Iva_hom }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">( - ) Cuotas Moderadora :</td>
+                        <td>{{ 0 }}</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: bold">( = ) Total :</td>
+                        <td>{{ Total_hom }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div
+                *ngIf="resolucion_hom.Tipo_Resolucion == 'Resolucion_Electronica'"
+                class="row"
+                style="margin-top: 10px"
+              >
+                <div class="col-md-12 oscuro">
+                  <p style="font-size: 11px !important">Cufe: {{ detalles_hom.Cufe }}</p>
+                </div>
+              </div>
+              <div class="row" style="margin-top: 10px">
+                <div class="col-md-12 oscuro">
+                  <p>{{ globales.Nota_1 }}</p>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 10px">
+                <div class="col-md-12 claro">
+                  <p><strong>Nota:</strong> {{ globales.Nota_2 }}</p>
+                </div>
+                <div class="col-md-12 claro">
+                  <p><strong>Cuentas Bancarias: </strong> {{ globales.Cuenta_Bancaria }}</p>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 40px">
+                <div class="col-sm-12">
+                  <table class="table table-bordered table-striped table-sm">
+                    <tbody>
+                      <tr>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                        <td style="width: 35%; border-top: 2px solid #000">
+                          Elaborado por: {{ firmaUsuario }}
+                        </td>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                        <td style="width: 35%; border-top: 2px solid #000">
+                          Recibí conforme:
+                          <br />
+                          CC:
+                        </td>
+                        <td style="width: 10%; border-top: 2px solid #fff"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 10px"></div>
+
+              <div class="row mb-2" *ngIf="perfilUsuario == '27'">
+                <div class="col-md-6">
+                  <a
+                    href="{{
+                      environment.ruta
+                    }}php/contabilidad/movimientoscontables/movimientos_factura_nopos_pdf.php?id_registro={{
+                      detalles_hom.Id_Factura
+                    }}&id_funcionario_elabora={{ funcionario.Identificacion_Funcionario }}"
+                    target="_blank"
+                    class="btn btn-info btn-block"
+                  >
+                    <i class="fa fa-book"></i> Ver Contabilización PCGA</a
+                  >
+                </div>
+                <div class="col-md-6">
+                  <a
+                    href="{{
+                      environment.ruta
+                    }}php/contabilidad/movimientoscontables/movimientos_factura_nopos_pdf.php?id_registro={{
+                      detalles_hom.Id_Factura
+                    }}&id_funcionario_elabora={{
+                      funcionario.Identificacion_Funcionario
+                    }}&tipo_valor=Niif"
+                    target="_blank"
+                    class="btn btn-info btn-block"
+                  >
+                    <i class="fa fa-book"></i> Ver Contabilización NIIF</a
+                  >
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <a
+                    href="{{ environment.ruta }}php/facturasventas/factura_dis_pdf.php?id={{
+                      detalles.Id_Factura
+                    }}&Tipo=Homologo"
+                    target="_blank"
+                    class="btn btn-success btn-block"
+                  >
+                    <i class="fa fa-print"></i> Imprimir Factura</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <app-notascreditoverdefacturas
+        [idFactura]="id"
+        [tipoFactura]="'Factura'"
+      ></app-notascreditoverdefacturas>
+    </div>
+  </div>
+</div>
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>

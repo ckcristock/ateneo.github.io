@@ -1,0 +1,520 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <ng-container [formGroup]="form">
+      <div class="row">
+        <!-- fecha -->
+        <mat-form-field class="col-md-6" appearance="outline">
+          <mat-label>Fecha</mat-label>
+          <input
+            matInput
+            type="date"
+            name="Fecha_Comprobante"
+            id="Fecha_Comprobante"
+            formControlName="Fecha_Comprobante"
+            (change)="getCodigoIngreso($event.target.value)"
+            autocomplete="off"
+          />
+          <mat-error>{{ getErrorMessage('Fecha_Comprobante') }}</mat-error>
+        </mat-form-field>
+        <!-- cliente -->
+        <app-autocomplete-fc
+          *ngIf="Mostrar_Input_Cli"
+          class="col"
+          label="Cliente"
+          placeholder="Cliente"
+          [control]="form.controls['Id_Cliente']"
+          [list]="Cliente"
+          [required]="true"
+        ></app-autocomplete-fc>
+        <app-autocomplete-fc
+          *ngIf="!Mostrar_Input_Cli"
+          class="col"
+          label="Cliente"
+          placeholder="Cliente"
+          [control]="form.controls['Id_Cliente']"
+          [list]="Cliente"
+          readonly
+        ></app-autocomplete-fc>
+        <!-- banco -->
+        <mat-form-field class="col-md-6" appearance="outline">
+          <mat-label>Banco</mat-label>
+          <mat-select name="Cuenta_Banco" formControlName="Id_Banco">
+            <mat-option *ngFor="let cuenta of CuentasBancarias" [value]="cuenta.value">
+              {{ cuenta.text }}</mat-option
+            >
+          </mat-select>
+          <mat-error>{{ getErrorMessage('Id_Banco') }}</mat-error>
+        </mat-form-field>
+        <!-- Valor banco -->
+        <mat-form-field class="col-md-6" appearance="outline">
+          <mat-label>Valor banco</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el valor"
+            name="Valor_Banco"
+            id="Valor_Banco"
+            formControlName="Valor_Banco"
+            (change)="calcularTotalesDebitoCredito()"
+            required
+            autocomplete="off"
+          />
+          <mat-error>{{ getErrorMessage('Valor_Banco') }}</mat-error>
+        </mat-form-field>
+        <!-- Forma de pago -->
+        <mat-form-field class="col-12 h-100 max-height-100" appearance="outline">
+          <mat-label>Forma de pago</mat-label>
+          <mat-select name="Id_Forma_Pago" formControlName="Forma_Pago" required>
+            <mat-option *ngFor="let fp of FormaPago" [value]="fp.Id_Forma_Pago">
+              {{ fp.Nombre }}</mat-option
+            >
+          </mat-select>
+          <mat-error>{{ getErrorMessage('Forma_Pago') }}</mat-error>
+        </mat-form-field>
+        <!-- Observaciones -->
+        <mat-form-field class="col-12 mat-form-field-no-padding textarea" appearance="outline">
+          <mat-label>Observaciones</mat-label>
+          <textarea
+            matInput
+            placeholder="Ingresa las observaciones"
+            rows="5"
+            name="Observaciones"
+            id="Observaciones"
+            formControlName="Observaciones"
+            [cdkTextareaAutosize]="true"
+          ></textarea>
+        </mat-form-field>
+        <!-- Notas -->
+        <mat-form-field class="col-12 mat-form-field-no-padding textarea" appearance="outline">
+          <mat-label>Notas</mat-label>
+          <textarea
+            matInput
+            placeholder="Ingresa las notas"
+            rows="5"
+            name="Notas"
+            id="Notas"
+            formControlName="Notas"
+            [cdkTextareaAutosize]="true"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </ng-container>
+    <hr />
+    <!-- si-no-cargar archivo -->
+    <div class="row">
+      <div *ngIf="Mostrar_Opciones && Facturas_Multiple" class="col-md-12 text-center">
+        <strong> ¿Asociar este ingreso a algunas facturas existentes?</strong>
+        <br />
+        Recuerda que puedes registrar un ingreso sin necesidad de que esté asociado a una cuenta de
+        cobro <br />
+        <input
+          type="radio"
+          name="Asociar"
+          value="Si"
+          (click)="MostarContenido($event.target.value)"
+        />
+        Sí
+        <input
+          type="radio"
+          name="Asociar"
+          Value="No"
+          (click)="MostarContenido($event.target.value)"
+        />
+        No
+        <input
+          type="radio"
+          name="Asociar"
+          Value="Archivo"
+          (click)="MostarContenido($event.target.value)"
+        />
+        Cargar archivo
+      </div>
+      <!-- cargando facturas -->
+      <div *ngIf="Cargando" class="col-md-12 text-center m-t-10">
+        <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+        <span class="sr-only">Cargando...</span>
+        <h4>Cargando Facturas...</h4>
+      </div>
+    </div>
+    <hr />
+    <div *ngIf="Mostrar && Facturas_Multiple" class="text-center">
+      <h1><i class="fa fa-exclamation-triangle"></i></h1>
+      <h2>Este proceso se encuentra en mantenimiento</h2>
+    </div>
+    <div *ngIf="Mostrar && !Facturas_Multiple" class="text-center">
+      <label style="display: block; cursor: pointer" for="Acta_Entrega">
+        <h1><i class="fa fa-upload"></i></h1>
+        <h6>Haga click sobre el icono para cargar el archivo.</h6>
+      </label>
+
+      <input
+        type="file"
+        id="Acta_Entrega"
+        ngModel
+        accept="application/vnd.ms-excel"
+        data-max-size="2048"
+        name="Acta_Entrega"
+        class="form-control form-control-sm"
+        (change)="CargarArchivo($event)"
+        style="display: none"
+      />
+    </div>
+    <!-- COMENTADO TEMPORTALMENTE -->
+    <!-- <div *ngIf="Mostrar" class="row">
+            <div class="col-md-12">
+              <table class="table  invoice-detail-table tabla">
+                <thead>
+                  <tr class="thead-default">
+
+                    <th>Cuenta</th>
+                    <th style="width:100px;">Valor</th>
+                    <th style="width:30px">Impuesto</th>
+                    <th style="width:50px;">Cantidad</th>
+                    <th style="width:50px;">Observaciones</th>
+                    <th style="width:50px;">Total</th>
+
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of Categorias; let i = index" id="fila{{i}}">
+                    <td><input  [(ngModel)]="item.Cuenta" type="text" name="Cuenta{{i}}" id="Cuenta{{i}}" class="form-control form-control-sm f-9"
+                        [ngbTypeahead]="search1" [resultTemplate]="rt1" [inputFormatter]="formatter1" (ngModelChange)="BuscarCuenta(item.Cuenta, i)"
+                        required />
+                    </td>
+                    <td><input name="Valor{{i}}" [(ngModel)]="item.Valor" class="form-control form-control-sm text-end"></td>
+                    <td> <select class="form-control form-control-sm text-center" name="Impuesto{{i}}" id="Impuesto{{i}}"
+                        [(ngModel)]="item.Impuesto">
+                        <option value="">Sin IVA</option>
+                        <option *ngFor="let impuesto of Impuesto; let i=index" [value]="impuesto.Valor">{{impuesto.Valor}}</option>
+                      </select></td>
+                    <td><input name="Cantidad{{i}}" [(ngModel)]="item.Cantidad" class="form-control form-control-sm text-end" type="number"
+                        (change)="Calcular(i)"></td>
+                    <td><input name="Observaciones{{i}}" [(ngModel)]="item.Observaciones" class="form-control form-control-sm"></td>
+
+                    <td><input name="Total{{i}}" [(ngModel)]="item.Subtotal" class="form-control form-control-sm text-end"
+                        readonly></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div *ngIf="Mostrar" class="row">
+            <div class="col-md-12 contenido ">
+              <strong >¿ SE APLICÓ ALGUNA RETENCIÓN ?</strong><br>
+              <div class="row m-t-10">
+                <div class="col-md-6">
+                  <table class="table  invoice-detail-table tabla">
+                    <thead class="thead-default">
+                      <td>Tipo de Retención </td>
+                      <td style="width:70px;">Valor </td>
+                      <td style="width:10px;"> </td>
+
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of Rentenciones; let i = index" id="fila{{i}}">
+                        <td><select name="Retencion{{i}}" id="Retencion{{i}}" class="form-control form-control-sm" [(ngModel)]="item.Id_Retencion" (change)="CalcularRetenciones(i)">
+                          <option value="">Tipo de Retención</option>
+                          <option *ngFor="let item of ListaRetenciones; let j = index" [value]="item.Id_Retencion">{{ item.Nombre }}</option>
+                        </select></td>
+                        <td><input name="ValorRetencion{{i}}" [(ngModel)]="item.Valor" class="form-control form-control-sm text-end"></td>
+                        <td> <a  href="javascript:;"  (click)="EliminarRetencion(i)">
+                            <span>
+                              <i class="fa fa-trash-o"></i>
+                            </span>
+                          </a>
+                      </tr>
+
+                    </tbody>
+
+                  </table>
+                  <a href="javascript:;" (click)="AgregarRetencion()"><i class="fa fa-plus-square"></i> Agregar retención</a>
+                </div>
+              </div>
+            </div>
+
+            </div>
+          <div *ngIf="Mostrar" class="row">
+            <div class="col-sm-12">
+              <table class="table invoice-table invoice-total">
+                <tbody>
+                  <tr>
+                    <th>Subtotal:</th>
+                    <td>{{ Subtotal_Ingreso | currency }}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Impuestos:</th>
+                    <td>{{ Impuesto_Ingreso| currency }}</td>
+                  </tr>
+                  <tr *ngIf="Subtotal_Retenciones!=0" >
+                    <th>Retenciones:</th>
+                    <td> -{{ Subtotal_Retenciones | currency }}</td>
+                  </tr>
+                  <tr>
+                    <th>Precio Total:</th>
+                    <td>{{ Total_Ingreso | currency }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div> -->
+
+    <!-- Lista_Facturas -->
+    <div *ngIf="Mostrar_Cliente" class="row">
+      <div class="col-md-12 text-center">
+        <h6>Facturas Pendientes</h6>
+      </div>
+      <div class="col-sm-12">
+        <div style="max-height: 450px; overflow: auto">
+          <table class="table invoice-detail-table tabla">
+            <thead>
+              <tr class="thead-default">
+                <th style="width: 20px"></th>
+                <th style="width: 100px">Factura</th>
+                <th style="width: 100px; text-align: right">Total</th>
+                <th style="width: 100px; text-align: right">Pagado</th>
+                <th style="width: 100px; text-align: right">Gravado</th>
+                <th style="width: 100px; text-align: right">Iva</th>
+                <th style="width: 100px; text-align: right">Excenta</th>
+                <th style="width: 100px; text-align: right">Por Pagar</th>
+                <th style="width: 105px">Descuentos</th>
+                <th style="width: 105px">Ajustes Credito</th>
+                <th style="width: 180px">Retenciones</th>
+                <th style="width: 100px; text-align: right">Valor Recibido</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of Lista_Facturas; let i = index" id="fila{{ i }}">
+                <td class="text-center">
+                  <input
+                    type="checkbox"
+                    name="Factura{{ i }}"
+                    id="Factura{{ i }}"
+                    (change)="listaFacturas(item, i)"
+                  />
+                </td>
+                <td>{{ item.Codigo }}</td>
+                <td style="text-align: right">
+                  {{ item.Total_Compra | currency }}
+                </td>
+                <td style="text-align: right">
+                  {{ item.Pagado | currency }}
+                </td>
+                <td style="text-align: right">
+                  {{ item.Gravada | currency }}
+                </td>
+                <td style="text-align: right">
+                  {{ item.Iva | currency }}
+                </td>
+                <td style="text-align: right">
+                  {{ item.Exenta | currency }}
+                </td>
+                <td style="text-align: right">
+                  {{ item.Por_Pagar | currency }}
+                </td>
+                <td>
+                  <table style="margin-left: 5px">
+                    <tr *ngFor="let descuento of item.DescuentosFactura; let z = index">
+                      <td>
+                        <!-- (blur)="validarCampo(descuento.Descuento, $event, 'Descuento')" ///input de abajo -->
+                        <input
+                          [(ngModel)]="descuento.Descuento"
+                          type="text"
+                          name="Descuento{{ i }}{{ z }}"
+                          id="Descuento{{ i }}{{ z }}"
+                          class="form-control form-control-sm f-9"
+                          [ngbTypeahead]="search1"
+                          [resultTemplate]="rt1"
+                          [inputFormatter]="formatter1"
+                          placeholder="Cuenta"
+                          (ngModelChange)="AgregarCampos(i, descuento.Descuento, 'Descuento', z)"
+                        />
+                        <br />
+
+                        <input
+                          name="ValorDescuento{{ i }}{{ z }}"
+                          id="ValorDescuento{{ i }}{{ z }}"
+                          [(ngModel)]="descuento.ValorDescuento"
+                          class="form-control form-control-sm text-end"
+                          (change)="calculosAdicionales(i, z)"
+                        />
+                      </td>
+                      <td style="vertical-align: middle">
+                        <a href="javascript:;" (click)="EliminarDescuentoFactura(i, z)">
+                          <span>
+                            <i class="fa fa-trash-o"></i>
+                          </span>
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  <a
+                    style="display: none"
+                    id="botondescuentos{{ i }}"
+                    href="javascript:;"
+                    (click)="AgregarDescuentoFactura(i)"
+                    ><i class="fa fa-plus-square"></i> Agregar</a
+                  >
+                </td>
+                <td>
+                  <table style="margin-left: 5px">
+                    <tr>
+                      <td>
+                        <!-- (blur)="validarCampo(item.MayorPagar, $event, 'Ajuste Credito')" ////input de abajo -->
+                        <input
+                          [(ngModel)]="item.MayorPagar"
+                          type="text"
+                          name="MayorPagar{{ i }}"
+                          id="MayorPagar{{ i }}"
+                          class="form-control form-control-sm f-9"
+                          [ngbTypeahead]="search1"
+                          [resultTemplate]="rt1"
+                          [inputFormatter]="formatter1"
+                          readonly
+                          placeholder="Cuenta"
+                          (ngModelChange)="AgregarCampos(i, item.MayorPagar, 'MayorPagar')"
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input
+                          name="ValorMayorPagar{{ i }}"
+                          id="ValorMayorPagar{{ i }}"
+                          [(ngModel)]="item.ValorMayorPagar"
+                          class="form-control form-control-sm text-end"
+                          (change)="calculosAdicionales(i)"
+                          readonly
+                        />
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td>
+                  <table style="margin-left: 50px">
+                    <tr
+                      *ngFor="let valor of item.RetencionesFacturas; let j = index"
+                      id="fila{{ j }}"
+                    >
+                      <td style="width: 150px">
+                        <select
+                          name="Retencion{{ j }}"
+                          id="Retencion{{ j }}"
+                          class="form-control form-control-sm"
+                          [(ngModel)]="valor.Id_Retencion"
+                          (change)="CalcularRetencionesFacturas(i, j)"
+                        >
+                          <option value="">Tipo de Retención</option>
+                          <option
+                            *ngFor="let item of ListaRetenciones; let j = index"
+                            [value]="item.Id_Retencion"
+                          >
+                            {{ item.Nombre }}
+                          </option>
+                        </select>
+                      </td>
+                      <td style="width: 150px">
+                        <input
+                          name="ValorRetencion{{ j }}"
+                          [(ngModel)]="valor.Valor"
+                          class="form-control form-control-sm text-end"
+                          (change)="ActualizaValores('Facturas')"
+                        />
+                      </td>
+                      <td>
+                        <a href="javascript:;" (click)="EliminarRetencionFactura(i, j)">
+                          <span>
+                            <i class="fa fa-trash-o"></i>
+                          </span>
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  <a
+                    style="display: none"
+                    id="botonretencion{{ i }}"
+                    href="javascript:;"
+                    (click)="AgregarRetencionFactura(i)"
+                    ><i class="fa fa-plus-square"></i> Agregar retención</a
+                  >
+                </td>
+                <td>
+                  <input
+                    name="ValorIngresado{{ i }}"
+                    id="ValorIngresado{{ i }}"
+                    [(ngModel)]="item.ValorIngresado"
+                    class="form-control form-control-sm text-end"
+                    (change)="
+                      ActualizaValores('Facturas'); validarValorFactura($event.target.value, i)
+                    "
+                    readonly
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!Facturas_Multiple" class="row">
+      <div *ngIf="ListaFact.length > 0" class="col-md-12">
+        <app-tablafacturascargadas [Facturas]="ListaFact"></app-tablafacturascargadas>
+      </div>
+
+      <div *ngIf="Faltantes.length > 0" class="col-md-12">
+        <hr />
+        <h6 class="text-center">Facturas no anexadas o que ya se encuentran pagas</h6>
+        <app-tablafacturafaltante [Facturas_Faltantes]="Faltantes"></app-tablafacturafaltante>
+      </div>
+    </div>
+
+    <!-- tabla inferior -->
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Subtotal:</th>
+            <th *ngIf="Retenciones_Totales > 0">Retenciones</th>
+            <th>Precio Total:</th>
+            <th>Total Debito:</th>
+            <th>Total Credito</th>
+            <th>Diferencia:</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            <td>${{ Subtotal_Facturas | number: '1.2-2' }}</td>
+            <td *ngIf="Retenciones_Totales > 0">-${{ Retenciones_Totales | number: '1.2-2' }}</td>
+            <td>${{ Total_Facturas | number: '1.2-2' }}</td>
+            <td>${{ Total_Debito | number: '1.2-2' }}</td>
+            <td>${{ Total_Credito | number: '1.2-2' }}</td>
+            <td>${{ Total_Debito - Total_Credito | number: '1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Guardar -->
+    <button
+      type="button"
+      class="btn btn-primary btn-block"
+      [disabled]="!form.valid"
+      (click)="guardarComprobante()"
+    >
+      Guardar
+    </button>
+  </div>
+</div>
+
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9"
+    ><strong>{{ r.Nombre }}</strong>
+  </span>
+</ng-template>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>

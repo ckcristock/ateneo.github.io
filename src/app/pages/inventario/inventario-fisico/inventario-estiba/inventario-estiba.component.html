@@ -1,0 +1,180 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <!--Encabezado-->
+          <app-cabecera [datosCabecera]="DatosCabecera"> </app-cabecera>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-4 text-center" *ngIf="Funcionario_Cuenta">
+                  <strong>Funcionario que Cuenta</strong><br />
+                  <!-- <img src="{{RutaPrincipal}}/IMAGENES/FUNCIONARIOS/{{Funcionario_Cuenta.Imagen}}" style="width:120px;height: 120px; border-radius: 50%;" /> -->
+                  <br />
+                  {{ Funcionario_Cuenta?.first_name }} {{ Funcionario_Cuenta?.surname }}
+                </div>
+                <div class="col-md-4 text-center" *ngIf="Funcionario_Digita">
+                  <strong>Funcionario que Digita</strong><br />
+                  <!-- <img src="{{RutaPrincipal}}/IMAGENES/FUNCIONARIOS/{{Funcionario_Digita.Imagen}}" style="width:120px;height: 120px; border-radius: 50%;" /> -->
+                  <br />
+                  {{ Funcionario_Digita?.first_name }} {{ Funcionario_Digita?.surname }}
+                </div>
+
+                <div class="col-md-4 text-center">
+                  Estiba : <strong>{{ Model.Estiba.Nombre }}</strong
+                  ><br />
+                  Bodega : <strong>{{ Model.Bodega.Nombre }}</strong
+                  ><br />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12" style="border-top: 1px dotted #ccc; padding-top: 50px"></div>
+            <div *ngIf="Cargando" class="col-md-12 text-center">
+              <i class="fa fa-spinner fa-spin"></i>
+              <h6>Cargando Productos</h6>
+            </div>
+            <div *ngIf="!Cargado" class="col-md-12 text-center">
+              <input
+                type="text"
+                autofocus
+                class="form-control input-barras"
+                #Barra
+                name="Barras"
+                id="Barras"
+                [(ngModel)]="Codigo_Barras"
+                (change)="ConsultaCodigo($event.target.value)"
+              />
+            </div>
+            <div *ngIf="!Cargado" class="col-md-12 text-center">
+              <i class="fa fa-barcode fa-3x"></i>
+              <h4>
+                Escanee el Código de Barras del Producto<br />para buscar los lotes existentes en
+                Inventario
+              </h4>
+            </div>
+
+            <div *ngIf="Cargado" class="col-md-2 text-center">
+              <img
+                *ngIf="Producto_Barras.Imagen != ''"
+                src="{{ RutaPrincipal }}/IMAGENES/PRODUCTOS/{{ Producto_Barras.Imagen }}"
+                class="img-fluid img-thumbnail imagen"
+              />
+              <img
+                *ngIf="Producto_Barras.Imagen == ''"
+                src="assets/images/producto.png"
+                class="img-fluid img-thumbnail imagen"
+              />
+            </div>
+            <div
+              *ngIf="Cargado"
+              class="col-md-3 text-start"
+              style="text-transform: uppercase; font-size: 9px"
+            >
+              <strong style="font-size: 11px">{{ Producto_Barras.Nombre }}</strong
+              ><br />
+              <strong>Lab Comerical:</strong> {{ Producto_Barras.Laboratorio_Comercial }}<br />
+              <strong>Lab. Generico:</strong> {{ Producto_Barras.Laboratorio_Generico }}<br />
+              <strong>Embalaje:</strong> {{ Producto_Barras.Embalaje }}<br /><br />
+
+              <strong>Cantidad Presentación</strong><br /><br />
+              <input
+                type="number"
+                min="0"
+                onkeypress="return event.charCode >= 48  && event.charCode <= 57 "
+                class="form-control"
+                [(ngModel)]="Producto_Barras.Cantidad_Presentacion"
+              />
+            </div>
+            <div *ngIf="Cargado" class="col-md-7 text-start">
+              <h4>Lotes del Producto</h4>
+              <p class="label label-warning text-center">{{ Producto_Barras.Mensaje }}</p>
+              <table class="table table-stripped tabla-lotes">
+                <thead style="text-align: center">
+                  <tr>
+                    <th style="width: 30px"></th>
+                    <th style="width: 150px">Codigo</th>
+                    <th>Lote</th>
+                    <th style="width: 150px">Fecha Vencimiento</th>
+                    <th style="width: 150px">Cantidad Encontrada</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let lote of Producto_Barras.Lotes; let i = index" id="fila{{ i }}">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ lote.Codigo }}</td>
+                    <td>
+                      <input
+                        type="text"
+                        [(ngModel)]="lote.Lote"
+                        id="Lote{{ i }}"
+                        class="form-control form-control-xs"
+                        (change)="ValidarLote(i)"
+                        style="text-transform: uppercase"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="date"
+                        [(ngModel)]="lote.Fecha_Vencimiento"
+                        id="Vencimiento{{ i }}"
+                        (blur)="ValidarFecha(i)"
+                        class="form-control form-control-xs"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        min="0"
+                        onkeypress="return event.charCode >= 48  && event.charCode <= 57 "
+                        [(ngModel)]="lote.Cantidad_Encontrada"
+                        id="Cantidad{{ i }}"
+                        (blur)="ValidarCantidad(i)"
+                        class="form-control form-control-xs text-end"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <button class="btn btn-block btn-success" (click)="guardarvalidado()">
+                Guardar Lotes
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-top: 70px" *ngIf="Productos.length > 0">
+            <app-listadoproductosyainventariadosestiba [Model]="Model" [Productos]="Productos">
+            </app-listadoproductosyainventariadosestiba>
+          </div>
+          <div class="row" *ngIf="Productos.length > 0">
+            <div class="col-md-6">
+              <button
+                type="button"
+                (click)="onSaveBackTo()"
+                class="btn btn-danger btn-sm btn-block"
+                [disabled]="Productos.length >= 1 ? false : true"
+              >
+                <i class="fa fa-save"></i> Guardar y salir
+              </button>
+            </div>
+            <div class="col-md-6">
+              <button
+                type="button"
+                (click)="onEndInventory()"
+                class="btn btn-primary btn-sm btn-block"
+                [disabled]="Productos.length >= 1 ? false : true"
+              >
+                <i class="fa fa-check"></i> guardar y terminar conteo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

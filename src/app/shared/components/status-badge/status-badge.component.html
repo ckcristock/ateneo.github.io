@@ -1,0 +1,23 @@
+@if (classic) {
+  <span
+    [ngClass]="{
+      badge: true,
+      'bg-success':
+        status === 'activo' ||
+        status === 'activa' ||
+        status === 'aprobada' ||
+        status === 'recibida' ||
+        status === 'facturada',
+      'bg-danger':
+        status === 'inactivo' ||
+        status === 'inactiva' ||
+        status === 'rechazada' ||
+        status == 'anulada',
+      'bg-warning': status === 'pendiente',
+      'bg-info': status === 'enviada'
+    }"
+    >{{ status | uppercase }}</span
+  >
+} @else {
+  <span class="badge {{ class }}">{{ status }}</span>
+}

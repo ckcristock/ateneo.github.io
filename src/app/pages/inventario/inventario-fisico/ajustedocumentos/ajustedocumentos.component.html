@@ -1,0 +1,98 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="DatosCabecera"> </app-cabecera>
+    <div class="row">
+      <div class="col-md-12 col-sm-12 listado-sin-diferencia">
+        <h4 class="text-center text-primary">Listado de productos</h4>
+        <app-table [loading]="loading" [arrayData]="productos">
+          <ng-container titles>
+            <th class="text-center" style="width: 60px">Documento</th>
+            <th class="text-center">Producto</th>
+            <th class="text-center">Estiba</th>
+            <th class="text-center">Grupo Estiba</th>
+            <th class="text-center">Primer Conteo</th>
+            <th class="text-center">Fecha Primer Conteo</th>
+            <th class="text-center">Segundo Conteo</th>
+            <th class="text-center">Fecha Segundo Conteo</th>
+            <th class="text-center">Diferencia</th>
+            <th>Cantidad final</th>
+          </ng-container>
+          <tbody content>
+            @if (productos.length > 0) {
+              @for (producto of productos; track $index) {
+                <tr class="text-center">
+                  <td class="text-center">
+                    <strong>{{ producto.Id_Doc_Inventario_Fisico }}</strong>
+                  </td>
+                  <td class="d-flex flex-column">
+                    <strong>{{ producto.Nombre_Comercial }}</strong>
+                    <span class="text-muted">{{ producto.Nombre_Producto }}</span>
+                  </td>
+                  <td class="text-center">
+                    {{ producto.Nombre_Estiba }}
+                  </td>
+                  <td class="text-center">
+                    {{ producto.Nombre_Grupo }}
+                  </td>
+                  <td class="text-center">
+                    {{ producto.Primer_Conteo | number }}
+                  </td>
+                  <td class="text-center">
+                    {{ producto.Fecha_Primer_Conteo }}
+                  </td>
+                  <td class="text-center">
+                    {{ producto.Segundo_Conteo | number }}
+                  </td>
+                  <td class="text-center">
+                    {{ producto.Fecha_Segundo_Conteo }}
+                  </td>
+
+                  <td class="text-center fw-bold">
+                    <span
+                      [ngClass]="{
+                        'text-danger': producto.Cantidad_Diferencial < 0,
+                        'text-success': producto.Cantidad_Diferencial > 0
+                      }"
+                    >
+                      <span *ngIf="producto.Cantidad_Diferencial > 0">+</span>
+                      {{ producto.Cantidad_Diferencial | number }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <!-- Para editar cantidad  -->
+                    <div *ngIf="producto.Cantidad_Auditada !== '' || producto.editar">
+                      <input
+                        type="number"
+                        class="form-control"
+                        placeholder="Cantidad final"
+                        (input)="updateCantidadFinal(producto, $event.target.value)"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </app-table>
+      </div>
+    </div>
+    <button
+      type="button"
+      (click)="descargarInforme()"
+      aria-hidden="true"
+      class="btn btn-success btn-sm mb-3"
+      [disabled]="productos.length > 0 ? false : true"
+    >
+      <i class="fa fa-check"></i> Descargar informe
+    </button>
+    <button
+      type="button"
+      (click)="guardarFinal()"
+      aria-hidden="true"
+      class="btn btn-primary btn-block"
+      [disabled]="productos.length > 0 ? false : true"
+    >
+      <i class="fa fa-check"></i> Terminar inventario
+    </button>
+  </div>
+</div>

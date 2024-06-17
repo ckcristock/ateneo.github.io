@@ -1,0 +1,84 @@
+<app-card viewTitle="Pendientes" [filterTemplate]="filterTemplate">
+  <app-table
+    [loading]="loading"
+    [arrayData]="purchases"
+    [pagination]="pagination"
+    (pageChange)="getReturnPending()"
+  >
+    <ng-container titles>
+      <th scope="col">Acta</th>
+      <th scope="col">Orden</th>
+      <th scope="col">Proveedor</th>
+      <th scope="col">Estado</th>
+      <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of purchases; track $index) {
+        <tr class="text-center">
+          <td class="align-middle" scope="row">
+            <app-load-image
+              classImg="rounded-circle mx-auto img-fluid header-profile-user"
+              [src]="item.image"
+            ></app-load-image>
+            <span>
+              {{ item.Codigo_Compra }}
+            </span>
+          </td>
+          <td>{{ item.Codigo_Orden }}</td>
+          <td>{{ item.Nombre }}</td>
+          <td><app-status-badge [status]="item.Estado" /></td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="plus"
+                text="Crear orden de compra"
+                type="success"
+                (click)="
+                  openCreatePurchaseOrder(item.Id_Acta_Recepcion_Compra, item.Id_No_Conforme)
+                "
+              />
+              <app-action-button
+                icon="truck"
+                text="Generar devolución"
+                type="primary"
+                [link]="{
+                  url: 'vernoconformidad/' + item.Id_No_Conforme
+                }"
+              />
+              <app-action-button
+                icon="sync-alt"
+                text="Revertir no conforme"
+                type="info"
+                [link]="{
+                  url: 'revertir/' + item.Codigo_Orden + '/' + 'Nacional',
+                  params: { devolucion: item.Id_No_Conforme }
+                }"
+              />
+              <app-action-button
+                icon="times-circle"
+                text="Cerrar no conforme"
+                type="danger"
+                (click)="closeNonConforming(item.Id_No_Conforme)"
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col mb-3"
+    label="Acta"
+    placeholder="Filtro acta"
+    (searching)="onFilters('codigo', $event)"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col mb-3"
+    label="Orden"
+    placeholder="Filtro orden"
+    (searching)="onFilters('orden', $event)"
+  ></app-automatic-search>
+</ng-template>

@@ -1,0 +1,222 @@
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>
+<ng-container *ngIf="!loading; else placeholder">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title">
+            <h5 class="text-primary">Seguimiento</h5>
+          </div>
+          <hr class="line" />
+
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item px-0" *ngFor="let activity of activities">
+              <div class="d-flex w-100 justify-content-between">
+                <div>
+                  <h6 class="mb-0">
+                    <span
+                      class="badge"
+                      [class]="
+                        activity.Estado == 'Creacion'
+                          ? 'bg-info'
+                          : activity.Estado == 'Edicion'
+                            ? 'bg-warning'
+                            : activity.Estado == 'Anulada' || activity.Estado == 'Rechazada'
+                              ? 'bg-danger'
+                              : activity.Estado == 'Aprobacion'
+                                ? 'bg-success '
+                                : activity.Estado == 'Recepcion'
+                                  ? 'bg-primary '
+                                  : ''
+                      "
+                    >
+                      {{ activity.Estado }}</span
+                    >
+                  </h6>
+                  <p class="mb-1">{{ activity.Detalles }}</p>
+                  <small>{{ activity.Fecha }}</small>
+                  <small class="d-block">{{ activity.person?.full_names }}</small>
+                </div>
+                <img
+                  class="d-block img-thumbnail rounded-circle img-fluid header-profile-user"
+                  alt="Image"
+                  [src]="activity.person?.image"
+                  onerror="this.src='../../../../../assets/images/noprofile.png'"
+                />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-body">
+          <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+          <div class="row align-items-center justify-content-between">
+            <div class="col-md-6 d-flex gap-3 justify-content-start">
+              <div>
+                <span>Estado: </span>
+                <app-status-badge [status]="Compra?.Estado" />
+              </div>
+              <div>
+                <span>Aprobación: </span>
+                <app-status-badge [status]="Compra?.Aprobacion" />
+              </div>
+            </div>
+            <div class="col-md-6 d-flex justify-content-end mb-2">
+              <div class="btn-group" role="group" aria-label="Button group">
+                <ng-container *ngIf="permission.permissions.approve">
+                  <ng-container
+                    *ngIf="Compra.Aprobacion == 'pendiente' && Compra.Estado == 'Pendiente'"
+                  >
+                    <button
+                      class="btn btn-danger btn-sm"
+                      (click)="EstadoAprobacion('Rechazada')"
+                      type="button"
+                    >
+                      <i class="fa fa-thumbs-down"></i> Rechazar
+                    </button>
+                    <button
+                      class="btn btn-primary btn-sm"
+                      (click)="EstadoAprobacion('Aprobada')"
+                      type="button"
+                    >
+                      <i class="fa fa-thumbs-up"></i> Aprobar y proceder
+                    </button>
+                    <button
+                      class="btn btn-danger btn-sm"
+                      (click)="EstadoAprobacion('Anulada')"
+                      type="button"
+                    >
+                      <i class="fa fa-ban"></i> Anular
+                    </button>
+                  </ng-container>
+                  <ng-container *ngIf="Compra.Estado == 'Anulada'">
+                    <button
+                      class="btn btn-success btn-sm"
+                      (click)="EstadoAprobacion('Pendiente')"
+                      type="button"
+                    >
+                      <i class="fa fa-check"></i> Activar
+                    </button>
+                  </ng-container>
+                  <!-- TODO PENDIENTE IMPRIMIR -->
+                  @if (Compra.Aprobacion == 'aprobada') {
+                    <button class="btn btn-danger btn-sm" (click)="download(id)">
+                      <span
+                        ><i
+                          class="fas"
+                          [class]="!downloading ? 'fa-file-download' : 'fa-spinner fa-spin'"
+                        ></i>
+                        {{ !downloading ? 'Descargar' : 'Descargando' }}</span
+                      >
+                    </button>
+                  }
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <hr class="line" />
+          <app-table>
+            <ng-container titles>
+              <th>Funcionario</th>
+              <th>Proveedor</th>
+              <th>Bodega</th>
+              <th>Fecha de compra</th>
+              <th>Fecha probable de entrega</th>
+              <th>Entrega real</th>
+            </ng-container>
+            <tbody content>
+              <tr class="text-center">
+                <td>
+                  {{ Compra?.person?.full_names | uppercase }}
+                </td>
+                <td>
+                  {{ Compra?.third?.full_name | uppercase }}
+                </td>
+                <td>
+                  {{ Compra?.store?.Nombre | uppercase }}
+                </td>
+                <td>
+                  {{ Compra?.created_at | date }}
+                </td>
+                <td>
+                  {{ Compra?.Fecha_Entrega_Probable | date }}
+                </td>
+                <td>
+                  {{ (Compra?.Fecha_Entrega_Real | date) || 'Sin entregar' }}
+                </td>
+              </tr>
+            </tbody>
+          </app-table>
+          <hr />
+          <h6>Productos</h6>
+          <app-table [loading]="false" [arrayData]="Compra.products">
+            <ng-container titles>
+              <th>#</th>
+              <th>Producto</th>
+              <th>Embalaje</th>
+              <th>Cantidad</th>
+              <th>Costo</th>
+              <th>IVA %</th>
+              <th>SubTotal</th>
+              <th>IVA $</th>
+              <th>Total</th>
+            </ng-container>
+            <tbody content>
+              @for (producto of Compra.products; track producto.id; let i = $index) {
+                <tr class="text-center">
+                  <th>{{ i + 1 }}</th>
+                  <td class="align-middle">
+                    {{ producto?.product?.Nombre_Comercial | uppercase }}
+                  </td>
+                  <td class="align-middle">
+                    <span class="text-muted">
+                      {{ producto?.product?.packaging?.name | titlecase }}
+                    </span>
+                  </td>
+                  <td class="align-middle">
+                    {{ producto?.Cantidad | number }}
+                  </td>
+                  <td class="align-middle">${{ producto?.product?.Precio | number: '1.2-2' }}</td>
+                  <td class="align-middle">{{ producto?.tax?.Valor | number: '1.2-2' }}%</td>
+                  <td class="align-middle">${{ producto?.Subtotal | number: '1.2-2' }}</td>
+                  <td class="align-middle">${{ producto?.Valor_Iva | number: '1.2-2' }}</td>
+                  <td class="align-middle">$ {{ producto?.Total | number: '1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </app-table>
+          <app-table>
+            <ng-container titles>
+              <th class="bg-light text-start">Observaciones</th>
+            </ng-container>
+            <tbody content>
+              <tr class="text-start">
+                <td>{{ Compra.Observaciones | uppercase }}</td>
+              </tr>
+            </tbody>
+          </app-table>
+          <app-list-items
+            title1="SUBTOTAL"
+            [var1]="Compra.Subtotal"
+            type1="cop"
+            title2="IVA"
+            [var2]="Compra.Iva"
+            type2="cop"
+            title3="Total"
+            [var3]="Compra.Total"
+            type3="cop"
+            mt="mt-2"
+          >
+          </app-list-items>
+          <!-- card body -->
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

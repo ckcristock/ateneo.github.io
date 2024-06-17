@@ -1,0 +1,121 @@
+<article class="row row-gap-3">
+  @for (Ajuste of Ajustes; track $index) {
+    <div class="col-md-4">
+      <app-activity
+        class="card flex-grow-1"
+        [activities]="Ajuste.Actividades"
+        titleActivity="Seguimiento ajuste individual"
+      ></app-activity>
+    </div>
+    <app-card class="col" viewTitle="Ver ajuste individual">
+      <div class="table-responsive">
+        <table class="table table-active">
+          <tbody>
+            <tr>
+              <td>
+                <strong>Tipo</strong>
+              </td>
+              <td class="text-end">{{ Ajuste.Origen_Destino }}</td>
+              <td>
+                <strong>Origen</strong>
+              </td>
+              <td class="text-end">{{ Ajuste.Origen }}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Funcionario</strong>
+              </td>
+              <td class="text-end">{{ Ajuste.Funcionario }}</td>
+              <td>
+                <strong>Cargo</strong>
+              </td>
+              <td class="text-end">{{ Ajuste.Cargo_Funcionario }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <app-table [loading]="false" [arrayData]="Ajuste.productos">
+        <ng-container titles>
+          <th>Descripción</th>
+          <th>Lab.</th>
+          <th>Lote</th>
+          <th>Venc.</th>
+          <th>Cant.</th>
+          <th>Observaciones</th>
+          @if (Ajuste.Tipo == 'Entrada' && Ajuste.Origen_Destino == 'Bodega') {
+            <th>N. Estiba</th>
+          }
+          <th>Costo</th>
+          <th>Sub Total</th>
+        </ng-container>
+        <tbody content>
+          @for (item of Ajuste.productos; track $index) {
+            <tr class="text-center">
+              <td>
+                <strong>{{ item.Nombre_Comercial }}</strong
+                ><br />
+                <span class="text-muted">{{ item.Nombre_Producto }}</span>
+              </td>
+              <td>{{ item.Laboratorio_Comercial }}</td>
+              <td>{{ item.Lote }}</td>
+              <td>{{ item.Fecha_Vencimiento | date: 'dd/MM/yy' }}</td>
+              <td>{{ item.Cantidad }}</td>
+              <td class="text-center">{{ item.Observaciones }}</td>
+              <td
+                *ngIf="Ajuste.Tipo == 'Entrada' && Ajuste.Origen_Destino == 'Bodega'"
+                class="text-center"
+              >
+                {{
+                  item.Nombre_Nueva_Estiba == null || item.Nombre_Nueva_Estiba == ''
+                    ? 'Sin Acomodar'
+                    : item.Nombre_Nueva_Estiba
+                }}
+              </td>
+              <td class="text-right">{{ item.Costo | currency }}</td>
+
+              <td class="text-right">{{ item.Sub_Total | currency }}</td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+      <div class="d-flex gap-3">
+        <span> Total: </span>
+        <span>
+          {{ Ajuste.Total | currency }}
+        </span>
+      </div>
+      <div class="d-flex gap-5">
+        <div>
+          <app-load-image
+            class="d-block pb-2 border-bottom border-dark mb-3"
+            classImg="w-100 h-100"
+            style="width: 320px"
+            srcDefault="./assets/images/sinfirma.png"
+            src="{{ globales.ruta }}/DOCUMENTOS/{{ Ajuste.Identificacion_Funcionario }}/{{
+              Ajuste.Firma
+            }}"
+          ></app-load-image>
+          <p>Elaborado por: {{ Ajuste.Funcionario }}</p>
+        </div>
+        <div>
+          <app-load-image
+            class="d-block pb-2 border-bottom border-dark mb-3"
+            classImg="w-100 h-100"
+            style="width: 320px"
+            srcDefault="./assets/images/sinfirma.png"
+            src="{{ globales.ruta }}/DOCUMENTOS/{{ Ajuste.Identificacion_Funcionario }}/{{
+              Ajuste.Firma
+            }}"
+          ></app-load-image>
+          <p>Recibí conforme: CC.</p>
+        </div>
+      </div>
+      <a
+        href="{{ globales.ruta }}php/ajusteindividual/descarga_pdf.php?id={{ id }}"
+        target="_blank"
+        class="btn btn-success w-100"
+        ><i class="fa fa-print"></i> Imprimir Ajuste</a
+      >
+    </app-card>
+  }
+</article>

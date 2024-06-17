@@ -1,0 +1,9 @@
+<app-reason
+  titleReason="causal"
+  [pagination]="pagination"
+  [data]="causes"
+  [loading]="loading"
+  (saveReason)="saveReason($event)"
+  (newRequest)="getCauses($event)"
+  (changeStatus)="onChangeStateReason($event)"
+></app-reason>

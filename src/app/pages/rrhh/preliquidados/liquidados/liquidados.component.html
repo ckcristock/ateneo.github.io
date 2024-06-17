@@ -1,0 +1,334 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <div *ngIf="!loading && liquidado; else notData">
+      <h5 class="text-center mb-3">
+        Liquidación de {{ liquidado.first_name | titlecase }}
+        {{ liquidado.second_name | titlecase }}
+        {{ liquidado.first_surname | titlecase }}
+        {{ liquidado.second_surname | titlecase }}
+      </h5>
+      <form [formGroup]="form">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Motivo</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Ingresa el motivo, ej: retiro voluntario"
+              formControlName="motivo"
+              required
+              autocomplete="off"
+            />
+            <mat-icon matSuffix>question_mark</mat-icon>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>¿Justa causa?</mat-label>
+            <mat-select
+              (selectionChange)="justaCausaValidate($event)"
+              formControlName="justa_causa"
+              required
+            >
+              <mat-option value="si">Sí</mat-option>
+              <mat-option value="no">No</mat-option>
+            </mat-select>
+            <mat-icon matSuffix>balance</mat-icon>
+          </mat-form-field>
+          <!-- <h6>2. Fecha</h6> -->
+          <ng-container *ngIf="liquidado">
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Fecha de contratación</mat-label>
+              <input matInput type="date" formControlName="fecha_contratacion" readonly required />
+              <mat-icon matSuffix>event</mat-icon>
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Fecha de terminación</mat-label>
+              <input
+                matInput
+                type="date"
+                formControlName="fecha_terminacion"
+                (change)="changeParams($event.target.value)"
+                readonly
+                required
+              />
+              <mat-icon matSuffix>event</mat-icon>
+            </mat-form-field>
+            <!-- <mat-form-field class="col" appearance="outline">
+                <mat-label>Días a liquidar</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  placeholder="Ingresa los días a liquidar"
+                  formControlName="dias_liquidados"
+                  readonly
+                  required
+                />
+              </mat-form-field>
+              <mat-form-field class="col" appearance="outline">
+                <mat-label>Días de vacaciones</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  placeholder="Ingresa los días de vacaciones"
+                  formControlName="dias_vacaciones"
+                  required
+                />
+              </mat-form-field> -->
+            <!-- <mat-form-field class="col" appearance="outline">
+                <mat-label>Vacaciones acumuladas</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  placeholder="Ingresa el numero"
+                  formControlName="vacacionesacumuladas"
+                  required
+                />
+              </mat-form-field> -->
+          </ng-container>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Salario base</mat-label>
+            <input
+              matInput
+              placeholder="Ingresa el salario base"
+              currencyMask
+              appInputPosition
+              [options]="mask.maskCOP"
+              formControlName="salario_base"
+              required
+              autocomplete="off"
+            />
+            <mat-icon matPrefix>payments</mat-icon>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Vacaciones base</mat-label>
+            <input
+              matInput
+              placeholder="Ingresa el valor"
+              currencyMask
+              appInputPosition
+              [options]="mask.maskCOP"
+              formControlName="vacaciones_base"
+              required
+              autocomplete="off"
+            />
+            <mat-icon matPrefix>beach_access</mat-icon>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Cesantías base</mat-label>
+            <input
+              matInput
+              placeholder="Ingresa el valor"
+              currencyMask
+              appInputPosition
+              [options]="mask.maskCOP"
+              formControlName="cesantias_base"
+              required
+              autocomplete="off"
+            />
+            <mat-icon matPrefix>savings</mat-icon>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Dominicales incluidas</mat-label>
+            <mat-select formControlName="dominicales_incluidas" required>
+              <mat-option value="Si">Sí</mat-option>
+              <mat-option value="No">No</mat-option>
+            </mat-select>
+            <mat-icon matPrefix>attach_money</mat-icon>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Otros ingresos</mat-label>
+            <input
+              matInput
+              currencyMask
+              appInputPosition
+              [options]="mask.maskCOP"
+              placeholder="Ingresa el valor"
+              formControlName="ingresos_adicionales"
+              required
+              autocomplete="off"
+            />
+            <mat-icon matPrefix>monetization_on</mat-icon>
+          </mat-form-field>
+          <!-- <mat-form-field class="col" appearance="outline">
+                <mat-label>Préstamos</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  placeholder="Ingresa el valor"
+                  formControlName="prestamos"
+                  required
+                  autocomplete="off"
+                />
+              </mat-form-field>  ya esta incluido el valor en la formula del back end de total_liquidacion-->
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Otras deducciones</mat-label>
+            <input
+              matInput
+              currencyMask
+              appInputPosition
+              [options]="mask.maskCOP"
+              placeholder="Ingresa el valor"
+              formControlName="deducciones_adicionales"
+              required
+              autocomplete="off"
+            />
+            <mat-icon matPrefix>credit_card</mat-icon>
+          </mat-form-field>
+          <!-- <mat-form-field class="col" appearance="outline">
+                <mat-label>Cesantías año anterior incluidas</mat-label>
+                <mat-select formControlName="cesantias_anterior" required>
+                  <mat-option value="Si">Sí</mat-option>
+                  <mat-option value="No">No</mat-option>
+                </mat-select>
+              </mat-form-field> -->
+          <!-- <mat-form-field class="col" appearance="outline">
+                <mat-label>Intereses de cesantías incluidos</mat-label>
+                <mat-select
+                  formControlName="intereses_cesantias"
+                  value="Si"
+                  required
+                >
+                  <mat-option value="Si" selected>Sí</mat-option>
+                  <mat-option value="No">No</mat-option>
+                </mat-select>
+              </mat-form-field> -->
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+            <mat-label>Notas</mat-label>
+            <textarea
+              matInput
+              placeholder="Ingresa la notas"
+              rows="5"
+              formControlName="notas"
+              required
+              [cdkTextareaAutosize]="true"
+            ></textarea>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <div class="col-lg-6">
+            <ul class="list-group list-group-flush">
+              <li [class]="classList">
+                Días líquidados
+                <span>{{ info.dias_liquidacion | number }} días</span>
+              </li>
+              <li [class]="classList">
+                Días de vacaciones pendientes
+                <span>{{ info.vacaciones_actuales | number }} días</span>
+              </li>
+              <li [class]="classList">
+                Vacaciones pendientes
+                <span>${{ info.total_vacaciones | number: '1.2-2' }}</span>
+              </li>
+              <li [class]="classList">
+                Cesantías
+                <span>${{ info.total_cesantias | number: '1.2-2' }}</span>
+              </li>
+            </ul>
+          </div>
+          <hr />
+          <div class="col-lg-6">
+            <ul class="list-group list-group-flush">
+              <li [class]="classList">
+                Interes de cesantías
+                <span>${{ info.total_intereses_cesantias | number: '1.2-2' }}</span>
+              </li>
+              <li [class]="classList">
+                <span>Prima de servicios</span>
+                <span>${{ info.total_prima | number: '1.2-2' }}</span>
+              </li>
+              <li [class]="classList">
+                <span>Ingresos adicionales</span>
+                <span>
+                  ${{ this.form.get('ingresos_adicionales').value || 0 | number: '1.2-2' }}
+                </span>
+              </li>
+              <li [class]="classList">
+                <span>Deducciones adicionales</span>
+                <span>
+                  ${{ this.form.get('deducciones_adicionales').value || 0 | number: '1.2-2' }}
+                </span>
+              </li>
+            </ul>
+          </div>
+          <hr />
+          <div class="col-lg-12">
+            <ul class="list-group list-group-flush">
+              <li [class]="classList">
+                <strong>Total liquidación</strong>
+                <strong>${{ totalLiquidacion | number: '1.2-2' }}</strong>
+              </li>
+
+              <li *ngIf="indemnizacion" [class]="classList">
+                <strong> Indemnización por despido </strong>
+                <strong>${{ info.total_indemnizacion | number: '1.2-2' }}</strong>
+              </li>
+
+              <li [class]="classList">
+                <strong>Total salario por pagar</strong>
+                <strong>${{ salarioPendiente | number: '1.2-2' }}</strong>
+              </li>
+              <!-- <li [class]="classList">
+                  Auxilio de transporte pendiente por cancelar
+                  <span>$-en desarrollo-</span>
+                </li> -->
+              <!-- <li [class]="classList">
+                  <strong>Otros</strong>
+                  <strong>$-en desarrollo-</strong>
+                </li> -->
+              <!-- <li [class]="classList">
+                  <span>Salario</span>
+                  <span
+                    >${{
+                       | number : "1.2-2"
+                    }}</span
+                  >
+                </li>
+                <li [class]="classList">
+                  <span>Seguridad social</span>
+                  <span
+                    >${{
+                      valorDiasTrabajados.seguridad_social | number : "1.2-2"
+                    }}</span
+                  >
+                </li> -->
+              <!-- <li [class]="classList">
+                  <strong>Pensión</strong>
+                  <strong>$-en desarrollo-</strong>
+                </li> -->
+              <li [class]="classList">
+                <strong>TOTAL</strong>
+                <strong>${{ total | number: '1.2-2' }}</strong>
+              </li>
+            </ul>
+            <div class="alert alert-danger text-center" role="alert">
+              Al confirmar la liquidación, el empleado no volverá a aparecer en la lista de
+              empleados activos, ni en el siguiente pago de nómina.
+            </div>
+          </div>
+          <hr />
+        </div>
+        <div class="row d-flex justify-content-between">
+          <div class="col text-end">
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button class="btn btn-danger" (click)="cancelButton()">Cancelar</button>
+              <button
+                [disabled]="!form.valid"
+                class="btn btn-primary"
+                (click)="liquidar()"
+                type="button"
+              >
+                Liquidar
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

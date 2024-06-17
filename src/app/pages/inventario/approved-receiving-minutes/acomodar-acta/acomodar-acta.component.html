@@ -1,0 +1,108 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="headData"></app-cabecera>
+    <hr class="line" />
+    @if (Datos) {
+      <div class="row">
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <div class="d-flex gap-2">
+              <h6 class="text-primary">COMPRA:</h6>
+              <h6>{{ Datos.Codigo }}</h6>
+            </div>
+            <div class="d-flex gap-2">
+              <h6 class="text-primary">BODEGA:</h6>
+              <h6>{{ Datos.Nombre_Bodega }}</h6>
+            </div>
+            <div class="d-flex gap-2">
+              <h6 class="text-primary">PRODUCTOS INGRESADOS:</h6>
+              <h6>
+                {{ Datos.ConteoProductos }} producto{{
+                  Datos.ConteoProductos ? 's' : ''
+                }}
+                diferente{{ Datos.ConteoProductos ? 's' : '' }}
+              </h6>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="d-flex flex-column">
+            <div class="d-flex gap-2">
+              <h6 class="text-primary">PROVEEDOR:</h6>
+              <h6>{{ Datos.NombreProveedor }}</h6>
+            </div>
+            <div class="d-flex gap-2">
+              <h6 class="text-primary">DIRECCIÓN:</h6>
+              <h6>{{ Datos.DireccionProveedor }}</h6>
+            </div>
+            <div class="d-flex gap-2">
+              <h6 class="text-primary">TELÉFONO:</h6>
+              <h6>{{ Datos.TelefonoProveedor }}</h6>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="d-flex flex-column">
+            <h6 class="text-primary">OBSERVACIONES:</h6>
+            <h6>{{ Datos.Observaciones || 'N/A' }}</h6>
+          </div>
+        </div>
+      </div>
+    }
+    <app-table [loading]="loading" [arrayData]="Productos">
+      <ng-container titles>
+        <th></th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Lote</th>
+        <th>Fecha Venc.</th>
+        @if (Datos && Datos.Cambio_Estiba) {
+          <th>Estiba Nueva</th>
+        }
+        <th>Estiba</th>
+      </ng-container>
+      <tbody content>
+        @for (item of Productos; track item['Id_Estiba']; let i = $index) {
+          <tr class="text-center">
+            <td>
+              <strong>{{ i + 1 }}</strong>
+            </td>
+            <td class="d-flex flex-column">
+              <strong>{{ item.Nombre_Producto }}</strong>
+              <span>{{ item.Nombre_General }}</span>
+            </td>
+            <td>
+              {{ item.Cantidad | number | puntos }}
+            </td>
+            <td>{{ item.Lote || 'N/A' }}</td>
+            <td>{{ item.Fecha_Vencimiento || 'N/A' }}</td>
+            <td *ngIf="Datos && Datos.Cambio_Estiba">{{ item.Estiba }}</td>
+            <td>
+              <input
+                #CodigoBarra
+                class="form-control form-control-sm"
+                placeholder="Digite el código de barras"
+                name="CodigoBarra"
+                autocomplete="off"
+                id="CodigBarra{{ i }}"
+                type="text"
+                id="cant{{ i }}"
+                [(ngModel)]="item.Codgo_Barras_Estiba"
+                (blur)="focus()"
+                (change)="validarEstiba(item, $event.target.value)"
+              />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+    <button
+      icon="button"
+      class="btn btn-primary btn-block"
+      [disabled]="!Productos.length"
+      (click)="onSaveProduct()"
+    >
+      Guardar productos
+    </button>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div>
+  <div class="text-center text-uppercase card-title mt-4">
+    <i class="fas fa-coins"></i>
+    Resumen del pago
+  </div>
+  <h3 class="text-center">
+    Total pago de provisiones
+    <br />
+    <span class="text-success">${{ provisionesDatos.valor_total | currency: '' : '' }}</span>
+  </h3>
+  <hr />
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-uppercase">
+          <th>Concepto</th>
+          <th class="text-center">Porcentaje</th>
+          <th class="text-center">Base</th>
+          <th class="text-center">x = Base * %</th>
+          <th class="text-center">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of datosResumen">
+          <td>{{ item.concepto }}</td>
+          <td class="text-center">{{ fijarPorcentaje(item.porcentaje * 100, 2) }}%</td>
+          <td class="text-center">{{ item.base | currency: '' : '' }}</td>
+          <td class="text-center">
+            {{ item.base | currency: '' : '' }} *
+            {{ fijarPorcentaje(item.porcentaje, 4) }}
+          </td>
+          <td class="text-center">{{ item.valor | currency: '' : '' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

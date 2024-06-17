@@ -1,0 +1,276 @@
+<app-card
+  viewTitle="Notas contables"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="UrlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]">
+    <button
+      type="button"
+      class="btn btn-primary btn-sm"
+      [routerLink]="['/contabilidad/comprobantes/crear-nota-contable']"
+    >
+      <i class="fa fa-plus"></i>
+      Agregar
+    </button>
+  </ng-container>
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="NotasContables"
+    [pagination]="pagination"
+    (pageChange)="onPagination($event)"
+  >
+    <ng-container titles>
+      <th>Fecha</th>
+      <th>Empresa</th>
+      <th>Documento</th>
+      <th>Beneficiario</th>
+      <th>Concepto</th>
+      <th>Total Debito</th>
+      <th>Total Credito</th>
+      <th>Total Debito NIIF</th>
+      <th>Total Credito NIIF</th>
+      <th>Funcionario</th>
+      <th class="col-1">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of NotasContables; track $index) {
+        <tr class="text-center text-uppercase">
+          <td>{{ item.Fecha || 'N/A' }}</td>
+          <td>{{ item.Empresa || 'N/A' }}</td>
+          <td>{{ item.Codigo || 'N/A' }}</td>
+          <td>{{ item.Beneficiario || 'N/A' }} - {{ item.Tercero || 'N/A' }}</td>
+          <td>{{ item.Concepto || 'N/A' }}</td>
+          <td>${{ item.Total_Debe_PCGA | number: '1.2-2' || 'N/A' }}</td>
+          <td>${{ item.Total_Haber_PCGA | number: '1.2-2' || 'N/A' }}</td>
+          <td>${{ item.Total_Debe_NIIF | number: '1.2-2' || 'N/A' }}</td>
+          <td>${{ item.Total_Haber_NIIF | number: '1.2-2' || 'N/A' }}</td>
+          <td>{{ item.Funcionario || 'N/A' }}</td>
+          <td>
+            <span class="badge" [class]="item.Estado == 'Anulada' ? 'bg-danger' : 'bg-success'">{{
+              item.Estado || 'N/A'
+            }}</span>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="fa fa-print"
+                text="Ver NIIF"
+                type="info"
+                (click)="getNIIF(item.Id_Documento_Contable)"
+              ></app-action-button>
+              <app-action-button
+                *ngIf="item.Estado != 'Anulada'"
+                icon="fas fa-times"
+                text="Anular"
+                type="danger"
+                (click)="onCancelDoc(); IdDocumento = item.Id_Documento_Contable"
+              ></app-action-button>
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+<!-- /////// -->
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Notas contables</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            [routerLink]="['/contabilidad/comprobantes/crear-nota-contable']"
+          >
+            <i class="fa fa-plus"></i> Agregar
+          </button>
+          <button class="btn btn-info btn-sm"><i class="fas fa-sliders-h"></i> Filtros</button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel class="mat-elevation-z0">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha de inicio</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              autocomplete="off"
+              placeholder="Busca por fecha"
+            />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Fecha de fin</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker2"
+              autocomplete="off"
+              placeholder="Busca por fecha"
+            />
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Documento</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por documento"
+              [(ngModel)]="filtros.codigo"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Beneficiario</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por beneficiario"
+              [(ngModel)]="filtros.tercero"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select [(ngModel)]="filtros.estado">
+              <mat-option value="">Todas</mat-option>
+              <mat-option value="Activo">Activo</mat-option>
+              <mat-option value="Anulada">Anulada</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!Cargando && NotasContables.length > 0"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Fecha</th>
+            <!-- <th>Empresa</th> -->
+            <th>Documento</th>
+            <th>Beneficiario</th>
+            <th>Concepto</th>
+            <th>Total Debito</th>
+            <th>Total Credito</th>
+            <th>Total Debito NIIF</th>
+            <th>Total Credito NIIF</th>
+            <th>Funcionario</th>
+            <th class="col-1">Estado</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of NotasContables" class="text-center">
+            <td>{{ item.Fecha }}</td>
+            <!-- <td> {{ item.Empresa }} </td> -->
+            <td>{{ item.Codigo }}</td>
+            <td>{{ item.Beneficiario }} - {{ item.Tercero }}</td>
+            <td>{{ item.Concepto }}</td>
+            <td>${{ item.Total_Debe_PCGA | number: '1.2-2' }}</td>
+            <td>${{ item.Total_Haber_PCGA | number: '1.2-2' }}</td>
+            <td>${{ item.Total_Debe_NIIF | number: '1.2-2' }}</td>
+            <td>${{ item.Total_Haber_NIIF | number: '1.2-2' }}</td>
+            <td>{{ item.Funcionario }}</td>
+            <td>
+              <span class="badge" [class]="item.Estado == 'Anulada' ? 'bg-danger' : 'bg-success'">{{
+                item.Estado
+              }}</span>
+            </td>
+            <td>
+              <div ngbDropdown container="body" class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <!-- <a
+                    class="dropdown-item"
+                    href="{{
+                      environment.base_url
+                    }}/php/contabilidad/notascontables/descarga_pdf.php?id={{
+                      item.Id_Documento_Contable
+                    }}"
+                    target="_blank"
+                  >
+                    <i class="fa fa-print"></i> Ver PCGA</a
+                  > -->
+                  <a
+                    class="dropdown-item text-info"
+                    href="{{
+                      environment.base_url
+                    }}/php/contabilidad/notascontables/descarga_pdf.php?id={{
+                      item.Id_Documento_Contable
+                    }}&tipo=Niif"
+                    target="_blank"
+                  >
+                    <i class="fa fa-print"></i> Ver NIIF</a
+                  >
+                  <a
+                    *ngIf="item.Estado != 'Anulada'"
+                    class="dropdown-item text-danger"
+                    href="javascript:;"
+                    (click)="onCancelDoc(); IdDocumento = item.Id_Documento_Contable"
+                  >
+                    <i class="fas fa-trash-alt"></i> Anular</a
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- /////// -->
+
+<ng-template #filterTemplate>
+  <!-- rango de fechas -->
+  <app-date-picker class="col" [value]="filtros" (dateChange)="selectedDate($event)" />
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Empresa</mat-label>
+    <mat-select [(ngModel)]="filtros.empresa" (selectionChange)="ListarNotasContables()">
+      <mat-option value="">Todas</mat-option>
+      <mat-option *ngFor="let company of companies" [value]="company.value">{{
+        company.text
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Documento</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por documento"
+      [(ngModel)]="filtros.codigo"
+      (input)="ListarNotasContables()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Beneficiario</mat-label>
+    <input
+      matInput
+      type="text"
+      placeholder="Busca por beneficiario"
+      [(ngModel)]="filtros.tercero"
+      (input)="ListarNotasContables()"
+    />
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filtros.estado" (selectionChange)="ListarNotasContables()">
+      <mat-option value="">Todas</mat-option>
+      <mat-option value="Activo">Activo</mat-option>
+      <mat-option value="Anulada">Anulada</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

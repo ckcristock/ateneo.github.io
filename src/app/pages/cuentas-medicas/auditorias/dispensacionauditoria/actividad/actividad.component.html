@@ -1,0 +1,54 @@
+<div class="card">
+  <div class="card-body">
+    <div class="card-title">
+      <h5 class="text-primary">Seguimiento {{ Modulo }}</h5>
+    </div>
+    <hr class="line" />
+
+    <ul
+      class="list-group list-group-flush"
+      *ngIf="!Cargando && Actividades.length > 0; else notData"
+    >
+      <li class="list-group-item px-0" *ngFor="let activity of Actividades">
+        <div class="d-flex w-100 justify-content-between">
+          <div>
+            <h6 class="mb-0">
+              <span
+                class="badge"
+                [class]="
+                  activity?.Estado == 'Creacion'
+                    ? 'bg-info'
+                    : activity?.Estado == 'Edicion'
+                      ? 'bg-warning'
+                      : activity?.Estado == 'Anulada' || activity?.Estado == 'Rechazada'
+                        ? 'bg-danger'
+                        : activity?.Estado == 'Aprobacion'
+                          ? 'bg-success '
+                          : activity?.Estado == 'Recepcion'
+                            ? 'bg-primary '
+                            : activity?.Estado != ''
+                              ? 'bg-secondary'
+                              : ''
+                "
+              >
+                {{ activity?.Estado || 'N/A' | capitalLetter }}</span
+              >
+            </h6>
+            <p class="mb-1">{{ activity?.Detalles || 'N/A' | capitalLetter }}</p>
+            <small>{{ activity?.Fecha }}</small>
+            <small class="d-block">{{ activity?.person?.full_names | capitalLetter }}</small>
+          </div>
+          <img
+            class="d-block img-thumbnail rounded-circle img-fluid header-profile-user"
+            [src]="activity?.person?.image"
+            onerror="this.src='../../../../../assets/images/noprofile.png'"
+          />
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>

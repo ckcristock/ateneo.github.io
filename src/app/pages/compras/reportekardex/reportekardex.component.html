@@ -1,0 +1,250 @@
+<app-card viewTitle="Reporte kardex">
+  <form #FormKardex="ngForm" class="row">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select
+        name="Tipo"
+        [value]="typeWinery"
+        (selectionChange)="loadBodegaPunto($event.value)"
+      >
+        <mat-option value="Bodega" selected>Bodega</mat-option>
+        <mat-option value="Punto">Punto dispensación</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Bodega/Punto</mat-label>
+      <mat-select name="IdBodegaPunto" [(ngModel)]="bodegaPunto">
+        @for (bodega of bodega_punto; track $index) {
+          <mat-option [value]="bodega.value">{{ bodega.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Rango de fechas</mat-label>
+      <mat-date-range-input [formGroup]="formRange" [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Fecha de inicio"
+          required
+          formControlName="start"
+          name="date_start"
+        />
+        <input
+          matEndDate
+          placeholder="Fecha de fin"
+          required
+          formControlName="end"
+          name="date_end"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancelar</button>
+          <button
+            mat-raised-button
+            color="primary"
+            matDateRangePickerApply
+            (click)="onFilterDate()"
+          >
+            Aplicar
+          </button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
+    </mat-form-field>
+    <div class="col">
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="formRange.invalid || !bodegaPunto"
+        (click)="openGetProduct(modalProductos)"
+      >
+        <i class="fa fa-search"></i> Escoger Producto
+      </button>
+    </div>
+  </form>
+  @if (Lista_Productos.length) {
+    <h5 class="text-center">
+      {{ ProductoConsulta['Nombre_Comercial'] }}
+    </h5>
+    <h6 class="text-center">
+      {{ ProductoConsulta['Nombre_Producto'] }} - EMB: {{ ProductoConsulta['Embalaje'] }}
+    </h6>
+  }
+  <app-table [loading]="Cargando2" [arrayData]="Lista_Productos">
+    <ng-container titles>
+      <th>#</th>
+      <th>Fecha</th>
+      <th>Tipo</th>
+      <th>Codigo</th>
+      <th>Factura</th>
+      <th>Origen</th>
+      <th>Destino</th>
+      @for (key of variablesKeys; track $index) {
+        <th>{{ key }}</th>
+      }
+      @if (showBatch) {
+        <th>Lote</th>
+        <th>Fecha Vencimiento</th>
+      }
+      <th>Entrada</th>
+      <th>Salida</th>
+      <th>Saldo</th>
+    </ng-container>
+    <tbody content>
+      @for (item of Lista_Productos; track item; let i = $index) {
+        <tr class="text-center">
+          <td>{{ i + 1 || 'N/A' }}</td>
+          <td>{{ (item.Fecha | date: 'dd/MM/yy') ? (item.Fecha | date: 'dd/MM/yy') : 'N/A' }}</td>
+          <td>
+            @if (item.Tipo !== 'Inventario') {
+              <span class="label {{ item.Tipo == 'Entrada' ? 'label-success' : 'label-danger' }}">
+                {{ item.Tipo || 'N/A' }}
+              </span>
+            } @else {
+              <span>{{ item.Tipo || 'N/A' }}</span>
+            }
+          </td>
+          <td>
+            @if (item.Tipo !== 'Inventario') {
+              {{ item.Codigo || 'N/A' }}
+            } @else {
+              <a
+                target="_blank"
+                style="font-size: 9px; cursor: pointer"
+                (click)="downloadReport(item.Ruta, item.ID)"
+              >
+                {{ item.Codigo || 'N/A' }}
+              </a>
+            }
+          </td>
+          <td>
+            @if (item.Factura) {
+              <a
+                [routerLink]="['/compras/reporte-kardex/factura-ver', item.Factura]"
+                style="font-size: 9px"
+              >
+                {{ item.Codigo_Fact || 'N/A' }}
+              </a>
+            } @else {
+              No hay factura
+            }
+          </td>
+          <td>{{ item.Nombre_Origen || 'N/A' }}</td>
+          <td>{{ item.Destino || 'N/A' }}</td>
+          @for (key of variablesKeys; track $index) {
+            <td>{{ item.variables[key] || 'N/A' }}</td>
+          }
+          @if (showBatch) {
+            <td>{{ item.Lote || 'N/A' }}</td>
+            <td>{{ item.Fecha_Vencimiento || 'N/A' }}</td>
+          }
+
+          <td>
+            @if (item.Tipo == 'Entrada' || item.Tipo == 'Inventario') {
+              {{ (item.Cantidad | number | puntos) ? (item.Cantidad | number | puntos) : 'N/A' }}
+            } @else {
+              No hay entrada
+            }
+          </td>
+          <td>
+            @if (item.Tipo == 'Salida') {
+              {{ (item.Cantidad | number | puntos) ? (item.Cantidad | number | puntos) : 'N/A' }}
+            } @else {
+              No hay salida
+            }
+          </td>
+          <td>
+            <strong>{{
+              (item.Saldo | number | puntos) ? (item.Saldo | number | puntos) : 'N/A'
+            }}</strong>
+          </td>
+        </tr>
+      }
+      <tr>
+        <td colspan="100%" class="text-end">
+          <span>
+            Saldo anterior: {{ (inicial | number | puntos) ? (inicial | number | puntos) : 'N/A' }}
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="100%" class="text-end">
+          <span>
+            Saldo actual:
+            {{ (Saldo_Actual | number | puntos) ? (Saldo_Actual | number | puntos) : 'N/A' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </app-table>
+  @if (Lista_Productos.length) {
+    <div class="text-end">
+      <a type="button" target="_blank" class="btn btn-primary" (click)="downloadKardex()">
+        <i class="fa fa-file"></i> Descargar Kardex
+      </a>
+    </div>
+  }
+</app-card>
+
+<ng-template #modalProductos>
+  <app-modal titleModal="Busqueda productos">
+    <div class="row gap-3 mb-3">
+      <app-automatic-search
+        class="col"
+        label="Filtro nombre"
+        placeholder="Busca por nombre"
+        [value]="filtro_nombre"
+        (searching)="filtro_nombre = $event; filtros()"
+      ></app-automatic-search>
+      <app-automatic-search
+        class="col"
+        label="Filtro código de barras"
+        placeholder="Busca por código de barras"
+        [value]="filtro_Codigo_barras"
+        (searching)="filtro_Codigo_barras = $event; filtros()"
+      ></app-automatic-search>
+    </div>
+    <div class="table-height">
+      <app-table [loading]="Cargando" [arrayData]="ListaProducto">
+        <ng-container titles>
+          <th></th>
+          <th>Nombre</th>
+          <th>Código de barras</th>
+        </ng-container>
+        <tbody content>
+          @for (producto of ListaProducto; track producto.Id_Producto; let i = $index) {
+            <tr class="text-center align-middle">
+              <td>
+                <mat-radio-button
+                  color="primary"
+                  id="check{{ i }}"
+                  name="Producto"
+                  [value]="producto.Producto"
+                  (change)="addProduct(i)"
+                ></mat-radio-button>
+              </td>
+              <td class="d-flex flex-column justify-content-center align-items-center">
+                <strong>{{ producto.Nombre_Comercial }}</strong>
+                <p class="text-muted m-0" style="font-size: 8px">{{ producto.name }}</p>
+              </td>
+              <td>
+                {{ producto.Codigo_Barras }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    </div>
+
+    <button
+      buttons
+      type="button"
+      [disabled]="!selectedProduct"
+      class="btn btn-primary"
+      (click)="AgregarProducto()"
+    >
+      Escoger Producto
+    </button>
+  </app-modal>
+</ng-template>

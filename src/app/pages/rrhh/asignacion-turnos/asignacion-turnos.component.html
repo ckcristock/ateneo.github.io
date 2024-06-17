@@ -1,0 +1,158 @@
+<app-card
+  viewTitle="Asignación de horarios"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-header-button
+    filters
+    icon="history"
+    text="Historial"
+    type="primary"
+    (click)="openModal(historyModal)"
+  ></app-header-button>
+  <h5>
+    <span class="badge rounded-pill bg-warning">
+      Semana del {{ startWeek | date }} al {{ endWeek | date }}
+    </span>
+  </h5>
+  <ng-container *ngIf="datosGenerales.length > 0 && !loading; else notData">
+    <ng-container *ngFor="let company of datosGenerales">
+      <ng-container *ngFor="let group of company.groups">
+        <ng-container *ngFor="let dependency of group.dependencies">
+          <h6 class="text-center text-uppercase text-primary">
+            {{ group.name }} - {{ dependency.name }}
+          </h6>
+          <app-semana-turno
+            [people]="dependency.people"
+            [turnosRotativos]="turns"
+            [diaInicial]="diaInicialSemana"
+            [changeWeek]="changeWeek"
+            [diaFinal]="diaFinalSemana"
+          ></app-semana-turno>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</app-card>
+
+<ng-template #filterTemplate>
+  <form [formGroup]="formFilters" (ngSubmit)="makeRequestBySemana()">
+    <div class="row">
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Grupo</mat-label>
+        <mat-select formControlName="group_id" (selectionChange)="makeRequestBySemana()">
+          <mat-option *ngFor="let group of groupList; let index = index" [value]="group.value">
+            {{ group.text }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Dependencia</mat-label>
+        <mat-select formControlName="dependency_id" (selectionChange)="makeRequestBySemana()">
+          <mat-option *ngFor="let dependency of dependencyList" [value]="dependency.value">
+            {{ dependency.text }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <app-automatic-search
+        class="col"
+        label="Funcionario"
+        placeholder="Busca por funcionario"
+        [value]="formFilters.controls['person'].value"
+        (searching)="onSearchPerson($event)"
+      ></app-automatic-search>
+      <app-date-picker class="col" [value]="dateFilter" (dateChange)="selectedDate($event)" />
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>
+
+<ng-template #historyModal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Historial de cambios</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-sm"
+        *ngIf="!loadingHistory && history?.length > 0; else notDataHistory"
+      >
+        <tbody>
+          <ng-container *ngFor="let item of history; let i = index">
+            <tr class="text-center" role="button" (click)="item.show = !item.show">
+              <td>{{ item?.created_at | date: 'MMM d, y, h:mm:ss a' }}</td>
+              <td>{{ item?.person.full_names | uppercase }}</td>
+              <td class="col-1">
+                <i
+                  [ngClass]="item.show ? 'fa-angle-up' : 'fa-angle-down'"
+                  aria-hidden="true"
+                  class="fas text-primary"
+                  role="button"
+                ></i>
+              </td>
+            </tr>
+            <ng-container *ngIf="item.show">
+              <tr>
+                <td colspan="100%">
+                  <app-table [loading]="loading" [arrayData]="item.elements">
+                    <ng-container titles>
+                      <th>Funcionario</th>
+                      <th>Acción</th>
+                      <th>Turno asignado</th>
+                      <th>Día del turno</th>
+                    </ng-container>
+                    <tbody content>
+                      @for (element of item.elements; track $index) {
+                        <tr class="text-center">
+                          <td>
+                            {{ element?.rotating_turn_hour?.person?.full_names | uppercase }}
+                          </td>
+                          <td>
+                            {{ element.action == 'create' ? 'Creación' : 'Edición' }}
+                          </td>
+                          <td>
+                            {{ element?.rotating_turn_hour?.turno_rotativo?.name | uppercase }}
+                          </td>
+                          <td>
+                            {{ element?.rotating_turn_hour?.date | date }}
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </app-table>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <mat-paginator
+      *ngIf="paginationMaterial"
+      [length]="paginationMaterial?.total"
+      [pageSize]="paginationMaterial?.per_page"
+      [pageIndex]="paginationMaterial?.current_page - 1"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="handlePageEvent($event)"
+      aria-label="Select page"
+    >
+    </mat-paginator>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #notDataHistory>
+  <app-not-data [loading]="loadingHistory"></app-not-data>
+</ng-template>

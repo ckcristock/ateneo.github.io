@@ -1,0 +1,26 @@
+<div class="card-title">
+  <div class="row d-flex justify-content-md-between">
+    <figure class="col-md figure my-auto text-md-start text-center">
+      <img
+        class="figure-img img-fluid rounded img-cabecera"
+        alt="Imagen de la empresa"
+        onerror="this.src='../../../../assets/images/not-available.png'"
+        fill
+        lazy
+        [ngSrc]="Empresa.logo ?? ''"
+      />
+      <figcaption class="figure-caption">
+        <strong>{{ Empresa.name }}</strong> <br /><strong>NIT:</strong> {{ Empresa.tin | number }}
+        <!-- -{{ Empresa?.verification_digit }} -->
+      </figcaption>
+    </figure>
+    <div class="col-md text-md-end text-center">
+      <h4 class="text-primary">{{ datosCabecera?.Titulo || 'Sin título' }}</h4>
+      <h4 *ngIf="datosCabecera?.Codigo !== undefined && datosCabecera?.Codigo !== ''">
+        {{ datosCabecera?.Codigo }}
+      </h4>
+      <h6>{{ datosCabecera?.Fecha | date: 'longDate' }}</h6>
+      <small>{{ datosCabecera?.CodigoFormato ? datosCabecera?.CodigoFormato : '' }}</small>
+    </div>
+  </div>
+</div>

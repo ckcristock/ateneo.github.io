@@ -1,0 +1,349 @@
+<app-card viewTitle="Crear nuevo ajuste">
+  <form #FormEntrada="ngForm" class="row mt-3">
+    @if (TipoAjuste !== 'Cambio') {
+      <mat-form-field class="col" appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select ngModel name="Tipo" required (selectionChange)="Tipo($event.value)">
+          <mat-option value="">Seleccione</mat-option>
+          <mat-option value="Bodega">Bodega</mat-option>
+          <mat-option value="Punto">Punto de dispensación</mat-option>
+        </mat-select>
+      </mat-form-field>
+    }
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Clase de ajuste individual</mat-label>
+      <mat-select ngModel name="Id_Clase_Ajuste_Individual" required>
+        <mat-option value="">Seleccione</mat-option>
+        @for (clase of Clase_Ajuste_Individual; track clase.Id_Clase_Ajuste_Individual) {
+          <mat-option [value]="clase.Id_Clase_Ajuste_Individual">
+            {{ clase.Descripcion }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Seleccione la Bodega</mat-label>
+      <mat-select ngModel name="Id_Bodega_Nuevo" (selectionChange)="BuscarEstiba($event.value)">
+        <mat-option value="">Seleccione</mat-option>
+        @for (bodegas of bodegas; track $index) {
+          <mat-option [value]="bodegas.Id_Bodega_Nuevo">
+            {{ bodegas.Nombre }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    @if (estibas.length && TipoAjuste !== 'Entrada' && TipoSelected === 'Bodega') {
+      <app-autocomplete-mdl
+        class="col"
+        label="Seleccione la estiba"
+        placeholder="Buscar estiba"
+        [model]="estiba"
+        [list]="estibas"
+        (optionSelectedEvent)="estiba = $event; listarInventarioBodega(estiba)"
+      ></app-autocomplete-mdl>
+    }
+    <div [ngStyle]="{ display: display_punto }">
+      <app-autocomplete-mdl
+        class="col"
+        label="Seleccione el punto"
+        placeholder="Buscar punto"
+        name="Id_Punto_Dispensacion"
+        [model]="punto"
+        [list]="puntos"
+        (optionSelectedEvent)="punto = $event; listarInventarioPunto(punto)"
+      ></app-autocomplete-mdl>
+    </div>
+    <div class="d-flex gap-3">
+      <app-autocomplete-mdl
+        class="col"
+        label="Producto"
+        placeholder="Busca por producto"
+        [model]="Productos"
+        [list]="TipoAjuste === 'Entrada' ? Lista_Productos : Lista_Productos_Salida"
+        (optionSelectedEvent)="
+          Productos = $event;
+          TipoAjuste === 'Entrada' ? ListarProductos(Productos['Id_Producto']) : ListarLotes()
+        "
+      ></app-autocomplete-mdl>
+      <app-automatic-search
+        class="col"
+        label="¡Pistolear!"
+        placeholder="Busca por pistolear"
+        (searching)="ConsultarCodigoBarras($event)"
+      ></app-automatic-search>
+    </div>
+  </form>
+  @if (TipoAjuste === 'Entrada') {
+    <app-table [loading]="false" [arrayData]="Lista_Productos_Salida">
+      <ng-container titles>
+        <th>Producto</th>
+        <th>Embalaje</th>
+        <th>Laboratorio</th>
+        <th>Lote</th>
+        <th>Cantidad</th>
+        <th>Costo</th>
+        <th>Fecha Venc.</th>
+        <th>Observaciones</th>
+        <th></th>
+      </ng-container>
+      <tbody content>
+        @for (item of Lista_Productos_Salida; track item; let i = $index) {
+          <tr>
+            <td>
+              {{ item.Nombre_Producto }}
+            </td>
+            <td>
+              {{ item.Embalaje }}
+            </td>
+            <td>
+              {{ item.Laboratorio_Comercial }}
+            </td>
+            <td>
+              <input
+                name="Lote{{ i }}"
+                id="Lote{{ i }}"
+                type="text"
+                class="form-control form-control-sm"
+                required
+                [(ngModel)]="item.Lote"
+                (change)="validarLoteEntrada(i, item)"
+              />
+            </td>
+            <td>
+              <input
+                name="Cantidad{{ i }}"
+                id="Cantidad{{ i }}"
+                type="number"
+                class="form-control form-control-sm"
+                ngModel
+                required
+                [(ngModel)]="item.Cantidad"
+              />
+            </td>
+            <td>
+              @if (item.Costo) {
+                <input
+                  *ngIf=""
+                  name="Costo{{ i }}"
+                  id="Costo{{ i }}"
+                  readonly
+                  [(ngModel)]="item.Costo"
+                  type="number"
+                  class="form-control form-control-sm"
+                  required
+                />
+              }
+              @if (!item.Costo || item.Costo == '0' || item.Costo == '0.00') {
+                <input
+                  name="CostoNuevo{{ i }}"
+                  id="CostoNuevo{{ i }}"
+                  type="number"
+                  class="form-control form-control-sm"
+                  required
+                  [(ngModel)]="item.Costo_Nuevo"
+                />
+              }
+            </td>
+            <td>
+              <input
+                type="date"
+                name="Fecha_Vencimiento{{ i }}"
+                id="Fecha_Vencimiento{{ i }}"
+                [min]="Fecha_Actual"
+                class="form-control form-control-sm"
+                required
+                (blur)="validarFecha(i, item)"
+                [(ngModel)]="item.Fecha_Vencimiento"
+              />
+            </td>
+            <td>
+              <textarea
+                name="Observaciones{{ i }}"
+                id="Observaciones{{ i }}"
+                id="Observaciones{{ i }}"
+                cols="30"
+                rows="5"
+                class="form-control form-control-sm"
+                placeholder="Especifique las razones del ajuste"
+                required
+                [(ngModel)]="item.Observaciones"
+              ></textarea>
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-danger btn-mini"
+                (click)="EliminarProductoEnt(i, item)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  } @else {
+    <app-table [loading]="false" [arrayData]="Lotes">
+      <ng-container titles>
+        <th>Producto</th>
+        <th>Embalaje</th>
+        <th>Laboratorio</th>
+        <th>Lote</th>
+        @if (TipoAjuste === 'Lotes') {
+          <th>Lote Nuevo</th>
+        }
+        <th>Cantidad</th>
+        <th>Fecha Venc.</th>
+        @if (TipoAjuste === 'Cambio') {
+          <th>Nueva Estiba</th>
+        }
+        <th></th>
+        <th></th>
+      </ng-container>
+      <tbody content>
+        @for (item of Lotes; track item; let i = $index) {
+          <tr class="text-center">
+            <td>
+              {{ item.Nombre }}
+            </td>
+            <td>
+              {{ item.Embalaje }}
+            </td>
+            <td>
+              {{ item.Laboratorio_Comercial }}
+            </td>
+            <td>
+              {{ item.Lote }}
+            </td>
+            @if (TipoAjuste === 'Lotes') {
+              <td>
+                <input
+                  name="LoteIngresado{{ i }}"
+                  type="text"
+                  [(ngModel)]="item.Lote_Nuevo"
+                  class="form-control form-control-sm"
+                  (blur)="ValidarLote(item)"
+                  required
+                />
+              </td>
+            }
+            @if (TipoAjuste === 'Salida' || TipoAjuste === 'Cambio') {
+              <td>
+                <input
+                  name="CantidadIngresada{{ i }}"
+                  type="number"
+                  class="form-control form-control-sm"
+                  required
+                  [(ngModel)]="item.Cantidad_Actual"
+                  (blur)="ValidarCantidad($event.target.value, i)"
+                />
+              </td>
+            }
+            @if (TipoAjuste === 'Lotes') {
+              <td>
+                {{ item.Cantidad }}
+              </td>
+            }
+            @if (TipoAjuste === 'Salida' || TipoAjuste === 'Cambio') {
+              <td>
+                {{ item.Fecha_Vencimiento }}
+              </td>
+            }
+            @if (TipoAjuste == 'Lotes') {
+              <td>
+                <input
+                  type="date"
+                  name="Fecha_Vencimiento{{ i }}"
+                  id="Fecha_Vencimiento{{ i }}"
+                  class="form-control form-control-sm"
+                  required
+                  [min]="Fecha_Actual"
+                  [(ngModel)]="item.Fecha_Vencimiento_Nueva"
+                  (change)="validarFechaNueva(i, item)"
+                />
+              </td>
+            }
+            @if (TipoAjuste === 'Cambio') {
+              <td>
+                <app-autocomplete-mdl
+                  class="col"
+                  label="Seleccione estiba"
+                  placeholder="Buscar estiba"
+                  [model]="item.Nueva_Estiba"
+                  [list]="estibasRemplazo"
+                  (optionSelectedEvent)="item.Nueva_Estiba = $event"
+                ></app-autocomplete-mdl>
+              </td>
+            }
+            <td>
+              <textarea
+                name="Observaciones{{ i }}"
+                id="Observaciones{{ i }}"
+                cols="30"
+                rows="5"
+                class="form-control form-control-sm"
+                placeholder="Especifique las razones del ajuste"
+                required
+                [(ngModel)]="item.Observaciones"
+              ></textarea>
+            </td>
+            <td>
+              <button type="button" class="btn btn-danger btn-sm" (click)="EliminarProducto(i)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  }
+  @if (Lista_Productos.length || Lista_Productos_Salida.length) {
+    <div class="text-end mt-3">
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!FormEntrada.valid"
+        (click)="onSaveInfo()"
+      >
+        Guardar Información
+      </button>
+    </div>
+  }
+</app-card>
+
+<ng-template #modalLotes>
+  <app-modal titleModal="Lotes del Productos">
+    <div class="col-md-12">
+      <h5 class="text-info">Producto</h5>
+      <p>
+        {{ Nombre }} <br /><br />
+        <strong>Embalaje:</strong> {{ Producto_Salida.Embalaje }}
+      </p>
+    </div>
+    <app-table [loading]="false" [arrayData]="Lotes">
+      <ng-container titles>
+        <th></th>
+        <th>Lote</th>
+        <th>Cantidad</th>
+        <th>Fecha Venc.</th>
+      </ng-container>
+      <tbody content>
+        @for (item of Lotes; track item; let i = $index) {
+          <tr class="text-center">
+            <td>
+              <input
+                type="checkbox"
+                id="check{{ i }}"
+                (change)="habilitarCampos(i)"
+                [disabled]="item.disabled"
+              />
+            </td>
+            <td>{{ item.Lote }}</td>
+            <td>{{ item.Cantidad }}</td>
+            <td>{{ item.Fecha_Vencimiento }}</td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-modal>
+</ng-template>

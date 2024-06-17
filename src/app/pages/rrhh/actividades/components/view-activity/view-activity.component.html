@@ -1,0 +1,57 @@
+<app-modal titleModal="Vista de la actividad">
+  <table class="table table-bordered">
+    <tbody>
+      <tr>
+        <th>Nombre de la actividad</th>
+        <td class="table-active w-75">{{ data?.name }}</td>
+      </tr>
+      <tr>
+        <th>Tipo de actividad</th>
+        <td class="table-active w-75">{{ data?.activity_type }}</td>
+      </tr>
+      <tr>
+        <th>Fecha de inicio</th>
+        <td class="table-active w-75">{{ data?.date_start | date: 'd-M-yyyy' }}</td>
+      </tr>
+      <tr>
+        <th>Fecha de fin</th>
+        <td class="table-active w-75">{{ data?.date_end | date: 'd-M-yyyy' }}</td>
+      </tr>
+      <tr>
+        <th>Hora de inicio</th>
+        <td class="table-active w-75">{{ data?.hour_start }}</td>
+      </tr>
+      <tr>
+        <th>Hora de fin</th>
+        <td class="table-active w-75">{{ data?.hour_end }}</td>
+      </tr>
+      <tr>
+        <th>Grupo</th>
+        <td class="table-active w-75">{{ data?.group }}</td>
+      </tr>
+      <tr>
+        <th>Dependencia</th>
+        <td class="table-active w-75">{{ data?.dependency_name }}</td>
+      </tr>
+      <tr>
+        <th>Detalles</th>
+        <td class="table-active w-75">{{ data?.description }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <h6>Funcionarios:</h6>
+  <div class="row" *ngIf="people.length && !loading; else notData">
+    <div *ngFor="let person of people" class="p-2 col-6">
+      <span class="d-block border-secondary border rounded p-2 col">
+        <app-load-image
+          classImg="rounded-circle mx-auto img-fluid header-profile-user"
+          [src]="person.person?.image"
+        ></app-load-image>
+        {{ person.person.text }}
+      </span>
+    </div>
+  </div>
+</app-modal>
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

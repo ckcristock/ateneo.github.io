@@ -1,0 +1,93 @@
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+        <hr class="line" />
+        <form #FormFiltros="ngForm">
+          <div class="row">
+            <mat-form-field class="col-md-4" appearance="outline">
+              <mat-label>Fecha inicial</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="MovimientoGlobalizadoModel.Fecha_Inicial"
+                (change)="setQueryParams()"
+                name="Fecha_Inicial"
+                id="Fecha_Inicial"
+                required
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-4" appearance="outline">
+              <mat-label>Fecha de corte</mat-label>
+              <input
+                matInput
+                type="date"
+                [(ngModel)]="MovimientoGlobalizadoModel.Fecha_Corte"
+                (change)="setQueryParams()"
+                name="Fecha_Corte"
+                id="Fecha_Corte"
+                required
+              />
+            </mat-form-field>
+            <mat-form-field class="col-md-4" appearance="outline">
+              <mat-label>Estado</mat-label>
+              <mat-select
+                name="Estado"
+                id="Estado"
+                (selectionChange)="setQueryParams()"
+                [(ngModel)]="MovimientoGlobalizadoModel.Estado"
+              >
+                <mat-option value="">Todos</mat-option>
+                <mat-option value="Activo">Activo</mat-option>
+                <mat-option value="Anulado">Inactivo</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>Fuente</mat-label>
+              <mat-select
+                name="Fuente"
+                id="Fuente"
+                [(ngModel)]="MovimientoGlobalizadoModel.Fuente"
+                (selectionChange)="setQueryParams()"
+                required
+              >
+                <mat-option value="">Ninguno</mat-option>
+                <mat-option *ngFor="let item of listaTiposDocumentos" [value]="item.Id_Modulo">
+                  {{ item.Documento }}</mat-option
+                >
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col-md-6" appearance="outline">
+              <mat-label>NIT</mat-label>
+              <input
+                matInput
+                type="text"
+                [(ngModel)]="TerceroSeleccionado"
+                (change)="AsignarTercero(TerceroSeleccionado)"
+                name="Nit"
+                placeholder="Ingresa el nombre o NIT"
+                [ngbTypeahead]="search_tercero"
+                [resultTemplate]="rt_tercero"
+                [inputFormatter]="formatter_tercero"
+              />
+            </mat-form-field>
+          </div>
+        </form>
+
+        <button class="btn btn-primary btn-block" target="_blank" (click)="generarReporte()">
+          <i class="fa fa-file-text"></i> Generar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} </span>
+</ng-template>
+<ng-template #rt_tercero let-r="result" let-t="term">
+  <span class="f-9">
+    {{ r.Nombre_Tercero }}
+  </span>
+</ng-template>

@@ -1,0 +1,59 @@
+<div class="row">
+  <app-data-sheet class="col" icon="fas fa-chart-bar">
+    <span>Total reportados</span>
+    <span>{{ totalReported }}</span>
+  </app-data-sheet>
+  <app-data-sheet class="col" icon="fas fa-check-circle">
+    <span>Total exitosos</span>
+    <span>{{ totalSuccessful }}</span>
+  </app-data-sheet>
+  <app-data-sheet class="col" icon="fas fa-pause-circle">
+    <span>Total pendientes</span>
+    <span>{{ totalPending }}</span>
+  </app-data-sheet>
+  <app-data-sheet class="col" icon="fas fa-exclamation-triangle">
+    <span>Total errores</span>
+    <span>{{ totalErrors }}</span>
+  </app-data-sheet>
+</div>
+<app-card viewTitle="Reporte DIAN">
+  <app-table
+    [loading]="loading"
+    [arrayData]="reports"
+    [pagination]="pagination"
+    (pageChange)="getDetailsDianReport()"
+  >
+    <ng-container titles>
+      <th>Funcionario</th>
+      <th>Fecha reporte</th>
+      <th>Cod. Nómina</th>
+      <th>Cune</th>
+      <th>Total pago</th>
+      <th>Estado</th>
+    </ng-container>
+    <tbody content>
+      @for (item of reports; track $index) {
+        <tr class="text-center">
+          <td>{{ item.person_basic.full_names }}</td>
+          <td>{{ item.electronic_payroll.report_date | date: 'shortDate' }}</td>
+          <td>{{ item.electronic_payroll.payroll_code }}</td>
+          <td>
+            <app-view-more [text]="item.electronic_payroll.cune" [length]="20"></app-view-more>
+          </td>
+          <td>COP {{ item.net_salary | currency: 'COP' : 'symbol-narrow' : '1.2' }}</td>
+          <td>
+            @if (item.electronic_payroll.status === 'Exito') {
+              <span class="badge bg-success">EXITO</span>
+            } @else if (item.electronic_payroll.status === 'Error') {
+              <span class="badge bg-danger">ERROR</span>
+            } @else if (item.electronic_payroll.status) {
+              <app-status-badge [status]="item.electronic_payroll.status" />
+            } @else {
+              N/A
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>

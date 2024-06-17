@@ -1,0 +1,22 @@
+<app-modal titleModal="Novedades">
+  @if (news) {
+    <app-table>
+      <ng-container titles>
+        <th>Concepto</th>
+        <th>Días</th>
+      </ng-container>
+      <tbody content>
+        @for (item of news | keyvalue; track $index) {
+          <tr class="text-center">
+            <td>{{ item.key }}</td>
+            <td>{{ item.value }} h</td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  } @else {
+    <div class="alert alert-warning text-center" role="alert">
+      El funcionario no presenta novedades en este periodo.
+    </div>
+  }
+</app-modal>

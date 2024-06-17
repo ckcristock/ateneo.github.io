@@ -1,0 +1,123 @@
+<div class="row">
+  <div class="col-12"><h2>Detalle de nómina electrónica</h2></div>
+
+  <div class="col-12">
+    <div class="row stats">
+      <div class="col-4">
+        <div class="card card-body">Resumen</div>
+      </div>
+      <div class="col-8">
+        <div class="row">
+          <div class="col-4" *ngFor="let stats of statistics">
+            <div class="card card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <i class="{{ stats.icon }} {{ stats.color }}"></i>
+                <div class="text-end">
+                  <h6>{{ stats.label }}</h6>
+                  <p>{{ stats.cuantity }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-12 d-flex justify-content-between">
+            <input type="text" style="width: 30%" class="form-control form-control-sm" />
+            <select style="width: 90px" class="form-control form-control-sm">
+              <option selected value="">Todos</option>
+              <option *ngFor="let item of statistics" [value]="item.stats">
+                {{ item.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-12 mt-2" *ngIf="penginds > 0 || rejecteds > 0">
+            <button class="btn btn-primary btn-sm btn-block" (click)="reportPendings()">
+              <i class="fas fa-paper-plane"></i>
+              Reportar todos los pendientes
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm table-striped">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Funcionario</th>
+              <th>Código</th>
+              <th>Cune</th>
+              <th>Estado</th>
+              <th>Total Pagado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let payroll of payrolls">
+              <td>{{ payroll.created_at | date: 'dd-MM-YYYY' }}</td>
+              <td>{{ payroll.person_name }}</td>
+              <td>{{ payroll.code }}</td>
+              <td>
+                <p style="width: 500px">
+                  {{ payroll.cune }}
+                </p>
+              </td>
+              <td>
+                <span
+                  [ngClass]="{
+                    'bg-danger': payroll.status == 'rejected',
+                    'bg-warning': payroll.status == 'deleted',
+                    'bg-success': payroll.status == 'succeded',
+                    'bg-dark': !payroll.status
+                  }"
+                  class="badge"
+                  >{{ payroll.status | payrollStatus }}</span
+                >
+              </td>
+              <td>{{ payroll.net_salary | currency: '' : '' }}</td>
+              <td class="text-end">
+                <button
+                  class="btn btn-sm btn-outline-success me-2"
+                  *ngIf="payroll.status != 'succeded'"
+                  (click)="report(payroll.id)"
+                >
+                  <i class="fas fa-paper-plane"></i> Reportar
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  *ngIf="payroll.status == 'succeded'"
+                >
+                  <i class="fas fa-file-import"></i> Modificar
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger me-2"
+                  (click)="deleteElectronicPayroll(payroll.id)"
+                  *ngIf="payroll.status == 'succeded'"
+                >
+                  <i class="fas fa-trash-alt"></i> Anular
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-primary me-2"
+                  (click)="getData.emit(payroll.id)"
+                >
+                  <i class="fas fa-history"></i> Histórico
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <app-historico-nomina-electronica
+    #modalHistoric
+    [getData]="getData"
+  ></app-historico-nomina-electronica>
+</div>

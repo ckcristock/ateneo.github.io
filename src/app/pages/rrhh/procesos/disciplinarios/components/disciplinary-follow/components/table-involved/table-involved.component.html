@@ -1,0 +1,111 @@
+<app-card viewTitle="Involucrados">
+  @if (!isClosed) {
+    <app-add-button filters (click)="openAddInvolvedDisciplinary()" />
+  }
+  <app-table [loading]="false" [arrayData]="involedList">
+    <ng-container titles>
+      <th>Foto</th>
+      <th>Involucrado</th>
+      <th>Fecha de creación</th>
+      <th>Creador</th>
+      <th>Memorandos</th>
+      <th>Observaciones</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (involved of involedList; track involved.id; let i = $index) {
+        <tr class="text-center">
+          <td class="p-0">
+            <app-load-image
+              classImg="img-thumbnail rounded-circle header-profile-user mx-auto d-block"
+              [src]="involved.person.image"
+            ></app-load-image>
+          </td>
+          <td class="align-middle">
+            {{ involved.person.full_names }}
+          </td>
+          <td class="align-middle">{{ involved.created_at | date }}</td>
+          <td class="align-middle">
+            {{ involved.user.person_id }}
+          </td>
+          <td class="align-middle">
+            <i
+              [ngClass]="collapsed[i] ? 'fa-angle-up' : 'fa-angle-down'"
+              class="fas text-primary"
+              role="button"
+              (click)="collapsed[i] = !collapsed[i]"
+            ></i>
+          </td>
+          <td class="align-middle">
+            <app-view-more [text]="involved.observation" [length]="40"></app-view-more>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="file-download"
+                text="Llamado a descargos"
+                type="primary"
+                (click)="openCallReleases(involved.id)"
+              ></app-action-button>
+              @if (involved.file) {
+                <app-action-button
+                  icon="download"
+                  text="Descargar documentos"
+                  type="success"
+                  [link]="{
+                    url: involved.file,
+                    target: '_blank'
+                  }"
+                ></app-action-button>
+              }
+              @if (!isClosed) {
+                <app-action-deactivate (action)="removeInvolved(involved.id)" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+        <tr>
+          @if (collapsed[i]) {
+            @if (involved.memorandum_involved.length) {
+              <td class="align-middle" colspan="100%">
+                <div class="rounded-top table-responsive">
+                  <table class="table table-bordered table-sm">
+                    <thead class="bg-light">
+                      <tr class="text-center text-uppercase">
+                        <th>Motivo</th>
+                        <th>Detalle</th>
+                        <th>Fecha de creación</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of involved.memorandum_involved; track $index) {
+                        <tr class="text-center">
+                          <td class="align-middle">
+                            {{ item.memorandum.memorandumtype.name }}
+                          </td>
+                          <td class="align-middle">
+                            <app-view-more
+                              [text]="item.memorandum.details"
+                              [length]="40"
+                            ></app-view-more>
+                          </td>
+                          <td class="align-middle">
+                            {{ item.memorandum.created_at | date }}
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            } @else {
+              <td class="align-middle" colspan="100%" class="text-center">
+                <div class="alert alert-info mb-0" role="alert">Sin memorandos agregados</div>
+              </td>
+            }
+          }
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>

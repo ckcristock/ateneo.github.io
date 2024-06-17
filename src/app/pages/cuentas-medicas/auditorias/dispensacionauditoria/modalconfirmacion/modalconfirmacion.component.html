@@ -1,0 +1,62 @@
+<app-modal-basic #ModalConfirmacion>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Cambiar estado de la auditoria</h4>
+    <h4
+      [ngClass]="{
+        'text-danger': Model.Estado == 'Rechazar',
+        'text-success': Model.Estado == 'Aceptar'
+      }"
+    >
+      {{ Model.Estado }}
+    </h4>
+    <button type="button" class="close basic-close" (click)="CerrarModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <form #FormConfirmacion="ngForm">
+      <div class="form-row">
+        <div class="col-md-12">
+          <p>La auditoria presenta algun error con algunos de los siguiente item:</p>
+        </div>
+        <div *ngFor="let item of Soportes; let i = index" class="col-md-12">
+          <div class="row">
+            <div class="col-md-12" style="text-transform: uppercase">
+              <input
+                type="checkbox"
+                name="tipo_soporte{{ i }}"
+                [value]="item.Id_Tipo_Soporte"
+                (change)="AgregarErrores($event, i)"
+              />
+              {{ item.Tipo_Soporte }}
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="Model.Estado == 'Rechazar'" class="col-md-12">
+          <label for="num_rad">Observaciones </label>
+          <textarea
+            rows="3"
+            class="form-control"
+            name="Observacion"
+            [(ngModel)]="Model.Observacion"
+            required
+          ></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button type="button" class="btn btn-default btn-sm" (click)="CerrarModal()">Cancelar</button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        (confirm)="GuardarEstado()"
+        [disabled]="!FormConfirmacion.valid"
+      >
+        Guardar
+      </button>
+    </div>
+  </div>
+</app-modal-basic>

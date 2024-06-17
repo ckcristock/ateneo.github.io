@@ -1,0 +1,234 @@
+<div class="card">
+  <div class="card-body">
+    <div class="card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Facturación</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button type="button" class="btn btn-primary btn-sm" [routerLink]="['nueva']">
+            <i class="fa fa-plus"></i>
+            Agregar
+          </button>
+          <button class="btn btn-info btn-sm" (click)="openClose()">
+            <i class="fas fa-sliders-h"></i> Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel class="mat-elevation-z0">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Código</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por código"
+              [(ngModel)]="filtro_cod_fact"
+              (blur)="filtros1()"
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <!-- Mirar commits anteriores a 16/10/23 -->
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Facturador</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por facturador"
+              [(ngModel)]="filtro_facturador"
+              (blur)="filtros1()"
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Cliente</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por cliente"
+              [(ngModel)]="filtro_cliente"
+              (blur)="filtros1()"
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Tipo</mat-label>
+            <mat-select (selectionChange)="filtros1()" [(ngModel)]="filtro_tipo_fact">
+              <mat-option *ngFor="let item of Servicios" [value]="item.Id_Tipo_Servicio">
+                {{ item.Nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <!-- <select (change)="filtros1()" [(ngModel)]="filtro_mod" class="form-control input-sm">
+                <option value="">Todas</option>
+                <option value="Factura">Factura</option>
+                <option value="Homologo">Homologo</option>
+              </select> -->
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select (selectionChange)="filtros1()" [(ngModel)]="filtro_estado_fact">
+              <mat-option value="">Todas</mat-option>
+              <mat-option value="Sin Cancelar">Sin Cancelar</mat-option>
+              <mat-option value="Cancelada">Canceladas</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div
+      class="rounded-top table-responsive"
+      *ngIf="!Cargando && Facturas.length > 0; else notData"
+    >
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Codigo</th>
+            <th>Fecha</th>
+            <th>Facturador</th>
+            <th>Cliente</th>
+            <th>Tipo</th>
+            <th>Modalidad</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let factura of Facturas"
+            class="text-center"
+            [ngClass]="{ 'text-danger': factura.Estado_Factura == 'Anulada' }"
+          >
+            <td>
+              <strong>{{ factura.Codigo }}</strong>
+            </td>
+            <td class="text-center">
+              {{ factura.Fecha_Documento | date: 'dd/MM/yyyy' }}
+            </td>
+            <td>
+              {{ factura.Funcionario }}
+            </td>
+            <td>{{ factura.Cliente }}</td>
+            <td>
+              <div class="text-center">
+                <span class="label label-inverse">{{ factura.Tipo }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="text-center">
+                <span
+                  class="label"
+                  [ngClass]="{
+                    'label-primary': factura.Modalidad == 'Homologo',
+                    'label-success': factura.Modalidad == 'Factura'
+                  }"
+                  >{{ factura.Modalidad }}</span
+                >
+              </div>
+            </td>
+            <td>
+              <div class="text-center">
+                <span
+                  class="label {{
+                    factura.Estado_Factura == 'Sin Cancelar' ? 'label-danger' : 'label-success'
+                  }}"
+                  >{{ factura.Estado_Factura }}</span
+                >
+              </div>
+            </td>
+            <td>
+              <div class="text-center">
+                <div ngbDropdown class="dropdown-primary">
+                  <button
+                    ngbDropdownToggle
+                    class="btn btn-secondary btn-mini waves-effect waves-light"
+                    type="button"
+                  >
+                    Acciones
+                  </button>
+                  <div ngbDropdownMenu>
+                    <!-- <a *ngIf="factura.Tipo == 'Evento' || factura.Tipo == 'NoPos'" class="dropdown-item waves-light waves-effect caja-botones" href="javascript:;" (click)="Id_Factura = factura.Id_Factura;modalInfoExtra.show()">
+                      <i class="fa fa-plus-circle"></i>Añadir Info Extra</a> -->
+                    <a
+                      *ngIf="factura.Tipo != 'Pos-Capita'"
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href=""
+                      [routerLink]="[
+                        '/cmfacturaver',
+                        factura.Tipo_Fact == 'Factura'
+                          ? factura.Id_Factura
+                          : factura.Id_Factura_Asociada
+                      ]"
+                    >
+                      <i class="ti-eye"></i>Ver</a
+                    >
+                    <a
+                      *ngIf="factura.Tipo == 'Pos-Capita'"
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href=""
+                      [routerLink]="['/cmfacturacapitaver', factura.Id_Factura]"
+                    >
+                      <i class="ti-eye"></i>Ver</a
+                    >
+                    <!-- Ver de Factura Capita -->
+                    <a
+                      *ngIf="factura.Tipo != 'Pos-Capita'"
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href="{{ globales.ruta }}php/facturasventas/factura_dis_pdf.php?id={{
+                        factura.Id_Factura
+                      }}"
+                      target="_blank"
+                    >
+                      <i class="ti-printer"></i>Imprimir Factura</a
+                    >
+                    <a
+                      *ngIf="factura.Tipo == 'Pos-Capita'"
+                      class="dropdown-item waves-light waves-effect caja-botones"
+                      href="{{ globales.ruta }}php/factura_capita/factura_capita_pdf.php?id={{
+                        factura.Id_Factura
+                      }}"
+                      target="_blank"
+                    >
+                      <i class="ti-printer"></i>Imprimir Factura</a
+                    >
+                    <!-- Imprimir de Factura Capita -->
+                    <a
+                      *ngIf="factura.Estado_Factura != 'Anulada' && factura.Tipo != 'Pos-Capita'"
+                      class="dropdown-item waves-light waves-effect caja-botones bg-danger"
+                      href="javascript:;"
+                      (click)="modalAnularFactura.show(); Id_Factura = factura.Id_Factura"
+                    >
+                      <i class="ti-close"></i> Anular</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- [collectionSize]="pagination.collectionSize"
+    [pageSize]="pagination.pageSize" [(page)]="pagination.page"
+    (pageChange)="paginacion($event)" -->
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      aria-label="Default pagination"
+      maxSize="5"
+      rotate="true"
+      ellipses="false"
+      [collectionSize]="20"
+      boundaryLinks="true"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+    >
+    </ngb-pagination>
+  </div>
+</div>
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>

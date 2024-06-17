@@ -1,0 +1,292 @@
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>
+<div class="card" *ngIf="!loading; else placeholder">
+  <div class="card-body">
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="card-title">
+        <h4 class="text-primary">{{ edit ? 'Editar' : 'Crear' }} vacante</h4>
+      </div>
+      <hr class="line" />
+      <div class="row">
+        <mat-form-field class="col-md-6" appearance="outline">
+          <mat-label>Título</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el título"
+            formControlName="title"
+            autocomplete="off"
+            required
+          />
+          <mat-error *ngIf="title_invalid"> Es necesario el título </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Rango de fechas</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input
+              matStartDate
+              placeholder="Fecha de inicio"
+              required
+              formControlName="date_start"
+              name="date_start"
+            />
+            <input
+              matEndDate
+              placeholder="Fecha de fin"
+              required
+              formControlName="date_end"
+              name="date_end"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker>
+            <mat-date-range-picker-actions>
+              <button mat-button matDateRangePickerCancel>Cancelar</button>
+              <button
+                mat-raised-button
+                color="primary"
+                matDateRangePickerApply
+                (click)="selectedDate()"
+              >
+                Aplicar
+              </button>
+            </mat-date-range-picker-actions>
+          </mat-date-range-picker>
+        </mat-form-field>
+        <app-filter-roles-company
+          [showAll]="false"
+          [hideSelect]="{ person_id: true }"
+          [formRef]="formRefRoles"
+        ></app-filter-roles-company>
+        <app-autocomplete-fc
+          class="col"
+          label="Departamento"
+          placeholder="Seleccionar"
+          [control]="form.controls['department_id']"
+          [class.is-invalid]="form.get('department_id').invalid"
+          [list]="departments"
+        ></app-autocomplete-fc>
+        <app-autocomplete-fc
+          class="col"
+          label="Municipio"
+          placeholder="Seleccionar"
+          [control]="form.controls['municipality_id']"
+          [class.is-invalid]="form.get('municipality_id').invalid"
+          [list]="municipalities"
+        ></app-autocomplete-fc>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de salario</mat-label>
+          <mat-select formControlName="salary_type_id" required>
+            <mat-option *ngFor="let item of salaries" [value]="item.value">{{
+              item.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Salario (-)</mat-label>
+          <input
+            matInput
+            formControlName="min_salary"
+            autocomplete="off"
+            placeholder="Ingresa el salario mínimo"
+            currencyMask
+            [options]="masks.maskCOP"
+            appInputPosition
+            (blur)="validarSalarios()"
+            required
+          />
+          <mat-error *ngIf="min_salary_invalid"> Es necesario el salario </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Salario (+)</mat-label>
+          <input
+            matInput
+            formControlName="max_salary"
+            placeholder="Ingresa el salario máximo"
+            currencyMask
+            [options]="masks.maskCOP"
+            appInputPosition
+            (blur)="validarSalarios()"
+            required
+          />
+          <mat-error *ngIf="max_salary_invalid"> Es necesario el salario </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de turno</mat-label>
+          <mat-select formControlName="turn_type" required>
+            <mat-option *ngFor="let item of turns" [value]="item.value">{{ item.text }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="turn_type_invalid"> Es necesario el tipo de turno </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Género</mat-label>
+          <mat-select formControlName="gener" required>
+            <mat-option value="No aplica">No aplica</mat-option>
+            <mat-option value="Masculino">Masculino</mat-option>
+            <mat-option value="Femenino">Femenino</mat-option>
+          </mat-select>
+          <mat-error *ngIf="gener_invalid"> Es necesario el género </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Idioma</mat-label>
+          <mat-select formControlName="languages" required>
+            <mat-option value="Español">Español</mat-option>
+            <mat-option value="Inglés">Inglés</mat-option>
+          </mat-select>
+          <mat-error *ngIf="languages_invalid"> Es necesario el idioma </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Medio de transporte</mat-label>
+          <mat-select formControlName="conveyance" required>
+            <mat-option value="Ninguno">Ninguno</mat-option>
+            <mat-option value="moto">Moto</mat-option>
+            <mat-option value="carro">Carro</mat-option>
+          </mat-select>
+          <mat-error *ngIf="conveyance_invalid"> Es necesario el medio de transporte </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Tipo de contrato</mat-label>
+          <mat-select formControlName="work_contract_type_id" required>
+            <mat-option *ngFor="let item of contracts" [value]="item.id">{{
+              item.name
+            }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="contractType_invalid"> Es necesario el tipo de contrato </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            placeholder="Ingresa la descripción"
+            rows="5"
+            [cdkTextareaAutosize]="true"
+            required
+          ></textarea>
+          <mat-error *ngIf="description_invalid"> Es necesaria la descripción </mat-error>
+        </mat-form-field>
+      </div>
+      <h6>Requisitos</h6>
+      <hr />
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Educación mínima</mat-label>
+          <mat-select formControlName="education" required>
+            <mat-option *ngFor="let item of educations" [value]="item.value">{{
+              item.name
+            }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="education_invalid"> Es necesario el campo </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Años de experencia</mat-label>
+          <input
+            matInput
+            currencyMask
+            [options]="masks.maskNumbers"
+            appInputPositionInitial
+            formControlName="experience_year"
+            placeholder="Ingresa los años de experiencia"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Meses de experencia</mat-label>
+          <input
+            matInput
+            currencyMask
+            [options]="masks.maskNumbers"
+            appInputPositionInitial
+            formControlName="months_experience"
+            placeholder="Ingresa los meses de experiencia"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Edad mínima</mat-label>
+          <input
+            matInput
+            currencyMask
+            [options]="masks.maskNumbers"
+            appInputPositionInitial
+            formControlName="min_age"
+            placeholder="Ingresa la edad mínima"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Edad máxima</mat-label>
+          <input
+            matInput
+            currencyMask
+            [options]="masks.maskNumbers"
+            appInputPositionInitial
+            formControlName="max_age"
+            placeholder="Ingresa la edad máxima"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Disponibilidad para viajar</mat-label>
+          <mat-select formControlName="can_trip" required>
+            <mat-option [value]="1">Sí</mat-option>
+            <mat-option [value]="2">No</mat-option>
+          </mat-select>
+          <mat-error *ngIf="can_trip_invalid"> Es necesario el campo </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Cambio de residencia</mat-label>
+          <mat-select formControlName="change_residence" required>
+            <mat-option [value]="1">Sí</mat-option>
+            <mat-option [value]="2">No</mat-option>
+          </mat-select>
+          <mat-error *ngIf="change_residence_invalid"> Es necesario el campo </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Licencia de conducción</mat-label>
+          <mat-select formControlName="driving_license">
+            <mat-option value="">No aplica</mat-option>
+            <mat-option *ngFor="let item of licenses" [value]="item.value">{{
+              item.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Documentos legales necesarios</mat-label>
+          <mat-select formControlName="document_type_id" required>
+            <mat-option *ngFor="let item of documents" [value]="item.value">{{
+              item.text
+            }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="documentType_invalid"> Es necesario el campo </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Pasaporte</mat-label>
+          <mat-select formControlName="passport" required>
+            <mat-option *ngFor="let item of options" [value]="item.clave">{{
+              item.clave
+            }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="passport_invalid"> Es necesario el campo </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Visa americana</mat-label>
+          <mat-select formControlName="visa" required>
+            <mat-option *ngFor="let item of options" [value]="item.valor">{{
+              item.clave
+            }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="visa_invalid"> Es necesario el campo </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline" *ngIf="form.get('visa_type_id').enabled">
+          <mat-label>Tipo de visa</mat-label>
+          <mat-select formControlName="visa_type_id" required>
+            <mat-option *ngFor="let item of visas" [value]="item.value">{{ item.text }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="visaType_invalid"> Es necesario el campo </mat-error>
+        </mat-form-field>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Guardar vacante</button>
+    </form>
+  </div>
+</div>
+<ng-template #rt let-r="result" let-t="term">
+  <span class="f-9">{{ r.Nombre }} </span>
+</ng-template>

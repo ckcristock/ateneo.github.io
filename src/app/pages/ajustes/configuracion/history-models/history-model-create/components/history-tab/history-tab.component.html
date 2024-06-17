@@ -1,0 +1,104 @@
+<div class="d-flex justify-content-end my-2">
+  <app-add-button (click)="addVariable()" />
+</div>
+<form [formGroup]="section" class="row">
+  @if (variables && variables.value.length > 0) {
+    <ng-container formArrayName="variables">
+      <ng-container *ngFor="let variable of variables.controls; let $indexVariables = index">
+        <ng-container [formGroupName]="$indexVariables">
+          <mat-accordion multi [class]="variable.get('size')?.value">
+            <mat-expansion-panel [expanded]="true" class="mat-elevation-z0">
+              <mat-expansion-panel-header class="ps-1">
+                <mat-panel-title class="fs-6 text-uppercase">
+                  {{ variable.get('name')?.value || 'Nueva variable' }}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="row">
+                <mat-form-field appearance="outline" class="col-md-8">
+                  <mat-label>Nombre de la variable</mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    formControlName="name"
+                    aria-hidden="true"
+                    placeholder="Ingresa el nombre de la variable"
+                    [required]="true"
+                  />
+                  <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="col-md-4">
+                  <mat-label>Tipo de variable</mat-label>
+                  <mat-select
+                    formControlName="type"
+                    (selectionChange)="onTypeChange($event, variable)"
+                  >
+                    @for (type of types; track $index) {
+                      <mat-option [value]="type.id">
+                        {{ type.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                @if (variable.get('type')?.value && variable.get('conditions')?.value.length > 0) {
+                  <div class="col-12">
+                    <div class="row">
+                      <ng-container formArrayName="conditions">
+                        <ng-container
+                          *ngFor="
+                            let condition of variable.get('conditions')?.controls;
+                            let $indexConditions = index
+                          "
+                        >
+                          <ng-container [formGroupName]="$indexConditions">
+                            <mat-form-field appearance="outline" class="col-md">
+                              <mat-label>{{ condition.get('name')?.value }}</mat-label>
+                              <input
+                                [type]="condition.get('type')?.value"
+                                matInput
+                                formControlName="value"
+                                aria-hidden="true"
+                                placeholder="Ingresa el valor"
+                                [required]="true"
+                              />
+                              <mat-error>Campo requerido</mat-error>
+                            </mat-form-field>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+                    </div>
+                  </div>
+                }
+                <mat-form-field appearance="outline" class="col-md-3">
+                  <mat-label>Tamaño</mat-label>
+                  <mat-select formControlName="size">
+                    <mat-option *ngFor="let size of sizes" [value]="size.value">
+                      {{ size.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-checkbox formControlName="required" class="col-md-3"> Requerido </mat-checkbox>
+                <!-- button delete -->
+                <div class="col-md-2">
+                  <button
+                    type="button"
+                    aria-label="delete"
+                    class="btn btn-sm btn-danger"
+                    (click)="deleteVariable($indexVariables)"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  } @else {
+    <div class="col-12">
+      <div class="alert alert-warning rounded" role="alert">
+        Aún no has agregado ninguna variable.
+      </div>
+    </div>
+  }
+</form>

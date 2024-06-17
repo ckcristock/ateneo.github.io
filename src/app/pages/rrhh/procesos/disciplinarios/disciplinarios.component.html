@@ -1,0 +1,194 @@
+<app-card
+  viewTitle="Procesos disciplinarios"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]">
+    <app-add-button routerLink="crear" />
+    <app-header-button
+      icon="plus"
+      text="Actuación"
+      type="success"
+      (click)="openAddActionType()"
+    ></app-header-button>
+    <app-header-button
+      icon="plus"
+      text="Causales"
+      type="warning"
+      (click)="openAddCauses()"
+    ></app-header-button>
+  </ng-container>
+  <app-table
+    [loading]="loading"
+    [arrayData]="process"
+    [pagination]="pagination"
+    (pageChange)="getDisciplinaryProcess()"
+  >
+    <ng-container titles>
+      <th scope="col">Código</th>
+      <th scope="col">Título</th>
+      <th scope="col">Funcionario Resp.</th>
+      <th scope="col">Involucrados</th>
+      <th scope="col">Descripción</th>
+      <th scope="col">Fecha Inicial</th>
+      <th scope="col">Fecha Final</th>
+      <th scope="col" class="col-1">Estado</th>
+      <th scope="col"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (proces of process; track proces.id; let i = $index) {
+        <tr class="text-center">
+          <td scope="row">{{ proces.code }}</td>
+          <td scope="row">{{ proces.title ?? 'No hay dato' }}</td>
+          <td>
+            {{ proces.person.first_name }} {{ proces.person.second_name }}
+            {{ proces.person.first_surname }}
+            {{ proces.person.second_surname }}
+          </td>
+          <td role="button" (click)="collapsed[i] = !collapsed[i]">
+            <i
+              [ngClass]="collapsed[i] ? 'fa-angle-up' : 'fa-angle-down'"
+              class="fas text-primary"
+            ></i>
+          </td>
+          <td>
+            <app-view-more [text]="proces.process_description" [length]="20"></app-view-more>
+          </td>
+          <td>{{ proces.date_of_admission | date }}</td>
+          <td>
+            @if (proces.status == 'Cerrado') {
+              {{ proces.date_end | date }}
+            } @else {
+              No aplica
+            }
+          </td>
+          <td>
+            <span
+              [ngClass]="
+                proces.status == 'abierto'
+                  ? 'badge bg-info'
+                  : proces.status == 'aprobado'
+                    ? 'badge bg-success'
+                    : 'badge bg-danger'
+              "
+            >
+              {{ proces.status | uppercase }}
+            </span>
+          </td>
+          <td>
+            @if (loadingDownload === proces.id) {
+              <button class="btn btn-primary btn-sm" type="button">
+                <i _ngcontent-ng-c2830628797="" class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+              </button>
+            } @else {
+              <app-dropdown-actions>
+                <app-action-button
+                  icon="eye"
+                  text="Seguimiento"
+                  type="success"
+                  [link]="{
+                    url: '/rrhh/procesos/disciplinarios/' + proces.id
+                  }"
+                ></app-action-button>
+                @if (proces.file != null) {
+                  <app-action-button
+                    icon="file"
+                    text="Ver documentos"
+                    type="info"
+                    [link]="{
+                      url: '/rrhh/procesos/disciplinarios/' + proces.id,
+                      target: '_blank'
+                    }"
+                  ></app-action-button>
+                }
+                @if (permission.permissions.approve && proces.status != 'Aprobado') {
+                  <app-action-button
+                    icon="thumbs-up"
+                    text="Aprobar"
+                    type="success"
+                    (click)="aprobar(proces.id)"
+                  ></app-action-button>
+                }
+                <app-action-button
+                  icon="file-download"
+                  text="Llamado a descargos"
+                  type="primary"
+                  (click)="openCallReleases(proces.id, 'personal')"
+                ></app-action-button>
+                @if (proces['person_involved']?.length) {
+                  <app-action-button
+                    icon="file-download"
+                    text="Llamado a descargos terceros"
+                    type="primary"
+                    (click)="openCallReleases(proces.id)"
+                  ></app-action-button>
+                }
+                @if (proces.status == 'Abierto' || proces.status == 'Aprobado') {
+                  <app-action-button
+                    icon="times-circle"
+                    text="Cerrar proceso"
+                    type="danger"
+                    (click)="openProcessClosed(proces.id)"
+                  ></app-action-button>
+                }
+              </app-dropdown-actions>
+            }
+          </td>
+        </tr>
+        @if (collapsed[i]) {
+          <tr>
+            <td colspan="100%">
+              @if (proces.person_involved.length > 0) {
+                <ul class="list-group">
+                  @for (item of proces.person_involved; track item) {
+                    <li class="list-group-item">
+                      {{ item.person.full_names }}
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="text-dark text-center pb-0">Sin involucrados</p>
+              }
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtros.code"
+    (searching)="filtros.code = $event; getDisciplinaryProcess()"
+  ></app-automatic-search>
+  <app-autocomplete-mdl
+    class="col"
+    label="Funcionario"
+    placeholder="Buscar funcionario"
+    [model]="filtros.person"
+    [list]="people$ | async"
+    classList="pb-0"
+    (optionSelectedEvent)="filtros.person = $event; getDisciplinaryProcess()"
+  ></app-autocomplete-mdl>
+  <app-automatic-search
+    class="col"
+    label="Involucrados"
+    placeholder="Busca por nombre del involucrado"
+    [value]="filtros.involved"
+    (searching)="filtros.involved = $event; getDisciplinaryProcess()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filtros.status" (selectionChange)="getDisciplinaryProcess()">
+      @for (statu of status; track $index) {
+        <mat-option [value]="statu.valor">
+          {{ statu.clave }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</ng-template>

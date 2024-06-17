@@ -1,0 +1,93 @@
+<app-card viewTitle="Resp. fiscales" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="openModal(add, 'Nueva responsabilidad fiscal')" />
+  <app-table
+    [loading]="loading"
+    [arrayData]="fiscalR"
+    [pagination]="pagination"
+    (pageChange)="getFiscalResponsibility()"
+  >
+    <ng-container titles>
+      <th>Código</th>
+      <th>Nombre</th>
+      <th class="col-1">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of fiscalR; track item.id) {
+        <tr class="text-center">
+          <td class="align-middle">{{ item.code }}</td>
+          <td class="align-middle">{{ item.name }}</td>
+          <td class="align-middle">
+            <app-status-badge [status]="item.state" />
+          </td>
+
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit
+                (action)="getFiscal(item); openModal(add, 'Editar responsabiliad fiscal')"
+              />
+              @if (item.state == 'activo') {
+                <app-action-deactivate (action)="activateOrInactivate(item, 'Inactivo')" />
+              }
+              @if (item.state == 'inactivo') {
+                <app-action-activate (action)="activateOrInactivate(item, 'Activo')" />
+              }
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filters.name"
+    (searching)="filters.name = $event; getFiscalResponsibility()"
+  ></app-automatic-search>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Estado</mat-label>
+    <mat-select [(ngModel)]="filters.state" (selectionChange)="getFiscalResponsibility()">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Activo">Activo</mat-option>
+      <mat-option value="Inactivo">Inactivo</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<ng-template #add let-modal>
+  <app-modal [titleModal]="title">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Código DIAN</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el código DIAN"
+            required
+            formControlName="code"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            required
+            formControlName="name"
+            autocomplete="off"
+          />
+        </mat-form-field>
+      </div>
+    </form>
+    <button buttons type="button" (click)="save()" [disabled]="!form.valid" class="btn btn-primary">
+      Guardar
+    </button>
+  </app-modal>
+</ng-template>

@@ -1,0 +1,61 @@
+<app-modal titleModal="Configuración de pago">
+  @if (!loading) {
+    <form [formGroup]="formChangePay">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Cálculo para incapacidad general</mat-label>
+          <mat-select formControlName="calculate_work_disability">
+            <mat-option value="general">General</mat-option>
+            <mat-option value="laboral">Laboral</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Pago de deducciones</mat-label>
+          <mat-select formControlName="pay_deductions">
+            <mat-option value="proporcionales">Proporcionales en cada pago</mat-option>
+            <mat-option value="final_periodo">Al final del periodo</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>¿Pagos recurrentes?</mat-label>
+          <mat-select formControlName="recurring_payment">
+            <mat-option value="proporcionales">Proporcionales</mat-option>
+            <mat-option value="fijos">Fijos</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>¿Cómo se paga el auxilio de transporte?</mat-label>
+          <mat-select formControlName="payment_transport_subsidy">
+            <mat-option value="mensual">Mensual</mat-option>
+            <mat-option value="quincenal">Quincenal</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col-12" appearance="outline">
+          <mat-label>¿Horas extras y recargos afectan auxilio de transporte?</mat-label>
+          <mat-select formControlName="affects_transportation_subsidy">
+            <mat-option value="si">Sí</mat-option>
+            <mat-option value="no">No</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>¿Pagar el día 31 del mes en vacaciones?</mat-label>
+          <mat-select formControlName="pay_vacations">
+            <mat-option value="si">Sí</mat-option>
+            <mat-option value="no">No</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </form>
+  } @else {
+    <app-not-data [loading]="loading"></app-not-data>
+  }
+  <button
+    buttons
+    type="button"
+    (click)="changePaymentConfiguration()"
+    [disabled]="loading"
+    class="btn btn-primary"
+  >
+    Guardar
+  </button>
+</app-modal>

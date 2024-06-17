@@ -1,0 +1,95 @@
+<app-modal titleModal="Agregar involucrados">
+  <form [formGroup]="formInvolved">
+    <div class="row">
+      <div class="col-md-6">
+        <app-autocomplete-fc
+          class="col"
+          label="Funcionario"
+          placeholder="Busca el nombre del funcionario"
+          [control]="formInvolved.controls['person_id']"
+          [list]="people$ | async"
+          (optionSelectedEvent)="validateInvolved($event)"
+        ></app-autocomplete-fc>
+        <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+          <mat-label>Observaciones</mat-label>
+          <textarea
+            matInput
+            placeholder="Ingrese las observaciones"
+            rows="5"
+            formControlName="observation"
+            name="ob"
+            required
+            id="obervaciones"
+            [cdkTextareaAutosize]="true"
+          ></textarea>
+        </mat-form-field>
+        <div class="col-md-12">
+          <div class="form-group text-center">
+            <label for="fileInvolved" class="custom-input-file col-md-12">
+              Cargar documentos
+            </label>
+            <input id="fileInvolved" type="file" class="d-none" (change)="onFileChanged($event)" />
+            <div class="col-md-12 text-center">
+              @if (loadFile) {
+                <small class="text-success">Documentos cargados</small>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 panel">
+        <div class="panel-body">
+          @if (!historyInfo.length && !loading && formInvolved.get('person').value == '') {
+            <div class="text-center mt-3">
+              <h1>
+                <i class="fa fa-exclamation-circle fa-3x text-warning"></i>
+              </h1>
+              <h6>Seleccione un usuario</h6>
+            </div>
+          }
+          @if (loading) {
+            <app-not-data [loading]="loading" [text]="'Sin datos agregados'"></app-not-data>
+          }
+          @for (historyInf of historyInfo; track historyInfo['id']; let i = $index) {
+            <ul class="list-group">
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-md-1">
+                    <input
+                      class="form-check-input ms-1"
+                      type="checkbox"
+                      [value]="historyInf.details"
+                      [id]="historyInf.id"
+                      (change)="onSelectOption($event)"
+                      [name]="historyInf.memorandumType"
+                    />
+                  </div>
+                  <div class="col">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h5 class="mb-1">Memorando</h5>
+                      <small>{{ historyInf.created_at_memorandum | date: 'MM-dd-yy' }}</small>
+                    </div>
+                    <p class="mb-1">
+                      Categoría:
+                      {{ historyInf.activity != '' ? historyInf.memorandumType : 'Sin categoria' }}
+                    </p>
+                    <small>Detalle: {{ historyInf.details }} </small>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          }
+        </div>
+      </div>
+    </div>
+  </form>
+  <button
+    buttons
+    type="submit"
+    class="btn btn-primary"
+    [disabled]="!formInvolved.valid"
+    (click)="newInvolved()"
+  >
+    Agregar
+  </button>
+</app-modal>

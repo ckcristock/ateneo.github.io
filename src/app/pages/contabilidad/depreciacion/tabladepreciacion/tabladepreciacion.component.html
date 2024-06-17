@@ -1,0 +1,65 @@
+<div class="row">
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Año</mat-label>
+    <mat-select
+      name="Year"
+      id="year"
+      [(ngModel)]="DepreciacionModel.Year"
+      (selectionChange)="setQueryParams()"
+    >
+      <ng-container *ngFor="let year of Years">
+        <mat-option [value]="year">{{ year }}</mat-option>
+      </ng-container>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Mes</mat-label>
+    <mat-select
+      name="Mes"
+      id="mes"
+      [(ngModel)]="DepreciacionModel.Mes"
+      (selectionChange)="setQueryParams()"
+    >
+      <ng-container *ngFor="let mes of Meses; let i = index">
+        <ng-container *ngIf="DepreciacionModel.Year && DepreciacionModel.Year == yearActual">
+          <mat-option *ngIf="i <= mesActual - 1" [value]="i + 1">
+            {{ mes }}
+          </mat-option>
+        </ng-container>
+        <ng-container
+          *ngIf="DepreciacionModel.Year && DepreciacionModel.Year != yearActual; else pastYears"
+        >
+          <mat-option [value]="i + 1">
+            {{ mes }}
+          </mat-option>
+        </ng-container>
+      </ng-container>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Tipo</mat-label>
+    <mat-select
+      name="Tipo"
+      id="tipo"
+      [(ngModel)]="DepreciacionModel.Tipo"
+      (selectionChange)="setQueryParams()"
+    >
+      <mat-option value="NIIF">NIIF</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<div class="btn-group btn-block" role="group" aria-label="Button group">
+  <a
+    class="btn btn-info"
+    href="{{ enviromen.base_url }}/php/depreciacion/vista_previa.php?{{ queryParams }}"
+    role="button"
+    target="_blank"
+    [ngClass]="{ disabled: queryParams === '' }"
+    ><i class="fa fa-eye"></i> Vista previa
+  </a>
+  <button class="btn btn-primary" (click)="onGenerateDepreciation()">
+    <i class="fas fa-plus"></i> Contabilizar
+  </button>
+</div>

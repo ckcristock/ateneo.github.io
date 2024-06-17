@@ -1,0 +1,60 @@
+<app-card
+  viewTitle="Modelos de historia clínica"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-add-button filters [routerLink]="['crear']" />
+  @if (loading) {
+    <app-not-data [loading]="loading" />
+  } @else {
+    <div class="d-flex flex-column gap-4 align-items-center">
+      <img src="./assets/images/HL7_FHIR_logo.png" alt="hl7" class="object-fit-cover w-25 h-auto" />
+      <h5>Unable to complete due to service connection error. Please try again later.</h5>
+    </div>
+  }
+  <!-- <app-table
+    [loading]="loading"
+    [arrayData]="templates"
+    [pagination]="pagination"
+    (pageChange)="getTemplates()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Especialidades</th>
+      <th class="col-1"><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (template of templates; track template.id) {
+        <tr class="text-center">
+          <td>{{ template.name | uppercase }}</td>
+          <td>
+            @for (speciality of template.specialities; track speciality.id) {
+              {{ speciality.name | uppercase }}.
+            }
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view [routerLink]="['ver', template.id]" />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card> -->
+
+  <ng-template #filterTemplate>
+    <!-- <form [formGroup]="formFilter">
+      <mat-form-field appearance="outline" class="col">
+        <mat-label>Nombre</mat-label>
+        <input
+          matInput
+          placeholder="Buscar"
+          formControlName="name"
+          autocomplete="off"
+          [placeholder]="'Busca por nombre'"
+        />
+      </mat-form-field>
+    </form> -->
+  </ng-template>
+</app-card>

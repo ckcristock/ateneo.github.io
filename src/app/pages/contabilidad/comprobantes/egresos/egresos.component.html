@@ -1,0 +1,121 @@
+<app-card
+  viewTitle="Comprobantes de egresos"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="UrlFiltersService.activeFilters"
+>
+  <ng-container ngProjectAs="[filters]">
+    <button
+      type="button"
+      class="btn btn-primary btn-sm"
+      [routerLink]="['/contabilidad/comprobantes/comprobanteegresovarioscrear']"
+    >
+      <i class="fa fa-plus"></i>
+      Agregar
+    </button>
+  </ng-container>
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="Comprobantes"
+    [pagination]="pagination"
+    (pageChange)="onPagination($event)"
+  >
+    <ng-container titles>
+      <th>Fecha</th>
+      <th>Documento</th>
+      <th>Beneficiario</th>
+      <th>Concepto</th>
+      <th>Cheques</th>
+      <th>Total Debito</th>
+      <th>Total Credito</th>
+      <th>Total Debito NIIF</th>
+      <th>Total Credito NIIF</th>
+      <th>Funcionario</th>
+      <th class="col-1">Estado</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (comprobante of Comprobantes; track $index) {
+        <tr class="text-center text-uppercase">
+          <td>{{ comprobante?.Fecha || 'N/A' }}</td>
+          <td>{{ comprobante?.Codigo || 'N/A' }}</td>
+          <td>{{ comprobante?.Beneficiario || 'N/A' }} - {{ comprobante?.Tercero || 'N/A' }}</td>
+          <td>{{ comprobante?.Concepto || 'N/A' }}</td>
+          <td>{{ comprobante?.Cheques || 'N/A' }}</td>
+          <td>${{ comprobante?.Total_Debe_PCGA | number: '1.2-2' || 'N/A' }}</td>
+          <td>${{ comprobante?.Total_Haber_PCGA | number: '1.2-2' || 'N/A' }}</td>
+          <td>${{ comprobante?.Total_Debe_NIIF | number: '1.2-2' || 'N/A' }}</td>
+          <td>${{ comprobante?.Total_Haber_NIIF | number: '1.2-2' || 'N/A' }}</td>
+          <td>{{ comprobante?.Funcionario || 'N/A' }}</td>
+          <td>
+            <span
+              [ngClass]="comprobante?.Estado === 'Anulada' ? 'badge bg-danger' : 'badge bg-success'"
+            >
+              {{ comprobante?.Estado || 'N/A' }}
+            </span>
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-button
+                icon="print"
+                text="Ver NIIF"
+                type="success"
+                (click)="descargarNIIF(comprobante?.Id_Documento_Contable)"
+              ></app-action-button>
+              <app-action-button
+                *ngIf="comprobante?.Estado != 'Anulada' && perfilUsuario == '27'"
+                icon="fas fa-times"
+                text="Anular"
+                type="danger"
+                (click)="onCancelDoc(); IdDocumento = comprobante?.Id_Documento_Contable"
+              ></app-action-button>
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+<ng-template #filterTemplate>
+  <!-- rango de fechas -->
+  <app-date-picker class="col" [value]="filtros" (dateChange)="selectedDate($event)" />
+  <ng-container [formGroup]="filtersForm">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Documento</mat-label>
+      <input
+        matInput
+        type="text"
+        placeholder="Busca por documento"
+        formControlName="cod"
+        (input)="ListarComprobantes()"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Beneficiario</mat-label>
+      <input
+        matInput
+        type="text"
+        placeholder="Busca por beneficiario"
+        formControlName="cli"
+        (input)="ListarComprobantes()"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Cheques</mat-label>
+      <input
+        matInput
+        type="text"
+        placeholder="Busca por cheques"
+        formControlName="cheque"
+        (input)="ListarComprobantes()"
+      />
+    </mat-form-field>
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select formControlName="est" (selectionChange)="ListarComprobantes()">
+        <mat-option value="">Todas</mat-option>
+        <mat-option value="Activo">Activas</mat-option>
+        <mat-option value="Anulada">Anuladas</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+</ng-template>

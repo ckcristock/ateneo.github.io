@@ -1,0 +1,56 @@
+.tabla {
+  font-size: 11px !important;
+}
+.ver {
+  background: #e9eef0 !important;
+  border-radius: 5px 5px !important;
+
+  font-size: 12px !important;
+  h6 {
+    margin-top: 5px !important;
+  }
+}
+.space thead {
+  background: #c1c1c1;
+}
+
+.space tbody {
+  background: #f3f3f3;
+}
+
+.space {
+  th,
+  td,
+  p,
+  strong {
+    white-space: normal;
+    font-size: 11px;
+    padding: 3px;
+  }
+}
+.tabla {
+  thead {
+    background: #cecece;
+    th {
+      border: 1px solid #ccc;
+      text-align: center !important;
+      padding: 3px;
+    }
+  }
+  tbody {
+    background: #f3f3f3;
+  }
+  td {
+    border: 1px solid #ccc;
+    text-align: center !important;
+    padding: 3px;
+  }
+  th,
+  td,
+  p,
+  strong {
+    white-space: normal;
+    font-size: 12px;
+    margin: 0;
+  }
+}

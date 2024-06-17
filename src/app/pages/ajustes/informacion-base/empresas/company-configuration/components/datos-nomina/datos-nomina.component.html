@@ -1,0 +1,155 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-10 px-0">
+        <h6 class="text-dark"><i class="fas fa-money-bill"></i> Datos de nómina</h6>
+      </div>
+      <div class="col-md-2 px-0 text-end">
+        <button class="btn btn-link" (click)="openModal(modal)">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+      </div>
+    </div>
+    @if (!loading && nomina) {
+      <div class="row">
+        <div class="col-lg-6 text-lg-end text-center text-primary">Máximas de horas extras</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ nomina.max_extras_hours || 'N/A' }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Máximos de festivos legales</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ nomina.max_holidays_legal || 'N/A' }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Máximas llegadas tardes</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ nomina.max_late_arrival || 'N/A' }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Salario base mensual</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          $ {{ (nomina.base_salary | number) || 'N/A' }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Auxilio de transporte</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          $ {{ (nomina.transportation_assistance | number) || 'N/A' }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Hora de inicio nocturna</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ nomina.night_start_time || 'N/A' }}
+        </div>
+        <div class="col-lg-6 text-lg-end text-center text-primary">Hora de fin nocturna</div>
+        <div class="col-lg-6 text-lg-start text-center">
+          {{ nomina.night_end_time || 'N/A' }}
+        </div>
+      </div>
+    } @else {
+      <app-not-data [loading]="loading"></app-not-data>
+    }
+  </div>
+</div>
+
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Datos de nómina</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Máximo de horas extra</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el número máximo"
+            formControlName="max_extras_hours"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Máximo de festivos legales</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el número máximo"
+            formControlName="max_holidays_legal"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Máximo de llegadas tarde</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el número máximo"
+            formControlName="max_late_arrival"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Salario base mensual</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el salario base"
+            formControlName="base_salary"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Auxilio de transporte</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa el valor"
+            formControlName="transportation_assistance"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Inicio hora nocturna</mat-label>
+          <input
+            matInput
+            type="time"
+            formControlName="night_start_time"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Fin hora nocturna</mat-label>
+          <input
+            matInput
+            type="time"
+            formControlName="night_end_time"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      [disabled]="!form.valid"
+      (click)="saveNominaData()"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>

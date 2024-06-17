@@ -1,0 +1,105 @@
+<app-modal-basic #Modalactaentrega [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Acta de Entrega</h4>
+    <button type="button" class="close basic-close" (click)="CerrarModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row" *ngIf="Mostar">
+      <div class="col-md-2" *ngIf="Model.Id_Dispensacion_Mipres != '0'">
+        <div class="form-group">
+          <label class="font-weight-bold">Tipo Doc.</label>
+          <select
+            name="Tipo_Documento"
+            class="form-control form-control-sm"
+            [(ngModel)]="Model.Id_Tipo_Documento"
+            (change)="AsignarCodigo()"
+            required
+          >
+            <option *ngFor="let t of Tipo_Documentos" [value]="t.Id_Tipo_Documento">
+              {{ t.Codigo }} - {{ t.Nombre }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-5" *ngIf="Model.Id_Dispensacion_Mipres != '0'">
+        <div class="form-group">
+          <label class="font-weight-bold">Nombre Reclamante</label>
+          <input
+            class="form-control form-control-sm"
+            name="Nombre_Reclamante"
+            [(ngModel)]="Model.Nombre"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="col-md-3" *ngIf="Model.Id_Dispensacion_Mipres != '0'">
+        <div class="form-group">
+          <label class="font-weight-bold">Numero Documento</label>
+          <input
+            type="number"
+            class="form-control form-control-sm"
+            name="Numero_Reclamante"
+            [(ngModel)]="Model.Id_Reclamante"
+            required
+          />
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="form-group">
+          <label for="Acta_Entrega">Adjuntar Acta *</label>
+          <input
+            type="file"
+            required
+            id="Acta_Entrega"
+            ngModel
+            accept="application/pdf"
+            data-max-size="2048"
+            name="Acta_Entrega"
+            class="form-control form-control-sm"
+            (change)="CargarActaEntrega($event)"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-right">
+      <button type="button" class="btn btn-default btn-sm" (click)="CerrarModal()">Cancelar</button>
+      <button
+        *ngIf="Model.tipo != 'Guardar_Acta'"
+        type="button"
+        class="btn btn-primary btn-sm"
+        [swal]="{
+          title: '¿Está Seguro?',
+          text: 'Se dispone hacer la entrega formal de los pendientes',
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Si, Actualizar',
+          cancelButtonText: 'No, Comprobar!'
+        }"
+        (confirm)="GuardarActa()"
+      >
+        Guardar
+      </button>
+      <button
+        *ngIf="Model.tipo == 'Guardar_Acta'"
+        type="button"
+        class="btn btn-primary btn-sm"
+        [swal]="{
+          title: '¿Está Seguro?',
+          text: 'Se dispone adjuntar el acta de entrega a esta dispensacion',
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Si, Actualizar',
+          cancelButtonText: 'No, Comprobar!'
+        }"
+        (confirm)="GuardarActa()"
+      >
+        Guardar
+      </button>
+    </div>
+  </div>
+</app-modal-basic>

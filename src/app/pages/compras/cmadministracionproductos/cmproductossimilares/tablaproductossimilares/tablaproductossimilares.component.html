@@ -1,0 +1,65 @@
+<app-card viewTitle="Productos similares" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="AbrirModalAsociarProductos('crear')" />
+  <app-table
+    [loading]="Cargando"
+    [arrayData]="ProductosAsociados"
+    [pagination]="pagination"
+    (pageChange)="ConsultaFiltrada()"
+  >
+    <ng-container titles>
+      <th>ID</th>
+      <th>Producto</th>
+      <th>Codigo Cum</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (pa of ProductosAsociados; track $index) {
+        <tr class="text-center">
+          <td>
+            {{ pa.Id_Producto_Asociado }}
+          </td>
+          <td>
+            @for (ip of pa.Productos_Asociados; track $index) {
+              <p>{{ ip.Nombre_Comercial }}</p>
+            }
+          </td>
+          <td>
+            @for (ip of pa.Productos_Asociados; track $index) {
+              <p>{{ ip.Codigo_Cum || 'No hay dato' }}</p>
+            }
+          </td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit
+                (action)="
+                  AbrirModalAsociarProductos(
+                    'editar',
+                    pa.Id_Producto_Asociado,
+                    pa.Id_Asociado_Genericos
+                  )
+                "
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-autocomplete-mdl
+    class="col"
+    label="Producto"
+    placeholder="Buscar producto"
+    classList="pb-0"
+    [model]="Filtros.id_producto"
+    [list]="ProductosFiltrar"
+    (optionSelectedEvent)="Filtros.id_producto = $event; ConsultaFiltrada()"
+  ></app-autocomplete-mdl>
+</ng-template>
+
+<app-modalasignarproductossimilares
+  [AbrirModal]="AbrirModalAsignarAsociados.asObservable()"
+  (ActualizarTabla)="ConsultaFiltrada()"
+></app-modalasignarproductossimilares>

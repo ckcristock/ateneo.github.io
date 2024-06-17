@@ -1,0 +1,65 @@
+<article class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="DatosCabecera"> </app-cabecera>
+    <div class="row">
+      <div class="col">
+        <strong>Paciente</strong>
+        <p>{{ Datos.Nombre || 'No hay dato' }}</p>
+      </div>
+      <div class="col">
+        <strong>Identificación</strong>
+        <p>{{ Datos.Id_Paciente || 'No hay dato' }}</p>
+      </div>
+      <div class="col">
+        <strong>Dirección</strong>
+        <p>{{ Datos.Direccion || 'No hay dato' }}</p>
+      </div>
+      <div class="col">
+        <strong>Regimén</strong>
+        <p>{{ Datos.Regimen || 'No hay dato' }}</p>
+      </div>
+      <div class="col">
+        <strong>Entrega</strong>
+        <p>{{ Datos.Numero_Entrega || 'No hay dato' }}</p>
+      </div>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Producto</th>
+            <th>Embalaje</th>
+            <th>Cum</th>
+            <th>Numero Presc.</th>
+            <th>ID</th>
+            <th>ID Programacion</th>
+            <th>ID Entrega</th>
+            <th>ID Reporte Entrega</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of Productos; track $index) {
+            <tr class="text-center">
+              <td>
+                <strong>{{ item.Nombre_Comercial }}</strong>
+                <p>{{ item.Nombre }}</p>
+              </td>
+              <td>
+                <p>{{ item.Embalaje }}</p>
+              </td>
+              <td>{{ item.Codigo_Cum }}</td>
+              <td>{{ item.NoPrescripcion }}</td>
+              <td>{{ item.ID }}</td>
+              <td>{{ item.IdProgramacion }}</td>
+              <td>{{ item.IdEntrega }}</td>
+              <td>{{ item.IdReporteEntrega }}</td>
+              <td>{{ item.Cantidad }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <a [routerLink]="['../']" class="btn btn-primary"> Volver </a>
+  </div>
+</article>

@@ -1,0 +1,35 @@
+<div
+  *ngIf="
+    (deduccionesDatos.valor_total > 0 &&
+      brand &&
+      datosEmpresa.pay_configuration?.deductions_pay == 'final_periodo') ||
+    (deduccionesDatos.valor_total > 0 &&
+      datosEmpresa.pay_configuration?.deductions_pay == 'proporcionales')
+  "
+>
+  <hr />
+  <div class="text-center text-uppercase card-title">Deducciones</div>
+
+  <div class="rounded-top table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+      <thead class="bg-light">
+        <tr class="text-uppercase">
+          <th>Concepto</th>
+          <th class="text-center col-md-1">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let deduccion of deducciones">
+          <td>{{ deduccion.concepto }}</td>
+          <td class="text-center">{{ deduccion.valor | currency: '' : '' }}</td>
+        </tr>
+        <tr class="fw-bold">
+          <td>Total deducciones</td>
+          <td class="text-center">
+            {{ deduccionesDatos.valor_total | currency: '' : '' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

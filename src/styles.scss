@@ -1,0 +1,155 @@
+//@import "~@ng-select/ng-select/themes/default.theme.css";
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+//@import "~@ng-select/ng-select/themes/material.theme.css";
+body {
+  scrollbar-width: thin;
+}
+
+hr.line {
+  border: 0;
+  margin-top: 0px;
+  height: 1px;
+  background-image: linear-gradient(to right, #f0f0f0, #3848ca, #3848ca, #f0f0f0);
+}
+
+.img-rounded {
+  object-fit: cover;
+}
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import 'assets/scss/material.scss';
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
+  z-index: 99999 !important;
+}
+
+.cdk-overlay-connected-position-bounding-box {
+  z-index: 99999 !important;
+}
+
+.mat-form-field-wrapper {
+  padding-bottom: 1.34375em;
+}
+
+.mat-horizontal-content-container.mat-horizontal-content-container {
+  padding: 0;
+}
+
+.modal-backdrop {
+  z-index: 1050 !important;
+}
+
+.component-host-scrollable {
+  .modal-body {
+    max-height: calc(100vh - 20rem);
+  }
+}
+
+.card {
+  border-radius: 0.7rem !important;
+}
+
+.card-horizontal {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+@media (max-width: 800px) {
+  .w-sm-100 {
+    display: inline-flex;
+    width: 100%;
+  }
+}
+
+.visually-hidden,
+.visually-hidden-focusable:not(:focus):not(:focus-within) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.img-rounded {
+  max-height: 11rem;
+  max-width: 11rem;
+  width: 11rem;
+  height: 11rem;
+  object-fit: cover;
+}
+
+.custom-input-file {
+  background-color: #24a0ed;
+  color: #fff;
+  cursor: pointer;
+  margin: 0 auto 0;
+  min-height: 15px;
+  overflow: hidden;
+  padding: 10px;
+  position: relative;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.custom-input-file .input-file {
+  cursor: pointer;
+  font-size: 10000px;
+  margin: 0;
+  opacity: 0;
+  outline: 0 none;
+  padding: 0;
+  position: absolute;
+  right: -1000px;
+  top: -1000px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbcbcb #fff;
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  position: absolute;
+}
+
+::-webkit-scrollbar:vertical {
+  width: 10px;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+::-webkit-scrollbar-track-piece {
+  background-color: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbcbcb;
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+  border: 0.1px solid #b7b7b7;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #909090;
+}
+
+.accordion-custom .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mat-mdc-form-field-icon-suffix {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

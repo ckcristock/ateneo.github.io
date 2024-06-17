@@ -1,0 +1,521 @@
+<ng-template #placeholder>
+  <app-placeholder-form></app-placeholder-form>
+</ng-template>
+<ng-container *ngIf="!loading; else placeholder">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+          <hr class="line" />
+          <!-- <button type="button" (click)="printform()" class="btn btn-info btn-sm">form</button> -->
+          <ng-container [formGroup]="form">
+            <!-- SECCION DE FACTURAS -->
+            <ng-container formArrayName="invoices">
+              <div class="row card-title d-flex justify-content-between">
+                <div class="col-md-6 px-0">
+                  <h6 class="text-primary">Facturas</h6>
+                </div>
+                <div class="col-md-6 px-0 text-end">
+                  <div class="btn-group rounded w-sm-100">
+                    <button class="btn btn-primary btn-sm" type="button" (click)="addInvoice()">
+                      <!-- //este boton debe tener un ngIf de permisos  -->
+                      <i class="fa fa-plus"></i> Agregar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              @if (invoices.controls.length) {
+                <div class="rounded-top table-responsive">
+                  <table class="table table-bordered table-striped table-sm">
+                    <thead class="bg-light">
+                      <tr class="text-center text-uppercase">
+                        <th>#</th>
+                        <th>Número factura</th>
+                        <th>Fecha</th>
+                        <th>CUFE</th>
+                        <th>Archivo</th>
+                        <th><i class="mdi mdi-chevron-down"></i></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        [formGroupName]="i"
+                        *ngFor="let invoice of invoices.controls; let i = index"
+                        class="text-center"
+                      >
+                        <td class="align-middle p-0">{{ i + 1 }}</td>
+                        <td class="align-middle p-0">
+                          <input
+                            type="text"
+                            placeholder="Ingresa el número de factura*"
+                            formControlName="Factura"
+                            required
+                            autocomplete="off"
+                            [readonly]="invoice.get('Id_Factura_Acta_Recepcion').value"
+                            class="form-control form-control-sm"
+                          />
+                        </td>
+                        <td class="align-middle p-0">
+                          <mat-form-field class="mb-0 pb-0 w-100">
+                            <input
+                              [matDatepicker]="picker"
+                              placeholder="Elije la fecha*"
+                              matInput
+                              formControlName="Fecha_Factura"
+                              readonly
+                              autocomplete="off"
+                              [readonly]="invoice.get('Id_Factura_Acta_Recepcion').value"
+                              class="border-0 color-transparent"
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                          </mat-form-field>
+                        </td>
+                        <td class="align-middle px-2 py-0">
+                          <input
+                            type="text"
+                            placeholder="Ingresar CUFE"
+                            formControlName="cufe"
+                            required
+                            class="form-control form-control-sm"
+                            [ngClass]="{
+                              'is-invalid':
+                                invoice.get('cufe').invalid && invoice.get('cufe').touched
+                            }"
+                            autocomplete="off"
+                          />
+                        </td>
+                        <td class="align-middle p-0">
+                          <div
+                            class="form-group mb-0 text-center col"
+                            *ngIf="!invoice.get('Id_Factura_Acta_Recepcion').value"
+                          >
+                            <div class="custom-input-file btn-sm">
+                              <input
+                                type="file"
+                                aria-hidden="true"
+                                #fileInput
+                                id="importFile"
+                                accept=".pdf,.png,.jpg,.jpeg"
+                                class="input-file"
+                                (change)="onFileChanged($event, i)"
+                              />
+                              Cargar factura
+                            </div>
+                            <div class="text-center">
+                              <small
+                                *ngIf="invoice.get('Archivo_Factura').value"
+                                class="text-success"
+                                >Cotización cargada exitosamente</small
+                              >
+                            </div>
+                          </div>
+                          <div *ngIf="invoice.get('Id_Factura_Acta_Recepcion').value">
+                            <a [href]="invoice.get('Archivo_Factura').value" target="_blank ">
+                              Factura</a
+                            >
+                          </div>
+                        </td>
+
+                        <td>
+                          <button
+                            type="button"
+                            (click)="removeInvoice(i)"
+                            aria-hidden="true"
+                            class="btn btn-danger btn-sm"
+                            [disabled]="invoice.get('Id_Factura_Acta_Recepcion').value"
+                          >
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              } @else {
+                <div class="alert alert-warning" role="alert">No hay facturas</div>
+              }
+              <!-- Tabla para facturas -> muchos items que se recorren, vas a tener un boton de agregar general y un boton de eliminar para cada factura, vas a tener el input para el nombre, otro para la fecha, este preferiblemente con datepicker de angular, otro para cargar archivo, tal como lo venimos llevando en todo el software, y que tenga restriccion de tipo de archivo, solo pdf o imgen (png, jpg, jpge), y que muestre cuando el archivo esté cargado, adicional habrá un campo para retenciones pero no tiene importancia
+
+              -->
+            </ng-container>
+            <!-- SECCION DE productos -->
+            <ng-container formArrayName="products_acta">
+              <!-- <div class="row card-title d-flex justify-content-between"> -->
+              <!--   <div class="col-md-12 px-0"> -->
+              <!--     <h6 class="text-primary">Productos recibidos</h6> -->
+              <!--   </div> -->
+              <!-- </div> -->
+              <!---->
+              <!-- <ng-container *ngIf="history != null; else notDataInfo"> -->
+              <!--   <app-table [arrayData]="groupProducts" [loading]="false"> -->
+              <!--     <ng-container titles> -->
+              <!--       <th>Producto</th> -->
+              <!--       <th></th> -->
+              <!--     </ng-container> -->
+              <!--     <tbody content> -->
+              <!--       @for (arrayProduct of groupProducts; track $index) { -->
+              <!--       <tr class="text-center"> -->
+              <!--         <td> -->
+              <!--           <app-product-name [data]="arrayProduct[0]?.product" /> -->
+              <!--         </td> -->
+              <!--         <td> -->
+              <!--           <div class="rounded-top table-responsive"> -->
+              <!--             <table class="table table-bordered table-striped table-sm"> -->
+              <!--               <thead class="bg-light"> -->
+              <!--                 <tr class="text-center text-uppercase"> -->
+              <!--                   <th>Lote</th> -->
+              <!--                   <th>Fecha Vencimiento</th> -->
+              <!--                   <th>Info</th> -->
+              <!--                   <th>Factura</th> -->
+              <!--                   <th>Cantidad</th> -->
+              <!--                   <th>Precio</th> -->
+              <!--                   <th>Iva</th> -->
+              <!--                   <th>No conforme</th> -->
+              <!--                   <th>Subtotal</th> -->
+              <!--                   <th>Total</th> -->
+              <!--                 </tr> -->
+              <!--               </thead> -->
+              <!--               <tbody> -->
+              <!--                 <ng-container *ngFor="let product of arrayProduct"> -->
+              <!--                   <tr class="text-center"> -->
+              <!--                     <td> -->
+              <!--                       {{ product?.product?.Nombre_Comercial | uppercase }} -->
+              <!--                     </td> -->
+              <!--                     <td> -->
+              <!--                       <span placement="top" [ngbPopover]="popContentRecibidos" aria-hidden="true" -->
+              <!--                         popoverTitle="Información" triggers="mouseenter:mouseleave" container="body"> -->
+              <!--                         <i class="fas fa-info-circle"></i> -->
+              <!--                       </span> -->
+              <!--                       <ng-template #popContentRecibidos> -->
+              <!--                         CATEGORÍA: {{ product?.product?.subcategory?.Nombre }} -->
+              <!--                       </ng-template> -->
+              <!--                     </td> -->
+              <!--                     <td>{{ product?.factura?.Factura | uppercase }}</td> -->
+              <!--                     <td> -->
+              <!--                       {{ product?.product?.unit?.name | titlecase }} -->
+              <!--                     </td> -->
+              <!--                     <td>{{ product?.Cantidad | number }}</td> -->
+              <!--                     <td> -->
+              <!--                       @if (product?.Cantidad) { -->
+              <!--                       ${{ product?.Subtotal / product?.Cantidad | number }} -->
+              <!--                       } @else { -->
+              <!--                       N/A -->
+              <!--                       } -->
+              <!--                     </td> -->
+              <!--                     <td>${{ product?.Impuesto | number: '1.2-2' }}</td> -->
+              <!--                     <td>{{ product?.causal_no_conforme?.Nombre || 'N/A' }}</td> -->
+              <!--                     <td>${{ product?.Subtotal | number: '1.2-2' }}</td> -->
+              <!--                     <td>${{ product?.Precio | number: '1.2-2' }}</td> -->
+              <!--                   </tr> -->
+              <!--                   <tr> -->
+              <!--                     <td colspan="100"> -->
+              <!--                       <ng-container *ngIf="product?.variables?.length; else notDataInfo"> -->
+              <!--                         <div class="alert alert-info" role="alert"> -->
+              <!--                           Los siguientes campos fueron ingresados debido a que en la -->
+              <!--                           parametrización de categorías y subcategorias están incluidos como -->
+              <!--                           solicitados en el momento de recibir el producto. -->
+              <!--                         </div> -->
+              <!--                         <div class="row mx-0"> -->
+              <!--                           @for (item of product?.variables; track $index) { -->
+              <!--                           <div class="col-md-3"> -->
+              <!--                             <span class="text-uppercase fw-bold">{{ -->
+              <!--                               item.category_variables.label -->
+              <!--                               }}</span> -->
+              <!--                             <span>: {{ item.valor }}</span> -->
+              <!--                           </div> -->
+              <!--                           } -->
+              <!--                         </div> -->
+              <!--                       </ng-container> -->
+              <!--                     </td> -->
+              <!--                   </tr> -->
+              <!--                 </ng-container> -->
+              <!--               </tbody> -->
+              <!--             </table> -->
+              <!--           </div> -->
+              <!--         </td> -->
+              <!--       </tr> -->
+              <!--       } -->
+              <!--     </tbody> -->
+              <!--   </app-table> -->
+              <!---->
+              <!--   <app-list-items class="d-block mb-4" title1="SUBTOTAL" [var1]="receivedTotals.Subtotal" type1="cop" -->
+              <!--     title2="IVA" [var2]="receivedTotals.Iva" type2="cop" title3="Total" [var3]="receivedTotals.Total" -->
+              <!--     type3="cop" mt="mt-2"> -->
+              <!--   </app-list-items> -->
+              <!---->
+              <!-- </ng-container> -->
+              <div class="col-md-12 px-0">
+                <h6 class="text-primary">Productos por verificar</h6>
+              </div>
+              @if (products_acta.controls.length) {
+                <app-table [arrayData]="products" [loading]="false">
+                  <ng-container titles>
+                    <th></th>
+                    <th>Producto</th>
+                    <th></th>
+                  </ng-container>
+                  <tbody content>
+                    @for (product of products; track product.Id_Producto; let index = $index) {
+                      <tr [formGroupName]="index" class="text-center">
+                        <td>
+                          <mat-checkbox
+                            color="primary"
+                            formControlName="toAdd"
+                            (change)="onActiveProduct(index, $event.checked)"
+                          ></mat-checkbox>
+                        </td>
+                        <td>
+                          <app-product-name [data]="product.product" />
+                          <span
+                            placement="top"
+                            [ngbPopover]="popContentVerificar"
+                            aria-hidden="true"
+                            popoverTitle="Información"
+                            triggers="mouseenter:mouseleave"
+                            container="body"
+                          >
+                            <i class="fas fa-info-circle"></i>
+                          </span>
+                          <ng-template #popContentVerificar>
+                            <div class="d-flex flex-column">
+                              <div>
+                                CATEGORÍA:
+                                {{ product.product.category.Nombre || 'N/A' | uppercase }}
+                              </div>
+                              <div>
+                                UNIDAD:
+                                {{ product.product?.unit?.name || 'N/A' | uppercase }}
+                              </div>
+                            </div>
+                          </ng-template>
+                        </td>
+                        <td>
+                          <div class="rounded-top table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                              <thead class="bg-light">
+                                <tr class="text-center text-uppercase">
+                                  <th>Lote</th>
+                                  <th>Fecha Vencimiento</th>
+                                  <th>Factura</th>
+                                  <th>Cantidad</th>
+                                  <th>Precio</th>
+                                  <th>Iva</th>
+                                  <th>No conforme</th>
+                                  <th>Subtotal</th>
+                                  <th>Total</th>
+                                </tr>
+                              </thead>
+                              <tbody [formArrayName]="index">
+                                <ng-container
+                                  *ngFor="
+                                    let product of getFormArray(index).controls;
+                                    let i = index
+                                  "
+                                  [formGroupName]="i"
+                                >
+                                  <tr class="text-center">
+                                    <td>
+                                      <input
+                                        class="w-100 border-0 color-transparent"
+                                        type="text"
+                                        placeholder="Lote"
+                                        formControlName="lote"
+                                      />
+                                    </td>
+                                    <td>
+                                      <input
+                                        class="w-100 border-0 color-transparent"
+                                        type="date"
+                                        formControlName="fecha_vencimiento"
+                                        (change)="addItemProduct(index, i)"
+                                      />
+                                    </td>
+                                    <td>
+                                      <select
+                                        class="w-100 border-0 color-transparent"
+                                        aria-hidden="true"
+                                        formControlName="Factura"
+                                      >
+                                        <option value="">Selecciona una factura</option>
+                                        <option
+                                          *ngFor="let item of invoices.value"
+                                          [value]="item.Factura"
+                                        >
+                                          {{ item.Factura }}
+                                        </option>
+                                      </select>
+                                    </td>
+                                    <td>
+                                      <input
+                                        type="text"
+                                        formControlName="Cantidad"
+                                        aria-hidden="true"
+                                        currencyMask
+                                        [options]="mask?.maskNumbers"
+                                        appInputPositionInitial
+                                        class="w-100 border-0 color-transparent"
+                                        [matTooltip]="
+                                          product.get('Cantidad')?.value !==
+                                          product.get('cantidad_').value
+                                            ? 'El valor es diferente al de la orden de compra'
+                                            : null
+                                        "
+                                      />
+                                    </td>
+                                    <td>
+                                      <input
+                                        class="w-100 border-0 color-transparent"
+                                        placeholder="Ingresa un valor"
+                                        currencyMask
+                                        appInputPosition
+                                        [options]="mask?.maskCOP"
+                                        formControlName="price"
+                                        autocomplete="off"
+                                      />
+                                    </td>
+                                    <td>
+                                      <select
+                                        class="w-100 h-28px border-0 color-transparent"
+                                        aria-hidden="true"
+                                        formControlName="iva_"
+                                      >
+                                        <option value="">Seleccionar</option>
+                                        @for (tax of taxIva; track $index) {
+                                          <option [value]="tax.Id_Impuesto">{{ tax.Valor }}</option>
+                                        }
+                                      </select>
+                                    </td>
+                                    <td>
+                                      <div class="d-flex">
+                                        <select
+                                          class="col border-0 color-transparent"
+                                          aria-hidden="true"
+                                          formControlName="nonConform"
+                                          (change)="onSelectNonConforming(product)"
+                                        >
+                                          <option value="">Seleccionar</option>
+                                          @for (item of nonConformingData; track $index) {
+                                            <option [value]="item.Id_Causal_No_Conforme">
+                                              {{ item.Nombre }}
+                                            </option>
+                                          }
+                                        </select>
+                                        <input
+                                          class="col border-0 color-transparent"
+                                          type="number"
+                                          placeholder="Cantidad"
+                                          formControlName="nonConformNum"
+                                        />
+                                      </div>
+                                    </td>
+                                    <td>${{ product.get('Subtotal').value || 0 | number }}</td>
+                                    <td>
+                                      <span class="text-nowrap">
+                                        ${{ product.get('Total').value || 0 | number }}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                  <tr
+                                    placement="top"
+                                    ngbPopover="Los siguientes campos son pedidos debido a que en la
+                                      parametrización de categorías y subcategorias están incluidos
+                                      como solicitados en el momento de recibir el producto.
+"
+                                    aria-hidden="true"
+                                    popoverTitle="Información"
+                                    triggers="mouseenter:mouseleave"
+                                    container="body"
+                                  >
+                                    <td colspan="100">
+                                      <ng-container *ngIf="product.get('variables').controls[0]">
+                                        <div class="row mx-0">
+                                          @for (
+                                            item of product.get('variables').controls;
+                                            track $index
+                                          ) {
+                                            <mat-form-field
+                                              class="col col-md-3 pb-0 mb-2"
+                                              appearance="outline"
+                                            >
+                                              <mat-label>{{ item.get('label').value }}</mat-label>
+                                              <input
+                                                matInput
+                                                aria-hidden="true"
+                                                [type]="item.get('type').value"
+                                                [placeholder]="item.get('label').value"
+                                                [formControl]="item.get('value')"
+                                              />
+                                            </mat-form-field>
+                                          }
+                                        </div>
+                                      </ng-container>
+                                    </td>
+                                  </tr>
+                                </ng-container>
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </app-table>
+
+                <app-list-items
+                  class="d-block mb-4"
+                  title1="SUBTOTAL"
+                  [var1]="totals.Subtotal"
+                  type1="cop"
+                  title2="IVA"
+                  [var2]="totals.Iva"
+                  type2="cop"
+                  title3="Total"
+                  [var3]="totals.Total"
+                  type3="cop"
+                  mt="mt-2"
+                >
+                </app-list-items>
+              } @else {
+                <div class="alert alert-warning" role="alert">No hay productos</div>
+              }
+
+              <!-- tabla para productos -> inicialmente se van a listar los productos de la orden de compra, con imagen, y con campos para la cantidad, el iva y los precios (precio total, precio iva, subtotal sin iva), habrá un checkbox para seleccionar los productos que se ingresan, y habrá una comparativa con la informacion que viene de la orden de compra, muestras un icon de un alert o de un ! con un tooltip donde describa que el campo es diferente a la orden de compra  -->
+            </ng-container>
+            <div class="row">
+              <mat-form-field
+                class="col-md-12 mat-form-field-no-padding textarea"
+                appearance="outline"
+              >
+                <mat-label>Observaciones</mat-label>
+                <textarea
+                  matInput
+                  placeholder="Ingresa las observaciones"
+                  rows="5"
+                  formControlName="Observaciones"
+                  [cdkTextareaAutosize]="true"
+                ></textarea>
+              </mat-form-field>
+            </div>
+            <button
+              class="btn btn-block btn-primary"
+              type="submit"
+              form="form"
+              (click)="saveActa()"
+              [disabled]="!form.valid"
+            >
+              Guardar
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>
+<ng-template #notDataInfo> </ng-template>

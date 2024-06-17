@@ -1,0 +1,109 @@
+<div class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="DatosCabecera" />
+    <form #InventarioFinal="ngForm">
+      <h5 class="text-center text-primary">Listado de inventario y cantidad diferencial</h5>
+      <app-table [loading]="loading" [arrayData]="Inventario_Diferencial_Lotes">
+        <ng-container titles>
+          <th class="text-center">Producto</th>
+          <th class="text-center">Cant. Inicial Inventario</th>
+          <th class="text-center">Cant. 1er Conteo</th>
+          <th class="text-center">Diferencia</th>
+          <th class="text-center">Cant. Segundo Conteo</th>
+        </ng-container>
+        <tbody content>
+          @for (item of Inventario_Diferencial_Lotes; track $index) {
+            <tr class="text-center">
+              <td class="d-flex flex-column">
+                <strong>{{ (item.Nombre_Comercial | uppercase) || 'N/A' }}</strong>
+                <span class="text-muted">{{ (item.Nombre_Producto | uppercase) || 'N/A' }}</span>
+              </td>
+              <td class="text-center">
+                {{ (item.Cantidad_Inventario | number) || 'N/A' }}
+              </td>
+              <td class="text-center">
+                {{ (item.Cantidad_Encontrada | number) || 'N/A' }}
+              </td>
+              <td class="text-center">
+                <span
+                  class="fw-bold fs-6"
+                  [ngClass]="{
+                    'text-success': item.Cantidad_Encontrada > item.Cantidad_Inventario,
+                    'text-danger': item.Cantidad_Inventario > item.Cantidad_Encontrada
+                  }"
+                  >{{ (item.Cantidad_Diferencial | number) || 'N/A' }}</span
+                >
+              </td>
+              <td class="text-center">
+                <input
+                  type="number"
+                  aria-hidden="true"
+                  min="0"
+                  pattern="[0-9]*"
+                  placeholder="Ingresa la cantidad final"
+                  class="form-control form-control-sm"
+                  (input)="updateCantidadFinal(item.Id_Producto, $event.target.value)"
+                  required
+                />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    </form>
+
+    <button
+      class="btn btn-success btn-sm"
+      [disabled]="!InventarioFinal.valid || loadingDownload"
+      (click)="DecargarInforme()"
+    >
+      {{ loadingDownload ? 'Descargando...' : 'Descargar informe' }}
+    </button>
+
+    <button
+      type="button"
+      (click)="guardarInventarioFinal()"
+      class="btn btn-primary btn-block mt-3"
+      [disabled]="!InventarioFinal.valid"
+    >
+      <i class="fa fa-check"></i> Terminar inventario
+    </button>
+
+    @if (Inventario_Sin_Diferencia.length != 0) {
+      <div class="row mt-3">
+        <div class="col-md-12 col-sm-12 listado-sin-diferencia">
+          <h5 class="text-center text-primary">Listado de inventario sin diferencia</h5>
+          <!-- ///////////////////// revisar si son necesarios -->
+          <!-- [loading]="Cargando2"
+              [arrayData]="Inventarios_Terminados"
+              [pagination]="adjInvPag"
+              (pageChange)="ConsultaFiltrada()" -->
+          <app-table>
+            <ng-container titles>
+              <th class="text-center">Producto</th>
+              <th class="text-center">Cant. Inicial Inventario</th>
+              <th class="text-center">Cant. Primer Conteo</th>
+            </ng-container>
+            <tbody content>
+              @for (item of Inventario_Sin_Diferencia; track $index) {
+                <tr class="text-center">
+                  <td>
+                    <strong>{{ item.Nombre_Comercial || 'N/A' }}</strong
+                    ><br />
+                    <span class="text-muted">{{ item.Nombre_Producto || 'N/A' }}</span>
+                  </td>
+                  <td class="text-center">
+                    {{ (item.Cantidad_Inventario | number) || 'N/A' }}
+                  </td>
+                  <td class="text-center">
+                    {{ (item.Cantidad_Encontrada | number) || 'N/A' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </app-table>
+        </div>
+      </div>
+    }
+  </div>
+</div>

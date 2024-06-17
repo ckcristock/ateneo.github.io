@@ -1,0 +1,33 @@
+.contenido2 {
+  span,
+  h6,
+  p {
+    font-size: 12px !important;
+  }
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background-color: rgb(112, 179, 117);
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #0e427e;
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #242b33;
+}
+
+.label-1 {
+  background: linear-gradient(45deg, #313131, #9fb9b4);
+}
+.label-2 {
+  background: linear-gradient(45deg, #962cb1, #9817ce);
+}

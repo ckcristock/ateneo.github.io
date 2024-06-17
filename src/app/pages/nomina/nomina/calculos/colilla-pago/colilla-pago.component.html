@@ -1,0 +1,67 @@
+<div *ngIf="!loading; else notData">
+  <app-resumen-colilla
+    [salarioDatos]="salarioDatos"
+    [horasExtrasDatos]="horasExtrasDatos"
+    [novedadesDatos]="novedadesDatos"
+    [ingresosDatos]="ingresosDatos"
+    [retencionesDatos]="retencionesDatos"
+    [deduccionesDatos]="deduccionesDatos"
+    [netoApagar]="netoApagar"
+  ></app-resumen-colilla>
+
+  <app-dias-trabajados
+    *ngIf="salarioDatos"
+    [salarioDatos]="salarioDatos"
+    [novedadesDatos]="novedadesDatos"
+  ></app-dias-trabajados>
+
+  <app-salario
+    [funcionario]="funcionario"
+    [salarioDatos]="salarioDatos"
+    [datosEmpresa]="datosEmpresa"
+    [brand]="brand"
+  ></app-salario>
+
+  <app-extras-recargos
+    [horasExtrasDatos]="horasExtrasDatos"
+    [porcentajesExtrasDatos]="porcentajesExtrasDatos"
+    [funcionario]="funcionario"
+  ></app-extras-recargos>
+
+  <app-novedades
+    *ngIf="hasNovedad"
+    [novedadesDatos]="novedadesDatos"
+    [datosEmpresa]="datosEmpresa"
+    [funcionario]="funcionario"
+    [brand]="brand"
+  ></app-novedades>
+
+  <app-ingresos [ingresosDatos]="ingresosDatos" [brand]="brand" [datosEmpresa]="datosEmpresa">
+  </app-ingresos>
+
+  <app-retenciones
+    [retencionesDatos]="retencionesDatos"
+    [brand]="brand"
+    [datosEmpresa]="datosEmpresa"
+    [nominaSeguridadFuncionario]="nominaSeguridadFuncionario"
+  ></app-retenciones>
+
+  <app-colilla-deducciones
+    [deduccionesDatos]="deduccionesDatos"
+    [brand]="brand"
+    [datosEmpresa]="datosEmpresa"
+  ></app-colilla-deducciones>
+
+  <div class="alert alert-warning text-center" role="alert">
+    <h4 class="alert-heading">Para tener en cuenta</h4>
+    <p>Para efectos laborales, todos los meses tienen 30 días, y los días tienen 8 horas</p>
+    <p>
+      Si desea editar alguna de las configuraciones mencionadas para estos cálculos, puede ir al
+      apartado de parametrización
+    </p>
+  </div>
+</div>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading" [text]="'Sin Datos'"></app-not-data>
+</ng-template>

@@ -1,0 +1,142 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Tipos nota de crédito</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button class="btn btn-primary btn-sm" (click)="openModal(modalAdd, 'new')">
+            <i class="fa fa-plus"></i> Agregar
+          </button>
+          <button class="btn btn-info btn-sm" (click)="matPanel.toggle()">
+            <i class="fas fa-sliders-h"></i> Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel #matPanel class="mat-elevation-z0">
+        <ng-container [formGroup]="formFilters">
+          <div class="row">
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input
+                type="text"
+                matInput
+                formControlName="name"
+                autocomplete="off"
+                placeholder="Busca por nombre"
+              />
+            </mat-form-field>
+          </div>
+        </ng-container>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!loading && creditNoteTypes.length > 0; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Nombre</th>
+            <th>Fecha de creación</th>
+            <th>Estado</th>
+            <th><i class="mdi mdi-chevron-down"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cnt of creditNoteTypes" class="text-center">
+            <td class="align-middle">{{ cnt.name | uppercase }}</td>
+            <td class="align-middle">{{ cnt.created_at | date }}</td>
+            <td class="align-middle">
+              <span class="badge" [class]="cnt.status == 'activo' ? 'bg-success' : 'bg-danger'">{{
+                cnt.status | uppercase
+              }}</span>
+            </td>
+            <td class="align-middle">
+              <div ngbDropdown container="body" class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a
+                    class="dropdown-item text-info"
+                    href="javascript: void(0);"
+                    (click)="openModal(modalAdd, 'edit', cnt)"
+                    ><i class="fas fa-edit"></i> Editar</a
+                  >
+                  <a
+                    href="javascript: void(0);"
+                    class="dropdown-item"
+                    [class]="cnt.status == 'activo' ? 'text-danger' : 'text-success'"
+                    (click)="changeStatus(cnt)"
+                  >
+                    <i
+                      class="fas"
+                      [class]="cnt.status == 'activo' ? 'fa-trash-alt' : 'fa-check'"
+                    ></i>
+                    {{ cnt.status == 'activo' ? 'Anular' : 'Activar' }}
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <ngb-pagination
+    class="d-flex justify-content-center pagination-rounded pagination-sm"
+    [collectionSize]="pagination.collectionSize"
+    [pageSize]="pagination.pageSize"
+    [(page)]="pagination.page"
+    (pageChange)="paginate($event)"
+    aria-label="Default pagination"
+    maxSize="5"
+    rotate="true"
+    ellipses="false"
+    boundaryLinks="true"
+  >
+  </ngb-pagination>
+</div>
+
+<ng-template #modalAdd let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            formControlName="name"
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button type="button" (click)="create()" class="btn btn-primary">Guardar</button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="loading"></app-not-data>
+</ng-template>

@@ -1,0 +1,82 @@
+<app-card viewTitle="Historial de pagos">
+  @if (!loading && !historialPagos.length) {
+    <div class="alert alert-warning" role="alert">
+      Aún no se ha realizado el primer pago de nómina, una vez hecho el pago podrá visualizar y
+      filtrar el historial de pagos por periodo.
+    </div>
+  }
+  <app-table
+    [loading]="loading"
+    [arrayData]="historialPagos"
+    [pagination]="pagination"
+    (pageChange)="getHistorialPagos()"
+  >
+    <ng-container titles>
+      <th>Código</th>
+      <th>Periodo</th>
+      <th>Salarios</th>
+      <th>Retenciones</th>
+      <th>Provisiones</th>
+      <th>Seguridad social</th>
+      <th>Parafiscales</th>
+      <th>Costo total empresa</th>
+      <th class="align-middle">
+        <i class="mdi mdi-chevron-down"></i>
+      </th>
+    </ng-container>
+    <tbody content>
+      @for (pago of historialPagos; track $index) {
+        <tr class="text-center">
+          <td>{{ pago.code }}</td>
+          <td>
+            {{ pago.start_period }} -
+            {{ pago.end_period }}
+          </td>
+          <td>
+            {{ pago.total_salaries | number: '1.2-2' }}
+          </td>
+          <td>
+            {{ pago.total_retentions | number: '1.2-2' }}
+          </td>
+          <td>
+            {{ pago.total_provisions | number: '1.2-2' }}
+          </td>
+          <td>
+            {{ pago.total_social_secturity | number: '1.2-2' }}
+          </td>
+          <td>
+            {{ pago.total_parafiscals | number: '1.2-2' }}
+          </td>
+          <td>{{ pago.total_cost | number: '1.2-2' }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view
+                [link]="{
+                  url: '/nomina/nomina',
+                  params: {
+                    inicio: pago.start_period,
+                    fin: pago.end_period
+                  }
+                }"
+              />
+              <app-action-button
+                icon="share-square"
+                text="Reportar"
+                type="warning"
+                (click)="onDianReport(pago.id)"
+              />
+              <app-action-button
+                icon="chart-bar"
+                text="Ver reporte DIAN"
+                type="info"
+                [link]="{
+                  url: pago.id
+                }"
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>

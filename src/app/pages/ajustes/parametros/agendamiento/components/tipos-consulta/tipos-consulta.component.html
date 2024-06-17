@@ -1,0 +1,19 @@
+<app-card viewTitle="Tipos de consulta">
+  <app-table
+    [loading]="loading"
+    [arrayData]="tiposConsulta"
+    [pagination]="pagination"
+    (pageChange)="getTiposConsulta()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+    </ng-container>
+    <tbody content>
+      @for (item of tiposConsulta; track $index) {
+        <tr class="text-center">
+          <td>{{ item.name }}</td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>

@@ -1,0 +1,75 @@
+<div class="modal-header">
+  <h4 class="text-primary modal-title">Iniciar inventario físico</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="activeModal.dismiss('Cross click')"
+  ></button>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <mat-form-field class="col-12" appearance="outline">
+      <mat-label># documento de funcionario digitador</mat-label>
+      <input
+        matInput
+        type="number"
+        placeholder="Ingresa el número de documento"
+        [(ngModel)]="Funcionario_Digita"
+        id="Funcionario_Digita"
+        name="Funcionario_Digita"
+        required
+        autocomplete="off"
+      />
+      <mat-error *ngIf="Error_Funcionario_Digita"> Campo obligatorio </mat-error>
+    </mat-form-field>
+    <mat-form-field class="col-12" appearance="outline">
+      <mat-label># documento de funcionario contador</mat-label>
+      <input
+        matInput
+        type="number"
+        placeholder="Ingresa el número de documento"
+        [(ngModel)]="Funcionario_Cuenta"
+        id="Funcionario_Cuenta"
+        name="Funcionario_Cuenta"
+        required
+        autocomplete="off"
+      />
+      <mat-error *ngIf="Error_Funcionario_Cuenta"> Campo obligatorio </mat-error>
+    </mat-form-field>
+    <mat-form-field class="col-12" appearance="outline">
+      <mat-label>Código de barras de estiba</mat-label>
+      <input
+        matInput
+        type="text"
+        placeholder="Ingresa el número de código de barras"
+        [(ngModel)]="Codigo_Barras"
+        #Barra
+        name="Barras"
+        id="Barras"
+        required
+        autocomplete="off"
+      />
+      <mat-error *ngIf="Error_Codigo_Barras"> Campo obligatorio </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="text-center"><i class="fa fa-barcode fa-4x"></i></div>
+  <div class="alert alert-primary text-center" role="alert">
+    Escanea el código de barras de la estiba
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="activeModal.close('Close click')">
+    Cancelar
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="listarProductosCategoria()"
+    [disabled]="isButtonDisabled()"
+  >
+    <i *ngIf="loading" class="fas fa-spinner fa-spin w-100" style="width: 38px !important"></i>
+    <span *ngIf="!loading">Iniciar</span>
+  </button>
+</div>

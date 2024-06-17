@@ -1,0 +1,118 @@
+<app-modal titleModal="{{ data ? 'Editar' : 'Agregar' }} categoría">
+  <form [formGroup]="formCategory">
+    <div class="row">
+      <mat-form-field class="col col-md-6" appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="Ingresa el nombre"
+          formControlName="Nombre"
+          required
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <!-- @if (data?.Fijo == 0) {
+      } -->
+      <mat-form-field class="col col-md-6" appearance="outline">
+        <mat-label>Compra internacional</mat-label>
+        <mat-select formControlName="Compra_Internacional" matInput required>
+          <mat-option value="si">Sí</mat-option>
+          <mat-option value="no">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+      @if (permission.permissions.approve_product_categories && data?.Fijo == 0) {
+        <div class="col col-md-4 mb-2">
+          <mat-slide-toggle color="primary" formControlName="Fijo">
+            Categoría fija
+          </mat-slide-toggle>
+        </div>
+      }
+      <mat-slide-toggle class="col col-md-4 mb-2" color="primary" formControlName="is_shooting">
+        ¿Se pistolea?
+      </mat-slide-toggle>
+      <mat-slide-toggle
+        class="col col-md-4 mb-2"
+        color="primary"
+        formControlName="receives_barcode"
+      >
+        ¿Recibe código de barras?
+      </mat-slide-toggle>
+      <mat-slide-toggle class="col col-md-4 mb-2" color="primary" formControlName="is_stackable">
+        ¿Es acomodable?
+      </mat-slide-toggle>
+      <mat-slide-toggle class="col col-md-4 mb-2" color="primary" formControlName="is_inventory">
+        ¿Es inventariable?
+      </mat-slide-toggle>
+      <mat-slide-toggle class="col col-md-4 mb-2" color="primary" formControlName="is_listed">
+        ¿Se alistan?
+      </mat-slide-toggle>
+    </div>
+    <hr class="border border-secondary border-1 opacity-50" />
+    <div class="row d-flex justify-content-between">
+      <div class="col-md-6 text-info">Campos adicionales</div>
+      <div class="col-md-6 text-end">
+        <div class="btn-group rounded w-sm-100 mat-form-field-wrapper">
+          <button type="button" class="btn btn-primary btn-sm" (click)="newField()">
+            <i class="fa fa-plus"></i> Agregar
+          </button>
+        </div>
+      </div>
+    </div>
+    <div formArrayName="dynamic">
+      @if (fieldDinamic.controls.length) {
+        @for (item of fieldDinamic.controls; track item; let i = $index) {
+          <div [formGroupName]="i">
+            <div class="row">
+              <mat-form-field class="col-md-3" appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Ingresa el nombre"
+                  formControlName="label"
+                  autocomplete="off"
+                  required
+                />
+              </mat-form-field>
+              <mat-form-field class="col-md-2" appearance="outline">
+                <mat-label>Tipo</mat-label>
+                <mat-select formControlName="type" required>
+                  <mat-option value="number">Numérico</mat-option>
+                  <mat-option value="text">Texto</mat-option>
+                  <mat-option value="date">Fecha</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field class="col-md-2" appearance="outline">
+                <mat-label>Requerido</mat-label>
+                <mat-select formControlName="required" required>
+                  <mat-option value="Si">Sí</mat-option>
+                  <mat-option value="No">No</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="col-md-2 mt-2">
+                <mat-checkbox
+                  matTooltip="Marca esta casilla si el campo es requerido solo cuando el producto se reciba en un acta de recepción"
+                  color="primary"
+                  formControlName="reception"
+                  >Recepcion</mat-checkbox
+                >
+              </div>
+              <mat-checkbox class="col col-md-2 mt-2" color="primary" formControlName="lists">
+                Listar
+              </mat-checkbox>
+              <div class="col-1 mt-2">
+                <button type="button" class="btn btn-danger btn-sm" (click)="deleteField(i, item)">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="alert alert-warning text-center" role="alert">No hay campos agregados</div>
+      }
+    </div>
+  </form>
+  <button buttons type="button" (click)="saveCategory()" class="btn btn-primary">Guardar</button>
+</app-modal>

@@ -1,0 +1,380 @@
+<article class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <div class="row invoive-info" style="margin-bottom: 0">
+      <div class="col-md-5 col-md-offset-2 invoice-client-info m-l-15">
+        <h6>Origen</h6>
+        <p class="m-0">
+          <strong style="color: dodgerblue"> {{ origen.Nombre }}</strong>
+        </p>
+        <p class="m-0 m-t-10"><strong>Dirección: </strong> {{ origen.Direccion }}</p>
+        <p class="m-0"><strong>Teléfono: </strong>{{ origen.Telefono }}</p>
+      </div>
+
+      <div class="col-md-6 col-xs-12 invoice-client-info">
+        <h6>Destino</h6>
+        <strong style="color: dodgerblue">{{ destino.Nombre }}</strong>
+        <p class="m-0 m-t-10"><strong>Dirección: </strong> {{ destino.Direccion }}</p>
+        <p class="m-0"><strong>Teléfono: </strong> {{ destino.Telefono }}</p>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="row m-0">
+      <div class="col-md-12 ver my-3">
+        <h6>Observaciones:</h6>
+        <p>{{ remision.Observaciones }}</p>
+      </div>
+    </div>
+    <form #FormAlistamiento="ngForm">
+      @if (Completo) {
+        <mat-stepper [linear]="true" #stepper>
+          <mat-step label="Busqueda de productos">
+            <form #FormFaseI="ngForm">
+              <div class="centered-content">
+                <div class="row">
+                  <div class="col-md-12 d-flex justify-content-between">
+                    <button class="btn btn-sm btn-info m-b-10" (click)="abrirMApa()">Mapa</button>
+                    <h4 class="text-danger" *ngIf="Leer_Estiba">Ingresar Estiba</h4>
+                    <h4 class="text-success" *ngIf="!Leer_Estiba">Ingresar Producto</h4>
+                    <button class="btn btn-sm btn-info m-b-10" (click)="ActualizarLista()">
+                      Actualizar
+                    </button>
+                  </div>
+                </div>
+                <input
+                  (focus)="focus()"
+                  (blur)="focus()"
+                  autofocus
+                  id="CodigoBarra"
+                  class="input-flotante"
+                  name="Codigo_Barra"
+                  #CodigoBarra
+                  (change)="HablilitarSiguiente($event.target.value)"
+                />
+                <div class="rounded-top table-responsive">
+                  <table class="table invoice-detail-table tabla">
+                    <thead>
+                      <tr class="thead-default">
+                        <th style="width: 150px">Estiba</th>
+                        <th style="width: 80px">Subcategoria</th>
+                        <th style="width: 40px"></th>
+                        <th>Producto</th>
+                        <th style="width: 180px">Embalaje</th>
+                        <th style="width: 100px">Lote</th>
+                        <th style="width: 70px">Fecha Vencimiento</th>
+                        <th style="width: 70px">Cantidad</th>
+                        <th style="width: 70px">Codigo de barras</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of Lista_Productos; let i = index" class="ver">
+                        <td
+                          *ngIf="item.Cantidades_Productos_Estiba"
+                          [attr.rowspan]="item.Cantidades_Productos_Estiba"
+                        >
+                          <span>{{ item.Nombre_Estiba }}</span>
+                          <input
+                            [(ngModel)]="item.Codigo_Barras_Ingresado"
+                            class="form-control form-control-sm codigos"
+                            id="codigo{{ i }}"
+                            placeholder="Escanee la estiba"
+                            name="Codigo{{ i }}"
+                            type="text"
+                            required
+                          />
+                        </td>
+                        <td [ngClass]="item.Clase" style="width: 80px">
+                          {{ item.Subcategoria }}
+                        </td>
+                        <td [ngClass]="item.Clase" style="width: 40px">
+                          <!--  -->
+                          <img
+                            *ngIf="item.Imagen != ''"
+                            width="50"
+                            height="50"
+                            class="img-radius imagen"
+                            [src]="item.Imagen | image: 'users'"
+                            data-toggle="lightbox"
+                            (click)="open(i)"
+                          />
+                        </td>
+                        <td [ngClass]="item.Clase" style="width: 140px" style="text-align: left">
+                          <strong
+                            *ngIf="'item.Laboratorio_Comercial' == 'item.Laboratorio_Generico'"
+                            >{{ item.Nombre_Comercial }} - LAB:
+                            {{ item.Laboratorio_Comercial }}
+                          </strong>
+                          <strong
+                            *ngIf="'item.Laboratorio_Comercial' != 'item.Laboratorio_Generico'"
+                            >{{ item.Nombre_Comercial }} - LAB1: {{ item.Laboratorio_Comercial }} /
+                            LAB2: {{ item.Laboratorio_Generico }} </strong
+                          ><br /><span style="font-size: 8px">{{ item.Nombre_Producto }}</span>
+                        </td>
+                        <td [ngClass]="item.Clase">{{ item.Embalaje }}</td>
+                        <td [ngClass]="item.Clase">{{ item.Lote }}</td>
+                        <td [ngClass]="item.Clase">
+                          {{ item.Fecha_Vencimiento }}
+                        </td>
+                        <td [ngClass]="item.Clase">{{ item.Cantidad }}</td>
+                        <td [ngClass]="item.Clase">
+                          <input
+                            [(ngModel)]="item.Codigo_Ingresado"
+                            class="form-control form-control-sm codigos"
+                            id="fila{{ i }}"
+                            placeholder="Escanee el Producto"
+                            name="Codigo_Ingresado{{ i }}"
+                            type="text"
+                            required
+                          />
+                          <input
+                            hidden
+                            ngModel="{{ item.Codigo_Barras }}"
+                            class="form-control form-control-sm"
+                            placeholder="Escanee el Producto"
+                            name="Codigo_Barras{{ i }}"
+                            type="text"
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="btn-group mt-10">
+                  <!--
+                      <button *ngIf="categoria_origen.Nombre=='MATERIALES' || categoria_origen.Id_Categoria_Nueva=='3' " type="button" [disabled]="!FormFaseI.valid" class="btn btn-primary btn-sm btn-block"
+                        (click)="showAlert($event,'Material')">Finalizar</button> -->
+                  <button
+                    [disabled]="!FormFaseI.valid"
+                    type="button"
+                    class="btn btn-primary btn-sm btn-block"
+                    (click)="showAlert($event, 'Fase1')"
+                  >
+                    Finalizar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </mat-step>
+          @if (estado_balanza) {
+            <mat-step label="Pesado de productos">
+              <form #FormFaseII="ngForm">
+                <div class="centered-content">
+                  <div class="rounded-top table-responsive">
+                    <table class="table invoice-detail-table tabla">
+                      <thead>
+                        <tr class="thead-default">
+                          <th>Producto</th>
+                          <th style="width: 180px">Embalaje</th>
+                          <th style="width: 40px">Lote</th>
+                          <th style="width: 70px">Fecha Vencimiento</th>
+                          <th style="width: 70px">Cantidad</th>
+                          <th style="width: 100px">Peso Ingresado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of Lista_Productos; let i = index" id="peso{{ i }}">
+                          <td>
+                            <strong
+                              >{{ item.Nombre_Comercial }} -
+                              {{ item.Laboratorio_Comercial }}</strong
+                            ><br /><span style="font-size: 8px">{{ item.Nombre_Producto }}</span>
+                          </td>
+                          <td>{{ item.Embalaje }}</td>
+                          <td>{{ item.Lote }}</td>
+                          <td>{{ item.Fecha_Vencimiento }}</td>
+                          <td>{{ item.Cantidad }}</td>
+                          <td class="text-center">
+                            <input
+                              [(ngModel)]="item.Peso"
+                              class="form-control form-control-sm tabla codigos"
+                              placeholder="Coloque Producto en la Balanza"
+                              name="Peso_Ingresado{{ i }}"
+                              (change)="HablilitarPesoSiguiente(i, $event.target.value)"
+                              type="text"
+                              readonly
+                              id="peso{{ i }}"
+                              readonly
+                              required
+                            />
+                            <input
+                              hidden
+                              [(ngModel)]="item.Peso_Presentacion_Regular"
+                              class="form-control form-control-sm"
+                              placeholder="Coloque los Productos en la Balanza"
+                              name="Peso_Presentacion_Regular{{ i }}"
+                              type="text"
+                            />
+                            <p style="margin-bottom: 0rem; text-align: center">
+                              {{ item.Mensaje }}
+                            </p>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="btn-group mt-10">
+                    <button
+                      type="button"
+                      [disabled]="!FormFaseII.valid"
+                      goToStep="2"
+                      class="btn btn-secondary btn-sm"
+                      (click)="QuitarObservable()"
+                      nextStep
+                    >
+                      Siguente Paso
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </mat-step>
+          }
+          <mat-step label="Conteo de productos">
+            <form #FormFaseII="ngForm">
+              <div class="centered-content">
+                <div class="rounded-top table-responsive">
+                  <table class="table invoice-detail-table tabla">
+                    <thead>
+                      <tr class="thead-default">
+                        <th style="width: 100px">Estiba</th>
+                        <th style="width: 80px">Subcategoria</th>
+
+                        <th>Producto</th>
+                        <th style="width: 180px">Embalaje</th>
+                        <th style="width: 100px">Lote</th>
+                        <th style="width: 70px">Fecha Vencimiento</th>
+                        <th style="width: 70px">Cantidad</th>
+                        <th style="width: 70px">Cantidad Encontrada</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="let item of Lista_Productos; let i = index"
+                        id="canti{{ i }}"
+                        class=" {{ item.Validado ? 'label-success' : 'label-danger' }}"
+                      >
+                        <!--  <td>{{item.Categoria}}</td> -->
+                        <td
+                          *ngIf="item.Cantidades_Productos_Estiba"
+                          class="bg-white"
+                          [attr.rowspan]="item.Cantidades_Productos_Estiba"
+                        >
+                          <span>{{ item.Nombre_Estiba }}</span>
+                        </td>
+                        <td style="width: 80px">{{ item.Subcategoria }}</td>
+                        <td class="text-start">
+                          <strong
+                            >{{ item.Nombre_Comercial }} - LAB1: {{ item.Laboratorio_Comercial }} /
+                            LAB2: {{ item.Laboratorio_Generico }}</strong
+                          ><br /><span style="font-size: 8px">{{ item.Nombre_Producto }}</span>
+                        </td>
+                        <td>{{ item.Embalaje }}</td>
+                        <td>{{ item.Lote }}</td>
+                        <td>{{ item.Fecha_Vencimiento }}</td>
+                        <td>{{ item.Cantidad }}</td>
+                        <td>
+                          <input
+                            [(ngModel)]="item.Cantidad_Ingresada"
+                            class="form-control form-control-sm tabla codigos"
+                            placeholder="Digite Cantidad"
+                            name="Cantidad_Ingresada{{ i }}"
+                            (change)="HablilitarCantidadSiguiente(i, $event.target.value)"
+                            type="text"
+                            id="cant{{ i }}"
+                            required
+                          />
+                          <p style="margin-bottom: 0rem; text-align: center; font-size: 13px">
+                            {{ item.Mensaje }}
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <input hidden [(ngModel)]="Peso_Total" name="Peso_Total" />
+                <div class="btn-group mt-10 text-end">
+                  <button
+                    [disabled]="!FormFaseII.valid || !validarCantidades()"
+                    type="button"
+                    class="btn btn-primary btn-sm btn-block"
+                    (click)="showAlert($event, 'Fase2')"
+                  >
+                    Finalizar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </mat-step>
+          @if (estado_balanza) {
+            <mat-step label="Proceso terminado">
+              <form #FormPesoTotal="ngForm">
+                <div class="centered-content">
+                  <div>
+                    <h3>Peso Global</h3>
+
+                    <h6>Coloque todos los Productos en la balanza Gracias!</h6>
+                    <input
+                      [(ngModel)]="Peso_Total"
+                      class="form-control form-control-sm tabla peso"
+                      name="Peso_Total"
+                      placeholder="El peso no concuerda con el calculado"
+                      type="text"
+                      readonly
+                      id="peso_total"
+                    />
+                    <p>{{ Mensaje }}</p>
+                  </div>
+
+                  <div class="btn-group mt-10">
+                    <button
+                      [disabled]="!!FormPesoTotal.valid"
+                      type="button"
+                      class="btn btn-primary btn-sm btn-block"
+                      (click)="showAlert($event, 'Fase2')"
+                    >
+                      Finalizar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </mat-step>
+          }
+        </mat-stepper>
+      }
+    </form>
+  </div>
+</article>
+<app-modal-basic #modalBodega [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Seleccione las balanzas que va a trabajar</h4>
+    <button type="button" class="close basic-close" (click)="modalBodega.hide()"></button>
+  </div>
+  <div class="app-modal-body">
+    <form #FormBodega="ngForm">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Por favor seleccione el Combo de balanzas que va utilizar</label>
+            <select
+              id="balanza"
+              name="balanzas"
+              class="form-control form-control-sm tipo-dis-select"
+            >
+              <option value="1-2">1-2</option>
+              <option value="3-4">3-4</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <div class="text-end">
+      <button type="button" class="btn btn-success btn-sm" (click)="GuardaBalanza()">
+        Guardar
+      </button>
+    </div>
+  </div>
+</app-modal-basic>

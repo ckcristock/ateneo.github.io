@@ -1,0 +1,134 @@
+<app-card
+  viewTitle="Consecutivos"
+  [filterTemplate]="filterTemplate"
+  [activeFilters]="urlFiltersService.activeFilters"
+>
+  <app-table
+    [loading]="loading"
+    [arrayData]="consecutivos"
+    [pagination]="pagination"
+    (pageChange)="paginate()"
+  >
+    <ng-container titles>
+      <th>Nombre</th>
+      <th>Prefijo</th>
+      <th>Año</th>
+      <th>Mes</th>
+      <th>Día</th>
+      <th>Ciudad</th>
+      <th>Longitud</th>
+      <th>Código de formato</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of consecutivos; track $index) {
+        <tr class="text-center">
+          <td>{{ item.Tipo }}</td>
+          <td>{{ item.Prefijo }}</td>
+          <td>{{ item.Anio ? 'Sí' : 'No' }}</td>
+          <td>{{ item.Mes ? 'Sí' : 'No' }}</td>
+          <td>{{ item.Dia ? 'Sí' : 'No' }}</td>
+          <td>{{ item.city ? 'Sí' : 'No' }}</td>
+          <td>{{ item.longitud }}</td>
+          <td>{{ item.format_code || 'Ninguno' }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-edit (action)="openModal(edit, item)" />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <ng-container [formGroup]="form_filters">
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="type"
+        autocomplete="off"
+        placeholder="Busca por nombre"
+      />
+    </mat-form-field>
+  </ng-container>
+</ng-template>
+
+<ng-template #edit let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">
+      Editar consecutivo: {{ titulo_consecutivo | lowercase }}
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="_modal.close()"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <ng-container [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Prefijo</mat-label>
+          <input
+            type="text"
+            matInput
+            formControlName="Prefijo"
+            autocomplete="off"
+            placeholder="Ingresa el prefijo"
+          />
+          <mat-hint>El prefijo debe ser de máximo 6 dígitos</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Longitud</mat-label>
+          <input
+            type="number"
+            matInput
+            formControlName="longitud"
+            autocomplete="off"
+            placeholder="Ingresa la longitud"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Código de formato</mat-label>
+          <input
+            type="text"
+            matInput
+            formControlName="format_code"
+            autocomplete="off"
+            placeholder="Ingresa el código de formato"
+          />
+        </mat-form-field>
+        <div class="col-12 d-flex justify-content-between">
+          <mat-slide-toggle color="primary" formControlName="Anio">Año</mat-slide-toggle>
+          <mat-slide-toggle color="primary" formControlName="Mes">Mes</mat-slide-toggle>
+          <mat-slide-toggle color="primary" formControlName="Dia">Día</mat-slide-toggle>
+          <mat-slide-toggle color="primary" formControlName="city">Ciudad</mat-slide-toggle>
+        </div>
+        <div class="col-12 mt-3">
+          <div class="alert alert-info" role="alert">
+            <b>Previsualización: </b> {{ form.controls.Prefijo.value
+            }}{{ form.controls.city.value ? '(BGA)' : '' }}-{{ consecutivo_numero
+            }}{{
+              form.controls.Anio.value || form.controls.Mes.value || form.controls.Dia.value
+                ? '-'
+                : ''
+            }}{{ form.controls.Anio.value ? today_.anio : ''
+            }}{{ form.controls.Mes.value ? today_.mes : ''
+            }}{{ form.controls.Dia.value ? today_.dia : '' }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="_modal.close()">Cancelar</button>
+    <button type="button" class="btn btn-primary" (click)="saveConsecutivo()">Guardar</button>
+  </div>
+</ng-template>

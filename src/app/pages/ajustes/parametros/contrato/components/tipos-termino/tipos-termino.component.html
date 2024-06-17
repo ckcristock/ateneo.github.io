@@ -1,0 +1,23 @@
+<app-card viewTitle="Términos del contrato" [filterTemplate]="filterTemplate">
+  <app-table [loading]="loading" [arrayData]="terms" [pagination]="pagination" (pageChange)="getTermsTypes()">
+    <ng-container titles>
+      <th>Tipos de Salario</th>
+    </ng-container>
+    <tbody content>
+      @for (term of terms; track $index) {
+      <tr class="text-center">
+        <td>{{ term.name }}</td>
+      </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search class="col pb-3" label="Nombre" placeholder="Busca por nombre" [value]="filtro.name"
+    (searching)="filtro.name = $event; getTermsTypes()"></app-automatic-search>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data-sa [loading]="loading"></app-not-data-sa>
+</ng-template>

@@ -1,0 +1,26 @@
+<mat-form-field [class]="'w-100 ' + classList" appearance="outline">
+  <mat-label>{{ label }}</mat-label>
+  <input
+    #input
+    type="text"
+    aria-label="input"
+    [placeholder]="placeholder"
+    matInput
+    [(ngModel)]="inputModel"
+    [matAutocomplete]="auto"
+    (input)="filter()"
+    (focus)="filter()"
+    (blur)="closed()"
+    [required]="required"
+  />
+  <mat-autocomplete
+    requireSelection
+    #auto="matAutocomplete"
+    (optionSelected)="optionSelected($event)"
+    (opened)="opened()"
+  >
+    <mat-option *ngFor="let option of filtered" [value]="option.value">
+      {{ option.text }}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

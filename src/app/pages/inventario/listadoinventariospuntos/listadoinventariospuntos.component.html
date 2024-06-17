@@ -1,0 +1,135 @@
+<app-card viewTitle="Documentos iniciados2" [filterTemplate]="filterTemplate">
+  <app-add-button filters (click)="iniciar_inventario_fisico()" />
+  <app-table [loading]="Cargando" [arrayData]="Documentos">
+    <ng-container titles>
+      <th>#</th>
+      <th>Estado</th>
+      <th>Fecha</th>
+      <th>Digitador</th>
+      <th>Contador</th>
+      <th>Bodega</th>
+      <th>Estiba</th>
+    </ng-container>
+    <tbody content>
+      @for (documento of Documentos; track $index) {
+        <tr class="text-center">
+          <td>{{ documento.Id_Doc_Inventario_Fisico_Punto }}</td>
+          <td>{{ documento.Estado }}</td>
+          <td>{{ documento.Fecha_Inicio }}</td>
+          <td>
+            {{ documento.Funcionario_Digita_Nombres }}
+            {{ documento.Funcionario_Digita_Apellidos }}
+          </td>
+          <td>
+            {{ documento.Funcionario_Cuenta_Nombres }}
+            {{ documento.Funcionario_Cuenta_Apellidos }}
+          </td>
+          <td>{{ documento.Punto_Dispensacion }}</td>
+          <td>{{ documento.Estiba }}</td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col mb-3"
+    label="Filtrar"
+    [value]="filtroBuscador"
+    (searching)="filtroBuscador = $event; filtrar($event)"
+  ></app-automatic-search>
+</ng-template>
+
+<app-card
+  viewTitle="Listado de inventarios realizados y ajustados"
+  [filterTemplate]="filterTemplate1"
+>
+  <app-table
+    [loading]="Cargando2"
+    [arrayData]="Inventarios_Terminados"
+    [pagination]="pagination"
+    (pageChange)="ConsultaFiltrada()"
+  >
+    <ng-container titles>
+      <th>#</th>
+      <th>Fecha</th>
+      <th>Funcionario Autorizó</th>
+      <th>Punto Dispensación</th>
+      <th>Grupo</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of Inventarios_Terminados; track $index) {
+        <tr class="text-center">
+          <td>{{ item.Id_Inventario_Fisico_Punto_Nuevo }}</td>
+          <td>{{ item.Fecha | date: 'dd/MM/yyyy hh:mm:ss a' }}</td>
+          <td>{{ item.Nombre_Funcionario_Autorizo }}</td>
+          <td>{{ item.Nombre_Bodega }}</td>
+          <td>{{ item.Nombre_Grupo }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view
+                [link]="{
+                  url: 'ver/' + item.Id_Inventario_Fisico_Punto_Nuevo
+                }"
+              />
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+
+<ng-template #filterTemplate1>
+  <mat-form-field class="col" appearance="outline">
+    <mat-label>Rango de fechas</mat-label>
+    <mat-date-range-input [formGroup]="formRange" [rangePicker]="picker">
+      <input
+        matStartDate
+        placeholder="Fecha de inicio"
+        required
+        formControlName="start"
+        name="date_start"
+      />
+      <input matEndDate placeholder="Fecha de fin" required formControlName="end" name="date_end" />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker>
+      <mat-date-range-picker-actions>
+        <button mat-button matDateRangePickerCancel>Cancelar</button>
+        <button mat-raised-button color="primary" matDateRangePickerApply (click)="onFilterDate()">
+          Aplicar
+        </button>
+      </mat-date-range-picker-actions>
+    </mat-date-range-picker>
+  </mat-form-field>
+  <app-automatic-search
+    class="col"
+    label="Filtrar"
+    [value]="filtroBuscador"
+    (searching)="filtroBuscador = $event; filtrar($event)"
+  ></app-automatic-search>
+  <app-autocomplete-mdl
+    class="col"
+    label="Seleccione estiba"
+    placeholder="Buscar estiba"
+    [model]="FiltrosTabla.Punto"
+    [list]="listaPuntos"
+    (optionSelectedEvent)="FiltrosTabla.Punto = $event; listarInventarioBodega()"
+  ></app-autocomplete-mdl>
+  @if (listaGrupoEstibas.length) {
+    <mat-form-field class="col" appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="FiltrosTabla.Grupo" (selectionChange)="ConsultaFiltrada()">
+        <mat-option value="">Todos</mat-option>
+        @for (item of listaGrupoEstibas; track $index) {
+          <mat-option [value]="item.Id_Grupo_Estiba">
+            {{ item.Nombre }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+</ng-template>

@@ -1,0 +1,108 @@
+<div class="card-title d-flex justify-content-between">
+  <h6><i class="fa fa-user-times" aria-hidden="true"></i> Afiliaciones</h6>
+  <button class="btn btn-link" (click)="openModal()">
+    <i class="fas fa-pencil-alt"></i>
+  </button>
+</div>
+
+@if (!loading) {
+  <div class="row">
+    <div class="col-lg-6 text-lg-end text-center text-primary">EPS</div>
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.eps?.name | uppercase }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">Fondo de pensiones</div>
+
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.pension_funds?.name | uppercase }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">Fondo de cesantias</div>
+
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.severance_fund?.name | uppercase }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">Caja de compensación</div>
+
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.compensation_fund?.name | uppercase }}
+    </div>
+    <div class="col-lg-6 text-lg-end text-center text-primary">ARL</div>
+
+    <div class="col-lg-6 text-lg-start text-center">
+      {{ userDetail?.arl?.name | uppercase }}
+    </div>
+  </div>
+} @else {
+  <app-not-data [loading]="loading"></app-not-data>
+}
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">Editar datos de afiliaciones</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    @if (!loadingInfo) {
+      <form [formGroup]="form">
+        <div class="row">
+          <app-autocomplete-fc
+            class="col col-md-6"
+            label="EPS"
+            placeholder="Ingresa EPS"
+            [control]="form.controls['eps_id']"
+            [list]="eps"
+          />
+          <app-autocomplete-fc
+            class="col col-md-6"
+            label="Fondo de pensiones"
+            placeholder="Ingresar pensión"
+            [control]="form.controls['pension_fund_id']"
+            [list]="pensions"
+          />
+          <app-autocomplete-fc
+            class="col col-md-6"
+            label="Fondo de cesantías"
+            placeholder="Ingresar cesantía"
+            [control]="form.controls['severance_fund_id']"
+            [list]="severances"
+          />
+          <app-autocomplete-fc
+            class="col col-md-6"
+            label="Caja de compensación"
+            placeholder="Ingresar compensación"
+            [control]="form.controls['compensation_fund_id']"
+            [list]="compensations"
+          />
+          <app-autocomplete-fc
+            class="col col-md-6"
+            label="ARL"
+            placeholder="Ingresar ARL"
+            [control]="form.controls['arl_id']"
+            [list]="arls"
+          />
+        </div>
+      </form>
+    } @else {
+      <app-not-data [loading]="loadingInfo"></app-not-data>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      [disabled]="!form.valid"
+      (click)="updateAfiliation()"
+      class="btn btn-primary"
+    >
+      Actualizar
+    </button>
+  </div>
+</ng-template>

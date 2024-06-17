@@ -1,0 +1,107 @@
+<article class="row gap-3">
+  <app-card class="col-md-6" viewTitle="Regímenes" [filterTemplate]="filterTemplateRegimen">
+    <!-- <app-add-button filters (click)="" /> -->
+    <app-table
+      [loading]="loadingRegimes"
+      [arrayData]="regimes"
+      [pagination]="pagination.regimes"
+      (pageChange)="getRegimes()"
+    >
+      <ng-container titles>
+        <th>Nombre</th>
+        <th>Código</th>
+      </ng-container>
+      <tbody content>
+        @for (regime of regimes; track $index) {
+          <tr
+            class="text-center"
+            role="button"
+            (click)="
+              regimeSelected = {
+                id: regime.id,
+                name: regime.name
+              };
+              selected(regimes, regime.id);
+              getLevels(regime.id)
+            "
+            [ngClass]="regime.selected ? 'bg-primary text-white fw-bold' : ''"
+          >
+            <td class="align-middle">{{ regime.name }}</td>
+            <td class="align-middle">{{ regime.code }}</td>
+          </tr>
+        }
+      </tbody>
+    </app-table>
+  </app-card>
+  <app-card class="col" viewTitle="Niveles" [filterTemplate]="filterTemplateLevels">
+    <!-- <app-add-button filters (click)="" /> -->
+    @if (regimeSelected.name) {
+      <h5 class="text-dark">Régimen {{ regimeSelected.name | lowercase }}</h5>
+      <app-table
+        [loading]="loadingLevels"
+        [arrayData]="levels"
+        [pagination]="pagination.levels"
+        (pageChange)="getLevels(regimeSelected.id)"
+      >
+        <ng-container titles>
+          <th>Nombre</th>
+          <th>Código</th>
+          <th>Cuota</th>
+        </ng-container>
+        <tbody content>
+          @for (level of levels; track $index) {
+            <tr class="text-center">
+              <td>{{ level.name }}</td>
+              <td>{{ level.code }}</td>
+              <td class="align-right">$ {{ level.cuote | number }}</td>
+            </tr>
+          }
+        </tbody>
+      </app-table>
+    } @else {
+      <app-not-data
+        [loading]="loadingLevels"
+        text="Seleccione un régimen para ver los niveles en ese régimen"
+      ></app-not-data>
+    }
+  </app-card>
+</article>
+<ng-template #filterTemplateRegimen>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtrosRegimes.name"
+    (searching)="filtrosRegimes.name = $event; getRegimes()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtrosRegimes.code"
+    (searching)="filtrosRegimes.code = $event; getRegimes()"
+  ></app-automatic-search>
+</ng-template>
+<ng-template #filterTemplateLevels>
+  <app-automatic-search
+    class="col pb-3"
+    label="Nombre"
+    placeholder="Busca por nombre"
+    [value]="filtrosLevels.name"
+    (searching)="filtrosLevels.name = $event; getLevels(regimeSelected.id)"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtrosLevels.code"
+    (searching)="filtrosLevels.code = $event; getLevels(regimeSelected.id)"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col pb-3"
+    label="Cuota"
+    placeholder="Busca por cuota"
+    [value]="filtrosLevels.cuote"
+    (searching)="filtrosLevels.cuote = $event; getLevels(regimeSelected.id)"
+  ></app-automatic-search>
+</ng-template>

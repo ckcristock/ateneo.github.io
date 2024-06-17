@@ -1,0 +1,103 @@
+<article class="card">
+  <form #FormDevolucion="ngForm" class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Bodega</th>
+            <th>Proveedor</th>
+            <th>Orden compra</th>
+            <th>Acta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            <td>{{ encabezado.Nombre_Bodega }}</td>
+            <td>
+              {{ encabezado.Proveedor }}
+            </td>
+            <td>
+              {{ encabezado.Compra }}
+            </td>
+            <td>
+              {{ encabezado.Acta }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Factura</th>
+            <th>Fecha Factura</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            @for (item of Facturas; track $index) {
+              <td>{{ item.Factura }}</td>
+              <td>{{ item.Fecha_Factura }}</td>
+            }
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <mat-form-field class="col-md-12 mat-form-field-no-padding textarea" appearance="outline">
+      <mat-label>Observaciones</mat-label>
+      <textarea
+        matInput
+        placeholder="Ingrese las observaciones"
+        rows="5"
+        ngModel
+        id="Observaciones"
+        name="Observaciones"
+        [cdkTextareaAutosize]="true"
+      ></textarea>
+    </mat-form-field>
+    <div class="rounded-top table-responsive">
+      <table class="table table-bordered table-striped table-sm">
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th>Nombre Producto</th>
+            <th>Cantidad</th>
+            <th>Motivo devolución</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            @for (item of Lista_Productos; track item; let i = $index) {
+              <td>
+                <strong>{{ item.Nombre_Comercial }}</strong>
+                <p>
+                  {{ item.Nombre_Producto }}
+                </p>
+              </td>
+              <td>{{ item.Cantidad }}</td>
+              <td>
+                <input
+                  [(ngModel)]="item.Motivo"
+                  name="motivo{{ i }}"
+                  class="form-control form-control-sm"
+                  type="text"
+                  id="observacionNoConformidad{{ i }}"
+                />
+              </td>
+            }
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button
+      type="button"
+      (click)="guardarDevolucion(FormDevolucion)"
+      [disabled]="!FormDevolucion.valid"
+      class="btn btn-success btn-block"
+    >
+      Generar devolución
+    </button>
+  </form>
+</article>

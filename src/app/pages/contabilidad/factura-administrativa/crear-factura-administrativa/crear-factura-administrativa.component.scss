@@ -1,0 +1,40 @@
+.tabla {
+  font-size: 11px;
+  word-wrap: break-word;
+  th,
+  td {
+    white-space: normal;
+    padding: 3px !important;
+    font-size: 11px;
+    line-height: 11px;
+  }
+  input {
+    word-wrap: break-word;
+  }
+}
+
+.form-control-sm {
+  font-size: 11px !important;
+  padding: 2px 5px !important;
+  height: 22px !important;
+  border-radius: 5px !important;
+}
+
+.inputDesc {
+  height: 70px !important;
+  max-height: 70px !important;
+  min-height: 70px !important;
+  font-size: 11px;
+}
+
+* {
+  word-break: normal !important;
+}
+
+.tabla-activos {
+  cursor: pointer;
+}
+
+.mgs {
+  margin: 0px 0px 5px 0px !important;
+}

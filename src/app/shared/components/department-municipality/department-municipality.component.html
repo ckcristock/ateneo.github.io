@@ -1,0 +1,31 @@
+<form class="row" [formGroup]="formDepMun">
+  @if (showCountry) {
+    <app-autocomplete-fc
+      class="col"
+      label="País"
+      placeholder="Ingresa el país"
+      [control]="formDepMun.controls['country_id']"
+      [list]="countries"
+      [required]="required"
+      (optionSelectedEvent)="onSelectCountry()"
+    ></app-autocomplete-fc>
+  }
+  <app-autocomplete-fc
+    class="col"
+    [label]="loadingDep ? 'Cargando...' : 'Departamento'"
+    placeholder="Ingresa el departamento"
+    [control]="formDepMun.controls['department_id']"
+    [list]="departments"
+    [required]="required"
+    (optionSelectedEvent)="onSelectDept()"
+  ></app-autocomplete-fc>
+  <app-autocomplete-fc
+    class="col"
+    placeholder="Ingresa el municipio"
+    [label]="loadingMun ? 'Cargando...' : 'Municipio'"
+    [control]="formDepMun.controls['municipality_id']"
+    [list]="municipalities"
+    [required]="required"
+    (optionSelectedEvent)="emitChangeSelection()"
+  ></app-autocomplete-fc>
+</form>

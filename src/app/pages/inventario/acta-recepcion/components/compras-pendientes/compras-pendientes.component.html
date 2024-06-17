@@ -1,0 +1,85 @@
+<app-card viewTitle="Compras pendientes" [filterTemplate]="filterTemplate">
+  <app-header-button
+    filters
+    icon="plus"
+    text="Causal no conforme"
+    type="success"
+    (click)="openNonconforming()"
+  />
+  <app-table
+    class="d-block mt-3"
+    [loading]="loadingComprasPendientes"
+    [arrayData]="pendientesNacional"
+    [pagination]="pagination"
+    (pageChange)="getComprasPendientes()"
+  >
+    <ng-container titles>
+      <th>Código</th>
+      <th>Fecha</th>
+      <th>Probable entrega</th>
+      <th>Proveedor</th>
+      <th>#Productos</th>
+      <th>Total</th>
+      <th><i class="mdi mdi-chevron-down"></i></th>
+    </ng-container>
+    <tbody content>
+      @for (item of pendientesNacional; track $index) {
+        <tr class="text-center">
+          <td class="text-nowrap">
+            <a
+              [routerLink]="['/compras/ver-nacional', item.Id_Orden_Compra_Nacional]"
+              target="_blank"
+            >
+              {{ item.Codigo }}
+            </a>
+          </td>
+          <td>{{ item.created_at | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ item.Fecha_Entrega_Probable | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ item.third.full_name | titlecase }}</td>
+          <td>{{ item.Items }}</td>
+          <td>${{ item.Total | number: '1.2-2' }}</td>
+          <td>
+            <app-dropdown-actions>
+              <app-action-view
+                [link]="{
+                  url: '/compras/ver-nacional/' + item.Id_Orden_Compra_Nacional
+                }"
+              />
+              @if (!item.acta) {
+                <app-action-button
+                  icon="plus"
+                  text="Recibir"
+                  type="primary"
+                  [link]="{
+                    url: 'crear/' + item.Id_Orden_Compra_Nacional + '/Nacional'
+                  }"
+                />
+              }
+              <!-- @else if (item.acta?.Estado === 'Parcial') { -->
+              <!--     <app-action-edit -->
+              <!--       [routerLink]="['editar/' + item?.Id_Orden_Compra_Nacional, 'Nacional']" -->
+              <!--     /> -->
+              <!--   } -->
+            </app-dropdown-actions>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </app-table>
+</app-card>
+<ng-template #filterTemplate>
+  <app-automatic-search
+    class="col"
+    label="Código"
+    placeholder="Busca por código"
+    [value]="filtersCP.codigo"
+    (searching)="filtersCP.codigo = $event; getComprasPendientes()"
+  ></app-automatic-search>
+  <app-automatic-search
+    class="col"
+    label="Proveedor"
+    placeholder="Busca por proveedor"
+    [value]="filtersCP.proveedor"
+    (searching)="filtersCP.proveedor = $event; getComprasPendientes()"
+  ></app-automatic-search>
+</ng-template>

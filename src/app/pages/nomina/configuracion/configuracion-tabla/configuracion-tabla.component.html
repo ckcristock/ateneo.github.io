@@ -1,0 +1,98 @@
+<table class="table table-md mt-2">
+  <tbody>
+    <tr *ngFor="let result of data; let index = index">
+      <td class="fw-bold">{{ result['concept'] ?? result['area'] | uppercase }}</td>
+      <td>
+        <div class="row row-gap-3">
+          <ng-container *ngIf="updates.people">
+            <app-autocomplete-mdl
+              class="col"
+              label="Responsable"
+              placeholder="Buscar responsable"
+              [model]="result.company_payroll?.person?.id"
+              [list]="people"
+              [classList]="'pb-0'"
+              [restoreValue]="restoreValue.id === result.id && restoreValue.key === 'people'"
+              (optionSelectedEvent)="updateResponsible($event, result.id)"
+            ></app-autocomplete-mdl>
+          </ng-container>
+          <ng-container *ngIf="updates.account">
+            <app-autocomplete-mdl
+              class="col"
+              label="Cuenta contable"
+              placeholder="Buscar cuenta contable"
+              [model]="result.accounts?.account_plan?.Id_Plan_Cuentas"
+              [list]="account"
+              [classList]="'pb-0'"
+              [restoreValue]="restoreValue.id === result.id && restoreValue.key === 'account'"
+              (optionSelectedEvent)="updateAccount($event, result.id)"
+            ></app-autocomplete-mdl>
+          </ng-container>
+          <ng-container *ngIf="updates.counterpart">
+            <app-autocomplete-mdl
+              class="col"
+              label="Contrapartida"
+              placeholder="Buscar contrapartida"
+              [model]="result.accounts?.account_setoff_info?.Id_Plan_Cuentas"
+              [list]="account"
+              [classList]="'pb-0'"
+              [restoreValue]="restoreValue.id === result.id && restoreValue.key === 'counterpart'"
+              (optionSelectedEvent)="updateCounterpart($event, result.id)"
+            ></app-autocomplete-mdl>
+          </ng-container>
+          <ng-container *ngIf="updates.percent">
+            <mat-form-field class="col pb-0 h-50 nomina__min-w" appearance="outline">
+              <mat-label>Porcentaje</mat-label>
+              <input
+                #percentage
+                matInput
+                appInputPositionInitial
+                [options]="options"
+                currencyMask
+                [value]="result.accounts?.percentage"
+                name="percentage"
+                id="percentage{{ index + type }}"
+                autocomplete="off"
+              />
+              <button
+                color="primary"
+                mat-icon-button
+                matSuffix
+                aria-label="Actualizar"
+                (click)="updatePercentage(percentage, result.id, result.accounts?.percentage)"
+              >
+                <mat-icon>save</mat-icon>
+              </button>
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngIf="updates.modality">
+            <mat-form-field class="col pb-0 h-50 nomina__min-w" appearance="outline">
+              <mat-label>Modalidad</mat-label>
+              <mat-select
+                #matSelect
+                [value]="result.modality"
+                (selectionChange)="
+                  updateModality($event.value, result.id, result.modality, matSelect)
+                "
+              >
+                <mat-option value="Por Dia">Por día</mat-option>
+                <mat-option value="Por Hora">Por hora</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngIf="updates.check">
+            <mat-slide-toggle
+              #matSlide
+              color="primary"
+              class="col-3"
+              [checked]="!!result.state"
+              (change)="updateIsActive($event.checked, result.id, matSlide)"
+            >
+              {{ result.state == 1 ? 'Activo' : 'Inactivo' }}
+            </mat-slide-toggle>
+          </ng-container>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

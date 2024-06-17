@@ -1,0 +1,767 @@
+<div class="card">
+  <div class="card-body">
+    <div class="card-title d-flex justify-content-between">
+      <div class="col-md-6 px-0">
+        <h4 class="text-primary">Tipos de activos fijos</h4>
+      </div>
+      <div class="col-md-6 px-0 text-end">
+        <div class="btn-group rounded w-sm-100">
+          <button
+            class="btn btn-primary btn-sm"
+            (click)="openConfirm(add, 'Nuevo tipo de activo fijo')"
+          >
+            <i class="fa fa-plus"></i>
+            Agregar<!--  (click)="ModalTipoActivo.show();" -->
+          </button>
+          <button class="btn btn-info btn-sm" (click)="openClose()">
+            <i class="fas fa-sliders-h"></i> Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="line" />
+    <mat-accordion multi>
+      <mat-expansion-panel class="mat-elevation-z0">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por nombre"
+              [(ngModel)]="Filtros.nombre"
+              (input)="ConsultaFiltrada()"
+              name="name"
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Categoría</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por categoría"
+              [(ngModel)]="Filtros.categoria"
+              (input)="ConsultaFiltrada()"
+              name="name"
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Vida útil</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por vida útil (Número de meses)"
+              [(ngModel)]="Filtros.vida_util"
+              (input)="ConsultaFiltrada()"
+              name="name"
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Depreciación</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Busca por porcentaje de depreciación"
+              [(ngModel)]="Filtros.depreciacion"
+              (input)="ConsultaFiltrada()"
+              name="name"
+              autocomplete="off"
+            />
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="rounded-top table-responsive">
+      <table
+        class="table table-bordered table-striped table-sm"
+        *ngIf="!Cargando && TiposActivosFijos.length > 0; else notData"
+      >
+        <thead class="bg-light">
+          <tr class="text-center text-uppercase">
+            <th class="align-middle">Tipo Activo</th>
+            <th class="align-middle">Categoría</th>
+            <th class="align-middle">Vida Util</th>
+            <th class="align-middle">% Depreciación</th>
+            <th class="align-middle">Cuenta Depreciación</th>
+            <!-- <th class="align-middle">Cuenta Depreciación PCGA</th> -->
+            <th class="align-middle">Cuenta Activo</th>
+            <!-- <th class="align-middle">Cuenta PCGA</th> -->
+            <!-- <th class="align-middle">Cuenta Credito PCGA</th> -->
+            <th class="align-middle">Cuenta Credito</th>
+            <th class="align-middle">
+              <i class="mdi mdi-chevron-down"></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let taf of TiposActivosFijos"
+            class="text-center"
+            [ngClass]="{
+              'text-danger fw-bold': taf.Estado == 'Inactivo'
+            }"
+          >
+            <td class="align-middle">{{ taf.Nombre_Tipo_Activo }}</td>
+            <td class="align-middle">{{ taf.Categoria }}</td>
+            <td class="align-middle">{{ taf.Vida_Util }} mes{{ taf.Vida_Util > 1 ? 'es' : '' }}</td>
+            <td class="align-middle">{{ taf.Porcentaje_Depreciacion_Anual }} %</td>
+            <td class="align-middle">{{ taf.Cuenta_Depreciacion_NIIF }}</td>
+            <!-- <td class="align-middle">{{ taf.Cuenta_Depreciacion_PCGA }}</td> -->
+            <td class="align-middle">{{ taf.Cuenta_Niif }}</td>
+            <!-- <td class="align-middle">{{ taf.Cuenta_Pcga }}</td> -->
+            <!-- <td class="align-middle">{{ taf.Cuenta_Credito_Pcga }}</td> -->
+            <td class="align-middle">{{ taf.Cuenta_Credito_Niif }}</td>
+            <td class="align-middle">
+              <div ngbDropdown container="body" class="dropdown-primary">
+                <button ngbDropdownToggle class="btn btn-primary btn-sm" type="button">
+                  <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div ngbDropdownMenu>
+                  <a
+                    class="dropdown-item text-info"
+                    href="javascript: void(0);"
+                    (click)="
+                      openConfirm(add, 'Editar tipo de activo fijo'); gettipoActivosFijos(taf)
+                    "
+                    ><!-- EditarTipoActivo(taf.Id_Tipo_Activo_Fijo); -->
+                    <i class="fas fa-edit"></i> Editar</a
+                  >
+                  <a
+                    *ngIf="taf.Estado == 'activo'"
+                    class="dropdown-item text-danger"
+                    href="javascript: void(0);"
+                    (click)="activateOrInactivate(taf, 'Inactivo')"
+                  >
+                    <i class="fas fa-trash-alt"></i> Anular</a
+                  >
+                  <a
+                    *ngIf="taf.Estado == 'Inactivo'"
+                    class="dropdown-item text-success"
+                    href="javascript: void(0);"
+                    (click)="activateOrInactivate(taf, 'Activo')"
+                  >
+                    <i class="fa fa-check"></i> Activar</a
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ngb-pagination
+      size="sm"
+      *ngIf="TiposActivosFijos.length > 0"
+      class="d-flex justify-content-center pagination-rounded pagination-sm"
+      [collectionSize]="TotalItems"
+      [pageSize]="pageSize"
+      [(page)]="page"
+      (pageChange)="ConsultaFiltrada(true, $event)"
+      aria-label="Default pagination"
+      [maxSize]="maxSize"
+      rotate="true"
+      ellipses="false"
+      boundaryLinks="true"
+    >
+    </ngb-pagination>
+  </div>
+</div>
+
+<ng-template #add let-modal>
+  <div class="modal-header">
+    <h4 class="text-primary modal-title">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            placeholder="Ingresa el nombre"
+            formControlName="Nombre_Tipo_Activo"
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Categoría</mat-label>
+          <mat-select formControlName="Categoria">
+            <mat-option value="Tangible">Tangible</mat-option>
+            <mat-option value="Intangible">Intangible</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- <mat-form-field class="col" appearance="outline">
+            <mat-label>Vida útil PCGA (meses)</mat-label>
+            <input
+              matInput
+              type="number"
+              placeholder="Ingresa la vida útil"
+              formControlName="Vida_Util_PCGA"
+              required
+              (change)="calculateDepreciationPercentage('pcga')"
+              autocomplete="off"
+            />
+          </mat-form-field> -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Vida útil (meses)</mat-label>
+          <input
+            matInput
+            type="number"
+            placeholder="Ingresa la vida útil"
+            formControlName="Vida_Util"
+            required
+            (input)="calcularPorcentajeDepreciacion()"
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <!-- <mat-form-field class="col" appearance="outline">
+            <mat-label>Porcentaje de depreciación PCGA mensual</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="Porcentaje_Depreciacion_Anual_PCGA"
+              required
+              readonly
+              autocomplete="off"
+            />
+          </mat-form-field> -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Porcentaje de depreciación anual</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="Porcentaje_Depreciacion_Anual"
+            required
+            readonly
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <!-- <mat-form-field class="col" appearance="outline">
+              <mat-label>Cuenta activo PCGA</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="Id_Plan_Cuenta_PCGA"
+                required
+                [ngbTypeahead]="search"
+                [inputFormatter]="inputFormatBandListValue"
+                [resultFormatter]="resultFormatBandListValue"
+                [editable]="false"
+                autocomplete="off"
+              />
+            </mat-form-field> -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Cuenta activo</mat-label>
+          <input
+            matInput
+            type="text"
+            required
+            [(value)]="CuentaNiif"
+            [ngbTypeahead]="search_cuenta_niif"
+            [resultTemplate]="rt2"
+            [inputFormatter]="formatter2"
+            [resultFormatter]="formatter2"
+            [class.is-invalid]="busquedaCuentaFallida.planCuenta"
+            (focus)="selCampoEnfocado('planCuenta')"
+            (selectItem)="AsignarCuenta($event, 'Id_Plan_Cuenta')"
+          />
+          <!-- value="{{tipoActivosFijos.Cuenta_Niif}}" -->
+          <mat-hint *ngIf="buscandoCuenta.planCuenta">Buscando...</mat-hint>
+          <div *ngIf="busquedaCuentaFallida.planCuenta">
+            Lo lamentamos, las opciones no pudieron ser cargadas.
+          </div>
+        </mat-form-field>
+        <!-- <mat-form-field class="col" appearance="outline">
+              <mat-label>Cuenta débito depreciación PCGA</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="Id_Plan_Cuenta_Debito_Depreciacion_PCGA"
+                required
+                [ngbTypeahead]="search"
+                [inputFormatter]="inputFormatBandListValue"
+                [resultFormatter]="resultFormatBandListValue"
+                [editable]="false"
+                autocomplete="off"
+              />
+            </mat-form-field> -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Cuenta débito depreciación</mat-label>
+          <input
+            matInput
+            type="text"
+            required
+            autocomplete="off"
+            [(value)]="CuentaDepreciacionNiif"
+            [ngbTypeahead]="search_cuenta_niif"
+            [resultTemplate]="rt2"
+            [inputFormatter]="formatter2"
+            [resultFormatter]="formatter2"
+            [class.is-invalid]="busquedaCuentaFallida.planCuentaDepreciacion"
+            (focus)="selCampoEnfocado('planCuentaDepreciacion')"
+            (selectItem)="AsignarCuenta($event, 'Id_Plan_Cuenta_Depreciacion')"
+          />
+          <mat-hint *ngIf="buscandoCuenta.planCuentaDepreciacion">Buscando...</mat-hint>
+          <div *ngIf="busquedaCuentaFallida.planCuentaDepreciacion">
+            Lo lamentamos, las opciones no pudieron ser cargadas.
+          </div>
+        </mat-form-field>
+        <!-- <mat-form-field class="col" appearance="outline">
+              <mat-label>Cuenta crédito depreciación PCGA</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="Id_Plan_Cuenta_Credito_Depreciacion_PCGA"
+                required
+                [ngbTypeahead]="search"
+                [inputFormatter]="inputFormatBandListValue"
+                [resultFormatter]="resultFormatBandListValue"
+                [editable]="false"
+                autocomplete="off"
+              />
+            </mat-form-field> -->
+        <mat-form-field class="col" appearance="outline">
+          <mat-label>Cuenta crédito depreciación</mat-label>
+          <input
+            matInput
+            type="text"
+            required
+            autocomplete="off"
+            [(value)]="CuentaCreditoDepreciacionNiif"
+            [ngbTypeahead]="search_cuenta_niif"
+            [resultTemplate]="rt2"
+            [inputFormatter]="formatter2"
+            [resultFormatter]="formatter2"
+            typeahead-append-to-body="true"
+            [class.is-invalid]="busquedaCuentaFallida.planCuentaDepreciacionCredito"
+            (focus)="selCampoEnfocado('planCuentaDepreciacionCredito')"
+            (selectItem)="AsignarCuenta($event, 'Id_Plan_Cuenta_Credito_Depreciacion')"
+          />
+          <mat-hint *ngIf="buscandoCuenta.planCuentaDepreciacionCredito">Buscando...</mat-hint>
+          <div *ngIf="busquedaCuentaFallida.planCuentaDepreciacionCredito">
+            Lo lamentamos, las opciones no pudieron ser cargadas.
+          </div>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss('Cross click')">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      (click)="GuardarTipoActivo()"
+      [disabled]="!form.valid"
+      class="btn btn-primary"
+    >
+      Guardar
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #notData>
+  <app-not-data [loading]="Cargando"></app-not-data>
+</ng-template>
+
+<ng-template #rt1 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo }} - {{ r.Nombre }} </span>
+</ng-template>
+<ng-template #rt2 let-r="result" let-t="term">
+  <span class="f-9">{{ r.Codigo_Niif }} - {{ r.Nombre_Niif }}</span>
+</ng-template>
+
+<!-- <div class="card">
+    <div class="card-body">
+      <div class="row card-title d-flex justify-content-between">
+        <div class="col-md-6 px-0">
+          <h4 class="text-primary">Tipos de activos fijos</h4>
+        </div>
+        <div class="col-md-6 px-0 text-end">
+          <div class="btn-group rounded w-sm-100">
+            <button
+              class="btn btn-primary btn-sm"
+              (click)="openConfirm(add, 'Nuevo tipo de activo fijo')"
+            >
+              <i class="fa fa-plus"></i> Agregar
+            </button>
+            <button class="btn btn-info btn-sm" (click)="openClose()">
+              <i class="fas fa-sliders-h"></i> Filtros
+            </button>
+          </div>
+        </div>
+      </div>
+      <hr class="line" />
+      <mat-accordion multi>
+        <mat-expansion-panel class="mat-elevation-z0">
+          <div class="row">
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input
+                type="text"
+                matInput
+                [(ngModel)]="filtros.name"
+                (input)="getFixedAssetTypes()"
+                name="name"
+                autocomplete="off"
+                placeholder="Busca por nombre"
+              />
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Categorías</mat-label>
+              <mat-select
+                [(ngModel)]="filtros.category"
+                (selectionChange)="getFixedAssetTypes()"
+              >
+                <mat-option value="Tangible">Tangible</mat-option>
+                <mat-option value="Intangible">Intangible</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Vida útil</mat-label>
+              <input
+                type="text"
+                matInput
+                [(ngModel)]="filtros.useful_life_niif"
+                (input)="getFixedAssetTypes()"
+                name="useful_life_niif"
+                autocomplete="off"
+                placeholder="Busca por vida útil"
+              />
+            </mat-form-field>
+            <mat-form-field class="col" appearance="outline">
+              <mat-label>Depreciación</mat-label>
+              <input
+                type="text"
+                matInput
+                [(ngModel)]="filtros.depreciation"
+                (input)="getFixedAssetTypes()"
+                name="depreciation"
+                autocomplete="off"
+                placeholder="Busca por depreciación"
+              />
+            </mat-form-field>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div class="rounded-top table-responsive">
+        <table
+          class="table table-bordered table-striped table-sm"
+          *ngIf="!loading && fixedAssets.length > 0; else notData"
+        >
+          <thead class="bg-light">
+            <tr class="text-center text-uppercase">
+              <th class="align-middle">Tipo Activo</th>
+              <th class="align-middle">Categoría</th>
+              <th class="align-middle">Vida Util</th>
+              <th class="align-middle">% Depreciación</th>
+              <th class="align-middle">Cuenta Depreciación</th>
+              <th class="align-middle">Cuenta activo</th>
+
+              <th class="align-middle">Cuenta Credito</th>
+              <th class="align-middle col-1"><i class="mdi mdi-chevron-down"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let item of fixedAssets"
+              class="text-center"
+              [ngClass]="{
+                'text-danger fw-bold': item.state == 'Inactivo'
+              }"
+            >
+              <td class="align-middle">{{ item.name }}</td>
+              <td class="align-middle">{{ item.category }}</td>
+              <td class="align-middle">{{ item.useful_life_niif }} mes(es)</td>
+              <td class="align-middle">
+                {{ item.annual_depreciation_percentage_niif }} %
+              </td>
+              <td class="align-middle">
+                {{ item.niif_account_plan_debit_depreciation }}
+              </td>
+              <td class="align-middle">{{ item.niif_account_plan }}</td>
+
+              <td class="align-middle">
+                {{ item.niif_account_plan_credit_depreciation }}
+              </td>
+              <td class="align-middle">
+                <div ngbDropdown container="body" class="dropdown-primary">
+                  <button
+                    ngbDropdownToggle
+                    class="btn btn-primary btn-sm "
+                    type="button"
+                  >
+                    <i class="mdi mdi-chevron-down"></i>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a
+                      class="dropdown-item  text-info "
+                      href="javascript: void(0);"
+                      (click)="
+                        getFixedAsset(item);
+                        openConfirm(add, 'Editar tipo de activo fijo')
+                      "
+                    >
+                      <i class="fas fa-edit"></i> Editar</a
+                    >
+                    <a
+                      *ngIf="item.state == 'activo'"
+                      href="javascript: void(0);"
+                      class="dropdown-item  text-danger "
+                      (click)="activateOrInactivate(item, 'Inactivo')"
+                    >
+                      <i class="fas fa-trash-alt"></i> Anular</a
+                    >
+                    <a
+                      *ngIf="item.state == 'Inactivo'"
+                      href="javascript: void(0);"
+                      class="dropdown-item  text-success "
+                      (click)="activateOrInactivate(item, 'Activo')"
+                    >
+                      <i class="fa fa-check"></i> Activar</a
+                    >
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ngb-pagination size="sm"
+        class="d-flex justify-content-center pagination-rounded pagination-sm"
+        [collectionSize]="pagination.collectionSize"
+        [pageSize]="pagination.pageSize"
+        [(page)]="pagination.page"
+        (pageChange)="getFixedAssetTypes($event)"
+        aria-label="Default pagination"
+        maxSize="5"
+        rotate="true"
+        ellipses="false"
+        boundaryLinks="true"
+      >
+      </ngb-pagination>
+    </div>
+  </div>
+
+  <ng-template #add let-modal>
+    <div class="modal-header">
+      <h4 class="text-primary modal-title">{{ title }}</h4>
+      <button
+        type="button"
+        class="btn-close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="modal.dismiss('Cross click')"
+      >
+
+      </button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="form">
+        <div class="row">
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="Ingresa el nombre"
+              formControlName="name"
+              required
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Categoría</mat-label>
+            <mat-select formControlName="category">
+              <mat-option value="Tangible">Tangible</mat-option>
+              <mat-option value="Intangible">Intangible</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Vida útil (meses)</mat-label>
+            <input
+              matInput
+              type="number"
+              placeholder="Ingresa la vida útil"
+              formControlName="useful_life_niif"
+              required
+              (change)="calculateDepreciationPercentage('niif')"
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Porcentaje de depreciación anual</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="annual_depreciation_percentage_niif"
+              required
+              readonly
+              autocomplete="off"
+            />
+          </mat-form-field>
+
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Cuenta activo</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="niif_account_plan_id"
+              required
+              [ngbTypeahead]="searchNiif"
+              [inputFormatter]="inputFormatListValueNiif"
+              [resultFormatter]="resultFormatListValueNiif"
+              [editable]="false"
+              autocomplete="off"
+            />
+          </mat-form-field>
+
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Cuenta débito depreciación</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="niif_account_plan_debit_depreciation_id"
+              required
+              [ngbTypeahead]="searchNiif"
+              [inputFormatter]="inputFormatListValueNiif"
+              [resultFormatter]="resultFormatListValueNiif"
+              [editable]="false"
+              autocomplete="off"
+            />
+          </mat-form-field>
+
+          <mat-form-field class="col" appearance="outline">
+            <mat-label>Cuenta crédito depreciación</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="niif_account_plan_credit_depreciation_id"
+              required
+              [ngbTypeahead]="searchNiif"
+              [inputFormatter]="inputFormatListValueNiif"
+              [resultFormatter]="resultFormatListValueNiif"
+              [editable]="false"
+              autocomplete="off"
+            />
+          </mat-form-field>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="modal.dismiss('Cross click')"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="save()"
+        [disabled]="!form.valid"
+        class="btn btn-primary"
+      >
+        Guardar
+      </button>
+    </div>
+  </ng-template>
+
+  <ng-template #notData>
+    <app-not-data [loading]="loading"></app-not-data>
+  </ng-template>
+   -->
+
+<!-- <th class="align-middle">Cuenta Depreciación PCGA</th> -->
+<!-- <th class="align-middle">Cuenta PCGA</th> -->
+<!-- <th class="align-middle">Cuenta Credito PCGA</th> -->
+
+<!-- <mat-form-field class="col" appearance="outline">
+            <mat-label>Cuenta crédito depreciación PCGA</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="pcga_account_plan_credit_depreciation_id"
+              required
+              [ngbTypeahead]="search"
+              [inputFormatter]="inputFormatBandListValue"
+              [resultFormatter]="resultFormatBandListValue"
+              [editable]="false"
+              autocomplete="off"
+            />
+          </mat-form-field> -->
+
+<!-- <mat-form-field class="col" appearance="outline">
+            <mat-label>Cuenta débito depreciación PCGA</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="pcga_account_plan_debit_depreciation_id"
+              required
+              [ngbTypeahead]="search"
+              [inputFormatter]="inputFormatBandListValue"
+              [resultFormatter]="resultFormatBandListValue"
+              [editable]="false"
+              autocomplete="off"
+            />
+          </mat-form-field> -->
+
+<!-- <mat-form-field class="col" appearance="outline">
+            <mat-label>Cuenta activo PCGA</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="pcga_account_plan_id"
+              required
+              [ngbTypeahead]="search"
+              [inputFormatter]="inputFormatBandListValue"
+              [resultFormatter]="resultFormatBandListValue"
+              [editable]="false"
+              autocomplete="off"
+            />
+          </mat-form-field> -->
+
+<!-- <mat-form-field class="col" appearance="outline">
+            <mat-label>Porcentaje de depreciación PCGA mensual</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="annual_depreciation_percentage_pcga"
+              required
+              readonly
+              autocomplete="off"
+            />
+          </mat-form-field> -->
+
+<!-- <mat-form-field class="col" appearance="outline">
+            <mat-label>Vida útil PCGA (meses)</mat-label>
+            <input
+              matInput
+              type="number"
+              placeholder="Ingresa la vida útil"
+              formControlName="useful_life_pcga"
+              required
+              (change)="calculateDepreciationPercentage('pcga')"
+              autocomplete="off"
+            />
+          </mat-form-field> -->
+
+<!-- <td class="align-middle">
+                {{ item.pcga_account_plan_debit_depreciation }}
+              </td> -->
+<!-- <td class="align-middle">{{ item.pcga_account_plan }}</td> -->
+<!-- <td class="align-middle">
+                {{ item.pcga_account_plan_credit_depreciation }}
+              </td> -->

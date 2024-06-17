@@ -1,0 +1,213 @@
+<article class="card">
+  <div class="card-body">
+    <app-cabecera [datosCabecera]="datosCabecera"></app-cabecera>
+    <hr class="line" />
+    <p class="m-t-20"><strong>Bodega de Origen: </strong> {{ Datos.Nombre_Bodega }}</p>
+    <div class="form-group">
+      <label>Observaciones</label>
+      <textarea
+        [(ngModel)]="Observaciones"
+        name="Observaciones"
+        placeholder="Digite las Observaciones de la Remisión"
+        type="text"
+        rows="3"
+        class="form-control"
+        required
+      ></textarea>
+      <input
+        hidden
+        type="text"
+        class="form-control form-control-sm"
+        name="Id_Remision"
+        ngModel="{{ Id_Remision }}"
+      />
+      <input
+        hidden
+        type="text"
+        class="form-control form-control-sm"
+        name="Codigo"
+        ngModel="{{ Codigo_Rem }}"
+      />
+      <input
+        hidden
+        type="text"
+        class="form-control form-control-sm"
+        name="Identificacion_Funcionario"
+        ngModel="{{ Identificacion_Funcionario }}"
+      />
+      <input
+        hidden
+        type="text"
+        class="form-control form-control-sm"
+        name="Id_Punto_Dispensacion"
+        ngModel="{{ punto_activo }}"
+      />
+      <input
+        hidden
+        type="text"
+        class="form-control form-control-sm"
+        name="NoConforme"
+        ngModel="{{ NoConforme }}"
+      />
+    </div>
+    @if (Datos.Entrega_Pendientes == 'No') {
+      <table class="table tabla table-bordered table-striped">
+        <thead>
+          <tr>
+            <th style="width: 25%">Nombre Producto</th>
+            <th>Presentacion</th>
+            <th style="width: 15%">Laboratorios</th>
+            <th>Invima</th>
+            <th>Cantidad</th>
+            <th>Lote</th>
+            <th>Fecha Venc.</th>
+            <th style="width: 10%">Cant. Recibida</th>
+            <th style="width: 5%">Cumple</th>
+            <th style="width: 5%">Revisado</th>
+            <th style="width: 5%" [ngStyle]="{ display: Tipo_Bodega }">Temperatura</th>
+            <th style="width: 110px" [ngStyle]="{ display: display_No_Conforme }">No Conforme</th>
+            <th [ngStyle]="{ display: display_No_Conforme }">Observaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let item of Lista_Productos; let i = index"
+            id="fila{{ i }}"
+            [ngClass]="{ 'bg-alert': item.Seleccionado == 1 }"
+          >
+            <td>
+              <strong>{{ item.Nombre_Comercial }}</strong>
+              <p class="text-muted" style="font-size: 9px">{{ item.Nombre_Producto }}</p>
+            </td>
+            <td>
+              <span class="mytooltip tooltip-effect-2"
+                ><span class="tooltip-item2"> Embalaje </span
+                ><span class="tooltip-content4 clearfix"
+                  ><span class="tooltip-text2">{{ item.Embalaje }}</span></span
+                >
+              </span>
+            </td>
+            <td>
+              <p class="text-muted" style="font-size: 9px">{{ item.Laboratorios }}</p>
+            </td>
+            <td>{{ item.Invima }}</td>
+            <td>{{ item.Cantidad }}</td>
+            <td>
+              {{ item.Lote }}
+            </td>
+            <td>
+              {{ item.Fecha_Vencimiento }}
+            </td>
+            <td>
+              <input
+                (change)="ValidarCantidad(i)"
+                class="form-control form-control-sm"
+                type="number"
+                id="Cantidad{{ i }}"
+                [(ngModel)]="item.Cantidad_Ingresada"
+                name="Cantidad_Ingresada{{ i }} "
+                required
+              />
+            </td>
+            <td>
+              <select
+                name="Cumple{{ i }}"
+                id="Cumple{{ i }}"
+                [(ngModel)]="item.Cumple"
+                class="form-control form-control-sm"
+              >
+                <option value="Si">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </td>
+            <td>
+              <select
+                name="Revisado{{ i }}"
+                id="Revisado{{ i }}"
+                [(ngModel)]="item.Revisado"
+                class="form-control form-control-sm"
+              >
+                <option value="Si">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </td>
+            <td [ngStyle]="{ display: Tipo_Bodega }">
+              <input
+                id="Temperatura{{ i }}"
+                name="Temperatura{{ i }}"
+                type="text"
+                [(ngModel)]="item.Temperatura"
+                class="form-control form-control-sm"
+              />
+            </td>
+            <td [ngStyle]="{ display: display_No_Conforme }">
+              <select
+                style="display: none"
+                class="form-control form-control-sm"
+                id="Id_Causal_No_Conforme{{ i }}"
+                name="Id_Causal_No_Conforme{{ i }}"
+                [(ngModel)]="item.Id_Causal_No_Conforme"
+              >
+                <option
+                  *ngFor="let tratamiento of Tratamientos; let i = index"
+                  [value]="tratamiento.Id_Causal_No_Conforme"
+                >
+                  {{ tratamiento.Nombre }}
+                </option>
+              </select>
+            </td>
+            <td [ngStyle]="{ display: display_No_Conforme }">
+              <input
+                style="display: none"
+                id="Observaciones{{ i }}"
+                name="Observaciones{{ i }}"
+                type="text"
+                [(ngModel)]="item.Observaciones"
+                class="form-control form-control-sm"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="row">
+        <div class="col-md-8">
+          <p>
+            <strong>Nota:</strong> Las filas que aparezca en color naranja van a generar un no
+            conforme porque la cantidad no coincide con la enviada.
+          </p>
+        </div>
+        <div class="col-md-2">
+          <button
+            type="button"
+            (click)="VerPantallaLista()"
+            class="btn btn-primary btn-sm btn-block"
+          >
+            Volver
+          </button>
+        </div>
+        <div class="col-md-2">
+          <!-- [swal]="confirmacionGuardar" -->
+          <button
+            type="button"
+            [disabled]="!FormActa.valid"
+            class="btn btn-primary btn-sm btn-block"
+          >
+            Generar Acta
+          </button>
+        </div>
+      </div>
+    } @else {
+      <br />
+      <app-productosactarecepcion
+        [Productos]="Lista_Productos"
+        [Temperatura]="Temperatura"
+        [Observaciones]="Observaciones"
+        [Productos_Pendientes]="Productos_Pendientes"
+        [Id_Remision]="Id_Remision"
+      ></app-productosactarecepcion>
+    }
+  </div>
+</article>
+<!-- <swal #confirmacionSwal title="" text="" type=""></swal> -->
+<!-- <swal #confirmacionGuardar [options]="alertOption"></swal> -->
+<!-- <swal #confirmacionSalir title="" html="" type="" (confirm)="VerPantallaLista()"></swal> -->
